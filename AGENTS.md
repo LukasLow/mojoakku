@@ -16,6 +16,11 @@ naming and docs are designed to be predictable, consistent and easy to read.
 ```
 repo root/
   AGENTS.md
+  README.md
+  TODO.md
+  LICENSE
+  Taskfile.yml        <-- task commands, reads the _todos/ catalogue
+  _todos/             <-- flat catalogue: one YAML file per planned library
   .agents/workflows/*.md
   mojoakku/
     socket/    <-- SIBLING library
