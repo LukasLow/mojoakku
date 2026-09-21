@@ -18,12 +18,12 @@ Determine and evidence the root cause of a defect WITHOUT changing code, and del
 - `manager`: opens the task, enforces the read-only scope, routes findings. Manager starts NO Manager.
 - `debug`: drives the root-cause analysis and owns the final report.
 - `explore`: maps call paths and relevant file locations.
-- `shell`: runs diagnostic build/test/profiling commands (via `smd`) and returns raw evidence.
+- `coder`: runs diagnostic build/test/profiling commands (via `smd`) and returns raw evidence.
 - `reviewer`: verifies that conclusions follow from the evidence.
 
 ## Steps
 1. `manager` opens the task, states the investigated question, and confirms the code-freeze/read-only scope.
-2. `shell` reproduces the defect and captures raw output; every diagnostic artifact is written to a file, not held in chat.
+2. `coder` reproduces the defect and captures raw output; every diagnostic artifact is written to a file, not held in chat.
 3. `explore` maps the relevant call paths and data flow with `file:line` references.
 4. `debug` forms explicit hypotheses and eliminates them one by one against the captured evidence.
 5. `debug` isolates the root cause and states its confidence, the affected scope, and the blast radius.

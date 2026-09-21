@@ -15,9 +15,8 @@ Create the compile-ready skeleton for `mojoakku/<lib>/` from the approved docs, 
 - The Manager starts no Manager subagent.
 
 ## Roles
-- **Manager**: owns the phase, starts ONE `coder` to create the skeleton, verifies the compile gate via `shell`.
-- **coder**: creates the files and stub bodies; writes no real logic.
-- **shell**: runs the Mojo compile check for the scaffold.
+- **Manager**: owns the phase, starts ONE `coder` to create the skeleton, delegates the compile gate to `coder`.
+- **coder**: creates the files and stub bodies; runs the Mojo compile check for the scaffold; writes no real logic.
 - **reviewer**: not started here; invoked by `NewLibPhase8ScaffoldReview.md`.
 
 ## Steps
@@ -35,7 +34,7 @@ Create the compile-ready skeleton for `mojoakku/<lib>/` from the approved docs, 
 5. Ensure `API.mojo` is syntactically valid and compiles: use the documented types and signatures, import what is strictly needed, and keep the file free of implementation details.
 6. In `__init__.mojo`, re-export the public API so `from <lib> import ...` works, and nothing more.
 7. Keep `_internal/` free of implementation. If the directory cannot be tracked empty, add only a minimal placeholder file without logic.
-8. Manager runs the compile gate: delegate to `shell` to compile/check `mojoakku/<lib>/` (e.g. `mojo build` or `mojo check` on `API.mojo`). The scaffold is only complete when it compiles with the stubs.
+8. Manager runs the compile gate: delegate to `coder` to compile/check `mojoakku/<lib>/` (e.g. `mojo build` or `mojo check` on `API.mojo`). The scaffold is only complete when it compiles with the stubs.
 9. If compilation fails, coder fixes the straightforward syntax/signature errors and Step 8 is repeated. Unclear failures are routed by the Manager, not delegated as guesses.
 10. Manager verifies that `_tests/` exists and has no `__init__.mojo`.
 11. Manager logs the scaffold result and the compile evidence via `agentlog`.

@@ -17,18 +17,17 @@ Measure before and after with benchmarks, isolate the bottleneck, and never opti
 ## Roles
 - `manager`: opens the task, states the target metric, routes the work. Manager starts NO Manager.
 - `debug`: isolates the bottleneck with profiling evidence.
-- `shell`: runs the baseline and post-change benchmarks (via `smd`) and returns raw output.
-- `coder`: applies the optimization only after the bottleneck is proven.
+- `coder`: runs the baseline and post-change benchmarks (via `smd`), returns raw output, and applies the optimization only after the bottleneck is proven.
 - `reviewer`: owns the review gate.
 - `explore`: maps hot call paths.
 
 ## Steps
 1. `manager` opens the task and records the target metric and acceptable workload.
-2. `shell` establishes the baseline: run the benchmark at least three times and record median and spread.
+2. `coder` establishes the baseline: run the benchmark at least three times and record median and spread.
 3. `debug` profiles the workload to isolate the bottleneck, producing evidence per hot path.
 4. `explore` maps the hot call paths with `file:line` references to confirm the bottleneck location.
 5. `coder` applies the smallest change that addresses the proven bottleneck; only measured bottlenecks are optimized.
-6. `shell` re-runs the identical benchmark under identical conditions and records median and spread.
+6. `coder` re-runs the identical benchmark under identical conditions and records median and spread.
 7. `debug` compares before/after, confirms the improvement is real and not measurement noise, and checks for regressions elsewhere.
 8. `coder` re-runs the full `_tests/` suite to prove behavior is unchanged.
 9. `reviewer` applies the review gate.

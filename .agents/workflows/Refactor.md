@@ -17,19 +17,18 @@ Restructure code without changing behavior, keeping the test suite green before 
 
 ## Roles
 - `manager`: opens the task, approves scope, routes to agents. Manager starts NO Manager.
-- `coder`: performs the restructuring.
-- `shell`: runs the baseline and post-refactor test/benchmark commands (via `smd`) and returns evidence.
+- `coder`: performs the restructuring and runs the baseline and post-refactor test/benchmark commands (via `smd`) as evidence.
 - `reviewer`: owns the review gate.
 - `docs`: updates `<LIB>_DOCS.md` only if internal structure references changed (public docs must already match).
 - `idea-reviewer`: consulted when the refactoring touches an abstraction boundary.
 
 ## Steps
-1. `manager` opens the task, bounds the scope, and delegates the baseline to `shell`.
-2. `shell` records the green baseline: full test suite output and, when performance matters, a benchmark baseline.
+1. `manager` opens the task, bounds the scope, and delegates the baseline to `coder`.
+2. `coder` records the green baseline: full test suite output and, when performance matters, a benchmark baseline.
 3. `coder` performs the restructuring in small steps; each step keeps the suite green.
-4. `shell` runs the full `_tests/` suite after every meaningful step and returns the result.
+4. `coder` runs the full `_tests/` suite after every meaningful step and returns the result.
 5. `idea-reviewer` verifies that no abstraction boundary, public API or documented behavior was silently altered.
-6. `shell` re-runs the benchmark and compares against the baseline; a performance regression must be justified or fixed.
+6. `coder` re-runs the benchmark and compares against the baseline; a performance regression must be justified or fixed.
 7. `docs` updates `<LIB>_DOCS.md` only for internal references; public docs are unchanged.
 8. `reviewer` applies the review gate.
 

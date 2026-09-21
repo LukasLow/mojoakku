@@ -17,11 +17,10 @@ Prepare and cut a release: decide the version, write the changelog, verify docs 
 - The release scope is frozen before the version decision.
 
 ## Roles
-- `manager`: opens the release task, freezes scope, approves version and tag. Manager starts NO Manager.
+- `manager`: opens the release task, freezes scope, approves the version and tag, and creates and pushes the tag (via direct host git). Manager starts NO Manager.
 - `docs`: writes the changelog and performs the docs check.
-- `shell`: runs the full test suite and provides the tag command (via `smd`).
+- `coder`: runs the full test suite (via `smd`) and fixes any blocker found during the release check.
 - `reviewer`: owns the release gate.
-- `coder`: fixes any blocker found during the release check.
 - `compliance`: consulted for legal/data-protection notes in the release.
 
 ## Steps
@@ -29,9 +28,9 @@ Prepare and cut a release: decide the version, write the changelog, verify docs 
 2. `manager` decides the version per the project's versioning rule (breaking change => major, new user-visible behavior => minor, fix only => patch) and records the rationale.
 3. `docs` writes the changelog: one entry per user-visible change, grouped into features, fixes, performance, deprecations and breaking changes, each referencing the affected `mojoakku/<lib>/`.
 4. `docs` performs the docs check: `<LIB>_DOCS.md`, API and README references agree with the shipped code; broken or stale links are fixed.
-5. `shell` runs the full test suite for every included library and attaches the output as release evidence.
+5. `coder` runs the full test suite for every included library and attaches the output as release evidence.
 6. `reviewer` applies the release gate against scope, version, changelog completeness, docs consistency and test evidence.
-7. `manager` authorizes the tag; `shell` creates and pushes the tag via `smd`.
+7. `manager` authorizes the tag, then creates and pushes it via direct host git.
 8. `manager` records the release in the task log with the tag name and included libraries.
 
 ## Artifacts / Outputs
@@ -39,7 +38,7 @@ Prepare and cut a release: decide the version, write the changelog, verify docs 
 - Version decision with rationale.
 - Full test evidence for every included library.
 - Docs-check result (consistent / fixed items).
-- Release tag created via `shell`.
+- Release tag created by `manager` (via direct host git).
 - Task-log entry with tag name, version and scope.
 
 ## Review Gate

@@ -19,8 +19,7 @@ Review a sibling library or change for security weaknesses in input validation, 
 - `manager`: opens the task, bounds the scope, routes findings. Manager starts NO Manager.
 - `reviewer`: owns the security review and the gate.
 - `explore`: maps input entry points, trust boundaries and `unsafe` sites with `file:line`.
-- `coder`: applies hardening fixes.
-- `shell`: runs sanitizers/tests (via `smd`) and returns evidence.
+- `coder`: applies hardening fixes and runs sanitizers/tests (via `smd`) as evidence.
 - `compliance`: consulted for data protection and user-data implications.
 
 ## Steps
@@ -31,7 +30,7 @@ Review a sibling library or change for security weaknesses in input validation, 
 5. `reviewer` checks transport security when in scope: TLS verification, certificate handling, downgrade paths, and plaintext exposure of sensitive data.
 6. `reviewer` checks secret handling: no hardcoded credentials, no secrets in logs, errors or test fixtures, secure default configuration.
 7. `reviewer` checks the unsafe/interop boundary: each `unsafe` block has a stated safety invariant, and FFI input is validated before crossing.
-8. `coder` applies required hardening fixes with tests proving each fix; `shell` runs the suite and any sanitizers.
+8. `coder` applies required hardening fixes with tests proving each fix, then runs the suite and any sanitizers.
 9. `reviewer` re-checks the fixes and applies the review gate.
 
 ## Artifacts / Outputs

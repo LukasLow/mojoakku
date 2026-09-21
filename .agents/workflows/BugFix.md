@@ -17,19 +17,18 @@ Restore correct behavior for a confirmed defect through reproduce (failing test)
 
 ## Roles
 - `manager`: opens the task, assigns scope, routes to agents, records status. Manager starts NO Manager.
-- `coder`: writes the failing test and applies the fix.
+- `coder`: writes the failing test, applies the fix, and runs build and test commands (via `smd`) as evidence.
 - `debug`: root-cause analysis when the cause is not evident from the reproduction.
-- `shell`: runs build and test commands (via `smd`) and returns evidence.
 - `reviewer`: owns the review gate.
 - `docs`: updates `<LIB>_DOCS.md` when observable behavior or API documentation changes.
 
 ## Steps
 1. `manager` opens the task, captures the report, names the affected `mojoakku/<lib>/`, and delegates reproduction to `coder`.
 2. `coder` writes one failing test in `mojoakku/<lib>/_tests/` that encodes the expected behavior (not the buggy behavior).
-3. `shell` runs that test and returns evidence that it fails for the reported reason; if it already passes, the report is not a defect and investigation moves to `BugInvestigation`.
+3. `coder` runs that test and returns evidence that it fails for the reported reason; if it already passes, the report is not a defect and investigation moves to `BugInvestigation`.
 4. `coder` determines the root cause. If the cause is not evident, `manager` routes to `debug` for root-cause analysis (evidence-only, per `BugInvestigation`).
 5. `coder` fixes the minimal root cause in `API.mojo` or `_internal/`; no unrelated refactoring, no API shape change.
-6. `shell` runs the full `_tests/` suite of the affected library plus the tests of sibling libraries that depend on it; all must be green and the new test must pass.
+6. `coder` runs the full `_tests/` suite of the affected library plus the tests of sibling libraries that depend on it; all must be green and the new test must pass.
 7. `docs` updates `<LIB>_DOCS.md` only if the fix changes documented behavior or error surface.
 8. `reviewer` applies the review gate and returns `APPROVED` or `NEEDS_DEBUG` / `NEEDS_COMPLIANCE`.
 
