@@ -1,0 +1,5 @@
+id: soa
+name: Struct of Arrays
+status: todo
+depends_on: [memory,layout]
+summary: SIMD friendly data layout.

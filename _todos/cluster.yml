@@ -1,0 +1,5 @@
+id: cluster
+name: Cluster
+status: todo
+depends_on: [actor,socket]
+summary: Remote nodes and distribution.

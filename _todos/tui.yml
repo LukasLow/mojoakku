@@ -1,0 +1,5 @@
+id: tui
+name: TUI
+status: todo
+depends_on: [terminal,input]
+summary: Terminal user interfaces.

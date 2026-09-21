@@ -1,0 +1,5 @@
+id: cookie
+name: Cookie
+status: todo
+depends_on: [datetime,url]
+summary: HTTP cookie handling.

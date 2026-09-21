@@ -1,0 +1,5 @@
+id: chart
+name: Chart
+status: todo
+depends_on: [image,math]
+summary: Data charts and plots.

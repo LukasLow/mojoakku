@@ -1,0 +1,5 @@
+id: dispatch
+name: Dispatch
+status: todo
+depends_on: [trait]
+summary: Multiple dispatch.

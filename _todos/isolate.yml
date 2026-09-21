@@ -1,0 +1,5 @@
+id: isolate
+name: Isolate
+status: todo
+depends_on: [thread,channel]
+summary: Isolated concurrent workers.

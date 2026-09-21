@@ -1,0 +1,5 @@
+id: socket
+name: Socket
+status: todo
+depends_on: [io,ip]
+summary: Low level socket primitives.

@@ -1,0 +1,5 @@
+id: gpu
+name: GPU
+status: todo
+depends_on: [memory,simd]
+summary: GPU compute and device management.

@@ -1,0 +1,5 @@
+id: decimal
+name: Decimal
+status: todo
+depends_on: [math]
+summary: Decimal floating point numbers.

@@ -1,0 +1,5 @@
+id: color
+name: Color
+status: todo
+depends_on: [math]
+summary: Color models and conversion.

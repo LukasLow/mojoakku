@@ -1,0 +1,5 @@
+id: i18n
+name: Internationalization
+status: todo
+depends_on: [string,encoding]
+summary: Message catalogs and locale handling.

@@ -1,0 +1,5 @@
+id: limits
+name: Limits
+status: todo
+depends_on: []
+summary: Numeric type limits and properties.

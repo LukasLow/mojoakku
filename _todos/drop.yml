@@ -1,0 +1,5 @@
+id: drop
+name: Drop
+status: todo
+depends_on: [ownership]
+summary: Destructors and scope based cleanup.

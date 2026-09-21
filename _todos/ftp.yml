@@ -1,0 +1,5 @@
+id: ftp
+name: FTP
+status: todo
+depends_on: [tcp,fs]
+summary: File transfer protocol.

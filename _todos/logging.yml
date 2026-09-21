@@ -1,0 +1,5 @@
+id: logging
+name: Logging
+status: todo
+depends_on: [io,time]
+summary: Structured logging.

@@ -1,0 +1,5 @@
+id: trait
+name: Trait
+status: todo
+depends_on: []
+summary: Interfaces and dynamic dispatch.

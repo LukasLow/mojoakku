@@ -1,0 +1,5 @@
+id: search
+name: Search
+status: todo
+depends_on: [string,collections]
+summary: Full text search and indexing.

@@ -1,0 +1,5 @@
+id: tcp
+name: TCP
+status: todo
+depends_on: [socket]
+summary: Streaming TCP connections.

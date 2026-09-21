@@ -1,0 +1,5 @@
+id: build
+name: Build
+status: todo
+depends_on: [package,process]
+summary: Build graph and task running.

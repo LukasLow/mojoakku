@@ -1,0 +1,5 @@
+id: bit
+name: Bit
+status: todo
+depends_on: []
+summary: Bit twiddling and bitsets.

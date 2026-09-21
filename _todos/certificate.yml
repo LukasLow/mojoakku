@@ -1,0 +1,5 @@
+id: certificate
+name: Certificate
+status: todo
+depends_on: [publickey,digest,encoding]
+summary: X.509 certificate handling.

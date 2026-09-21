@@ -1,0 +1,5 @@
+id: weakref
+name: Weakref
+status: todo
+depends_on: [memory,ownership]
+summary: Weak reference tracking.

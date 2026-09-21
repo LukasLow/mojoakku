@@ -1,0 +1,5 @@
+id: supervisor
+name: Supervisor
+status: todo
+depends_on: [actor]
+summary: Restart and monitor child actors.

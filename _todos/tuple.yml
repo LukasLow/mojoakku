@@ -1,0 +1,5 @@
+id: tuple
+name: Tuple
+status: todo
+depends_on: []
+summary: Heterogeneous product types.

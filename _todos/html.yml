@@ -1,0 +1,5 @@
+id: html
+name: HTML
+status: todo
+depends_on: [string]
+summary: HTML escaping, parsing and rendering.

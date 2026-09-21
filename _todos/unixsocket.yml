@@ -1,0 +1,5 @@
+id: unixsocket
+name: Unix Socket
+status: todo
+depends_on: [socket,fs]
+summary: Unix domain sockets.

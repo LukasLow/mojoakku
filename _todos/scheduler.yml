@@ -1,0 +1,5 @@
+id: scheduler
+name: Scheduler
+status: todo
+depends_on: [time,thread]
+summary: Timers and periodic tasks.

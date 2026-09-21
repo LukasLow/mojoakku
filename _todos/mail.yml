@@ -1,0 +1,5 @@
+id: mail
+name: Mail
+status: todo
+depends_on: [mime,tls]
+summary: SMTP, IMAP and POP3.

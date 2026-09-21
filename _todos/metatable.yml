@@ -1,0 +1,5 @@
+id: metatable
+name: Metatable
+status: todo
+depends_on: [trait,collections]
+summary: Per value behavior hooks.

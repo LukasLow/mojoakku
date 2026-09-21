@@ -1,0 +1,5 @@
+id: file
+name: File
+status: todo
+depends_on: [path,io]
+summary: File reading and writing.

@@ -1,0 +1,5 @@
+id: orm
+name: ORM
+status: todo
+depends_on: [sql]
+summary: Object relational mapping.

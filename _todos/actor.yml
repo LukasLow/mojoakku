@@ -1,0 +1,5 @@
+id: actor
+name: Actor
+status: todo
+depends_on: [channel,scheduler]
+summary: Message driven concurrency units.

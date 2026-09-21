@@ -1,0 +1,5 @@
+id: lint
+name: Lint
+status: todo
+depends_on: [parser,ast]
+summary: Static analysis and linting.

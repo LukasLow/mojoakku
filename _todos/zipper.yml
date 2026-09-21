@@ -1,0 +1,5 @@
+id: zipper
+name: Zipper
+status: todo
+depends_on: [collections]
+summary: Functional cursor for navigating trees.

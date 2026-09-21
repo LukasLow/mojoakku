@@ -1,0 +1,5 @@
+id: uuid
+name: UUID
+status: todo
+depends_on: [random,string]
+summary: Unique identifier generation.

@@ -1,0 +1,5 @@
+id: richtext
+name: Rich Text
+status: todo
+depends_on: [string,html]
+summary: Text carrying attributes for each range.

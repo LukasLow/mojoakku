@@ -1,0 +1,5 @@
+id: unicode
+name: Unicode
+status: todo
+depends_on: [encoding]
+summary: Unicode properties, normalization and segmentation.

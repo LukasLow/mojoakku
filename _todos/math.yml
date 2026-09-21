@@ -1,0 +1,5 @@
+id: math
+name: Math
+status: todo
+depends_on: []
+summary: Arithmetic, trigonometry and constants.

@@ -1,0 +1,5 @@
+id: clipboard
+name: Clipboard
+status: todo
+depends_on: [io]
+summary: System clipboard access.

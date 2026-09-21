@@ -1,0 +1,5 @@
+id: observer
+name: Observer
+status: todo
+depends_on: [collections]
+summary: Publish and subscribe notification.

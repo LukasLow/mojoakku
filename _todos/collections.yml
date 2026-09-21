@@ -1,0 +1,5 @@
+id: collections
+name: Collections
+status: todo
+depends_on: []
+summary: Core containers: list, map, set and deque.

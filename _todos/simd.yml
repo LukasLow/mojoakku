@@ -1,0 +1,5 @@
+id: simd
+name: SIMD
+status: todo
+depends_on: [math]
+summary: Vectorized numeric operations.

@@ -1,0 +1,5 @@
+id: pattern
+name: Pattern
+status: todo
+depends_on: [variant]
+summary: Structural pattern matching.

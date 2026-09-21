@@ -1,0 +1,5 @@
+id: bigint
+name: Big Integer
+status: todo
+depends_on: [math]
+summary: Arbitrary precision integers.

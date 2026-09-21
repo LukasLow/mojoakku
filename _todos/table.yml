@@ -1,0 +1,5 @@
+id: table
+name: Table
+status: todo
+depends_on: [string,collections]
+summary: Tabular data display and formatting.

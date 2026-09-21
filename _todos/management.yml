@@ -1,0 +1,5 @@
+id: management
+name: Management
+status: todo
+depends_on: [os,io]
+summary: Runtime management and introspection.

@@ -1,0 +1,275 @@
+version: '3'
+
+# silent: true on every task — the runner does not echo the shell commands.
+# Output stays clean, which matters for a low-vision user who reads the list.
+silent: true
+
+# ============================================================================
+# MojoAkku catalogue — Taskfile
+#
+# Reads the flat catalogue in _todos/ (one YAML file per library).
+# Uses only sh, awk, grep, sed and sort, so it runs in the smd container
+# (bare debian:bookworm-slim: no python3, node, jq or yq).
+#
+# Every file in _todos/ is flat YAML:
+#   id: udp
+#   name: UDP
+#   status: todo
+#   depends_on: [socket, ip]
+#   summary: Datagram UDP sockets.
+#
+# status is ONLY one of: todo | current | done.
+# "blocked" is never stored — `task todo` derives it from depends_on.
+# A library is ready to build when its status is todo and every id in its
+# depends_on list has status done.
+#
+# Usage:
+#   task            same as `task todo`
+#   task todo       list libraries you can start building right now
+#   task current    list libraries that are in progress
+#   task all        list every library as: id  status  name
+#   task count      count libraries per status, plus the total
+#   task show -- <id>   print the catalogue file for one library
+#   task waiting    list libraries still waiting for a dependency, with names
+# ============================================================================
+
+tasks:
+
+  default:
+    desc: 'List libraries you can build right now (runs the todo task).'
+    cmds:
+      - task: todo
+
+  # --------------------------------------------------------------------------
+  # todo — the main command. One line per library that can be built NOW:
+  # status is todo and every dependency is done. Prints "<id>  <name>".
+  # If nothing is ready it says so plainly.
+  # --------------------------------------------------------------------------
+  todo:
+    desc: 'List libraries ready to build now (status todo, all dependencies done).'
+    cmds:
+      - |
+        files=""
+        for f in _todos/*.yml; do
+          [ -f "$f" ] || continue
+          files="$files $f"
+        done
+        if [ -z "$files" ]; then
+          echo "No catalogue files found yet (no _todos/*.yml)."
+          exit 0
+        fi
+        # One awk pass over all files builds a table of id -> status.
+        # A second pass prints every library whose status is "todo" and whose
+        # dependencies are all "done". A dependency with no file is not done.
+        out=$(awk '
+          function trim(s) { gsub(/^[ \t]+/, "", s); gsub(/[ \t\r]+$/, "", s); return s }
+          function flush() {
+            if (id != "") { order[++n] = id; name_of[id] = name; status_of[id] = status; deps_of[id] = deps }
+            id = ""; name = ""; status = ""; deps = ""
+          }
+          FNR == 1 { flush() }
+          /^id:/         { line = $0; sub(/^id:[ \t]*/,         "", line); id     = trim(line) }
+          /^name:/       { line = $0; sub(/^name:[ \t]*/,       "", line); name   = trim(line) }
+          /^status:/     { line = $0; sub(/^status:[ \t]*/,     "", line); status = trim(line) }
+          /^depends_on:/ { line = $0; sub(/^depends_on:[ \t]*/, "", line); deps   = trim(line) }
+          END {
+            flush()
+            for (i = 1; i <= n; i++) {
+              id = order[i]
+              if (status_of[id] != "todo") continue
+              raw = deps_of[id]
+              gsub(/^\[/, "", raw); gsub(/\]$/, "", raw)
+              cnt = split(raw, parts, ",")
+              ok = 1
+              for (j = 1; j <= cnt; j++) {
+                dep = trim(parts[j])
+                if (dep == "") continue
+                if (status_of[dep] != "done") ok = 0
+              }
+              if (ok) print id "\t" name_of[id]
+            }
+          }
+        ' $files | sort | awk -F'\t' 'NF > 0 { printf "%s  %s\n", $1, $2 }')
+        if [ -z "$out" ]; then
+          echo "Nothing is ready to build yet."
+          echo "Every remaining library still waits for a dependency that is not done."
+        else
+          printf '%s\n' "$out"
+        fi
+
+  # --------------------------------------------------------------------------
+  # current — libraries with status current (work already started).
+  # Prints "<id>  <name>".
+  # --------------------------------------------------------------------------
+  current:
+    desc: 'List libraries that are in progress (status current).'
+    cmds:
+      - |
+        files=""
+        for f in _todos/*.yml; do
+          [ -f "$f" ] || continue
+          files="$files $f"
+        done
+        if [ -z "$files" ]; then
+          echo "No catalogue files found yet (no _todos/*.yml)."
+          exit 0
+        fi
+        awk '
+          function trim(s) { gsub(/^[ \t]+/, "", s); gsub(/[ \t\r]+$/, "", s); return s }
+          function flush() {
+            if (id != "") { order[++n] = id; name_of[id] = name; status_of[id] = status }
+            id = ""; name = ""; status = ""
+          }
+          FNR == 1 { flush() }
+          /^id:/     { line = $0; sub(/^id:[ \t]*/,     "", line); id     = trim(line) }
+          /^name:/   { line = $0; sub(/^name:[ \t]*/,   "", line); name   = trim(line) }
+          /^status:/ { line = $0; sub(/^status:[ \t]*/, "", line); status = trim(line) }
+          END {
+            flush()
+            for (i = 1; i <= n; i++) if (status_of[order[i]] == "current") print order[i] "\t" name_of[order[i]]
+          }
+        ' $files | sort | awk -F'\t' 'NF > 0 { printf "%s  %s\n", $1, $2 }'
+
+  # --------------------------------------------------------------------------
+  # all — every library as "<id>  <status>  <name>", sorted by id.
+  # --------------------------------------------------------------------------
+  all:
+    desc: 'List every catalogued library as: id  status  name (sorted by id).'
+    cmds:
+      - |
+        files=""
+        for f in _todos/*.yml; do
+          [ -f "$f" ] || continue
+          files="$files $f"
+        done
+        if [ -z "$files" ]; then
+          echo "No catalogue files found yet (no _todos/*.yml)."
+          exit 0
+        fi
+        awk '
+          function trim(s) { gsub(/^[ \t]+/, "", s); gsub(/[ \t\r]+$/, "", s); return s }
+          function flush() {
+            if (id != "") print id "\t" status "\t" name
+            id = ""; name = ""; status = ""
+          }
+          FNR == 1 { flush() }
+          /^id:/     { line = $0; sub(/^id:[ \t]*/,     "", line); id     = trim(line) }
+          /^name:/   { line = $0; sub(/^name:[ \t]*/,   "", line); name   = trim(line) }
+          /^status:/ { line = $0; sub(/^status:[ \t]*/, "", line); status = trim(line) }
+          END { flush() }
+        ' $files | sort | awk -F'\t' '{ printf "%s  %s  %s\n", $1, $2, $3 }'
+
+  # --------------------------------------------------------------------------
+  # count — how many libraries are in each status, plus the total.
+  # --------------------------------------------------------------------------
+  count:
+    desc: 'Count libraries per status, plus the total.'
+    cmds:
+      - |
+        files=""
+        for f in _todos/*.yml; do
+          [ -f "$f" ] || continue
+          files="$files $f"
+        done
+        if [ -z "$files" ]; then
+          echo "No catalogue files found yet (no _todos/*.yml)."
+          exit 0
+        fi
+        awk '
+          function trim(s) { gsub(/^[ \t]+/, "", s); gsub(/[ \t\r]+$/, "", s); return s }
+          function flush() {
+            if (id != "") print status
+            id = ""; status = ""
+          }
+          FNR == 1 { flush() }
+          /^id:/     { line = $0; sub(/^id:[ \t]*/,     "", line); id     = trim(line) }
+          /^status:/ { line = $0; sub(/^status:[ \t]*/, "", line); status = trim(line) }
+          END { flush() }
+        ' $files | awk '
+          { if ($0 != "") { c[$0]++; total++ } }
+          END {
+            printf "MojoAkku catalogue: %d libraries\n\n", total
+            printf "%-10s %d\n", "todo:", c["todo"] + 0
+            printf "%-10s %d\n", "current:", c["current"] + 0
+            printf "%-10s %d\n", "done:", c["done"] + 0
+            printf "%-10s %d\n", "total:", total + 0
+          }
+        '
+
+  # --------------------------------------------------------------------------
+  # waiting — libraries that still wait for a dependency, with the names of
+  # the missing dependencies. This is the "blocked" view, computed, never
+  # stored. Output: "<id>  <status>  <name>  -> waiting for: <dep>, <dep>"
+  # --------------------------------------------------------------------------
+  waiting:
+    desc: 'List libraries waiting for a dependency and name the missing ones.'
+    cmds:
+      - |
+        files=""
+        for f in _todos/*.yml; do
+          [ -f "$f" ] || continue
+          files="$files $f"
+        done
+        if [ -z "$files" ]; then
+          echo "No catalogue files found yet (no _todos/*.yml)."
+          exit 0
+        fi
+        out=$(awk '
+          function trim(s) { gsub(/^[ \t]+/, "", s); gsub(/[ \t\r]+$/, "", s); return s }
+          function flush() {
+            if (id != "") { order[++n] = id; name_of[id] = name; status_of[id] = status; deps_of[id] = deps }
+            id = ""; name = ""; status = ""; deps = ""
+          }
+          FNR == 1 { flush() }
+          /^id:/         { line = $0; sub(/^id:[ \t]*/,         "", line); id     = trim(line) }
+          /^name:/       { line = $0; sub(/^name:[ \t]*/,       "", line); name   = trim(line) }
+          /^status:/     { line = $0; sub(/^status:[ \t]*/,     "", line); status = trim(line) }
+          /^depends_on:/ { line = $0; sub(/^depends_on:[ \t]*/, "", line); deps   = trim(line) }
+          END {
+            flush()
+            for (i = 1; i <= n; i++) {
+              id = order[i]
+              if (status_of[id] == "done") continue
+              raw = deps_of[id]
+              gsub(/^\[/, "", raw); gsub(/\]$/, "", raw)
+              cnt = split(raw, parts, ",")
+              missing = ""
+              for (j = 1; j <= cnt; j++) {
+                dep = trim(parts[j])
+                if (dep == "") continue
+                if (status_of[dep] != "done") {
+                  label = dep
+                  if (!(dep in status_of)) label = dep " (no file)"
+                  missing = (missing == "" ? label : missing ", " label)
+                }
+              }
+              if (missing != "") print id "\t" status_of[id] "\t" name_of[id] "\t" missing
+            }
+          }
+        ' $files | sort | awk -F'\t' '{ printf "%s  %s  %s  -> waiting for: %s\n", $1, $2, $3, $4 }')
+        if [ -z "$out" ]; then
+          echo "No library is waiting for a dependency."
+        else
+          printf '%s\n' "$out"
+        fi
+
+  # --------------------------------------------------------------------------
+  # show — print one catalogue file: task show -- <id>
+  # --------------------------------------------------------------------------
+  show:
+    desc: 'Print one catalogue file: task show -- <id>'
+    cmds:
+      - |
+        id="{{.CLI_ARGS}}"
+        if [ -z "$id" ]; then
+          echo "error: no library id given."
+          echo "usage: task show -- <id>"
+          exit 1
+        fi
+        file="_todos/${id}.yml"
+        if [ ! -f "$file" ]; then
+          echo "error: no catalogue file for id '${id}' (looked for ${file})."
+          echo "Run 'task all' to see every known id."
+          exit 1
+        fi
+        awk '{ print }' "$file"

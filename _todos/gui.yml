@@ -1,0 +1,5 @@
+id: gui
+name: GUI
+status: todo
+depends_on: [io]
+summary: Graphical user interfaces.

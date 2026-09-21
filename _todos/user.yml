@@ -1,0 +1,5 @@
+id: user
+name: User
+status: todo
+depends_on: [os]
+summary: User and group lookup.

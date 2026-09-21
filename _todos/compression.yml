@@ -1,0 +1,5 @@
+id: compression
+name: Compression
+status: todo
+depends_on: [memory,io]
+summary: Deflate, gzip, zlib and zstd.

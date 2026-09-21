@@ -1,0 +1,5 @@
+id: plugin
+name: Plugin
+status: todo
+depends_on: [ffi,fs]
+summary: Dynamic library loading.

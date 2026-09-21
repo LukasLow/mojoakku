@@ -1,0 +1,5 @@
+id: sse
+name: Server-Sent Events
+status: todo
+depends_on: [http]
+summary: Server-sent event streams.

@@ -1,0 +1,5 @@
+id: contextmanager
+name: Context Manager
+status: todo
+depends_on: [error,trait]
+summary: Scoped resource blocks.

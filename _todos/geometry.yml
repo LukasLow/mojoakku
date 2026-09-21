@@ -1,0 +1,5 @@
+id: geometry
+name: Geometry
+status: todo
+depends_on: [math]
+summary: Points, shapes and geometric operations.

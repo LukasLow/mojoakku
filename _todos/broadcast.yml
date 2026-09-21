@@ -1,0 +1,5 @@
+id: broadcast
+name: Broadcast
+status: todo
+depends_on: [iter,simd]
+summary: Elementwise broadcasting and fusion.

@@ -1,0 +1,5 @@
+id: pdf
+name: PDF
+status: todo
+depends_on: [io,compression]
+summary: PDF reading and writing.

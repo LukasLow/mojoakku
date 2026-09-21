@@ -1,0 +1,5 @@
+id: signal
+name: Signal
+status: todo
+depends_on: [process,os]
+summary: Unix signal handling.

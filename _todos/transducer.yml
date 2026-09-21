@@ -1,0 +1,5 @@
+id: transducer
+name: Transducer
+status: todo
+depends_on: [collections,iter]
+summary: Composable transformation steps.

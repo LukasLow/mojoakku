@@ -1,0 +1,5 @@
+id: currency
+name: Currency
+status: todo
+depends_on: [string,math]
+summary: Money values and currency formatting.

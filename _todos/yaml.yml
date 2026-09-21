@@ -1,0 +1,5 @@
+id: yaml
+name: YAML
+status: todo
+depends_on: [string,file]
+summary: YAML parsing and serialization.

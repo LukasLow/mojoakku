@@ -1,0 +1,5 @@
+id: pin
+name: Pin
+status: todo
+depends_on: [ownership,memory]
+summary: Stable memory addresses.

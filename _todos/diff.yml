@@ -1,0 +1,5 @@
+id: diff
+name: Diff
+status: todo
+depends_on: [string,collections]
+summary: Text and sequence diffing.

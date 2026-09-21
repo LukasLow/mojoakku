@@ -1,0 +1,5 @@
+id: cipher
+name: Cipher
+status: todo
+depends_on: [memory,string]
+summary: Symmetric encryption.

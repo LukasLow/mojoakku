@@ -1,0 +1,5 @@
+id: database
+name: Database
+status: todo
+depends_on: [io,sql]
+summary: Database connections and pooling.

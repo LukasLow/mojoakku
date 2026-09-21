@@ -1,0 +1,5 @@
+id: metadata
+name: Metadata
+status: todo
+depends_on: [reflection]
+summary: Structured metadata about values.

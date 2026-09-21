@@ -1,0 +1,5 @@
+id: kvstore
+name: Key Value Store
+status: todo
+depends_on: [fs]
+summary: Embedded key value storage.

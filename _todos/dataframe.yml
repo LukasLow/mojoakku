@@ -1,0 +1,5 @@
+id: dataframe
+name: Dataframe
+status: todo
+depends_on: [collections,csv]
+summary: Columnar tables for data analysis.

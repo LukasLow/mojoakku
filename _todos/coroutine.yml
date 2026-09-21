@@ -1,0 +1,5 @@
+id: coroutine
+name: Coroutine
+status: todo
+depends_on: [future]
+summary: Coroutines and generators.

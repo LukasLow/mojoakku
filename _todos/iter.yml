@@ -1,0 +1,5 @@
+id: iter
+name: Iteration
+status: todo
+depends_on: [collections]
+summary: Iterator protocol and adapters.

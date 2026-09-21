@@ -1,0 +1,5 @@
+id: easing
+name: Easing
+status: todo
+depends_on: [math]
+summary: Interpolation and easing functions.

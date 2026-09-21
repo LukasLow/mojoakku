@@ -1,0 +1,5 @@
+id: rational
+name: Rational
+status: todo
+depends_on: [math]
+summary: Exact rational numbers.

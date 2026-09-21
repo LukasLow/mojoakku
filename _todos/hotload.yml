@@ -1,0 +1,5 @@
+id: hotload
+name: Hot Reload
+status: todo
+depends_on: [plugin,module]
+summary: Replace code in a running system.

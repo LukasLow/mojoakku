@@ -1,0 +1,5 @@
+id: terminal
+name: Terminal
+status: todo
+depends_on: [io,console]
+summary: Terminal control and ANSI sequences.

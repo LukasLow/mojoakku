@@ -1,0 +1,5 @@
+id: shell
+name: Shell
+status: todo
+depends_on: [process,string]
+summary: Shell invocation and quoting.

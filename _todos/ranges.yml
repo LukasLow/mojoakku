@@ -1,0 +1,5 @@
+id: ranges
+name: Ranges
+status: todo
+depends_on: []
+summary: Lazy range and view types.

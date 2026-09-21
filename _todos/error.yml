@@ -1,0 +1,5 @@
+id: error
+name: Error
+status: todo
+depends_on: []
+summary: Error values and propagation.

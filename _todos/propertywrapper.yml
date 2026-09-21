@@ -1,0 +1,5 @@
+id: propertywrapper
+name: Property Wrapper
+status: todo
+depends_on: [macro]
+summary: Declarative behavior on properties.

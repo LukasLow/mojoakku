@@ -1,0 +1,5 @@
+id: stm
+name: STM
+status: todo
+depends_on: [atomic,sync]
+summary: Software transactional memory.

@@ -1,0 +1,5 @@
+id: glob
+name: Glob
+status: todo
+depends_on: [path,string]
+summary: Pattern matching for file paths.

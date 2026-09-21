@@ -1,0 +1,5 @@
+id: module
+name: Module
+status: todo
+depends_on: [path,fs]
+summary: Module loading and discovery.

@@ -1,0 +1,5 @@
+id: queue
+name: Queue
+status: todo
+depends_on: [collections,sync]
+summary: FIFO, priority and blocking queues.

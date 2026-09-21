@@ -1,0 +1,5 @@
+id: graph
+name: Graph
+status: todo
+depends_on: [collections]
+summary: Directed and undirected graph structures.

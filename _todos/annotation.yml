@@ -1,0 +1,5 @@
+id: annotation
+name: Annotation
+status: todo
+depends_on: [reflection,comptime]
+summary: Declarative metadata on declarations.

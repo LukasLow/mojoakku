@@ -1,0 +1,5 @@
+id: closure
+name: Closure
+status: todo
+depends_on: []
+summary: First class functions.

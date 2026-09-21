@@ -1,0 +1,5 @@
+id: immutable
+name: Immutable
+status: todo
+depends_on: [collections,ownership]
+summary: Persistent immutable collections.

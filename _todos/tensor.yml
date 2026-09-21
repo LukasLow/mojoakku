@@ -1,0 +1,5 @@
+id: tensor
+name: Tensor
+status: todo
+depends_on: [matrix,simd]
+summary: N dimensional arrays and operations.

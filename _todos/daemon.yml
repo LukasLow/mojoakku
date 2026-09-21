@@ -1,0 +1,5 @@
+id: daemon
+name: Daemon
+status: todo
+depends_on: [process,os]
+summary: Detach and run as a service.

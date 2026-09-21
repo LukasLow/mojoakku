@@ -1,0 +1,5 @@
+id: quic
+name: QUIC
+status: todo
+depends_on: [udp,tls]
+summary: QUIC transport.

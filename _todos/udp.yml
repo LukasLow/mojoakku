@@ -1,0 +1,5 @@
+id: udp
+name: UDP
+status: todo
+depends_on: [socket]
+summary: Datagram UDP sockets.

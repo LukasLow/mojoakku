@@ -1,0 +1,5 @@
+id: mime
+name: MIME
+status: todo
+depends_on: [string]
+summary: Media type handling.

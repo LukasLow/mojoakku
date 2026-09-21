@@ -1,0 +1,5 @@
+id: encoding
+name: Encoding
+status: todo
+depends_on: []
+summary: Character encodings and conversion between them.

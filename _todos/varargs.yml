@@ -1,0 +1,5 @@
+id: varargs
+name: Varargs
+status: todo
+depends_on: []
+summary: Variadic argument handling.

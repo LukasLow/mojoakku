@@ -1,0 +1,5 @@
+id: xml
+name: XML
+status: todo
+depends_on: [string,collections,parser]
+summary: XML parsing and serialization.

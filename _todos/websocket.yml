@@ -1,0 +1,5 @@
+id: websocket
+name: WebSocket
+status: todo
+depends_on: [http]
+summary: Full duplex HTTP upgrade.

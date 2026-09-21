@@ -1,0 +1,5 @@
+id: mmap
+name: Memory Map
+status: todo
+depends_on: [memory,fs]
+summary: Memory mapped files.

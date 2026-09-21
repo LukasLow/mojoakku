@@ -1,0 +1,5 @@
+id: typing
+name: Typing
+status: todo
+depends_on: [annotation]
+summary: Static type annotations and protocols.

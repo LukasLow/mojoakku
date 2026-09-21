@@ -1,0 +1,5 @@
+id: serialization
+name: Serialization
+status: todo
+depends_on: [binary,collections]
+summary: Encoding of structured values.

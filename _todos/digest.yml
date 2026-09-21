@@ -1,0 +1,5 @@
+id: digest
+name: Crypto Hash
+status: todo
+depends_on: [hash,memory]
+summary: Cryptographic hash functions.

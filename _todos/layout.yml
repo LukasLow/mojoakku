@@ -1,0 +1,5 @@
+id: layout
+name: Layout
+status: todo
+depends_on: [memory]
+summary: Control over memory layout.

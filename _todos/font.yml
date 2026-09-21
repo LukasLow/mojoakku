@@ -1,0 +1,5 @@
+id: font
+name: Font
+status: todo
+depends_on: [io,binary]
+summary: Font parsing and rendering.

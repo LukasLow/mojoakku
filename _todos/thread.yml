@@ -1,0 +1,5 @@
+id: thread
+name: Thread
+status: todo
+depends_on: [atomic]
+summary: Operating system threads.

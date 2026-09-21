@@ -1,0 +1,5 @@
+id: noise
+name: Noise
+status: todo
+depends_on: [math,random]
+summary: Procedural noise for content and graphics.

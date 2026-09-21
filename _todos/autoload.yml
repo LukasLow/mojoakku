@@ -1,0 +1,5 @@
+id: autoload
+name: Autoload
+status: todo
+depends_on: [module,fs]
+summary: Automatic symbol loading.

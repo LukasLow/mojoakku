@@ -1,0 +1,5 @@
+id: ownership
+name: Ownership
+status: todo
+depends_on: []
+summary: Move, borrow and lifetime discipline.

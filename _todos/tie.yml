@@ -1,0 +1,5 @@
+id: tie
+name: Tie
+status: todo
+depends_on: [trait]
+summary: Binding an ordinary variable to methods.

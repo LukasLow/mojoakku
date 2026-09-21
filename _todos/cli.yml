@@ -1,0 +1,5 @@
+id: cli
+name: CLI
+status: todo
+depends_on: [string,collections]
+summary: Command line argument parsing.

@@ -1,0 +1,5 @@
+id: overload
+name: Overload
+status: todo
+depends_on: [trait]
+summary: Operator overloading for user types.

@@ -1,0 +1,5 @@
+id: template
+name: Template
+status: todo
+depends_on: [string,file]
+summary: Text templating in the style of Jinja.

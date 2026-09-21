@@ -1,0 +1,5 @@
+id: allocator
+name: Allocator
+status: todo
+depends_on: [memory]
+summary: Custom memory allocators.

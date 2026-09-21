@@ -1,0 +1,5 @@
+id: csv
+name: CSV
+status: todo
+depends_on: [string,file]
+summary: Comma separated value reading and writing.

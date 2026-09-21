@@ -1,0 +1,5 @@
+id: option
+name: Option
+status: todo
+depends_on: [variant]
+summary: Optional and result values instead of null.

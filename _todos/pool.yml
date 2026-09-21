@@ -1,0 +1,5 @@
+id: pool
+name: Pool
+status: todo
+depends_on: [allocator,memory]
+summary: Reusable object and buffer pools.

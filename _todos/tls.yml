@@ -1,0 +1,5 @@
+id: tls
+name: TLS
+status: todo
+depends_on: [tcp,cipher,mac,certificate,publickey]
+summary: Transport layer security.

@@ -1,0 +1,5 @@
+id: algorithm
+name: Algorithms
+status: todo
+depends_on: [collections,iter]
+summary: Sorting, searching and generic algorithms.

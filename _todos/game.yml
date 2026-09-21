@@ -1,0 +1,5 @@
+id: game
+name: Game
+status: todo
+depends_on: [gui,input,audio]
+summary: Game loop and engine primitives.

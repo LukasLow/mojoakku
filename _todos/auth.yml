@@ -1,0 +1,5 @@
+id: auth
+name: Auth
+status: todo
+depends_on: [password,mac]
+summary: Authentication primitives.

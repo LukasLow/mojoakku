@@ -1,0 +1,5 @@
+id: json
+name: JSON
+status: todo
+depends_on: [string,collections]
+summary: JSON parsing and serialization.

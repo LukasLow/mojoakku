@@ -1,0 +1,5 @@
+id: markdown
+name: Markdown
+status: todo
+depends_on: [string,html]
+summary: Markdown parsing and rendering.

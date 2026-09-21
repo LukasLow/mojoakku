@@ -1,0 +1,5 @@
+id: random
+name: Random
+status: todo
+depends_on: [math]
+summary: Random number generation.

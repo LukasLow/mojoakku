@@ -1,0 +1,5 @@
+id: redis
+name: Redis
+status: todo
+depends_on: [tcp,string]
+summary: Redis client.

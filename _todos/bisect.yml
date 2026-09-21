@@ -1,0 +1,5 @@
+id: bisect
+name: Bisect
+status: todo
+depends_on: [collections]
+summary: Binary search and sorted insertion.

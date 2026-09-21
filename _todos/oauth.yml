@@ -1,0 +1,5 @@
+id: oauth
+name: OAuth
+status: todo
+depends_on: [http,jwt]
+summary: OAuth authorization flows.

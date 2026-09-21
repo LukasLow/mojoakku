@@ -1,0 +1,5 @@
+id: set
+name: Set
+status: todo
+depends_on: [collections]
+summary: Unordered collections of unique elements.

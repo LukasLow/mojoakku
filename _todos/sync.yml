@@ -1,0 +1,5 @@
+id: sync
+name: Sync
+status: todo
+depends_on: [atomic]
+summary: Mutexes, locks and condition variables.

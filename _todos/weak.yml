@@ -1,0 +1,5 @@
+id: weak
+name: Weak
+status: todo
+depends_on: [refcount]
+summary: Weak references that do not own.

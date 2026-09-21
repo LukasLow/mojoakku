@@ -1,0 +1,5 @@
+id: pretty
+name: Pretty Print
+status: todo
+depends_on: [string,collections]
+summary: Human readable printing of data structures.

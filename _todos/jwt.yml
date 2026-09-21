@@ -1,0 +1,5 @@
+id: jwt
+name: JWT
+status: todo
+depends_on: [json,mac,base64]
+summary: JSON web tokens.

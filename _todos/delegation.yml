@@ -1,0 +1,5 @@
+id: delegation
+name: Delegation
+status: todo
+depends_on: [trait]
+summary: Forwarding methods to another value.

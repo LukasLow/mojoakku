@@ -1,0 +1,5 @@
+id: lockfile
+name: Lockfile
+status: todo
+depends_on: [fs,os]
+summary: Advisory file locking.

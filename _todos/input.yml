@@ -1,0 +1,5 @@
+id: input
+name: Input
+status: todo
+depends_on: [io,terminal]
+summary: Keyboard and input events.

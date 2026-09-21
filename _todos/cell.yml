@@ -1,0 +1,5 @@
+id: cell
+name: Cell
+status: todo
+depends_on: [ownership]
+summary: Interior mutability.

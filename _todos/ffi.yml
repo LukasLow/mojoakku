@@ -1,0 +1,5 @@
+id: ffi
+name: FFI
+status: todo
+depends_on: [memory]
+summary: Foreign function interface.

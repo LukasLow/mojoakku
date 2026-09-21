@@ -1,0 +1,5 @@
+id: channel
+name: Channel
+status: todo
+depends_on: [sync]
+summary: Message passing channels.

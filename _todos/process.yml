@@ -1,0 +1,5 @@
+id: process
+name: Process
+status: todo
+depends_on: [io,os]
+summary: Spawning and controlling processes.

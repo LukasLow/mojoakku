@@ -1,0 +1,5 @@
+id: contract
+name: Contract
+status: todo
+depends_on: [error,comptime]
+summary: Preconditions and postconditions.

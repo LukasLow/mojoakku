@@ -1,0 +1,5 @@
+id: keypath
+name: Key Path
+status: todo
+depends_on: [reflection]
+summary: First class property paths.

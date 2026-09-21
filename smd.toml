@@ -1,0 +1,35 @@
+[project]
+  name = "mojoakku"
+
+[container]
+  workdir = "/app"
+
+[security]
+  allow_env = []
+
+[volume]
+  enabled = false
+  [volume.packages]
+
+[port]
+
+[session]
+  ports = []
+
+[live]
+  mount_pwd = true
+  ports = []
+
+[temp]
+  allow_env = []
+  mount_pwd = true
+  read_only = false
+
+[dockerfile]
+  lines = [
+    "FROM docker.io/debian:bookworm-slim",
+    "RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl && rm -rf /var/lib/apt/lists/*",
+    "RUN sh -c \"$(curl -fsSL https://taskfile.dev/install.sh)\" -- -d -b /usr/local/bin",
+  ]
+
+# For more information see: smd --help | smd --agent | smd --toml

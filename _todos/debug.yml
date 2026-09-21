@@ -1,0 +1,5 @@
+id: debug
+name: Debugging
+status: todo
+depends_on: [io,error]
+summary: Debug helpers and backtraces.

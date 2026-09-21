@@ -1,0 +1,5 @@
+id: config
+name: Config
+status: todo
+depends_on: [toml,yaml,ini,json]
+summary: Configuration loading from files.

@@ -1,0 +1,5 @@
+id: safety
+name: Memory Safety
+status: todo
+depends_on: [memory]
+summary: Runtime safety and bounds checking.

@@ -1,0 +1,5 @@
+id: refcount
+name: Reference Count
+status: todo
+depends_on: [ownership,atomic]
+summary: Shared ownership counters.

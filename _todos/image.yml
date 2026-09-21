@@ -1,0 +1,5 @@
+id: image
+name: Image
+status: todo
+depends_on: [io,compression]
+summary: Image decoding and encoding.

@@ -1,0 +1,5 @@
+id: instrument
+name: Instrument
+status: todo
+depends_on: [codegen,ffi]
+summary: Runtime instrumentation hooks.

@@ -1,0 +1,5 @@
+id: fs
+name: Filesystem
+status: todo
+depends_on: [path,io]
+summary: Directory and file system operations.

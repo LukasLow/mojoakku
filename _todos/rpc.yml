@@ -1,0 +1,5 @@
+id: rpc
+name: RPC
+status: todo
+depends_on: [serialization,tcp]
+summary: Remote procedure calls.
