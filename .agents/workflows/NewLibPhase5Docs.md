@@ -6,7 +6,7 @@ Turn the approved design into the complete `<LIB>_DOCS.md` single source of trut
 ## Inputs
 - `mojoakku/<lib>/<LIB>_DOCS.md` containing the approved design sections.
 - The approved design review verdict from `NewLibPhase4DesignReview.md`.
-- `mojoakku/<lib>/research/<lang>.md` for reference names and rationale.
+- `mojoakku/<lib>/.research/<lang>.md` for reference names and rationale.
 - This workflow file.
 
 ## Preconditions

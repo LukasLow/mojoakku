@@ -19,7 +19,7 @@ NewLibPhase1Research -> NewLibPhase2ResearchReview -> NewLibPhase3Design
 
 | Phase workflow | Purpose |
 | --- | --- |
-| `NewLibPhase1Research.md` | Research the problem space and prior art, one agent per language, output `research/<lang>.md`. |
+| `NewLibPhase1Research.md` | Research the problem space and prior art: researchers report into the shared project file, one `docs` agent materializes `.research/<lang>.md`. |
 | `NewLibPhase2ResearchReview.md` | Review the research for completeness, sources and relevance. |
 | `NewLibPhase3Design.md` | Design the public API and justify every decision. |
 | `NewLibPhase4DesignReview.md` | Review the API design against the research and the process rules. |

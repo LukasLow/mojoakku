@@ -5,7 +5,7 @@ Verify that the derived Mojo API design for `<lib>` is semantically complete, co
 
 ## Inputs
 - `mojoakku/<lib>/<LIB>_DOCS.md` containing the design section from `NewLibPhase3Design.md`.
-- `mojoakku/<lib>/research/<lang>.md` for all languages.
+- `mojoakku/<lib>/.research/<lang>.md` for all languages.
 - The approved research review verdict.
 - This workflow file.
 

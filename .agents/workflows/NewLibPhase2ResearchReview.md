@@ -4,7 +4,7 @@
 Verify that the per-language research for `<lib>` is complete, contradiction-free and evidence-based before any API design begins.
 
 ## Inputs
-- `mojoakku/<lib>/research/<lang>.md` for every language in the frozen language list.
+- `mojoakku/<lib>/.research/<lang>.md` for every language in the frozen language list.
 - The frozen standardized question set from `NewLibPhase1Research.md`.
 - This workflow file.
 
@@ -19,8 +19,8 @@ Verify that the per-language research for `<lib>` is complete, contradiction-fre
 - **researcher** (only if the Manager sends the phase back): fixes the specific findings and the review is repeated.
 
 ## Steps
-1. Manager confirms the frozen language list and checks that exactly one `mojoakku/<lib>/research/<lang>.md` exists per listed language.
-2. Manager starts ONE `reviewer` with: "Review the research for `<lib>` in `mojoakku/<lib>/research/`. Check completeness against the standardized question set, contradictions between languages, missing sources, and whether cross-language conclusions are evidence-based. Report `APPROVED` or `NEEDS_WORK` with a concrete findings list."
+1. Manager confirms the frozen language list and checks that exactly one `mojoakku/<lib>/.research/<lang>.md` exists per listed language.
+2. Manager starts ONE `reviewer` with: "Review the research for `<lib>` in `mojoakku/<lib>/.research/`. Check completeness against the standardized question set, contradictions between languages, missing sources, and whether cross-language conclusions are evidence-based. Report `APPROVED` or `NEEDS_WORK` with a concrete findings list."
 3. reviewer checks completeness: every one of the 12 questions is answered for every language; missing answers are listed per file and per question.
 4. reviewer checks contradictions: statements that conflict across files (e.g. one file says `recv` is non-blocking, another says blocking) are listed with both `file:line` references and asked to be reconciled with evidence.
 5. reviewer checks sources: every non-`GUESS` statement has a citation (URL, RFC, or `repo/path:line`); unreachable, invented or circular sources are flagged.

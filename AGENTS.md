@@ -50,6 +50,7 @@ mojoakku/<lib>/
   <LIB>_DOCS.md      # single source of truth (e.g. SOCKET_DOCS.md)
   _internal/         # private implementation details
   _tests/            # tests, written BEFORE implementation (no __init__.mojo)
+  .research/         # phase-1 research notes, one file per reference language
 ```
 
 ## Library independence rules

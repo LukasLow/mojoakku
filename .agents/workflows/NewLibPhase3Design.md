@@ -4,7 +4,7 @@
 Derive the Mojo public API for `<lib>` from the reviewed research and record every decision with its justification and reference API in `mojoakku/<lib>/<LIB>_DOCS.md`.
 
 ## Inputs
-- `mojoakku/<lib>/research/<lang>.md` for all languages.
+- `mojoakku/<lib>/.research/<lang>.md` for all languages.
 - The approved research review verdict.
 - `AGENTS.md` and this workflow file.
 - The Mojo language constraints (ownership, `raises`, `var`/`borrowed`, no hidden global state, compile-time metaprogramming).
