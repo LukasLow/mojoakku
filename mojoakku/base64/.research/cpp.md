@@ -17,9 +17,10 @@ there is no byte-oriented codec at all. Source:
 
 Base16 is only reachable via `std::to_chars`/`std::format` per integer, or via the
 hex floating-point `chars_format::hex` for numbers — not as a byte-string codec.
-This is widely acknowledged: a survey article states flatly "The C++ standard
-library has no Base64", listing OpenSSL and Boost.Beast as the alternatives
-(<https://base64.dev/articles/base64-cpp>).
+The absence follows from the standard header list itself: no header in
+<https://en.cppreference.com/w/cpp/header> provides base-N encoding. The
+alternatives are therefore third-party: OpenSSL and Boost.Beast, as
+surveyed in section 2 below.
 
 (Assessment: derived from the header list and `std::to_chars` pages: C++ inherits
 C's absence of a codec and, unlike Go/Rust, did not add one in C++17/20/23/26; the
@@ -35,15 +36,15 @@ evidence is not proof of absence.
 
 ## 2. Relevant community libraries
 
-$%$ Library $%$ Maintainer $%$ Maturity $%$ License $%$ Variants $%$
-$%$ --- $%$ --- $%$ --- $%$ --- $%$ --- $%$
-$%$ cppcodec (tplgy) $%$ Topology LP / efidler $%$ header-only C++11, actively cited $%$ MIT $%$ base64, base64url, base64url-unpadded, base32, base32hex, Crockford, hex up/low $%$
-$%$ Boost.Beast base64 $%$ Boost (Vinnie Falco) $%$ part of Boost, but **detail/** namespace $%$ Boost Software License 1.0 $%$ base64 standard only $%$
-$%$ OpenSSL `EVP_*` via C API $%$ OpenSSL Foundation $%$ ubiquitous $%$ Apache-2.0 $%$ base64 standard only $%$
-$%$ tobiaslocker/base64 $%$ Tobias Locker $%$ header-only C++17/C++20 $%$ MIT $%$ base64 standard only $%$
-$%$ base64pp $%$ Matheus Gomes $%$ C++20, CMake $%$ MIT $%$ base64 standard only $%$
-$%$ cpp-base64 (ReneNyffenegger) $%$ René Nyffenegger $%$ long-lived snippet library $%$ zlib-like custom $%$ base64 standard only $%$
-$%$ aklomp/base64 $%$ Alfred Klomp $%$ C99 with SIMD; usable from C++ $%$ BSD-2-Clause $%$ base64 standard only $%$
+| Library | Maintainer | Maturity | License | Variants |
+| --- | --- | --- | --- | --- |
+| cppcodec (tplgy) | Topology LP / efidler | header-only C++11, actively cited | MIT | base64, base64url, base64url-unpadded, base32, base32hex, Crockford, hex up/low |
+| Boost.Beast base64 | Boost (Vinnie Falco) | part of Boost, but **detail/** namespace | Boost Software License 1.0 | base64 standard only |
+| OpenSSL `EVP_*` via C API | OpenSSL Foundation | ubiquitous | Apache-2.0 | base64 standard only |
+| tobiaslocker/base64 | Tobias Locker | header-only C++17/C++20 | MIT | base64 standard only |
+| base64pp | Matheus Gomes | C++20, CMake | MIT | base64 standard only |
+| cpp-base64 (ReneNyffenegger) | René Nyffenegger | long-lived snippet library | zlib-like custom | base64 standard only |
+| aklomp/base64 | Alfred Klomp | C99 with SIMD; usable from C++ | BSD-2-Clause | base64 standard only |
 
 Sources:
 - cppcodec "Header-only C++11 library to encode/decode base64, base64url, base32,
@@ -238,9 +239,13 @@ in the signature:
   Source: its header.
 
 (Assessment: derived from the sources above: C++ makes the ownership contract
-*selectable* — value-returning, container-refilling, and raw-`noexcept` — where C
-has only the raw form and Java has only the value form. The cost is a three-way API
-surface and a buffer-sizing contract that the type system still does not enforce.)
+*selectable* — value-returning, container-refilling, and raw-`noexcept`. C is not
+single-form either: its mainstream APIs are caller-allocated-output (OpenSSL, glibc,
+aklomp, mbedTLS, Windows) plus the gnulib explicit `_alloc` form (`c.md` §5). Java
+likewise exposes more than one value form — allocate-and-return `byte[] encode(byte[]
+src)`, caller-buffer `int encode(byte[] src, byte[] dst)` and the `String
+encodeToString(byte[] src)` convenience (`java.md:96-101`). The cost is a three-way
+API surface and a buffer-sizing contract that the type system still does not enforce.)
 
 ## 6. Blocking / non-blocking
 
@@ -263,16 +268,16 @@ flag.**
 - **cppcodec ships one class per variant** and makes the padding policy a
   `constexpr` property of that class:
 
-  $%$ Variant $%$ Alphabet $%$ generates padding $%$ requires padding $%$
-  $%$ --- $%$ --- $%$ --- $%$ --- $%$
-  $%$ `base64_rfc4648` $%$ `A-Z a-z 0-9 + /` $%$ `true` $%$ `true` $%$
-  $%$ `base64_url` $%$ `A-Z a-z 0-9 - _` $%$ `true` $%$ `true` $%$
-  $%$ `base64_url_unpadded` $%$ same as `base64_url` $%$ `false` $%$ `false` $%$
-  $%$ `base32_rfc4648` $%$ `A-Z 2-7` $%$ `true` $%$ `true` $%$
-  $%$ `base32_hex` $%$ `0-9 A-V` $%$ `true` $%$ `true` $%$
-  $%$ `base32_crockford` $%$ Crockford alphabet $%$ `false` $%$ `false` $%$
-  $%$ `hex_upper` $%$ `0-9 A-F` $%$ n/a $%$ n/a $%$
-  $%$ `hex_lower` $%$ `0-9 a-f` $%$ n/a $%$ n/a $%$
+  | Variant | Alphabet | generates padding | requires padding |
+  | --- | --- | --- | --- |
+  | `base64_rfc4648` | `A-Z a-z 0-9 + /` | `true` | `true` |
+  | `base64_url` | `A-Z a-z 0-9 - _` | `true` | `true` |
+  | `base64_url_unpadded` | same as `base64_url` | `false` | `false` |
+  | `base32_rfc4648` | `A-Z 2-7` | `true` | `true` |
+  | `base32_hex` | `0-9 A-V` | `true` | `true` |
+  | `base32_crockford` | Crockford alphabet | `false` | `false` |
+  | `hex_upper` | `0-9 A-F` | n/a | n/a |
+  | `hex_lower` | `0-9 a-f` | n/a | n/a |
 
   Sources: cppcodec README; `cppcodec/base64_rfc4648.hpp`, `base64_url.hpp`,
   `base64_url_unpadded.hpp`.

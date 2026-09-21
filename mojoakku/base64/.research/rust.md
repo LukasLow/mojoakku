@@ -347,7 +347,7 @@ not to the codec (Assessment: derived from the two adapter implementations).
   non-silent step.
 - **Constant-time as a first-class goal**: `base64ct`'s table-free,
   branch-free approach is a strong signal for a future MojoAkku "secure" engine
-  variant, and its no-lookup-table design may suite Mojo's compile-time
+  variant, and its no-lookup-table design may suit Mojo's compile-time
   flexibility (`https://docs.rs/base64ct/latest/base64ct/`).
 
 ## Sources

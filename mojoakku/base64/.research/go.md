@@ -37,7 +37,11 @@ All three are standard library, BSD-3-Clause; `encoding/base64` showed "Imported
 
 `encoding/hex` uses a flat, function-based API rather than an `Encoding` type: `EncodedLen` (`:39`), `Encode(dst, src) int` (`:45`), `AppendEncode` (`:57`), `EncodeToString` (`:126`), `DecodedLen` (`:78`), `Decode(dst, src) (int, error)` (`:87`), `AppendDecode` (`:118`), `DecodeString` (`:138`), `NewEncoder(w) io.Writer` (`:173`), `NewDecoder(r) io.Reader` (`:202`). There is no alphabet knob — hex is always `0123456789abcdef` on encode.
 
-(Line numbers from https://raw.githubusercontent.com/golang/go/master/src/encoding/... as cited; API summaries likewise on https://pkg.go.dev/encoding/base64.)
+(Line numbers from the full stdlib sources cited in Sources below —
+golang/go:src/encoding/base64/base64.go,
+golang/go:src/encoding/base32/base32.go,
+golang/go:src/encoding/hex/hex.go; API summaries likewise on
+<https://pkg.go.dev/encoding/base64>.)
 
 ## 4. Error representation
 
@@ -61,7 +65,7 @@ Go is garbage-collected and uses `[]byte` slices; there is no ownership transfer
 
 ## 6. Blocking / non-blocking
 
-Not applicable to the codec itself: encode/decode are pure in-memory transformations with no I/O and no concurrency primitives. The only I/O-aware surface is `NewEncoder`/`NewDecoder`, synchronous/blocking `io.Writer`/`io.Reader` wrappers by contract; the decoder reads from the wrapped reader inside `Read` (`encoding/base64/base64.go:461-...`). Go's concurrency model is goroutine-based, not `async`/`await`; an async caller wraps the blocking reader/writer in a goroutine. No async variant exists in the stdlib.
+Not applicable to the codec itself: encode/decode are pure in-memory transformations with no I/O and no concurrency primitives. The only I/O-aware surface is `NewEncoder`/`NewDecoder`, synchronous/blocking `io.Writer`/`io.Reader` wrappers by contract; the decoder reads from the wrapped reader inside `Read` (`encoding/base64/base64.go:439-547`). Go's concurrency model is goroutine-based, not `async`/`await`; an async caller wraps the blocking reader/writer in a goroutine. No async variant exists in the stdlib.
 
 ## 7. Alphabet variants and padding
 
@@ -74,7 +78,7 @@ Not applicable to the codec itself: encode/decode are pure in-memory transformat
 
 ## 8. Timeouts
 
-Not applicable: the packages have no timeout or cancellation concept. There is no `context.Context` parameter anywhere in `encoding/base64`, `encoding/base32` or `encoding/hex`; cancellation must happen at the `io.Reader`/`io.Writer` layer, because the stream wrappers only propagate the delegate's error (`encoding/base64/base64.go:217-263`, `:461-...`). (Assessment: derived from the API surface quoted above; no timeout symbol exists in the sources.)
+Not applicable: the packages have no timeout or cancellation concept. There is no `context.Context` parameter anywhere in `encoding/base64`, `encoding/base32` or `encoding/hex`; cancellation must happen at the `io.Reader`/`io.Writer` layer, because the stream wrappers only propagate the delegate's error (`encoding/base64/base64.go:217-263`, `:439-547`). (Assessment: derived from the API surface quoted above; no timeout symbol exists in the sources.)
 
 ## 9. Streaming / incremental encode+decode and leftover-byte carry
 

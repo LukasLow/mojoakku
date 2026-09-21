@@ -24,8 +24,10 @@ Node.js:
   `buf.toString(enc)`. `'base64url'` was introduced in v15.7.0/v14.18.0. (Source:
   https://nodejs.org/api/buffer.html)
 - **`Uint8Array.fromHex()` / `setFromHex()` / `toHex()`** provide Base16 in the
-  same ES 2027 family. (Source:
-  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/fromBase64)
+  same ES 2027 / Baseline 2025 family. (Sources:
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/fromHex,
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/setFromHex,
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toHex)
 
 ## 2. Relevant community libraries
 
@@ -50,16 +52,16 @@ Web platform (Sources: MDN btoa/atob, Uint8Array pages):
 
 - `btoa(stringToEncode) -> string`; `atob(encodedData) -> string` (binary string).
 - `Uint8Array.fromBase64(string[, options]) -> Uint8Array`, options:
-  `alphabet: "base64" $%$ "base64url"`, `lastChunkHandling: "loose" $%$ "strict" $%$
+  `alphabet: "base64" | "base64url"`, `lastChunkHandling: "loose" | "strict" |
   "stop-before-partial"`.
 - `Uint8Array.prototype.toBase64([options]) -> string`, options:
-  `alphabet: "base64" $%$ "base64url"`, `omitPadding: boolean` (default `false`).
+  `alphabet: "base64" | "base64url"`, `omitPadding: boolean` (default `false`).
 - `Uint8Array.prototype.setFromBase64(string[, options]) -> {read, written}`.
 
 Node.js `Buffer` (Source: https://nodejs.org/api/buffer.html):
 
-- `Buffer.from(string, 'base64' $%$ 'base64url' $%$ 'hex')`; `buf.toString(enc)`.
-- `Buffer.byteLength(string, 'base64'$%$'base64url'$%$'hex')`; `Buffer.isEncoding(enc)`;
+- `Buffer.from(string, 'base64' | 'base64url' | 'hex')`; `buf.toString(enc)`.
+- `Buffer.byteLength(string, 'base64'|'base64url'|'hex')`; `Buffer.isEncoding(enc)`;
   `Buffer.alloc(size, fill, encoding)`.
 
 js-base64 (Source: https://raw.githubusercontent.com/dankogai/js-base64/main/base64.ts):
@@ -160,7 +162,9 @@ off the main thread. (Assessment: derived from the MDN/Node docs above.)
   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/fromBase64)
 - **Base16**: Node `'hex'`; ES 2027 `toHex`/`fromHex`/`setFromHex`. Node truncates
   odd-length or non-hex input. (Sources: https://nodejs.org/api/buffer.html,
-  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/fromBase64)
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/fromHex,
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toHex,
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/setFromHex)
 - js-base64 additionally exposes an `isValid()` that accepts either alphabet but
   rejects mixing (`'+-' // false: can't mix both`) and allows omitted padding.
   (Source: https://raw.githubusercontent.com/dankogai/js-base64/main/base64.ts)
@@ -273,6 +277,9 @@ on decode. (Assessment: derived from the two MDN stream examples.)
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/fromBase64
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toBase64
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/setFromBase64
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/fromHex
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/setFromHex
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toHex
 - https://nodejs.org/api/buffer.html
 - https://raw.githubusercontent.com/dankogai/js-base64/main/README.md
 - https://raw.githubusercontent.com/dankogai/js-base64/main/base64.ts

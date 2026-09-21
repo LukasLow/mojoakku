@@ -14,12 +14,12 @@ Source: <https://en.cppreference.com/w/c/header>.
 
 C users therefore get their codec from one of four places, all non-standard:
 
-$%$ Provider $%$ Function family $%$ Header $%$
-$%$ --- $%$ --- $%$ --- $%$
-$%$ OpenSSL / BoringSSL $%$ `EVP_Encode*` / `EVP_Decode*` $%$ `<openssl/evp.h>` $%$
-$%$ glibc libresolv $%$ `b64_ntop` / `b64_pton` $%$ `<resolv.h>` (historically) $%$
-$%$ BSD libc $%$ `b64_ntop` / `b64_pton` $%$ `<resolv.h>` $%$
-$%$ gnulib / coreutils $%$ `base64_encode*` / `base64_decode*` $%$ `"base64.h"` $%$
+| Provider | Function family | Header |
+| --- | --- | --- |
+| OpenSSL / BoringSSL | `EVP_Encode*` / `EVP_Decode*` | `<openssl/evp.h>` |
+| glibc libresolv | `b64_ntop` / `b64_pton` | `<resolv.h>` (exported from libresolv) |
+| BSD libc | `b64_ntop` / `b64_pton` | `<resolv.h>` |
+| gnulib / coreutils | `base64_encode*` / `base64_decode*` | `"base64.h"` |
 
 - OpenSSL exposes the block and streaming entry points in `<openssl/evp.h>`:
   `EVP_ENCODE_CTX_new/free/copy/num`, `EVP_EncodeInit/Update/Final/Block`,
@@ -31,10 +31,19 @@ $%$ gnulib / coreutils $%$ `base64_encode*` / `base64_decode*` $%$ `"base64.h"` 
   `base64_decode_alloc_ctx`, plus macros `base64_decode`/`base64_decode_alloc`,
   and the length macro `BASE64_LENGTH(inlen) ((((inlen) + 2) / 3) * 4)`.
   Source: <https://raw.githubusercontent.com/coreutils/gnulib/master/lib/base64.h>.
-- glibc historically carried `b64_ntop`/`b64_pton` in `resolv/base64.c`
-  ("skips all whitespace anywhere", returns -1 on error), but they were never
-  public API; a glibc bug asks for them to be exported. Sources:
+- glibc carries `b64_ntop`/`b64_pton` in `resolv/base64.c` ("skips all
+  whitespace anywhere", returns -1 on error) and exposes them as public API in two
+  ways: the public `<resolv.h>` declares them
+  (`int b64_ntop (const unsigned char *, size_t, char *, size_t) __THROW;`,
+  `int b64_pton (char const *, unsigned char *, size_t) __THROW;`), and the
+  `libresolv` version script exports `__b64_ntop`/`__b64_pton` at `GLIBC_2.0`
+  (the header aliases `b64_ntop`/`b64_pton` to those). What is missing is an
+  official man page / documented status — bug 14118 (NEW since 2012) asks for
+  exactly that. So glibc exports them from *libresolv*, while BSD exports them
+  from *libc* itself (see below). Sources:
   <https://raw.githubusercontent.com/bminor/glibc/master/resolv/base64.c>,
+  <https://raw.githubusercontent.com/bminor/glibc/master/resolv/resolv.h>,
+  <https://raw.githubusercontent.com/bminor/glibc/master/resolv/Versions>,
   <https://sourceware.org/bugzilla/show_bug.cgi?id=14118>.
 - libsodium ships base64 `sodium_bin2base64`/`sodium_base642bin` and hex
   `sodium_bin2hex`/`sodium_hex2bin` in `<sodium/utils.h>`; Base32 is absent.
@@ -54,15 +63,15 @@ at <https://www.man7.org/linux/man-pages/man1/base32.1.html>).
 
 ## 2. Relevant community libraries
 
-$%$ Library $%$ Maintainer $%$ Maturity $%$ License $%$ Variants $%$
-$%$ --- $%$ --- $%$ --- $%$ --- $%$ --- $%$
-$%$ OpenSSL $%$ OpenSSL Foundation $%$ ubiquitous, current master $%$ Apache-2.0 $%$ base64 only $%$
-$%$ BoringSSL $%$ Google $%$ widely used (Chromium) $%$ ISC-style/OpenSSL $%$ base64 only $%$
-$%$ gnulib $%$ GNU/FSF $%$ coreutils dependency $%$ LGPL-2.1-or-later $%$ base64 (+base32 module) $%$
-$%$ libsodium $%$ Frank Denis $%$ 1.x, stable $%$ ISC $%$ base64 + hex; no base32 $%$
-$%$ libb64 $%$ libb64 project $%$ small, public domain $%$ public domain $%$ base64 only $%$
-$%$ aklomp/base64 $%$ Alfred Klomp $%$ active, SIMD-focused $%$ BSD-2-Clause $%$ base64 only $%$
-$%$ mbedTLS $%$ TrustedFirmware $%$ LTS crypto library $%$ Apache-2.0 (dual) $%$ base64 only $%$
+| Library | Maintainer | Maturity | License | Variants |
+| --- | --- | --- | --- | --- |
+| OpenSSL | OpenSSL Foundation | ubiquitous, current master | Apache-2.0 | base64 only |
+| BoringSSL | Google | widely used (Chromium) | ISC-style/OpenSSL | base64 only |
+| gnulib | GNU/FSF | coreutils dependency | LGPL-2.1-or-later | base64 (+base32 module) |
+| libsodium | Frank Denis | 1.x, stable | ISC | base64 + hex; no base32 |
+| libb64 | libb64 project | small, public domain | public domain | base64 only |
+| aklomp/base64 | Alfred Klomp | active, SIMD-focused | BSD-2-Clause | base64 only |
+| mbedTLS | TrustedFirmware | LTS crypto library | Apache-2.0 (dual) | base64 only |
 
 Sources:
 - OpenSSL license "Apache License 2.0":
@@ -89,7 +98,8 @@ C++.)
 
 ## 3. Exposed APIs
 
-**OpenSSL** (`<openssl/evp.h>`; sources `.../include/openssl/evp.h`,
+**OpenSSL** (`<openssl/evp.h>`; source
+<https://raw.githubusercontent.com/openssl/openssl/master/include/openssl/evp.h>,
 <https://manpages.debian.org/bookworm/libssl-doc/EVP_EncodeInit.3ssl.en.html>):
 
 - One-shot: `int EVP_EncodeBlock(unsigned char *t, const unsigned char *f, int dlen)`
@@ -140,14 +150,18 @@ C++.)
 - `bool base64_decode_alloc_ctx(...)`; `struct base64_decode_context { int i; char buf[4]; }`.
 - `signed char const base64_to_int[256]`, `isbase64`/`isubase64` inline helpers.
 
-**glibc / BSD** (`<resolv.h>`):
+**glibc / BSD** (`<resolv.h>`; glibc exports from `libresolv`, BSD from `libc`):
 
 - `int b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize)` —
   returns encoded length (excluding NUL) or -1 when the target is too small.
 - `int b64_pton(char const *src, u_char *target, size_t targsize)` — returns decoded
   bytes or -1. Skips whitespace anywhere; accepts `=` only as terminator; rejects
   non-zero trailing bits (the "subliminal channel" check `if (target && target[tarindex] != 0) return -1;`).
-  Source: <https://raw.githubusercontent.com/bminor/glibc/master/resolv/base64.c>.
+  Sources: <https://raw.githubusercontent.com/bminor/glibc/master/resolv/base64.c>,
+  <https://raw.githubusercontent.com/bminor/glibc/master/resolv/Versions> (glibc exports
+  `__b64_ntop`/`__b64_pton` from libresolv), and
+  <https://raw.githubusercontent.com/freebsd/freebsd-src/main/lib/libc/net/Symbol.map>
+  (FreeBSD exports `__b64_ntop`/`__b64_pton` from libc).
 
 **libsodium** (`<sodium/utils.h>`):
 
@@ -545,8 +559,16 @@ a public struct*, and *whether the one-shot API also exists*. OpenSSL answers
   <https://raw.githubusercontent.com/coreutils/gnulib/master/lib/base64.c>
 - glibc `resolv/base64.c`:
   <https://raw.githubusercontent.com/bminor/glibc/master/resolv/base64.c>
-- glibc bug 14118, "b64_ntop function not in public API":
+- glibc `resolv/resolv.h` (public declaration of `b64_ntop`/`b64_pton`):
+  <https://raw.githubusercontent.com/bminor/glibc/master/resolv/resolv.h>
+- glibc `resolv/Versions` (exports `__b64_ntop`/`__b64_pton` from libresolv):
+  <https://raw.githubusercontent.com/bminor/glibc/master/resolv/Versions>
+- FreeBSD `lib/libc/net/Symbol.map` (exports `__b64_ntop`/`__b64_pton` from libc):
+  <https://raw.githubusercontent.com/freebsd/freebsd-src/main/lib/libc/net/Symbol.map>
+- glibc bug 14118, "b64_ntop function not in public API" (asks for documented API
+  status; still NEW):
   <https://sourceware.org/bugzilla/show_bug.cgi?id=14118>
+  (text mirrored at <https://web.archive.org/web/20240715184623/https://sourceware.org/bugzilla/show_bug.cgi?id=14118>)
 - libsodium `sodium/utils.h`:
   <https://raw.githubusercontent.com/jedisct1/libsodium/master/src/libsodium/include/sodium/utils.h>
 - libsodium helpers documentation:

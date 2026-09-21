@@ -59,12 +59,18 @@ Legacy interface (file objects / RFC 2045): `encode(input, output)`,
 `decode(input, output)`, `encodebytes(s)`, `decodebytes(s)` — 76-char lines plus
 trailing newline. (Source: https://docs.python.org/3/library/base64.html)
 
-The current `main` branch source adds `padded` and `wrapcol` keyword arguments to
-`b64encode`, `b64decode`, `b32*`, `b16*` and `urlsafe_b64encode`, plus new
-`ignorechars`, `canonical` decode options. (Source:
+Python 3.15 (documented as "Changed in version 3.15") adds `padded` and `wrapcol`
+to `b64encode`; `padded`, `ignorechars` and `canonical` to `b64decode`;
+`padded`/`wrapcol`/`ignorechars`/`canonical` across the `b32*` and `b32hex*`
+pairs; `padded` to `urlsafe_b64encode`/`urlsafe_b64decode`; `wrapcol` to
+`b16encode`; `ignorechars` to `b16decode`; and, across the Base85 family,
+`wrapcol` (encode-side only), `ignorechars` (only on `b85decode`/`z85decode`)
+and `canonical` (on all three decoders). (Sources:
+https://docs.python.org/3.15/library/base64.html,
 https://raw.githubusercontent.com/python/cpython/main/Lib/base64.py) The 3.14.7
-docs page still documents the older signatures without `padded`/`wrapcol`.
-(Assessment: derived from comparing the docs page with the main-branch source.)
+docs page still documents the older signatures without these options.
+(Assessment: derived from comparing the 3.14.7 docs page with the 3.15 docs page
+and the main-branch source.)
 
 ## 4. Error representation
 
@@ -116,13 +122,14 @@ caller. (Source: https://docs.python.org/3/library/base64.html)
 
 Not applicable in the concurrency sense: base64 is a pure, CPU-bound transform
 with no I/O and no await points. The modern API is synchronous and blocking only
-for the duration of the CPU work. `binascii` releases the GIL inside the C
-functions when possible; pybase64 documents "Release the GIL" in its 1.2.0 change
-log. (Sources: https://docs.python.org/3/library/base64.html,
+for the duration of the CPU work. The CPython docs do not state whether the
+`binascii` conversion entry points release the GIL; in the CPython `binascii` C
+source the `Py_BEGIN_ALLOW_THREADS`/`Py_END_ALLOW_THREADS` pairs appear only
+inside `crc32` (`Modules/binascii.c:2207`), not in the Base64/Base32/Base16
+conversion functions. pybase64, by contrast, documents "Release the GIL" in its
+1.2.0 change log. (Sources: https://docs.python.org/3/library/base64.html,
+https://raw.githubusercontent.com/python/cpython/3.15/Modules/binascii.c,
 https://pypi.org/project/pybase64/)
-
-GUESS: whether every `binascii` entry point releases the GIL is not documented
-per-function; the pybase64 changelog is the only explicit GIL statement found.
 
 ## 7. Alphabet variants and padding
 
@@ -148,10 +155,10 @@ https://docs.python.org/3/library/binascii.html,
 https://raw.githubusercontent.com/python/cpython/main/Lib/base64.py)
 
 Padding is **on by default and expected** for Base64/Base32/Base16; wrong padding
-raises `binascii.Error`. URL-safe decode historically tolerates missing padding
-only via `validate=False`/`padded=False`; `urlsafe_b64decode` in the current main
-branch defaults to `padded=False`. (Sources:
-https://docs.python.org/3/library/base64.html,
+raises `binascii.Error`. Since Python 3.15, `urlsafe_b64decode(s, *, padded=False)`
+documents `padded` as defaulting to `False`, so padding of input is no longer
+required by default for URL-safe decoding. (Sources:
+https://docs.python.org/3.15/library/base64.html,
 https://raw.githubusercontent.com/python/cpython/main/Lib/base64.py)
 
 ## 8. Timeouts
@@ -227,7 +234,9 @@ https://raw.githubusercontent.com/python/cpython/main/Lib/base64.py)
 - **Value-semantics output**: return an owned `String`/`List[UInt8]`, and take the
   input as `borrowed` bytes so encode never copies the caller's buffer.
 - **Padding as an explicit `padded: Bool` parameter**, not an implicit lax mode —
-  strict by default, matching Python's newer `padded` direction.
+  strict by default, matching Python 3.15's documented `padded` parameter
+  (`padded=True` by default on encode; `urlsafe_b64decode` defaults to
+  `padded=False`). (Source: https://docs.python.org/3.15/library/base64.html)
 - **A dedicated streaming/incremental type** exposing `feed(chunk)` and `finish()`
   with an internally carried 0–2 byte encode remainder or 0–3 char decode
   remainder — filling the gap Python leaves to the caller.
@@ -244,6 +253,8 @@ rejects other non-alphabet characters.)
 - https://docs.python.org/3/library/base64.html
 - https://docs.python.org/3/library/binascii.html
 - https://docs.python.org/3/library/codecs.html
+- https://docs.python.org/3.15/library/base64.html
 - https://raw.githubusercontent.com/python/cpython/main/Lib/base64.py
+- https://raw.githubusercontent.com/python/cpython/3.15/Modules/binascii.c
 - https://pypi.org/project/pybase64/
 - Mojo side (not researched here): `mojov1` buch `stdlib/base64`

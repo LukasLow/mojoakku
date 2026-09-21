@@ -206,7 +206,12 @@ Java uses **unchecked and checked exceptions**, split by layer:
   Sources:
   <https://commons.apache.org/proper/commons-codec/apidocs/org/apache/commons/codec/binary/BaseNCodec.html>,
   <https://commons.apache.org/proper/commons-codec/apidocs/org/apache/commons/codec/binary/Base64.html>.
-- Bouncy Castle: dedicated checked `DecoderException` / `EncoderException` types.
+- Bouncy Castle: dedicated `DecoderException` / `EncoderException` types, but
+  **unchecked** (runtime) exceptions — both extend `java.lang.IllegalStateException`
+  ("Exception thrown if an attempt is made to decode invalid data, or some other
+  failure occurs"). Sources:
+  <https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/org/bouncycastle/util/encoders/DecoderException.html>,
+  <https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/org/bouncycastle/util/encoders/EncoderException.html>.
 
 (Assessment: derived from the sources above: Java's error surface is fragmented
 by layer and policy — `IllegalArgumentException` in memory, `IOException` in
@@ -474,12 +479,13 @@ Source: <https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/
 ## 11. Decisions NOT to copy
 
 1. **Checked exceptions in a pure codec** (`IOException` from the JDK stream
-   wrapper, `DecoderException`/`EncoderException` in Commons Codec and Bouncy
-   Castle). A malformed base64 string is a data error, not an I/O condition.
+   wrapper; `DecoderException`/`EncoderException` in Commons Codec are checked,
+   while Bouncy Castle's same-named exceptions are unchecked runtime
+   exceptions). A malformed base64 string is a data error, not an I/O condition.
    Sources:
    <https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Base64.Decoder.html>,
    <https://commons.apache.org/proper/commons-codec/apidocs/org/apache/commons/codec/binary/BaseNCodec.html>,
-   <https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/org/bouncycastle/util/encoders/package-summary.html>.
+   <https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/org/bouncycastle/util/encoders/DecoderException.html>.
 2. **The `Object`-based `Encoder`/`Decoder` bridge** (`encode(Object)`,
    `decode(Object)`, throwing `EncoderException`/`DecoderException` "if the
    parameter supplied is not of type byte[]"). This is type-erasure legacy; a

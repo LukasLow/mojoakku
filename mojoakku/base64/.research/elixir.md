@@ -29,20 +29,20 @@ BEAM, base16/base32 come from Elixir's `Base` only, while base64 can be done by
 either implementation.
 
 Types declared by `Base`:
-- `@type encode_case :: :upper $%$ :lower` (`base.ex:99`)
-- `@type decode_case :: :upper $%$ :lower $%$ :mixed` (`base.ex:100`)
+- `@type encode_case :: :upper | :lower` (`base.ex:99`)
+- `@type decode_case :: :upper | :lower | :mixed` (`base.ex:100`)
 
 Neither implementation offers base58/base62, MIME line-wrapping, or streaming
 (see §9). `(Assessment: derived from Base summary and base64 export list.)`
 
 ## 2. Relevant community libraries
 
-$%$ name $%$ maintainer / publisher $%$ maturity $%$ license $%$ notes $%$
-$%$ --- $%$ --- $%$ --- $%$ --- $%$ --- $%$
-$%$ `base64url` (hex 1.0.1) $%$ publisher `potatosalad`; repo `dvv/base64url` $%$ last updated Jul 28 2019; 43,091,702 all-time downloads; 8 dependants $%$ MIT $%$ standalone URL-safe base64 codec, Erlang module, no padding; adds `encode_mime` for padded URL-safe (https://hex.pm/packages/base64url, https://github.com/dvv/base64url) $%$
-$%$ `multibase` (hex 0.0.1) $%$ publisher `nocursor`; repo `nocursor/ex-multibase` $%$ last updated Nov 14 2018; one version only; 15,110 all-time downloads $%$ MIT $%$ 22 encodings incl. base16/32/32hex/58/64 + pad variants; self-describing prefix; returns `{:ok,_}`/`:error`/`{:error,_}` and bang variants (https://hex.pm/packages/multibase, https://github.com/nocursor/ex-multibase) $%$
-$%$ `b58` / `base58` $%$ e.g. `dwyl/base58` $%$ niche, crypto/IPFS oriented $%$ (per package) $%$ Base58 `encode/1`/`decode/1`, e.g. for IPFS CID (https://hex.pm/packages/b58, https://github.com/dwyl/base58) $%$
-$%$ `base62` $%$ Hex package $%$ small $%$ (per package) $%$ Base62 encoder/decoder pure Elixir (https://hex.pm/packages/base62) $%$
+| name | maintainer / publisher | maturity | license | notes |
+| --- | --- | --- | --- | --- |
+| `base64url` (hex 1.0.1) | publisher `potatosalad`; repo `dvv/base64url` | last updated Jul 28 2019; 43,091,702 all-time downloads; 8 dependants | MIT | standalone URL-safe base64 codec, Erlang module, no padding; adds `encode_mime` for padded URL-safe (https://hex.pm/packages/base64url, https://github.com/dvv/base64url) |
+| `multibase` (hex 0.0.1) | publisher `nocursor`; repo `nocursor/ex-multibase` | last updated Nov 14 2018; one version only; 15,110 all-time downloads | MIT | 22 encodings incl. base16/32/32hex/58/64 + pad variants; self-describing prefix; returns `{:ok,_}`/`:error`/`{:error,_}` and bang variants (https://hex.pm/packages/multibase, https://github.com/nocursor/ex-multibase) |
+| `b58` / `base58` | e.g. `dwyl/base58` | niche, crypto/IPFS oriented | (per package) | Base58 `encode/1`/`decode/1`, e.g. for IPFS CID (https://hex.pm/packages/b58, https://github.com/dwyl/base58) |
+| `base62` | Hex package | small | (per package) | Base62 encoder/decoder pure Elixir (https://hex.pm/packages/base62) |
 
 `base64url`'s own README documents the padding split explicitly: plain
 `encode` emits `_3_-_A` (no padding) while `encode_mime` emits `_3_-_A==`
@@ -51,7 +51,7 @@ $%$ `base62` $%$ Hex package $%$ small $%$ (per package) $%$ Base62 encoder/deco
 ## 3. Exposed APIs
 
 Elixir `Base` (https://hexdocs.pm/elixir/Base.html):
-- Base16: `encode16(data, opts \\ [])`, `decode16/2` (`{:ok, binary} $%$ :error`),
+- Base16: `encode16(data, opts \\ [])`, `decode16/2` (`{:ok, binary} | :error`),
   `decode16!/2` (raises), `valid16?/2` (since 1.19.0). Option: `:case`
   (https://hexdocs.pm/elixir/Base.html#encode16/2, `base.ex:431`, `:518`, `:555`, `:603`).
 - Base32: `encode32/2`, `decode32/2`, `decode32!/2`, `valid32?/2`; option
@@ -71,7 +71,7 @@ Erlang/OTP `base64` (https://www.erlang.org/doc/apps/stdlib/base64.html):
   `mime_decode/2`, `encode_to_string/1,2`, `decode_to_string/1,2`,
   `mime_decode_to_string/1,2`, `format_error/2`
   (`lib/stdlib/src/base64.erl` export list ~L29).
-- Option map `#{mode => standard $%$ urlsafe, padding => boolean}` for both
+- Option map `#{mode => standard | urlsafe, padding => boolean}` for both
   encode and decode; default `#{mode => standard, padding => true}`
   (`base64.erl:84`, `:109`).
 - `encode/decode` return/accept `binary()`; the `_to_string` variants work on
@@ -158,13 +158,13 @@ fast paths inside the same synchronous call (see §10).
 
 ## 7. Alphabet variants and padding
 
-$%$ scheme $%$ alphabet $%$ pad char $%$ notes $%$
-$%$ --- $%$ --- $%$ --- $%$ --- $%$
-$%$ base16 $%$ `0123456789ABCDEF` $%$ none $%$ `Base.encode16`; `:case` upper/lower; no padding option $%$
-$%$ base32 $%$ `ABCDEFGHIJKLMNOPQRSTUVWXYZ234567` $%$ `=` $%$ standard RFC 4648 §6 $%$
-$%$ base32hex $%$ `0123456789ABCDEFGHIJKLMNOPQRSTUV` $%$ `=` $%$ `hex_encode32`, RFC 4648 §7 $%$
-$%$ base64 $%$ `A–Za–z0–9+/` $%$ `=` $%$ standard RFC 4648 §4 $%$
-$%$ base64url $%$ `A–Za–z0–9-_` $%$ `=` $%$ `url_encode64`, RFC 4648 §5 $%$
+| scheme | alphabet | pad char | notes |
+| --- | --- | --- | --- |
+| base16 | `0123456789ABCDEF` | none | `Base.encode16`; `:case` upper/lower; no padding option |
+| base32 | `ABCDEFGHIJKLMNOPQRSTUVWXYZ234567` | `=` | standard RFC 4648 §6 |
+| base32hex | `0123456789ABCDEFGHIJKLMNOPQRSTUV` | `=` | `hex_encode32`, RFC 4648 §7 |
+| base64 | `A–Za–z0–9+/` | `=` | standard RFC 4648 §4 |
+| base64url | `A–Za–z0–9-_` | `=` | `url_encode64`, RFC 4648 §5 |
 
 Alphabets are hard-coded character lists in `base.ex`
 (`b16_alphabet`, `b32_alphabet`, `b32hex_alphabet`, `b64_alphabet`,
@@ -226,7 +226,7 @@ the absence of any init/update/finish API in both sources.)`
 ## 10. Interesting design decisions
 
 1. **Dual API: tuple vs bang.** Every decoder exists twice — `decode64/2`
-   returning `{:ok, bin} $%$ :error` and `decode64!/2` raising `ArgumentError`.
+   returning `{:ok, bin} | :error` and `decode64!/2` raising `ArgumentError`.
    The tuple form is implemented as `rescue ArgumentError -> :error` around the
    bang form (`base.ex:836`), i.e. exceptions are the single internal error
    mechanism and tuples are a lossy convenience wrapper.
@@ -242,7 +242,7 @@ the absence of any init/update/finish API in both sources.)`
    and a Lemire SWAR trick (`base.ex` SWAR comments around L150–L210).
 4. **Option model.** Elixir uses an untyped keyword list (`case: :mixed`,
    `padding: false`, `ignore: :whitespace`); Erlang uses a typed map
-   `#{mode => standard $%$ urlsafe, padding => boolean}` with documented defaults
+   `#{mode => standard | urlsafe, padding => boolean}` with documented defaults
    (`base64.erl:84`, `:109`). Erlang's typed map is the better-modelled of the
    two.
 5. **Two alphabets, one table.** Erlang selects standard vs urlsafe by an
@@ -293,7 +293,7 @@ the absence of any init/update/finish API in both sources.)`
   can take the alphabet and the padding policy as `comptime` parameters and
   specialize the encode/decode loop, removing all runtime branching (mirrors
   `base.ex`'s compile-time character lists, but user-selectable).
-- **Typed errors via `raises`.** Replace `{:ok,_}$%$:error` + `ArgumentError`
+- **Typed errors via `raises`.** Replace `{:ok,_}|:error` + `ArgumentError`
   with a `raises DecodeError` (or an error enum: `InvalidChar`, `BadPadding`,
   `WrongLength`), matching Mojo's explicit error model and beating both the
   bare `:error` and the Erlang crash.

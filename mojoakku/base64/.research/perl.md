@@ -77,7 +77,7 @@ MIME::Base64 does **not** return error codes or throw typed exceptions:
 
 At the XS level, `decode_base64` uses an `index_64[256]` table where illegal
 characters are `255` (XX) and `=` is `254` (EQ); illegal bytes are simply skipped
-(`if (uc != INVALID) c[i++] = uc;`) and `c[0]==EQ $%$$%$ c[1]==EQ` stops decoding.
+(`if (uc != INVALID) c[i++] = uc;`) and `c[0]==EQ || c[1]==EQ` stops decoding.
 (Source:
 https://raw.githubusercontent.com/Perl/perl5/blead/cpan/MIME-Base64/Base64.xs)
 
