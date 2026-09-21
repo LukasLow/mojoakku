@@ -17,5 +17,7 @@ See mojoakku/base64/.research/README.md (selected languages, adapted question se
 - reviewer: phase 2 review (completeness, sources, contradictions).
 
 ## Phase status
-1 research        running (frozen selection: C, C++, Go, Rust, Python, Perl, JS/TS, Java, Elixir + Mojo via buch)
-2..13             pending
+1 research        done (C, C++, Go, Rust, Python, Perl, JS/TS, Java, Elixir + Mojo buch)
+2 research review APPROVED
+3 design          done; user approved the public API (BASE64_DOCS.md, 15 entries)
+4..13             pending
