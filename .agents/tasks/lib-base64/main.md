@@ -3,19 +3,19 @@
 Goal: build mojoakku/base64 through the full 13-phase NewLib pipeline. It is the
 first library and therefore the template every later library copies.
 
-Working channel: shared project file 165ad9c3 (agents report there via project-write).
-Status: phase 1 (research) done for the frozen language list; pipe artifact fix + phase 2 review running.
+Status: restarting from scratch after the workflows were reworked (max 6
+researchers one per group, researchers write `.research/<lang>.md` directly,
+`src/` + `api/` layout, per-library Taskfile, user API-review gate, commit per
+phase).
 
 ## Frozen run config
-See mojoakku/base64/.research/README.md (selected languages, adapted question set, reporting contract).
+See mojoakku/base64/.research/README.md (selected languages, adapted question set).
 
 ## Who does what
-- researchers: report chunks into project 165ad9c3, never touch the repo.
-- docs: materializes .research/<lang>.md from the project file.
-- coder: repairs formatting artifacts in .research, never changes research content.
+- researchers (max 5 for this run): one per language group, each writes
+  `.research/<lang>.md` directly; they never report through a docs agent.
 - reviewer: phase 2 review (completeness, sources, contradictions).
 
 ## Phase status
-1 research        done (9 languages + README, mojov1 for Mojo)
-2 research review running
-3..13             pending
+1 research        running (frozen selection: C, C++, Go, Rust, Python, Perl, JS/TS, Java, Elixir + Mojo via buch)
+2..13             pending
