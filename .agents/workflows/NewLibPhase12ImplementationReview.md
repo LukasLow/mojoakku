@@ -7,7 +7,7 @@ Review the implementation from `NewLibPhase11Implementation.md` for semantic fid
 ## Inputs
 
 - `mojoakku/<lib>/<LIB>_DOCS.md`.
-- `mojoakku/<lib>/API.mojo` and `mojoakku/<lib>/_internal/`.
+- `mojoakku/<lib>/api/` and `mojoakku/<lib>/src/`.
 - `mojoakku/<lib>/_tests/` and the frozen baseline from the Tests phase.
 - Implementation diff and final green test log.
 - Documented dependency edges.
@@ -33,15 +33,21 @@ Review the implementation from `NewLibPhase11Implementation.md` for semantic fid
 7. Confirm no hidden nested-library structure exists under `mojoakku/<lib>/` and that each used dependency edge is documented in the depending library's docs.
 8. Confirm no undocumented API was invented and that every public symbol is justified in `<LIB>_DOCS.md`.
 9. Record findings per axis with file:line references and severity.
+10. If `NEEDS_WORK`, Manager returns the findings to `NewLibPhase11Implementation.md`.
+11. If `APPROVED`, Manager logs the verdict via `agentlog`.
+12. Manager commits the phase with a message naming the phase and verdict (e.g. `base64 phase 12: implementation review APPROVED`).
+13. Manager hands off to final review.
 
 ## Artifacts / Outputs
 
 - Implementation review report: semantic matrix, test-integrity result, error-handling, ownership/resource and structure findings.
 - Explicit go/no-go decision for the Final Review phase.
+- One git commit for the phase.
 
 ## Review Gate
 
 - Go only if: implementation matches the documented semantics, there is no test tampering, error handling and resource/ownership are correct, and no hidden nested-library structure exists.
 - Any semantic mismatch, test edit, ownership bug or undocumented API is a blocking finding and returns to `NewLibPhase11Implementation.md`.
+- The phase is committed.
 
 ## Handoff: `NewLibPhase13FinalReview.md`

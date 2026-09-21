@@ -4,7 +4,7 @@
 Restructure code without changing behavior, keeping the test suite green before and after.
 
 ## Inputs
-- Target scope in `mojoakku/<lib>/` (`API.mojo`, `_internal/`, or tests).
+- Target scope in `mojoakku/<lib>/` (`api/`, `src/`, or tests).
 - `<LIB>_DOCS.md` of the affected library (defines the behavior that must not change).
 - Current test suite in `mojoakku/<lib>/_tests/`.
 - The motivation: readability, duplication, dead code, naming or structure.
@@ -31,12 +31,14 @@ Restructure code without changing behavior, keeping the test suite green before 
 6. `coder` re-runs the benchmark and compares against the baseline; a performance regression must be justified or fixed.
 7. `docs` updates `<LIB>_DOCS.md` only for internal references; public docs are unchanged.
 8. `reviewer` applies the review gate.
+9. `manager` commits the refactoring with a message naming the restructuring goal.
 
 ## Artifacts / Outputs
 - Refactored files under `mojoakku/<lib>/`.
 - Baseline and post-refactor test output (both green) stored as evidence files.
 - Benchmark before/after comparison when performance was in scope.
 - Task-log entry naming the restructuring goal and the files touched.
+- One git commit carrying the restructuring.
 
 ## Review Gate
 `reviewer` verifies: (a) tests were green before and after, (b) no public API or semantics changed, (c) the restructuring is behavior-preserving, (d) any performance delta is explained. A missing baseline or changed semantics => reject and route to `NewLibPhase3Design.md`.

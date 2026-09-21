@@ -45,11 +45,14 @@ names added later; this list is illustrative, not exhaustive.
 
 ```
 mojoakku/<lib>/
-  __init__.mojo      # public package entry point
-  API.mojo           # the agreed public API surface
+  __init__.mojo      # public package entry point; re-exports from api/
+  api/               # public API surface, ONE file per API area (no API.mojo)
+    __init__.mojo    # re-exports every public member
+    <area>.mojo      # e.g. encode.mojo, decode.mojo — stubs + inline doc comments
+  src/               # private implementation details
   <LIB>_DOCS.md      # single source of truth (e.g. SOCKET_DOCS.md)
-  _internal/         # private implementation details
-  _tests/            # tests, written BEFORE implementation (no __init__.mojo)
+  _tests/            # tests, one file per concern (no __init__.mojo)
+  Taskfile.yml       # per-library test runner (task test)
   .research/         # phase-1 research notes, one file per reference language
 ```
 
@@ -69,6 +72,14 @@ mojoakku/<lib>/
 - **No implementation before research + API + scaffold + tests exist.**
 - `<LIB>_DOCS.md` is the **single source of truth** for a library.
 - Every API decision must be **justified in the docs**.
+- The public API lives in `api/` (one file per API area), never in a single
+  `API.mojo`; private logic lives in `src/`; every public function carries an
+  inline doc comment next to it.
+- Each library ships its own `Taskfile.yml` with a `test` task for its `_tests/`.
+- **The API design is approved by the user** before the design review runs
+  (`NewLibPhase3Design.md`, user review gate).
+- **Every workflow phase ends with a git commit** naming the phase (and, for a
+  review phase, its verdict), so each phase boundary is visible in history.
 - The **Manager starts NO Manager**.
 
 ## Mojo knowledge: the buch tool

@@ -31,6 +31,7 @@ Measure before and after with benchmarks, isolate the bottleneck, and never opti
 7. `debug` compares before/after, confirms the improvement is real and not measurement noise, and checks for regressions elsewhere.
 8. `coder` re-runs the full `_tests/` suite to prove behavior is unchanged.
 9. `reviewer` applies the review gate.
+10. `manager` commits the optimization with a message naming the metric and the improvement.
 
 ## Artifacts / Outputs
 - Benchmark script/steps and raw baseline/after output files.
@@ -38,6 +39,7 @@ Measure before and after with benchmarks, isolate the bottleneck, and never opti
 - Optimization diff localized to the bottleneck.
 - Before/after comparison table (median, spread, target met or not).
 - Task-log entry with the metric and the result.
+- One git commit carrying the optimization.
 
 ## Review Gate
 `reviewer` verifies: (a) a baseline existed before the change, (b) the bottleneck is proven by profiling, not guessed, (c) before/after use the identical workload and conditions, (d) the improvement exceeds measurement noise, (e) behavior is unchanged and tests are green. An optimization without a prior measurement => reject.

@@ -15,11 +15,14 @@ records deferred work that no library owns.
   `mojoakku/` tree is created in workflow phase 7 (Scaffold), and tests are
   written before implementation in phase 9 (Tests). A test runner would have
   nothing to run until then.
-- **Target state:** A `task test` command that walks every
-  `mojoakku/<lib>/_tests/*.mojo` file and runs each one with `mojo run` (there
-  is no `mojo test`; each test file is a program with its own `main()`),
-  stopping with a non-zero exit when a file fails. Plus the test files
-  themselves for each library.
+- **Target state:** A per-library `mojoakku/<lib>/Taskfile.yml` with a `test`
+  task that runs every `mojoakku/<lib>/_tests/*.mojo` file with `mojo run`
+  (there is no `mojo test`; each test file is a program with its own `main()`),
+  stopping with a non-zero exit when a file fails. The library Taskfile is
+  created in workflow phase 7 (Scaffold) together with the library skeleton, and
+  the tests themselves are written in phase 9 (Tests). Optionally a root-level
+  `task test` can walk every `mojoakku/<lib>/Taskfile.yml` and run each library's
+  `test` task.
 
 ## 2. Git tags and CI
 

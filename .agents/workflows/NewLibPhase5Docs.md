@@ -43,12 +43,14 @@ Turn the approved design into the complete `<LIB>_DOCS.md` single source of trut
 5. Ensure no API from the design is missing and no API appears that is not in the design. Newly discovered APIs are not added here; they go back through design.
 6. For every dependency edge, state the justification (e.g. `http -> tcp -> socket`) and confirm the dependency does not imply physical nesting.
 7. Manager logs the completed docs via `agentlog`.
-8. Manager hands the docs to review.
+8. Manager commits the phase: stages `mojoakku/<lib>/<LIB>_DOCS.md` and commits with a message naming the phase (e.g. `base64 phase 5: docs`).
+9. Manager hands the docs to review.
 
 ## Artifacts / Outputs
 - `mojoakku/<lib>/<LIB>_DOCS.md` in the final single-source-of-truth format, with one fully specified entry per API member and a documented dependency section.
 - Every entry carries Status, Signature, Semantics, Errors, Tests, Implementation status and Rationale.
 - One `.agents/log.md` entry recording the phase result.
+- One git commit for the phase.
 
 ## Review Gate
 - Every public API member from the approved design has exactly one documented entry.
@@ -56,5 +58,6 @@ Turn the approved design into the complete `<LIB>_DOCS.md` single source of trut
 - Every dependency edge has a written justification.
 - Status defaults to `planned`; implementation status is `not implemented`.
 - No implementation or tests are written in this phase.
+- The phase is committed.
 
 ## Handoff: `NewLibPhase6DocsReview.md`

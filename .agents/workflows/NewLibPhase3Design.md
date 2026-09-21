@@ -45,18 +45,23 @@ Derive the Mojo public API for `<lib>` from the reviewed research and record eve
 6. List every API entry in the `## Public API` section with a stable name that `NewLibPhase5Docs.md` will later document and `NewLibPhase7Scaffold.md` will stub.
 7. Record unresolved questions in `## Open Questions`; each must be answered before `NewLibPhase4DesignReview.md` can approve.
 8. Manager logs the design draft via `agentlog`.
-9. Manager hands the design to review.
+9. **User review gate (mandatory).** Manager presents the proposed public API to the user for discussion and approval before any review runs. The presentation must be readable for the low-vision user: the `## Public API` list with each signature and its one-line meaning, plus the decisions NOT to copy. The Manager uses the `question`/`show` tooling to collect the user's verdict. Only after the user explicitly approves (or the requested changes are applied and re-approved) does the phase continue. The user's decision and any requested changes are recorded in the `.agents/log.md` entry.
+10. Manager commits the phase: stages `mojoakku/<lib>/<LIB>_DOCS.md` and commits with a message naming the phase (e.g. `base64 phase 3: API design`).
+11. Manager hands the design to review.
 
 ## Artifacts / Outputs
 - `mojoakku/<lib>/<LIB>_DOCS.md` containing the derived design: goals, non-goals, reference APIs, public API list, full semantics, error surface, ownership/lifecycle, and per-decision justifications.
 - An explicit list of decisions NOT copied from other languages.
 - A `## Open Questions` list, ideally empty at handoff.
+- A recorded user verdict on the public API (approved / changes requested and applied).
 
 ## Review Gate
 - Every public API entry has semantics and not just a signature.
 - Every non-obvious decision has a `MojoAkku uses X because Y` justification naming a reference API.
 - No API is invented "silently": every choice traces to the research.
 - The design is implementable under Mojo language constraints.
+- The user has explicitly approved the public API (Step 9), or requested changes were applied and re-approved.
 - No code is written in this phase.
+- The phase is committed.
 
 ## Handoff: `NewLibPhase4DesignReview.md`

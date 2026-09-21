@@ -29,12 +29,15 @@ Verify that every designed API for `<lib>` has a complete, consistent `<LIB>_DOC
 7. reviewer checks the `## Dependencies` section: every edge has a written technical justification and no physical nesting is implied.
 8. reviewer returns `APPROVED` or `NEEDS_WORK` with a numbered findings list, each with `file:line` and the required fix.
 9. If `NEEDS_WORK`, Manager sends the findings back into `NewLibPhase5Docs.md` and repeats this review once.
-10. If `APPROVED`, Manager logs the verdict via `agentlog` and hands off to scaffold.
+10. If `APPROVED`, Manager logs the verdict via `agentlog`.
+11. Manager commits the phase with a message naming the phase and verdict (e.g. `base64 phase 6: docs review APPROVED`).
+12. Manager hands off to scaffold.
 
 ## Artifacts / Outputs
 - A written review verdict (`APPROVED` / `NEEDS_WORK`) with a findings list tied to `file:line`.
 - Corrected `mojoakku/<lib>/<LIB>_DOCS.md` when a rework pass was required.
 - One `.agents/log.md` entry recording the verdict.
+- One git commit for the phase.
 
 ## Review Gate
 - The designed API set and the documented entry set are identical.

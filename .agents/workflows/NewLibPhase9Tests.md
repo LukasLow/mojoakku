@@ -7,8 +7,9 @@ Write the complete behavioral test suite for `mojoakku/<lib>` from the documente
 ## Inputs
 
 - `mojoakku/<lib>/<LIB>_DOCS.md` (authoritative semantics).
-- `mojoakku/<lib>/API.mojo` (stubs defining names and signatures).
+- `mojoakku/<lib>/api/` (stubs defining names and signatures).
 - `mojoakku/<lib>/_tests/` (target directory, no `__init__.mojo`).
+- `mojoakku/<lib>/Taskfile.yml` (per-library test runner created in the scaffold).
 - Existing test conventions from sibling libraries under `mojoakku/*/_tests/`.
 
 ## Preconditions
@@ -28,20 +29,23 @@ Write the complete behavioral test suite for `mojoakku/<lib>` from the documente
 3. Ensure every documented public API has at least one test exercising its documented success path.
 4. Derive edge-case tests directly from the docs and cover at minimum: EOF, `EINTR`/`EAGAIN`, non-blocking behavior, ownership/close semantics, timeouts, and invalid input.
 5. Write assertions against documented semantics only — no assertions against implementation internals, and no self-referential (tautological) tests.
-6. Do not create `__init__.mojo` in `_tests/` and do not modify `API.mojo` to accommodate tests.
-7. Run the full test suite for the library.
+6. Do not create `__init__.mojo` in `_tests/` and do not modify the `api/` stubs to accommodate tests.
+7. Run the full test suite for the library via the per-library runner: `task -t mojoakku/<lib>/Taskfile.yml test` (or `cd mojoakku/<lib> && task test`).
 8. Record the objective baseline: exact test command, total test count, and the count of failing tests (expected: tests fail because stubs raise "not yet implemented"). Save the raw output to a baseline log file.
-9. Commit tests and the baseline log.
+9. Commit tests and the baseline log with a message naming the phase (e.g. `base64 phase 9: tests + failing baseline`).
 
 ## Artifacts / Outputs
 
 - `mojoakku/<lib>/_tests/test_<lib>_<concern>.mojo` files, one concern per file.
 - Baseline log with the exact command and the failing test count.
 - Concern-to-test-file coverage map.
+- One git commit for the phase.
 
 ## Review Gate
 
 - Entry gate for `NewLibPhase10TestsReview.md`: every documented concern has a test file, all required edge cases are present, and a reproducible failing baseline with an explicit failing-test count exists.
+- The per-library `Taskfile.yml test` task runs the suite.
 - Tests failing at this stage is the intended state; green tests here indicate a leaked implementation and block the phase.
+- The phase is committed.
 
 ## Handoff: `NewLibPhase10TestsReview.md`

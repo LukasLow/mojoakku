@@ -7,7 +7,8 @@ phase you are in and follow the matching workflow.
 ## New library pipeline
 
 The full path for a new library, in order. Each phase has a review gate before
-the next phase starts.
+the next phase starts, and each phase ends with a git commit naming the phase
+(and, for a review phase, its verdict).
 
 ```
 NewLibPhase1Research -> NewLibPhase2ResearchReview -> NewLibPhase3Design
@@ -19,13 +20,13 @@ NewLibPhase1Research -> NewLibPhase2ResearchReview -> NewLibPhase3Design
 
 | Phase workflow | Purpose |
 | --- | --- |
-| `NewLibPhase1Research.md` | Research the problem space and prior art: researchers report into the shared project file, one `docs` agent materializes `.research/<lang>.md`. |
+| `NewLibPhase1Research.md` | Research the problem space and prior art: at most 6 researchers, one per language group, each writes `.research/<lang>.md` directly. |
 | `NewLibPhase2ResearchReview.md` | Review the research for completeness, sources and relevance. |
-| `NewLibPhase3Design.md` | Design the public API and justify every decision. |
+| `NewLibPhase3Design.md` | Design the public API, justify every decision, and get explicit user approval of the API before review. |
 | `NewLibPhase4DesignReview.md` | Review the API design against the research and the process rules. |
 | `NewLibPhase5Docs.md` | Write `<LIB>_DOCS.md` as the single source of truth. |
 | `NewLibPhase6DocsReview.md` | Review the docs for accuracy, completeness and justification. |
-| `NewLibPhase7Scaffold.md` | Scaffold `mojoakku/<lib>/` (`__init__.mojo`, `API.mojo`, `_internal/`, `_tests/`). |
+| `NewLibPhase7Scaffold.md` | Scaffold `mojoakku/<lib>/` (`__init__.mojo`, `api/`, `src/`, `_tests/`, `Taskfile.yml`). |
 | `NewLibPhase8ScaffoldReview.md` | Review the scaffold against the agreed layout. |
 | `NewLibPhase9Tests.md` | Write tests before any implementation exists. |
 | `NewLibPhase10TestsReview.md` | Review the tests for coverage and correctness of intent. |

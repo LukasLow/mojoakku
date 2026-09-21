@@ -5,8 +5,8 @@ Review a sibling library or change for security weaknesses in input validation, 
 
 ## Inputs
 - Scope: the library or change under `mojoakku/<lib>/`.
-- `<LIB>_DOCS.md` and `API.mojo` for the intended trust boundaries.
-- Any `unsafe`/FFI/interop code in `_internal/`.
+- `<LIB>_DOCS.md` and the `api/` files for the intended trust boundaries.
+- Any `unsafe`/FFI/interop code in `src/`.
 - TLS, socket and HTTP configuration if in scope.
 - Threat-relevant tests in `mojoakku/<lib>/_tests/`.
 
@@ -32,6 +32,7 @@ Review a sibling library or change for security weaknesses in input validation, 
 7. `reviewer` checks the unsafe/interop boundary: each `unsafe` block has a stated safety invariant, and FFI input is validated before crossing.
 8. `coder` applies required hardening fixes with tests proving each fix, then runs the suite and any sanitizers.
 9. `reviewer` re-checks the fixes and applies the review gate.
+10. `manager` commits the hardening fixes with a message naming the findings addressed.
 
 ## Artifacts / Outputs
 - Security review report: findings with severity, `file:line`, affected trust boundary, and required fix.
@@ -39,6 +40,7 @@ Review a sibling library or change for security weaknesses in input validation, 
 - Re-check confirmation for each fixed finding.
 - Compliance note when user data is affected.
 - Task-log entry referencing the report.
+- One git commit carrying the hardening fixes.
 
 ## Review Gate
 `reviewer` verifies: (a) every entry point and `unsafe` site was examined, (b) findings are mapped to `file:line` and severity, (c) every high/critical finding is fixed with a test, (d) TLS and secret handling meet the documented expectations. An unexamined trust boundary or an outstanding high finding => reject.

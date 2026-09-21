@@ -29,12 +29,15 @@ Verify that the derived Mojo API design for `<lib>` is semantically complete, co
 7. reviewer checks that all `## Open Questions` are resolved or consciously accepted with a written rationale.
 8. reviewer returns `APPROVED` or `NEEDS_WORK` with a numbered findings list, each finding with `file:line` and the required fix.
 9. If `NEEDS_WORK`, Manager sends the findings back into `NewLibPhase3Design.md`, then repeats this review once.
-10. If `APPROVED`, Manager logs the verdict via `agentlog` and hands off to docs.
+10. If `APPROVED`, Manager logs the verdict via `agentlog`.
+11. Manager commits the phase with a message naming the phase and verdict (e.g. `base64 phase 4: design review APPROVED`).
+12. Manager hands off to docs.
 
 ## Artifacts / Outputs
 - A written review verdict (`APPROVED` / `NEEDS_WORK`) with a findings list tied to `file:line` in `<LIB>_DOCS.md`.
 - Corrected design sections when a rework pass was required.
 - One `.agents/log.md` entry recording the verdict.
+- One git commit for the phase.
 
 ## Review Gate
 - Every public API entry has complete semantics.

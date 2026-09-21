@@ -28,12 +28,15 @@ Verify that the per-language research for `<lib>` is complete, contradiction-fre
 7. reviewer checks that guesses are explicitly marked `GUESS:` and are not treated as facts anywhere.
 8. reviewer returns `APPROVED` or `NEEDS_WORK` plus a numbered findings list, each finding with `file:line` and the required fix.
 9. If `NEEDS_WORK`, Manager starts targeted `researcher` agents to fix only the listed findings, then returns to Step 1 with one new reviewer pass.
-10. If `APPROVED`, Manager logs the verdict via `agentlog` and hands off to design.
+10. If `APPROVED`, Manager logs the verdict via `agentlog`.
+11. Manager commits the phase: stages the corrected research files (if any) and the review verdict and commits with a message naming the phase and the verdict (e.g. `base64 phase 2: research review APPROVED`). If the phase was approved without any file change, commit an empty-but-meaningful review record (e.g. the updated `.agents/log.md`) so the phase boundary is visible in history.
+12. Manager hands off to design.
 
 ## Artifacts / Outputs
 - A written review verdict (`APPROVED` / `NEEDS_WORK`) with a findings list, each finding tied to `file:line`.
 - Corrected research files when a rework pass was required.
 - One `.agents/log.md` entry recording the verdict.
+- One git commit for the phase recording the verdict.
 
 ## Review Gate
 - All findings are closed or explicitly deferred with a written reason.

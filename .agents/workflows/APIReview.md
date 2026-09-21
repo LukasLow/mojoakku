@@ -5,7 +5,7 @@ Check a proposed or landed public API change for consistency with `<LIB>_DOCS.md
 
 ## Inputs
 - The API change: before/after signatures, types, error behavior.
-- `mojoakku/<lib>/API.mojo` (agreed public surface) and `mojoakku/<lib>/__init__.mojo` (exports).
+- `mojoakku/<lib>/api/` (agreed public surface) and `mojoakku/<lib>/__init__.mojo` (exports).
 - `<LIB>_DOCS.md` of the affected library (single source of truth).
 - Call sites in dependent sibling libraries.
 - Existing tests in `mojoakku/<lib>/_tests/`.
@@ -33,14 +33,16 @@ Check a proposed or landed public API change for consistency with `<LIB>_DOCS.md
 6. `reviewer` checks backward compatibility: breaking changes require an explicit decision and migration note; no silent removals or signature changes.
 7. `coder` applies corrections found in steps 2-6; `docs` re-syncs `<LIB>_DOCS.md`.
 8. `reviewer` applies the review gate.
+9. `manager` commits the API change with a message naming the symbol and the library.
 
 ## Artifacts / Outputs
 - API review report: verdict, undocumented items, naming findings, compatibility findings, required changes.
-- Updated `API.mojo`, `__init__.mojo` and `<LIB>_DOCS.md` when corrections were required.
+- Updated `api/` files, `__init__.mojo` and `<LIB>_DOCS.md` when corrections were required.
 - Migration note for any accepted breaking change.
 - Task-log entry referencing the report.
+- One git commit carrying the accepted API change.
 
 ## Review Gate
-`reviewer` verifies: (a) `API.mojo` and `<LIB>_DOCS.md` agree on every public symbol, (b) naming and error surface are consistent with the library, (c) backward compatibility is either preserved or explicitly accepted with a migration note, (d) all call sites are accounted for. Any undocumented public symbol or silent breaking change => reject.
+`reviewer` verifies: (a) the `api/` files and `<LIB>_DOCS.md` agree on every public symbol, (b) naming and error surface are consistent with the library, (c) backward compatibility is either preserved or explicitly accepted with a migration note, (d) all call sites are accounted for. Any undocumented public symbol or silent breaking change => reject.
 
 ## Handoff: NewLibPhase3Design.md if the API needs redesign, NewLibPhase11Implementation.md for corrections, or Release.md when the change is user-visible and accepted; otherwise close the task.
