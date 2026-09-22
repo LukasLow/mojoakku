@@ -1,45 +1,10 @@
-# API-DOCS-START
-# encode_into — encode borrowed bytes/text into a caller-owned String.
-# Status: implemented
-# Signature: def encode_into[
-#   alphabet: Alphabet = Alphabet.B64_STANDARD,
-#   padding: Padding = Padding.REQUIRED,
-# ](input: Span[UInt8], mut result: String) -> Int
-# def encode_into[
-#   alphabet: Alphabet = Alphabet.B64_STANDARD,
-#   padding: Padding = Padding.REQUIRED,
-# ](input: StringSpan, mut result: String) -> Int
-# Semantics: `input` is borrowed bytes or text treated as raw bytes; `result` is
-#   a caller-owned mutable String appended to (prior contents kept). The
-#   implementation reserves capacity itself, so `result` may have zero capacity on
-#   entry. Returns the number of encoded characters appended; no new heap
-#   allocation beyond result's own growth. Caller owns result; input stays
-#   borrowed. No I/O.
-# Errors: none; encode cannot fail.
-# Tests: test_base64_encode_into.mojo
-# Implementation status: implemented
-# Rationale: MojoAkku uses an appending in-place `mut result` overload because
-#   Go's incremental building block is the Append* family (AppendEncode grows the
-#   caller's buffer and returns the extended slice), and the Mojo stdlib's
-#   b64encode(input_bytes, mut result: String) writes into the caller's String
-#   while reserving capacity, so result may be a 0-capacity string on entry.
-#   Append, not overwrite-at-offset-0, is the documented contract.
-# API-DOCS-END
-
 from .alphabet import Alphabet
 from .padding import Padding
 
 from base64._internal.engine import encode_all
 
 
-# encode_into (Span[UInt8]) — encode raw bytes into a caller-owned String.
-#
-# Parameters: `input` is borrowed bytes; `result` is caller-owned and appended
-# to (its prior contents are kept). The implementation reserves capacity itself,
-# so `result` may have zero capacity on entry.
-# Return / meaning: the number of encoded characters appended to `result`.
-# Errors: none; encode cannot fail.
-# Semantics (one line): append semantics, like Go's AppendEncode.
+# Appends to result; the implementation reserves capacity itself.
 def encode_into[
     alphabet: Alphabet = Alphabet.B64_STANDARD,
     padding: Padding = Padding.REQUIRED,
@@ -49,13 +14,6 @@ def encode_into[
     return result.byte_length() - start
 
 
-# encode_into (StringSpan) — encode text into a caller-owned String.
-#
-# Parameters: `input` is borrowed text treated byte by byte; `result` is
-# caller-owned and appended to; capacity is reserved by the implementation.
-# Return / meaning: the number of encoded characters appended to `result`.
-# Errors: none; encode cannot fail.
-# Semantics (one line): append semantics, matching encode_into's byte overload.
 def encode_into[
     alphabet: Alphabet = Alphabet.B64_STANDARD,
     padding: Padding = Padding.REQUIRED,
@@ -63,3 +21,33 @@ def encode_into[
     var start = result.byte_length()
     encode_all[alphabet, padding](input.as_bytes(), result)
     return result.byte_length() - start
+
+# API-DOCS-START
+# encode_into — encode borrowed bytes/text into a caller-owned String.
+# Signature:
+#   def encode_into[
+#       alphabet: Alphabet = Alphabet.B64_STANDARD,
+#       padding: Padding = Padding.REQUIRED,
+#   ](input: Span[UInt8], mut result: String) -> Int
+#   def encode_into[
+#       alphabet: Alphabet = Alphabet.B64_STANDARD,
+#       padding: Padding = Padding.REQUIRED,
+#   ](input: StringSpan, mut result: String) -> Int
+# What it does:
+#   The in-place sibling of `encode`. `input` is borrowed bytes or text treated
+#   as raw bytes; `result` is a caller-owned mutable String that is APPENDED to
+#   (its prior contents are kept). The implementation reserves capacity itself,
+#   so `result` may have zero capacity on entry. `alphabet` and `padding` are
+#   compile-time and match `encode`.
+# Returns:
+#   The number of encoded characters appended to `result`. The caller owns
+#   `result`; `input` stays borrowed.
+# Errors:
+#   none — encode cannot fail.
+# Example:
+#   var out = String("prefix:")
+#   var n = encode_into("foobar", out)   # -> n == 8, out == "prefix:Zm9vYmFy"
+#   var plain = String()
+#   _ = encode_into("foo", plain)        # plain -> "Zm9v"
+#   _ = encode_into("bar", plain)        # plain -> "Zm9vYmFy" (appends)
+# API-DOCS-END

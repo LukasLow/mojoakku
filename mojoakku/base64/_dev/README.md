@@ -49,7 +49,7 @@ here is why", which is itself evidence.
 ## Writing contract
 
 Each researcher writes its language files **directly** into
-`mojoakku/base64/.research/<lang>.md`, one file per language of its group, using
+`mojoakku/base64/_dev/<lang>.md`, one file per language of its group, using
 exactly the section structure in `.agents/workflows/NewLibPhase1Research.md`.
 There is no reporting-project and no `docs` materialization pass.
 

@@ -354,9 +354,11 @@ struct DecodeState:
                 out.append(UInt8((acc >> shift) & 0xFF))
 
     # process — consume one chunk. `base` is the number of original-stream bytes
-    # before this chunk, so positions stay cumulative for streaming. Incomplete
-    # padding at the end of a call is always INVALID_PADDING (the stream cannot
-    # need more padding than the current quantum).
+    # before this chunk, so positions stay cumulative for streaming. A chunk
+    # boundary is NOT end of stream: an incomplete padding run at the end of a
+    # chunk is RETAINED (feed must not fail on a valid prefix), and only
+    # `finish` decides whether the run was completed. A real symbol following a
+    # padding symbol is still an error here, because padding is terminal.
     def process[
         a: Alphabet,
         pm: PaddingMode,
@@ -411,18 +413,23 @@ struct DecodeState:
                 self.emit_group[a](self.count, self.last_pos, False, emit, out)
                 self.count = 0
                 self.quantum_start = pos + 1
-        if self.pad_count > 0:
-            # Incomplete padding when the call ends.
-            raise Base64Error(ErrorKind.INVALID_PADDING, self.quantum_start)
+        # A chunk boundary is not end of stream: an incomplete padding run is
+        # retained here and validated by `finish`.
+        return
 
-    # finish — validate and flush the retained remainder, mirroring one-shot
-    # `decode` for a structurally impossible remainder (INVALID_LENGTH), a
-    # STRICT partial quantum lacking canonical padding (INVALID_PADDING) and a
-    # TOLERANT partial quantum completed without padding.
+    # finish — validate and flush the retained remainder at true end of stream,
+    # mirroring one-shot `decode`. It raises INVALID_PADDING for an incomplete
+    # padding run (e.g. a stream that ends "Zg=" under STRICT), INVALID_LENGTH
+    # for a structurally impossible remainder, and completes a valid partial
+    # quantum (TOLERANT without padding, or a completed run already emitted by
+    # `process`).
     def finish[a: Alphabet, pm: PaddingMode](mut self, emit: Bool, mut out: List[UInt8]) raises Base64Error -> Int:
         var start = len(out)
         if self.stream_ended:
             return 0
+        if self.pad_count > 0:
+            # A padding run that never completed by end of stream.
+            raise Base64Error(ErrorKind.INVALID_PADDING, self.quantum_start)
         var r = self.count
         if r == 0:
             return 0

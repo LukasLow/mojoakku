@@ -175,6 +175,51 @@ def test_streaming_matches_one_shot_with_padding() raises:
     _ = dec^.finish(out)
     assert_equal(out, decode("Zg=="))
 
+def test_streaming_padding_split_at_every_point_matches_one_shot() raises:
+    # Every split point of a padded input must equal one-shot decode, including
+    # splits that cut the padding run itself (feed("Zg=") then feed("=")).
+    var raw = "Zg=="
+    var all = bytes_of(raw)
+    for split in range(0, len(all) + 1):
+        var first = List[UInt8]()
+        for i in range(0, split):
+            first.append(all[i])
+        var second = List[UInt8]()
+        for i in range(split, len(all)):
+            second.append(all[i])
+        var out = List[UInt8]()
+        var dec = Decoder()
+        try:
+            _ = dec.feed(Span(first), out)
+        except e:
+            dec^.discard()
+            raise e^
+        try:
+            _ = dec.feed(Span(second), out)
+        except e:
+            dec^.discard()
+            raise e^
+        _ = dec^.finish(out)
+        assert_equal(out, decode(raw), "padding split point mismatch")
+
+def test_incomplete_padding_at_finish_raises() raises:
+    # A stream that ends mid-padding ("Zg=") is an incomplete padding run and
+    # raises INVALID_PADDING only at finish, matching one-shot decode("Zg=").
+    var out = List[UInt8]()
+    var dec = Decoder()
+    try:
+        _ = dec.feed("Zg=", out)
+    except e:
+        dec^.discard()
+        raise e^
+    var caught = False
+    try:
+        _ = dec^.finish(out)
+    except e:
+        caught = True
+        assert_equal(e.kind, ErrorKind.INVALID_PADDING)
+    assert_true(caught)
+
 def test_padding_then_more_symbols_fails_like_one_shot() raises:
     # feed("Zg==") then feed("AAAA") must fail just like decode("Zg==AAAA"),
     # with the same kind and the same cumulative `position` (docs: streaming
@@ -334,13 +379,14 @@ def test_feed_raises_invalid_symbol() raises:
     assert_equal(kind, ErrorKind.INVALID_SYMBOL)
 
 def test_feed_raises_invalid_padding_for_padding_mid_stream() raises:
-    # A padding symbol with symbols still expected (no full quantum yet) is a
-    # mid-stream padding error.
+    # Padding is terminal: a real symbol after a padding symbol is an error.
+    # (A padding run that merely crosses a chunk boundary is NOT an error; that
+    # valid prefix is retained and validated by finish.)
     var out = List[UInt8]()
     var dec = Decoder()
     var kind = ErrorKind.INVALID_SYMBOL
     try:
-        _ = dec.feed("Zg=", out)
+        _ = dec.feed("Zg=Z", out)
         dec^.discard()
     except e:
         kind = e.kind

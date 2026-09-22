@@ -1,45 +1,4 @@
-# API-DOCS-START
-# PaddingMode — compile-time decode padding policy.
-# Status: implemented
-# Signature: struct PaddingMode(Equatable, ImplicitlyCopyable, Deinitable):
-#   var _id: UInt8; @doc_hidden def __init__(out self, id: UInt8)
-#   comptime STRICT = PaddingMode(0); comptime TOLERANT = PaddingMode(1)
-# Semantics: used as `[padding_mode: PaddingMode = PaddingMode.STRICT]` on
-#   decode/decode_into/Decoder/is_valid. STRICT requires RFC 4648 canonical input
-#   (exact padding if the final quantum is partial, none if it is full) and
-#   rejects non-zero trailing bits as INVALID_SYMBOL. TOLERANT accepts a padded or
-#   unpadded final quantum; if padding is present its count must still be exactly
-#   right, padding may only occur at the end and no symbol may follow it;
-#   TOLERANT also accepts non-zero trailing bits. For HEX_LOWER/HEX_UPPER there is
-#   no padding symbol at all, so STRICT and TOLERANT are equivalent; the
-#   parameter remains for API uniformity. Value type, compile-time only.
-# Errors: invalid padding under either mode raises INVALID_PADDING (or
-#   INVALID_LENGTH for a structurally impossible remainder); a recoverable data
-#   error.
-# Tests: test_base64_padding_mode.mojo
-# Implementation status: implemented
-# Rationale: MojoAkku uses a two-value PaddingMode because Rust's
-#   Indifferent/RequireCanonical pair and Commons Codec's CodecPolicy show that
-#   "padding present/absent" is a decode policy distinct from the encode policy,
-#   while Java shows the tolerant mode is useful for real-world interop.
-#   RequireNone (padding forbidden) is deliberately not represented: a caller who
-#   must reject '=' scans for it before choosing TOLERANT, and STRICT is the
-#   complement and the default.
-# API-DOCS-END
-
-
-# PaddingMode — compile-time decode padding policy.
-#
-# Used as `[padding_mode: PaddingMode = PaddingMode.STRICT]` on
-# decode/decode_into/Decoder/is_valid.
-# Parameters: none; callers use the two named constants below.
-# Return / meaning: STRICT requires RFC 4648 canonical input (exact padding, and
-# zero trailing bits in the final symbol); TOLERANT accepts a padded or unpadded
-# final quantum, but if padding is present its count must still be exact.
-# Errors: invalid padding under either mode raises INVALID_PADDING (or
-# INVALID_LENGTH for a structurally impossible remainder).
-# Semantics (one line): the decode policy is separate from the encode policy and
-# defaults to strict canonicality.
+# PaddingMode — compile-time decode padding policy; see API-DOCS below.
 struct PaddingMode(Equatable, ImplicitlyCopyable, Deinitable):
     var _id: UInt8
 
@@ -49,3 +8,40 @@ struct PaddingMode(Equatable, ImplicitlyCopyable, Deinitable):
 
     comptime STRICT   = PaddingMode(0)   # require canonical padding / no padding
     comptime TOLERANT = PaddingMode(1)   # padding optional, but consistent if present
+
+# API-DOCS-START
+# PaddingMode — compile-time decode padding policy.
+# Signature:
+#   struct PaddingMode(Equatable, ImplicitlyCopyable, Deinitable):
+#       var _id: UInt8
+#       @doc_hidden
+#       def __init__(out self, id: UInt8)
+#       comptime STRICT   = PaddingMode(0)
+#       comptime TOLERANT = PaddingMode(1)
+# What it does:
+#   Passed as a compile-time value parameter to the decoding entries `decode`,
+#   `decode_into`, `Decoder` and `is_valid`, e.g.
+#   `decode[Alphabet.B64_STANDARD, PaddingMode.TOLERANT]("Zg")`.
+#     STRICT   — require RFC 4648 canonical input: a partial final quantum must
+#                carry exactly its padding, a full quantum none, and the unused
+#                trailing bits of the final symbol must be zero (non-zero bits
+#                raise INVALID_SYMBOL).
+#     TOLERANT — accept a padded or unpadded final quantum. If padding is
+#                present its count must still be exactly right, padding may only
+#                appear at the end, and no symbol may follow it. Non-zero
+#                trailing bits are accepted.
+#   STRICT is the default. For HEX_LOWER/HEX_UPPER there is no padding symbol,
+#   so the two modes behave identically; the parameter remains for uniformity.
+#   A structurally impossible remainder (e.g. a single base64 symbol) fails under
+#   both modes.
+# Returns:
+#   An opaque compile-time value, used only as a value parameter.
+# Errors:
+#   none at selection time. A policy violation during decode raises Base64Error
+#   with kind INVALID_PADDING (or INVALID_LENGTH for an impossible remainder);
+#   every failure is a recoverable data error.
+# Example:
+#   decode[Alphabet.B64_STANDARD, PaddingMode.STRICT]("Zg")    # raises INVALID_PADDING
+#   decode[Alphabet.B64_STANDARD, PaddingMode.TOLERANT]("Zg")  # -> [102]
+#   decode[Alphabet.B64_STANDARD, PaddingMode.TOLERANT]("Zh==") # -> [102]
+# API-DOCS-END
