@@ -1,5 +1,8 @@
-# MojoAkku base64 — private implementation area.
+# MojoAkku base64 — private implementation area marker.
 #
-# This directory is the private implementation home. It deliberately contains no
-# real logic in the scaffold phase (Phase 7); the public stubs live in api/.
-# This placeholder keeps the directory tracked in git.
+# The real private logic lives in `engine.mojo` in this directory: the shared
+# encode/decode state machine, alphabet tables and length functions. The public
+# stubs delegate from `api/`.
+#
+# This file carries no logic; it only marks the `src/` directory. See
+# `engine.mojo` for the implementation.

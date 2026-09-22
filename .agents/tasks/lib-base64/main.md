@@ -27,8 +27,9 @@ See mojoakku/base64/.research/README.md (selected languages, adapted question se
 8 scaffold review APPROVED (layout/stubs/inline docs verified; 3 non-blocking notes for phase 9: abort = process exit not catchable error, stdlib base64 name-collision check, .tmp mkdir)
 9 tests           done; red baseline 14 files / 0 passed / 14 failed (baseline.log); compile gate via consumer import passes
 10 tests review   APPROVED (commit 3bdc9a8)
-11 implementation done; all 14 test files green (127 tests, 0 failing); compile gate passes; 3 latent test bugs fixed (see note). next: 12 implementation review
-12..13            pending
+11 implementation done; all 14 test files green (compile gate passes); 3 latent test bugs fixed (see note)
+12 implementation review APPROVED (blocker fixed: padded impossible remainder now INVALID_LENGTH; +3 regression tests; docs carry-array size fixed). next: 13 final review
+13                pending
 
 ## Note on test fixes during Phase 11
 Three frozen tests were objectively wrong (they contradicted BASE64_DOCS.md and

@@ -45,6 +45,11 @@ def test_impossible_length_is_false() raises:
     assert_false(is_valid("Z"))
     assert_false(is_valid("Zg==="))
 
+def test_padded_impossible_remainder_is_false() raises:
+    # Regression: padding cannot complete a structurally impossible remainder.
+    assert_false(is_valid("A==="))
+    assert_false(is_valid[Alphabet.B32_STANDARD]("A======="))
+
 def test_missing_padding_is_false_under_strict() raises:
     assert_false(
         is_valid[Alphabet.B64_STANDARD, PaddingMode.STRICT, Whitespace.REJECT]("Zg")

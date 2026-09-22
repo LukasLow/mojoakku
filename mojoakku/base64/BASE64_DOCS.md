@@ -1121,7 +1121,9 @@ Semantics:
   caller-owned mutable `String`
   appended to. `finish`/`discard` consume the encoder. The carry size is
   `quantum_bytes - 1` (base64: 0–2 bytes; base32: 0–4 bytes; base16: none),
-  stored in a small fixed `Array[UInt8, 4]` plus a count; it is never exposed.
+  stored in a small fixed `Array[UInt8, 8]` plus a count; it is never exposed.
+  (The array is sized 8 so the largest carry — base32's 4 bytes — plus the
+  in-progress byte always fits; the count, not the array, bounds the remainder.)
 - **Return / meaning:** `feed` returns the number of encoded characters appended
   for this chunk, encoding only complete quanta and holding the remainder.
   `finish` encodes the final partial quantum (with padding if
@@ -1454,23 +1456,25 @@ Most decisions are closed against the reviewed research and the `mojov1` buch.
 
 **Open**
 
-- **Named destructor signature.** The buch documents the named destructor form
-  as `def name(deinit self)` (optionally `raises`); it does **not** evidence a
-  named destructor that additionally takes a `mut out` parameter and returns an
-  `Int` (`finish(deinit self, mut out: String) -> Int`). This could not be
-  compile-verified in this phase (no Mojo toolchain). **Interim answer:** keep
-  the `finish(deinit self, mut out: …) -> Int` signature only if Phase 7
-  compiles it; otherwise restructure so the final flush writes through a
-  non-destructor method and the destructor stays argument-light as documented.
-- **User-struct value as a value-parameter type.** The buch evidences scalar
-  (`factor: Int`), `String` (`msg: String = "woof"`) and *type* parameters
-  (`struct Bar[v: Int]`, which is itself parameterized on a value), but not a
-  user-defined struct **value** used as a value-parameter type such as
-  `[alphabet: Alphabet]`. Phase 7 must compile this; if it is rejected, fall
-  back to a `UInt8` id value parameter plus documented constant aliases
-  (`mojov1/functions/parameters-and-generics`).
 - **Go base32 decode case sensitivity.** `go.md` §7 says only that base32's
   `decodeMap` is built from the uppercase alphabet and is silent on lowercase
   rejection, so the Go corroboration for `B32_*` uppercase-only is a **GUESS**;
   Python (`casefold=False`) and cppcodec (uppercase-only tables) carry the claim.
-  Phase 7 verifies the Go source before this is treated as established.
+  Still unverified against the Go source; the Mojo behaviour follows
+  Python/cppcodec and RFC 4648.
+
+**Resolved during implementation (Phase 7 / 11)**
+
+- **Named destructor signature — RESOLVED (works).** Phase 7 compiled
+  `finish(deinit self, mut out: String) -> Int` (and the `raises` decoder form)
+  unchanged; the documented destructor-with-`out` form is valid in Mojo 1.x, so
+  no fallback is needed. Callers transfer with `^` (e.g. `enc^.finish(out)`).
+- **User-struct value as a value-parameter type — RESOLVED (works).** Phase 7/11
+  compiled `[alphabet: Alphabet = …]` with user-defined `Alphabet`, `Padding`,
+  `PaddingMode` and `Whitespace` values; the `UInt8`-id fallback is not needed.
+- **`Span[UInt8]` spelling — implementation uses `Span[UInt8, _]`.** The exact
+  documented signature `Span[UInt8]` is under-specified for Mojo 1.x, which
+  requires an explicit origin; the implementation writes the idiomatic
+  `Span[UInt8, _]` (wildcard origin). This is a syntax necessity, not an API
+  change: the parameter is still a borrowed byte span. Documented signatures that
+  read `Span[UInt8]` are to be understood as `Span[UInt8, _]`.

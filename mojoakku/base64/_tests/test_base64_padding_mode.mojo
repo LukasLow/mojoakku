@@ -123,6 +123,40 @@ def test_both_modes_reject_impossible_remainder() raises:
         assert_equal(e.position, 0)
     assert_true(tolerant_caught)
 
+def test_both_modes_reject_padded_impossible_remainder() raises:
+    # A structurally impossible remainder that is completed by padding is still
+    # invalid: padding cannot rescue symbol counts the alphabet cannot carry
+    # (base64 1 symbol, base32 1/3/6 symbols). Regression for the '=' branch.
+    var strict_caught = False
+    try:
+        _ = decode[Alphabet.B64_STANDARD, PaddingMode.STRICT]("A===")
+    except e:
+        strict_caught = True
+        assert_equal(e.kind, ErrorKind.INVALID_LENGTH)
+        assert_equal(e.position, 0)
+    assert_true(strict_caught)
+
+    var tolerant_caught = False
+    try:
+        _ = decode[Alphabet.B64_STANDARD, PaddingMode.TOLERANT]("Z===")
+    except e:
+        tolerant_caught = True
+        assert_equal(e.kind, ErrorKind.INVALID_LENGTH)
+        assert_equal(e.position, 0)
+    assert_true(tolerant_caught)
+
+def test_base32_rejects_padded_impossible_remainder() raises:
+    # base32 valid remainders are 2, 4, 5 and 7 symbols; 1, 3 and 6 are
+    # impossible even when the padding run is complete.
+    for input in ["A=======", "AAA=====", "AAAAAA=="]:
+        var caught = False
+        try:
+            _ = decode[Alphabet.B32_STANDARD, PaddingMode.STRICT](input)
+        except e:
+            caught = True
+            assert_equal(e.kind, ErrorKind.INVALID_LENGTH)
+        assert_true(caught)
+
 def test_base16_modes_are_equivalent_and_reject_equals() raises:
     # base16 has no padding symbol; '=' is INVALID_SYMBOL under both modes.
     assert_equal(

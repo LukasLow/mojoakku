@@ -380,6 +380,11 @@ struct DecodeState:
                 if self.pad_count > required:
                     raise Base64Error(ErrorKind.INVALID_PADDING, self.quantum_start)
                 if self.pad_count == required:
+                    # A complete padding run only closes a structurally possible
+                    # remainder; padding cannot rescue an impossible symbol count
+                    # (e.g. base64 "A===" or base32 "A=======").
+                    if not valid_remainder[a](self.count):
+                        raise Base64Error(ErrorKind.INVALID_LENGTH, self.quantum_start)
                     # Trailing-bit canonicality is only enforced under STRICT.
                     self.emit_group[a](self.count, self.last_pos, pm == PaddingMode.STRICT, emit, out)
                     self.stream_ended = True
