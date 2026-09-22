@@ -1,0 +1,5 @@
+# .changes/new — pending change files
+
+Every pull request adds exactly one `.md` file here (see `.changes/README.md`).
+A file in this folder is pending; CI moves it to `.changes/archive/<tag>/` when
+it releases. This `.gitkeep` only keeps the folder in git while it is empty.

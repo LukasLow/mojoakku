@@ -41,48 +41,53 @@ tasks:
       - task: todo
 
   # --------------------------------------------------------------------------
-  # changes:version — compute the NEXT version from the current tag and the
-  # category lines in .changes/*.md.
+  # changes:version — PREVIEW the next version from the current tag and the
+  # pending files in .changes/new/. Read-only; it changes nothing.
   #
   # MojoAkku stays on 0.x.y; major is NEVER bumped. A pre-1.0 break is a minor
   # bump, same as NEW/DEPRECATED.
-  #   NEW / BREAKING / DEPRECATED present  -> minor: 0.(x+1).0
+  #   NEW / BREAKING / DEPRECATED present    -> minor: 0.(x+1).0
   #   only FIX/SECURITY/PERFORMANCE/INTERNAL -> patch: 0.x.(y+1)
-  # Prints the next version on stdout (e.g. "0.2.0"). Current tag comes from
-  # `git describe --tags --abbrev=0`; with no tag yet the base is 0.0.0.
+  # Prints the next version (e.g. "0.2.0"), or "none" when .changes/new/ is
+  # empty. The real release does the same computation in
+  # `.github/scripts/release-prepare.sh`.
   # --------------------------------------------------------------------------
   changes:version:
-    desc: 'Compute the next 0.x.y version from the current tag and .changes/ categories.'
+    desc: 'Preview the next 0.x.y from the current tag and pending .changes/new files.'
     cmds:
       - |
-        tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        tag=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n1)
+        [ -n "$tag" ] || tag=v0.0.0
         ver=${tag#v}
-        major=$(printf '%s' "$ver" | cut -d. -f1)
         minor=$(printf '%s' "$ver" | cut -d. -f2)
         patch=$(printf '%s' "$ver" | cut -d. -f3)
-        [ -n "$major" ] || major=0
         [ -n "$minor" ] || minor=0
         [ -n "$patch" ] || patch=0
-        # any minor-bumping category present? Consider only real change files;
-        # skip the explanatory .changes/README.md and any archive.
         bump=patch
-        for f in .changes/*.md; do
+        any=""
+        for f in .changes/new/*.md; do
           [ -f "$f" ] || continue
-          case "$f" in
-            .changes/README.md) continue ;;
-          esac
-          if grep -qE '^(NEW|BREAKING|DEPRECATED):' "$f"; then
-            bump=minor
-            break
-          fi
+          any="yes"
+          if grep -qE '^(NEW|BREAKING|DEPRECATED):' "$f"; then bump=minor; fi
         done
-        if [ "$bump" = "minor" ]; then
-          minor=$((minor + 1))
-          patch=0
+        if [ -z "$any" ]; then
+          echo "none"
+        elif [ "$bump" = "minor" ]; then
+          echo "0.$((minor + 1)).0"
         else
-          patch=$((patch + 1))
+          echo "0.${minor}.$((patch + 1))"
         fi
-        echo "0.${minor}.${patch}"
+
+  # --------------------------------------------------------------------------
+  # release:prepare — fold the pending status:new files into CHANGELOG.md,
+  # archive them, and print the new version (e.g. "new=v0.2.0"). Used by the
+  # main-push workflow; safe to run locally to preview the exact changelog edit.
+  # With no pending file it prints "new=none" and changes nothing.
+  # --------------------------------------------------------------------------
+  release:prepare:
+    desc: 'Apply pending .changes to CHANGELOG.md and print new=vX.Y.Z (or none).'
+    cmds:
+      - sh .github/scripts/release-prepare.sh
 
   # --------------------------------------------------------------------------
   # todo — the main command. One line per library that can be built NOW:

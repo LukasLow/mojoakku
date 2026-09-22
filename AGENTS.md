@@ -90,7 +90,7 @@ The canonical reference is `.agents/workflows/LibraryLayout.md`.
   every `mojoakku/*/Taskfile.yml` and runs each library's `test` (and optional
   `ci`) task; no library is registered anywhere. Each library owns how it tests.
 - **`.changes/` drives the changelog and the tag.** Every notable change gets one
-  `.changes/<date>-<slug>.md` file with category lines (`NEW`, `FIX`, `SECURITY`,
+  `.changes/new/<date>-<slug>.md` file with category lines (`NEW`, `FIX`, `SECURITY`,
   `PERFORMANCE`, `BREAKING`, `DEPRECATED`, `INTERNAL`). Versions stay on `0.x.y`
   and **major is never bumped**: `NEW`/`BREAKING`/`DEPRECATED` → minor,
   the rest → patch (`task changes:version`). See `.changes/README.md`.

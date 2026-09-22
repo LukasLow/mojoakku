@@ -7,7 +7,7 @@
 ## Checklist
 
 - [ ] `task ci` passes locally (it auto-discovers and tests every library).
-- [ ] A `.changes/<yyyy-mm-dd>-<slug>.md` file is added, with one category line
+- [ ] A `.changes/new/<yyyy-mm-dd>-<slug>.md` file is added, with one category line
       per change (`NEW:` / `FIX:` / `SECURITY:` / `PERFORMANCE:` / `BREAKING:` /
       `DEPRECATED:` / `INTERNAL:` — see `.changes/README.md`).
 - [ ] The affected library's inline `# API-DOCS` blocks are current.

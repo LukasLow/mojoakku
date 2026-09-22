@@ -3,8 +3,7 @@
 All notable changes to MojoAkku are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-No release has been cut yet, so no version numbers or release dates appear below;
-the entries live under `Unreleased` until the first tag is created.
+Versions stay on `0.x.y`; major is never bumped.
 
 ## [Unreleased]
 

@@ -1,25 +1,36 @@
 # .changes — how a change is recorded
 
-`.changes/` is the controlled input for the changelog and the version tag.
-Every user-visible (or otherwise notable) change lands here as **one file**, and
-the release workflow turns those files into `CHANGELOG.md` entries and the next
-git tag.
-
-## One file per change
-
-Create a file named `<yyyy-mm-dd>-<short-slug>.md` in `.changes/` (the date first
-keeps them ordered; the slug keeps them readable). One file = one change.
-
-Inside, write the change, one category line per change:
+`.changes/` is the controlled input for the changelog and the version tag. It
+has exactly two areas:
 
 ```
+.changes/
+  new/                 # pending changes — written by humans / pull requests
+    <yyyy-mm-dd>-<slug>.md
+  archive/             # released changes — created by CI only, one subfolder per tag
+    <tag>/<file>.md
+```
+
+- **`new/` is the input.** Every pull request adds **exactly one** Markdown file
+  here. A file that sits in `new/` is by definition pending: it has not been
+  released yet. No extra status field is needed.
+- **`archive/` is the output.** The `main-push` workflow creates
+  `.changes/archive/<tag>/` and moves the released files there. **Nobody writes
+  or moves anything in `archive/` by hand** — CI owns it.
+
+## The change file
+
+Name it `<yyyy-mm-dd>-<short-slug>.md` (the date first keeps them ordered; the
+slug keeps them readable). The file holds one category line per change:
+
+```markdown
 NEW: base64 — 15-entry public API with base16/base32/base64url
 FIX: base64 — streaming decoder accepts padding across chunk boundaries
 ```
 
-The category must be one of the six below, spelled exactly, followed by `: `.
-
 ## Categories
+
+The category lines drive the version. One file may carry several lines:
 
 | Category | Means | Version effect |
 | --- | --- | --- |
@@ -33,20 +44,22 @@ The category must be one of the six below, spelled exactly, followed by `: `.
 
 ## Versioning rule (IMPORTANT)
 
-MojoAkku stays on **`0.x.y`** — **major is never bumped**. It is a pre-1.0
-project, so a breaking change does **not** become `1.0.0`; it bumps the **minor**
-(`0.x.0`), exactly like `NEW` and `DEPRECATED`. The version is derived from the
-current tag plus the categories present in `.changes/`:
+MojoAkku stays on **`0.x.y`** — **major is never bumped**. A break is a **minor**
+bump (`0.x.0`), exactly like `NEW` and `DEPRECATED`. The version is derived from
+the current tag plus the categories of the pending files in `new/`:
 
-- any `NEW`, `BREAKING` or `DEPRECATED` → minor bump: `0.<x+1>.0`
-- only `FIX`, `SECURITY`, `PERFORMANCE` or `INTERNAL` → patch bump: `0.<x>.<y+1>`
+- any `NEW`, `BREAKING` or `DEPRECATED` → minor: `0.<x+1>.0`
+- only `FIX`, `SECURITY`, `PERFORMANCE` or `INTERNAL` → patch: `0.<x>.<y+1>`
 
-`task changes:version` (root Taskfile) computes the next version from the current
-`git describe` tag and the categories in `.changes/`. The release workflow uses
-that number for the tag and the changelog heading.
+## The release flow
 
-## After a release
+Triggered by a push to `main` (`.github/workflows/main-push.yml`):
 
-The release workflow writes the finished `CHANGELOG.md` section and then moves
-the consumed change files into `.changes/archive/<version>/`, so `.changes/`
-starts empty for the next cycle.
+1. `task ci` runs (nothing is released unless the suite is green).
+2. `sh .github/scripts/release-prepare.sh` computes the next `0.x.y`, prepends
+   the changelog section, and **moves** the released files from `new/` into
+   `.changes/archive/<version>/`.
+3. The workflow commits the changelog and the moves, tags `v<version>` and
+   pushes both atomically (with retry if `main` moved meanwhile).
+
+With nothing in `new/`, nothing is released — the push only runs the tests.

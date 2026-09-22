@@ -1,0 +1,94 @@
+name: main-push
+
+# Runs on every push to main. It ALWAYS tests (task ci). If there is a pending
+# file in `.changes/new/`, it then releases: it folds the change files into
+# CHANGELOG.md, moves them to `.changes/archive/<tag>/`, commits that, and
+# creates the next 0.x.y tag — pushed atomically, with retry if main moved
+# meanwhile. With nothing in `.changes/new/` it stops after the tests. Major is
+# never bumped (the release script rejects a non-zero major).
+#
+# The workflow is structured after dreego-stack/dreego's main-push.
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: main-push
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  test-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install pixi
+        uses: prefix-dev/setup-pixi@v0.10.2
+        with:
+          pixi-version: latest
+          run-install: false
+
+      - name: Install the toolchain
+        run: pixi install
+
+      - name: Test and release (task ci)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          for attempt in $(seq 1 5); do
+            git fetch origin main --tags
+            git checkout -B release-work origin/main
+
+            latest=$(git for-each-ref --format='%(refname:short)' --sort=-version:refname 'refs/tags/v[0-9]*.[0-9]*.[0-9]*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)
+            if [ -n "$latest" ] && ! git merge-base --is-ancestor "$latest" HEAD; then
+              echo "error: latest published tag $latest is not an ancestor of main" >&2
+              exit 1
+            fi
+
+            pixi run task ci
+
+            if ! find .changes/new -maxdepth 1 -type f -name '*.md' | grep -q .; then
+              echo "no pending change files; nothing to release"
+              exit 0
+            fi
+
+            out=$(sh .github/scripts/release-prepare.sh)
+            echo "$out"
+            new=$(printf '%s\n' "$out" | grep '^new=' | cut -d= -f2)
+
+            if [ "$new" = "none" ]; then
+              echo "no pending change files; keeping them pending"
+              exit 0
+            fi
+            if [ -z "$new" ]; then
+              echo "error: release-prepare.sh did not report a version" >&2
+              exit 1
+            fi
+
+            if git ls-remote --exit-code --tags origin "refs/tags/$new" >/dev/null 2>&1; then
+              echo "error: release tag already exists: $new" >&2
+              exit 1
+            fi
+
+            git add -A
+            git commit -m "release: $new [skip ci]"
+            git tag "$new"
+
+            if git push --atomic origin HEAD:main "$new"; then
+              echo "released $new"
+              exit 0
+            fi
+
+            git tag -d "$new"
+            echo "main advanced during release attempt $attempt; retrying"
+          done
+
+          echo "release failed after five concurrent-update retries" >&2
+          exit 1

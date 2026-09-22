@@ -1,0 +1,52 @@
+name: pull-request-check
+
+# Runs on every pull request. It requires exactly ONE new `.changes/new/*.md`
+# file with valid category lines, so every PR is reviewable and releasable.
+# Structured after dreego-stack/dreego's PR check.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install pixi
+        uses: prefix-dev/setup-pixi@v0.10.2
+        with:
+          pixi-version: latest
+          run-install: false
+
+      - name: Install the toolchain
+        run: pixi install
+
+      - name: Test
+        run: pixi run task ci
+
+      - name: Validate the change file
+        run: |
+          git fetch origin main
+          base=$(git merge-base HEAD origin/main)
+          files=$(git diff --diff-filter=A --name-only "$base" HEAD -- '.changes/new/*.md' | grep -v '/\.gitkeep$' || true)
+          count=$(printf '%s\n' "$files" | grep -c . || true)
+          if [ "$count" -ne 1 ]; then
+            echo "error: expected exactly one new .changes/new/*.md file, found $count"
+            exit 1
+          fi
+          f=$(printf '%s\n' "$files" | head -n1)
+          bad=$(awk '
+            /^[[:space:]]*$/ { next }
+            !/^(NEW|BREAKING|DEPRECATED|FIX|SECURITY|PERFORMANCE|INTERNAL):/ { print }
+          ' "$f")
+          if [ -n "$bad" ]; then
+            echo "error: $f: line without a valid category: '$bad'" >&2
+            exit 1
+          fi
+          echo "change file OK: $f"

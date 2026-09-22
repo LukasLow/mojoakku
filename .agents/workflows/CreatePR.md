@@ -18,7 +18,7 @@ hand-off from a finished library (or task) to CI and review.
   returned GO; for a task: the matching workflow's gate passed).
 - `task ci` is green locally (it auto-discovers every library and runs its
   tests).
-- There is at least one `.changes/<yyyy-mm-dd>-<slug>.md` file for the change.
+- There is at least one `.changes/new/<yyyy-mm-dd>-<slug>.md` file for the change.
 - The Manager starts no Manager subagent.
 
 ## Roles
@@ -32,7 +32,7 @@ hand-off from a finished library (or task) to CI and review.
 1. Manager confirms the change set is committed and `task ci` is green.
 2. Manager creates a short-lived branch off `main` named for the change, e.g.
    `base64-api` or `fix/streaming-padding`.
-3. Manager ensures a `.changes/<yyyy-mm-dd>-<slug>.md` file exists, with one
+3. Manager ensures a `.changes/new/<yyyy-mm-dd>-<slug>.md` file exists, with one
    category line per change (`NEW:` / `FIX:` / `SECURITY:` / `PERFORMANCE:` /
    `BREAKING:` / `DEPRECATED:` / `INTERNAL:`). If it is missing, `docs` writes it.
 4. Manager verifies the next version with `task changes:version` (always
