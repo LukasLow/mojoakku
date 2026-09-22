@@ -54,6 +54,10 @@ def test_base32_omitted_formula() raises:
     assert_equal(encoded_len[Alphabet.B32_STANDARD, Padding.OMITTED](6), 10)
 
 def test_base32_hex_uses_same_lengths_as_base32() raises:
+    # Absolute anchor: B32_HEX OMITTED for 6 bytes is 5 symbols * 2 = 10
+    # (the same value B32_STANDARD would give), so the relative comparison
+    # below cannot pass on two equally wrong results.
+    assert_equal(encoded_len[Alphabet.B32_HEX, Padding.OMITTED](6), 10)
     assert_equal(
         encoded_len[Alphabet.B32_HEX, Padding.REQUIRED](3),
         encoded_len[Alphabet.B32_STANDARD, Padding.REQUIRED](3),

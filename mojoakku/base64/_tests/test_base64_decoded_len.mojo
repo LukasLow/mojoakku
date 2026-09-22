@@ -39,6 +39,9 @@ def test_base32_formula_partial_map() raises:
     assert_equal(decoded_len[Alphabet.B32_STANDARD](10), 6)
 
 def test_base32_hex_uses_same_lengths_as_base32() raises:
+    # Absolute anchor: an 8-symbol B32_HEX quantum is 5 bytes, so the relative
+    # comparison below cannot pass on two equally wrong results.
+    assert_equal(decoded_len[Alphabet.B32_HEX](8), 5)
     for n in range(0, 17):
         assert_equal(
             decoded_len[Alphabet.B32_HEX](n),

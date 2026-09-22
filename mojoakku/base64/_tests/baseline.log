@@ -1,30 +1,31 @@
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_alphabet.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/codec.mojo:43:10: MojoAkku: this API is not yet implemented
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_decode.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/codec.mojo:94:10: MojoAkku: this API is not yet implemented
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_decode_into.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/codec.mojo:129:10: MojoAkku: this API is not yet implemented
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_decoded_len.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/codec.mojo:178:10: MojoAkku: this API is not yet implemented
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_decoder.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/streaming.mojo:117:14: MojoAkku: this API is not yet implemented
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_encode.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/codec.mojo:43:10: MojoAkku: this API is not yet implemented
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_encode_into.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/codec.mojo:72:10: MojoAkku: this API is not yet implemented
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_encoded_len.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/codec.mojo:162:10: MojoAkku: this API is not yet implemented
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_encoder.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/streaming.mojo:40:14: MojoAkku: this API is not yet implemented
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_errors.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/codec.mojo:94:10: MojoAkku: this API is not yet implemented
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_is_valid.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/codec.mojo:196:10: MojoAkku: this API is not yet implemented
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_padding.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/codec.mojo:43:10: MojoAkku: this API is not yet implemented
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_padding_mode.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/codec.mojo:94:10: MojoAkku: this API is not yet implemented
 == mojo run -I mojoakku mojoakku/base64/_tests/test_base64_whitespace.mojo
-   result: FAIL (non-zero exit)
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/base64/api/codec.mojo:94:10: MojoAkku: this API is not yet implemented
 --------
 baseline: 14 files, 0 passed, 14 failed
+  failures: 14 stub abort, 0 compile/import error, 0 other

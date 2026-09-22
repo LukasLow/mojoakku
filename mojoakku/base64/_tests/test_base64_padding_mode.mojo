@@ -11,12 +11,8 @@
 from std.testing import assert_equal, assert_true, TestSuite
 from base64 import (
     Alphabet,
-    Padding,
     PaddingMode,
-    Whitespace,
     ErrorKind,
-    Base64Error,
-    encode,
     decode,
 )
 

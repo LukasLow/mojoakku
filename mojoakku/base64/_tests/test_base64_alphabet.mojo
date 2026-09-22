@@ -9,10 +9,7 @@ from std.testing import assert_equal, assert_true, TestSuite
 from base64 import (
     Alphabet,
     Padding,
-    PaddingMode,
-    Whitespace,
     ErrorKind,
-    Base64Error,
     encode,
     decode,
 )
@@ -67,8 +64,15 @@ def test_b64_standard_rejects_url_symbols() raises:
 def test_b64_case_sensitive_both_cases_are_symbols() raises:
     # base64 is inherently two-case: 'Z' and 'z' are different symbols.
     assert_equal(decode("Zm9v"), bytes_of("foo"))
-    var other = decode("zm9v")
-    assert_true(other != bytes_of("foo"))
+    # Exact bytes, not mere inequality: 'z' has value 51, 'Z' has value 25.
+    # "zm9v" -> 0xCE 0x6F 0x6F ("\xCEoo"); only 'm', '9' and 'v' are shared
+    # with "Zm9v". The raw bytes are built as a List because 0xCE makes the
+    # value invalid UTF-8 and so cannot be spelled as a String literal.
+    var expected = List[UInt8]()
+    expected.append(UInt8(0xCE))
+    expected.append(UInt8(0x6F))
+    expected.append(UInt8(0x6F))
+    assert_equal(decode("zm9v"), expected)
 
 def test_b32_standard_vectors() raises:
     # RFC 4648 §6 test vectors.

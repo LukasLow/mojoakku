@@ -9,11 +9,7 @@
 
 from std.testing import assert_equal, assert_true, TestSuite
 from base64 import (
-    Alphabet,
-    PaddingMode,
-    Whitespace,
     ErrorKind,
-    Base64Error,
     decode,
     decode_into,
 )

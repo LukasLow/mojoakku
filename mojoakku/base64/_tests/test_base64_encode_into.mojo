@@ -8,16 +8,9 @@
 from std.testing import assert_equal, TestSuite
 from base64 import (
     Alphabet,
-    Padding,
     encode,
     encode_into,
 )
-
-def bytes_of(text: String) -> List[UInt8]:
-    var out = List[UInt8]()
-    for b in text.bytes():
-        out.append(b)
-    return out^
 
 def test_encode_into_appends_to_existing_contents() raises:
     var result = String("prefix:")
@@ -43,7 +36,11 @@ def test_encode_into_can_be_called_repeatedly() raises:
     assert_equal(result, "Zm9vYmFy")
 
 def test_encode_into_byte_overload() raises:
-    var data = bytes_of("foobar")
+    # "foobar" as raw bytes, built by appending so no UTF-8 helper is needed.
+    var text = String("foobar")
+    var data = List[UInt8]()
+    for b in text.bytes():
+        data.append(b)
     var result = String()
     var n = encode_into(Span(data), result)
     assert_equal(n, 8)

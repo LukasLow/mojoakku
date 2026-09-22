@@ -5,14 +5,11 @@
 # '='; the choice is visible in the signature and affects base64/base32 output
 # only (base16 has no padding). Decode is governed separately by `PaddingMode`.
 
-from std.testing import assert_equal, assert_true, TestSuite
+from std.testing import assert_equal, TestSuite
 from base64 import (
     Alphabet,
     Padding,
     PaddingMode,
-    Whitespace,
-    ErrorKind,
-    Base64Error,
     encode,
     decode,
 )

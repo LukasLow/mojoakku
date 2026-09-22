@@ -20,7 +20,6 @@ from base64 import (
     PaddingMode,
     Whitespace,
     ErrorKind,
-    Base64Error,
     Decoder,
     decode,
 )
@@ -171,18 +170,115 @@ def test_streaming_matches_one_shot_with_padding() raises:
     assert_equal(out, decode("Zg=="))
 
 def test_padding_then_more_symbols_fails_like_one_shot() raises:
-    # feed("Zg==") then feed("AAAA") must fail just like decode("Zg==AAAA").
+    # feed("Zg==") then feed("AAAA") must fail just like decode("Zg==AAAA"),
+    # with the same kind and the same cumulative `position` (docs: streaming
+    # equals one-shot with "same output, same error kind, same position").
+    var one_shot_kind = ErrorKind.INVALID_SYMBOL
+    var one_shot_pos = -1
+    var one_shot_caught = False
+    try:
+        _ = decode("Zg==AAAA")
+    except e:
+        one_shot_caught = True
+        one_shot_kind = e.kind
+        one_shot_pos = e.position
+    assert_true(one_shot_caught)
+
     var out = List[UInt8]()
     var dec = Decoder()
     var kind = ErrorKind.INVALID_SYMBOL
+    var pos = -1
+    var caught = False
     try:
         _ = dec.feed("Zg==", out)
         _ = dec.feed("AAAA", out)
         dec^.discard()
     except e:
+        caught = True
         kind = e.kind
+        pos = e.position
         dec^.discard()
-    assert_equal(kind, ErrorKind.INVALID_PADDING)
+    assert_true(caught)
+    assert_equal(kind, one_shot_kind)
+    assert_equal(pos, one_shot_pos)
+
+def test_streaming_error_position_matches_one_shot() raises:
+    # An invalid symbol in the SECOND chunk must report the cumulative
+    # position of the whole stream: feed("Zm9") then feed("!AAA") reports the
+    # same kind and position as decode("Zm9!AAA") (docs `### Base64Error`
+    # "cumulative across the whole stream").
+    var one_shot_kind = ErrorKind.INVALID_PADDING
+    var one_shot_pos = -1
+    var one_shot_caught = False
+    try:
+        _ = decode("Zm9!AAA")
+    except e:
+        one_shot_caught = True
+        one_shot_kind = e.kind
+        one_shot_pos = e.position
+    assert_true(one_shot_caught)
+
+    var out = List[UInt8]()
+    var dec = Decoder()
+    var kind = ErrorKind.INVALID_PADDING
+    var pos = -1
+    var caught = False
+    try:
+        _ = dec.feed("Zm9", out)
+        _ = dec.feed("!AAA", out)
+        dec^.discard()
+    except e:
+        caught = True
+        kind = e.kind
+        pos = e.position
+        dec^.discard()
+    assert_true(caught)
+    assert_equal(kind, one_shot_kind)
+    assert_equal(pos, one_shot_pos)
+
+def test_carry_atomicity_invalid_symbol_not_retained() raises:
+    # Post-error state (docs `### Decoder`): each symbol is validated before it
+    # mutates the carry, so on a raise the carry holds only fully validated
+    # sub-quantum symbols. Feed a valid partial quantum, then a chunk whose
+    # first symbol is invalid; the retained carry must still be the three valid
+    # symbols "Zm9" -- not "Zm9!". Proof: `finish` on a retained "Zm9" (a
+    # structurally valid 3-symbol remainder lacking its canonical padding)
+    # raises INVALID_PADDING, whereas a carry contaminated with the bad '!'
+    # would raise INVALID_SYMBOL instead.
+    var out = List[UInt8]()
+    var dec = Decoder()
+    try:
+        _ = dec.feed("Zm9", out)
+    except e:
+        dec^.discard()
+        raise e^
+
+    var feed_kind = ErrorKind.INVALID_PADDING
+    var feed_pos = -1
+    var feed_caught = False
+    try:
+        _ = dec.feed("!AAA", out)
+    except e:
+        feed_caught = True
+        feed_kind = e.kind
+        feed_pos = e.position
+
+    # `finish` consumes the decoder, so it must run before any raising assert:
+    # a throw between the two calls would abandon the linear value.
+    var finish_kind = ErrorKind.INVALID_SYMBOL
+    var finish_caught = False
+    try:
+        _ = dec^.finish(out)
+    except e:
+        finish_caught = True
+        finish_kind = e.kind
+
+    assert_true(feed_caught)
+    assert_equal(feed_kind, ErrorKind.INVALID_SYMBOL)
+    # '!' is the fourth symbol of the stream; the three earlier symbols remain.
+    assert_equal(feed_pos, 3)
+    assert_true(finish_caught)
+    assert_equal(finish_kind, ErrorKind.INVALID_PADDING)
 
 def test_finish_raises_invalid_length_for_impossible_remainder() raises:
     var out = List[UInt8]()
