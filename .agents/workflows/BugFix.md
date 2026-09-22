@@ -44,4 +44,4 @@ Restore correct behavior for a confirmed defect through reproduce (failing test)
 ## Review Gate
 `reviewer` verifies: (a) a failing test demonstrably preceded the fix, (b) the root cause is addressed and not just the symptom, (c) the full affected test suite is green, (d) no scope creep or API change, (e) docs are synced. Missing reproduction or red tests => reject.
 
-## Handoff: Refactor.md if the fix introduced structural debt, otherwise Release.md when the fix is user-visible; otherwise close the task.
+## Handoff: Refactor.md if the fix introduced structural debt, otherwise CreatePR.md when the fix is user-visible; otherwise close the task.

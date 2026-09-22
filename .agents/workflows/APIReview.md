@@ -45,4 +45,4 @@ Check a proposed or landed public API change for consistency with the inline `# 
 ## Review Gate
 `reviewer` verifies: (a) the API files and the inline `# API-DOCS` blocks agree on every public symbol, (b) naming and error surface are consistent with the library, (c) backward compatibility is either preserved or explicitly accepted with a migration note, (d) all call sites are accounted for. Any undocumented public symbol or silent breaking change => reject.
 
-## Handoff: NewLibPhase3Design.md if the API needs redesign, NewLibPhase11Implementation.md for corrections, or Release.md when the change is user-visible and accepted; otherwise close the task.
+## Handoff: NewLibPhase3Design.md if the API needs redesign, NewLibPhase11Implementation.md for corrections, or CreatePR.md when the change is accepted and user-visible; otherwise close the task.

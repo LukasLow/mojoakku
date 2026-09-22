@@ -37,9 +37,22 @@ Run these from the repository root:
 | `task all` | List every library as `id  status  name`, sorted by id. |
 | `task count` | Count libraries per status, plus the total. |
 | `task waiting` | List libraries still waiting for a dependency, and name it. |
+| `task test` | Run the `test` task of every library (auto-discovered via `mojoakku/*/Taskfile.yml`). |
+| `task ci` | The single CI entry point: every library's tests plus optional per-library `ci` hooks. |
+| `task changes:version` | Compute the next `0.x.y` version from the current tag and `.changes/`. |
 
 More commands: `task current` (libraries in progress) and
 `task show -- <id>` (print one catalogue file).
+
+## CI and changes
+
+- **CI** (`.github/workflows/ci.yml`) runs exactly one command: `task ci`. The
+  root Taskfile auto-discovers every library, so a new library is tested the
+  moment its `mojoakku/<lib>/Taskfile.yml` exists — nothing to register.
+- **Changes** are recorded as one file per change in `.changes/`, with category
+  lines (`NEW`, `FIX`, `SECURITY`, `PERFORMANCE`, `BREAKING`, `DEPRECATED`,
+  `INTERNAL`). `Release.md` turns them into `CHANGELOG.md` and the git tag;
+  versions stay on `0.x.y` and major is never bumped. See `.changes/README.md`.
 
 ## License
 

@@ -1,0 +1,34 @@
+name: CI
+
+# The CI runs exactly ONE project command: `task ci`.
+# Everything else is derived from it — `task ci` auto-discovers every library
+# under mojoakku/*/Taskfile.yml, runs each library's `test` (and optional `ci`)
+# task, and fails the job if any library fails. Libraries never have to be
+# registered here; adding mojoakku/<lib>/Taskfile.yml is enough.
+#
+# We do not use the smd container here: GitHub runners are already ephemeral
+# and isolated. Mojo is installed with pixi (the repo's pinned toolchain).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pixi
+        uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          pixi-version: latest
+          run-install: false
+
+      - name: Install the toolchain
+        run: pixi install
+
+      - name: Run CI
+        run: pixi run task ci

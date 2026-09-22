@@ -10,28 +10,19 @@ records deferred work that no library owns.
 
 ## 1. Test infrastructure and tests
 
-- **Status:** deferred.
-- **Why:** The repository currently contains no Mojo libraries yet. The
-  `mojoakku/` tree is created in workflow phase 7 (Scaffold), and tests are
-  written before implementation in phase 9 (Tests). A test runner would have
-  nothing to run until then.
-- **Target state:** A per-library `mojoakku/<lib>/Taskfile.yml` with a `test`
-  task that runs every `mojoakku/<lib>/_tests/*.mojo` file with `mojo run`
-  (there is no `mojo test`; each test file is a program with its own `main()`),
-  stopping with a non-zero exit when a file fails. The library Taskfile is
-  created in workflow phase 7 (Scaffold) together with the library skeleton, and
-  the tests themselves are written in phase 9 (Tests). Optionally a root-level
-  `task test` can walk every `mojoakku/<lib>/Taskfile.yml` and run each library's
-  `test` task.
+- **Status:** DONE. Each library ships `mojoakku/<lib>/Taskfile.yml` with a
+  `test` task (runs every `_tests/*.mojo` with `mojo run`). The root Taskfile's
+  `task test` auto-discovers `mojoakku/*/Taskfile.yml` and dispatches to each
+  library's `test`; `task ci` adds optional per-library `ci` hooks. First
+  library (base64) has 132 passing tests.
 
 ## 2. Git tags and CI
 
-- **Status:** deferred.
-- **Why:** There is no release yet and no library to build. Tagging or a CI
-  pipeline now would encode a process that does not exist.
-- **Target state:** Git tags for releases and a CI pipeline that runs the
-  build and the test suite on every push, so a broken change is caught before
-  it reaches `main`.
+- **Status:** DONE (CI) / ready (tags). `.github/workflows/ci.yml` runs exactly
+  `task ci` on push and pull requests. The `.changes/` directory drives the
+  changelog and the version: `task changes:version` computes the next `0.x.y`
+  (major is never bumped), and `Release.md` writes `CHANGELOG.md` and creates
+  the tag. No release tag has been cut yet.
 
 ## 3. Automatic upload to prefix.dev
 

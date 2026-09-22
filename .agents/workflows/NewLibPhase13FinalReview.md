@@ -48,4 +48,4 @@ Serve as the end-to-end gate proving that docs, API, tests and implementation fo
 - No-go returns to the specific failing phase (Design, Docs, Scaffold, Tests or Implementation) with the blocking findings attached.
 - The phase is committed.
 
-## Handoff: `Release.md`
+## Handoff: `CreatePR.md`

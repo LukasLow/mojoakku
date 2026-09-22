@@ -41,6 +41,50 @@ tasks:
       - task: todo
 
   # --------------------------------------------------------------------------
+  # changes:version — compute the NEXT version from the current tag and the
+  # category lines in .changes/*.md.
+  #
+  # MojoAkku stays on 0.x.y; major is NEVER bumped. A pre-1.0 break is a minor
+  # bump, same as NEW/DEPRECATED.
+  #   NEW / BREAKING / DEPRECATED present  -> minor: 0.(x+1).0
+  #   only FIX/SECURITY/PERFORMANCE/INTERNAL -> patch: 0.x.(y+1)
+  # Prints the next version on stdout (e.g. "0.2.0"). Current tag comes from
+  # `git describe --tags --abbrev=0`; with no tag yet the base is 0.0.0.
+  # --------------------------------------------------------------------------
+  changes:version:
+    desc: 'Compute the next 0.x.y version from the current tag and .changes/ categories.'
+    cmds:
+      - |
+        tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        ver=${tag#v}
+        major=$(printf '%s' "$ver" | cut -d. -f1)
+        minor=$(printf '%s' "$ver" | cut -d. -f2)
+        patch=$(printf '%s' "$ver" | cut -d. -f3)
+        [ -n "$major" ] || major=0
+        [ -n "$minor" ] || minor=0
+        [ -n "$patch" ] || patch=0
+        # any minor-bumping category present? Consider only real change files;
+        # skip the explanatory .changes/README.md and any archive.
+        bump=patch
+        for f in .changes/*.md; do
+          [ -f "$f" ] || continue
+          case "$f" in
+            .changes/README.md) continue ;;
+          esac
+          if grep -qE '^(NEW|BREAKING|DEPRECATED):' "$f"; then
+            bump=minor
+            break
+          fi
+        done
+        if [ "$bump" = "minor" ]; then
+          minor=$((minor + 1))
+          patch=0
+        else
+          patch=$((patch + 1))
+        fi
+        echo "0.${minor}.${patch}"
+
+  # --------------------------------------------------------------------------
   # todo — the main command. One line per library that can be built NOW:
   # status is todo and every dependency is done. Prints "<id>  <name>".
   # If nothing is ready it says so plainly.
@@ -273,3 +317,58 @@ tasks:
           exit 1
         fi
         awk '{ print }' "$file"
+
+  # --------------------------------------------------------------------------
+  # test — run the `test` task of EVERY library. Auto-discovery: it scans
+  # mojoakku/*/Taskfile.yml, so a new library is picked up the moment its
+  # Taskfile.yml exists. No library has to be registered here. A library owns
+  # how it tests (its own Taskfile `test`); this root task only dispatches.
+  # Exits non-zero if any library test fails; names the failing libraries.
+  # --------------------------------------------------------------------------
+  test:
+    desc: 'Run the test task of every library (auto-discovered via mojoakku/*/Taskfile.yml).'
+    cmds:
+      - |
+        found=""
+        failed=""
+        for d in mojoakku/*/; do
+          [ -f "${d}Taskfile.yml" ] || continue
+          found="yes"
+          echo "== ${d}task test"
+          if ! task -t "${d}Taskfile.yml" test; then
+            failed="${failed} ${d}"
+          fi
+        done
+        if [ -z "$found" ]; then
+          echo "No library Taskfiles found under mojoakku/*/ (nothing to test)."
+          exit 0
+        fi
+        if [ -n "$failed" ]; then
+          echo ""
+          echo "FAILED libraries:${failed}"
+          exit 1
+        fi
+        echo ""
+        echo "task test: all libraries passed."
+
+  # --------------------------------------------------------------------------
+  # ci — the single CI entry point. CI runs exactly `task ci`; everything else
+  # is derived from it. It runs the full library test sweep (`task test`) and
+  # then any optional per-library `ci` hook (a library may add extra checks in
+  # its own Taskfile `ci` task). Repository-level checks live here too.
+  # --------------------------------------------------------------------------
+  ci:
+    desc: 'CI entry point: run every library test plus per-library ci hooks.'
+    cmds:
+      - task: test
+      - |
+        for d in mojoakku/*/; do
+          [ -f "${d}Taskfile.yml" ] || continue
+          # optional per-library ci hook: run it only if declared.
+          if task -t "${d}Taskfile.yml" --list 2>/dev/null | grep -qE '^[* ]*ci[ :]'; then
+            echo "== ${d}task ci"
+            task -t "${d}Taskfile.yml" ci
+          fi
+        done
+        echo ""
+        echo "task ci: done."

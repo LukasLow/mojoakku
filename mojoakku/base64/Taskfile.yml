@@ -23,9 +23,12 @@ tasks:
   # --------------------------------------------------------------------------
   # test — run every _tests/*.mojo with `mojo run`, stop on the first failure.
   # Exits 0 when _tests/ is empty or every test passes, non-zero otherwise.
+  # `dir` pins the working directory to this Taskfile's own folder, so the task
+  # behaves the same whether run here or dispatched from the root Taskfile.
   # --------------------------------------------------------------------------
   test:
     desc: 'Run every _tests/*.mojo with mojo run; stop and fail on the first error.'
+    dir: '{{.TASKFILE_DIR}}'
     cmds:
       - |
         set -e
@@ -53,6 +56,7 @@ tasks:
   # --------------------------------------------------------------------------
   compile:
     desc: 'Type-check the public API via a consumer import (JIT).'
+    dir: '{{.TASKFILE_DIR}}'
     cmds:
       - |
         set -e

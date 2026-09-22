@@ -86,7 +86,15 @@ The canonical reference is `.agents/workflows/LibraryLayout.md`.
   (`NewLibPhase3Design.md`, user review gate).
 - **Every workflow phase ends with a git commit** naming the phase (and, for a
   review phase, its verdict), so each phase boundary is visible in history.
-- The **Manager starts NO Manager**.
+- **CI runs one command: `task ci`.** The root `Taskfile.yml` auto-discovers
+  every `mojoakku/*/Taskfile.yml` and runs each library's `test` (and optional
+  `ci`) task; no library is registered anywhere. Each library owns how it tests.
+- **`.changes/` drives the changelog and the tag.** Every notable change gets one
+  `.changes/<date>-<slug>.md` file with category lines (`NEW`, `FIX`, `SECURITY`,
+  `PERFORMANCE`, `BREAKING`, `DEPRECATED`, `INTERNAL`). Versions stay on `0.x.y`
+  and **major is never bumped**: `NEW`/`BREAKING`/`DEPRECATED` → minor,
+  the rest → patch (`task changes:version`). See `.changes/README.md`.
+- **The Manager starts NO Manager**.
 
 ## Mojo knowledge: the buch tool
 
@@ -122,9 +130,9 @@ The process lives in `.agents/workflows/`. Start at the index:
 - `NewLibPhase2ResearchReview.md` — review the research output.
 - `NewLibPhase3Design.md` — design the public API.
 - `NewLibPhase4DesignReview.md` — review the API design.
-- `NewLibPhase5Docs.md` — write `<LIB>_DESIGN.md` as the design document.
+- `NewLibPhase5Docs.md` — complete `_dev/DESIGN.md` (shared sections + one block per API entry).
 - `NewLibPhase6DocsReview.md` — review the design document.
-- `NewLibPhase7Scaffold.md` — create the library skeleton and materialise the design.
+- `NewLibPhase7Scaffold.md` — create the library skeleton and materialise the design into inline end-user docs.
 - `NewLibPhase8ScaffoldReview.md` — review the scaffold.
 - `NewLibPhase9Tests.md` — write tests before implementation.
 - `NewLibPhase10TestsReview.md` — review the tests.
@@ -138,4 +146,13 @@ The process lives in `.agents/workflows/`. Start at the index:
 - `APIReview.md` — review an API change.
 - `PerformanceInvestigation.md` — investigate and fix performance.
 - `SecurityReview.md` — security and hardening review.
-- `Release.md` — prepare and cut a release.
+- `CreatePR.md` — branch, `.changes/` entry, push and open the pull request.
+- `Release.md` — turn `.changes/` into `CHANGELOG.md` and tag the release.
+
+## Toolchain and CI
+
+- **Mojo runs in the smd container** (global `mojo`, version pinned by
+  `pixi.toml` via smd.toml). Use `smd` for commands; never bare `bash`.
+- **CI** (`.github/workflows/ci.yml`) runs exactly `task ci` on push/PR.
+- **Changes** are recorded in `.changes/` and drive the version tag; see
+  `.changes/README.md`.
