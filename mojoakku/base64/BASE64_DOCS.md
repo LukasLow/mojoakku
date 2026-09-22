@@ -1,11 +1,59 @@
 # BASE64_DOCS
 
+## Purpose
+
+`mojoakku/base64` is the single source of truth for the MojoAkku `base64`
+library. It defines the public API, the full semantics of every entry, the error
+surface, the ownership and lifecycle rules, and the conventions that every
+sibling library copies. It is designed for a low-vision user: one naming scheme,
+one option model, one typed error, borrowed input, owned output and explicit
+streaming with a mandatory flush. This document contains no implementation and no
+tests; those follow in later phases.
+
+## Status legend
+
+Every API entry carries a `Status:` field with exactly one of these values:
+
+| Status | Meaning |
+| --- | --- |
+| `planned` | Designed and documented; no code exists yet. Default in this phase. |
+| `scaffolded` | A stub with the documented signature exists; behaviour is not implemented. |
+| `tested` | Tests exist and pass against the implementation. |
+| `implemented` | Implemented and passing its tests. |
+| `benchmarked` | Implemented, tested and measured against the performance goals. |
+
+All 15 entries in this document are `planned`, and every entry's
+`Implementation status:` is `not implemented`, in this phase.
+
+## Dependencies
+
+`base64` has **no dependency edge to any sibling MojoAkku library**. It is a
+leaf in the dependency graph: it depends only on the Mojo standard library.
+
+| Library | Edge | Justification |
+| --- | --- | --- |
+| (none) | — | Encoding and decoding are pure in-memory transforms over `Span`, `StringSpan`, `String`, `List` and `Array`. No signature mentions a socket, file, buffer, URL or other sibling concept, so no sibling edge can be technically justified. |
+
+- **Why a leaf.** A dependency edge exists only when a library needs another
+  library's public types or functions. `base64` needs none: every parameter and
+  return type (`Span[UInt8]`, `StringSpan`, `String`, `List[UInt8]`, `Int`,
+  `Bool`, `UInt8`, `Array`) comes from the Mojo standard library. Adding an edge
+  would create coupling without a technical reason, which the dependency rules
+  forbid.
+- **No physical nesting.** The absence of an edge is the conceptual statement.
+  Physically, `mojoakku/base64/` is a flat sibling under `mojoakku/`; it is never
+  nested inside another library and no library is nested inside it. A dependency
+  is a conceptual edge, never a parent/child relationship.
+- **Direction of future edges.** If a later library (for example an HTTP or MIME
+  layer) needs base64, the edge points *from that library to `base64`*, never
+  from `base64` outward. That does not change this document.
+
 ## Overview
 
 MojoAkku `base64` is a pure, in-process data-encoding library that covers the
 RFC 4648 family — base64 (standard), base64url, base32 (standard), base32hex and
-base16/hex — through **one uniform API shape**. It is the Phase-3 API design; it
-contains no implementation and no tests.
+base16/hex — through **one uniform API shape**. It is the single source of truth
+for the library; it contains no implementation and no tests.
 
 The problem space is well covered by every reference language, so the value of
 this library is not "another base64". It is a *predictable, consistent and
@@ -274,6 +322,10 @@ raw bytes; the library never performs UTF-8 conversion or normalisation.
 
 ### `Alphabet`
 
+Status: planned
+
+Signature:
+
 ```mojo
 struct Alphabet(Equatable, ImplicitlyCopyable, Deinitable):
     var _id: UInt8
@@ -289,6 +341,8 @@ struct Alphabet(Equatable, ImplicitlyCopyable, Deinitable):
     comptime HEX_LOWER    = Alphabet(4)   # RFC 4648 §8,  0-9 a-f
     comptime HEX_UPPER    = Alphabet(5)   # RFC 4648 §8,  0-9 A-F
 ```
+
+Semantics:
 
 - **Parameters / preconditions:** none; the value is a compile-time constant
   used as a function/struct **value parameter** (`[alphabet: Alphabet]`). The
@@ -342,35 +396,45 @@ struct Alphabet(Equatable, ImplicitlyCopyable, Deinitable):
   alphabet value (`Goals` 1 and 3).
 - **Ownership:** value type; copied by value at compile time only. No heap, no
   lifetime.
-- **Errors:** none in practice. The six named constants are the only `Alphabet`
-  values in the public *contract*, so code that stays on public names never
-  supplies an invalid alphabet (`go.md` §11 rejects the runtime `NewEncoding`
-  panic). This is a documented convention boundary, not a compiler-enforced one:
-  because Mojo has no access control, the `@doc_hidden` initializer is
-  technically reachable inside the package (see **Parameters / preconditions**
-  above), and the library defines behaviour only for `_id` values 0–5. Values
-  outside that set are outside the API and their behaviour is unspecified.
 - **Stream I/O:** EOF/EINTR/EAGAIN/close do not apply because the type is a
   compile-time constant and performs no I/O.
-- **Justification:** MojoAkku uses a compile-time Alphabet value parameter
-  because Go's runtime `variant` integer and Rust's `Alphabet::new` pay per-call
-  branching/validation, while cppcodec's variant-as-type and Mojo's documented
-  value-parameter specialization remove all runtime alphabet dispatch
-  (`go.md` §7,§10; `rust.md` §12; `cpp.md` §10,§12;
-  `mojov1/functions/parameters-and-generics` "value parameters for compile-time
-  specialization"). The buch documents scalar (`factor: Int`) and `String`
-  (`msg: String = "woof"`) value parameters plus a *parameterized struct type*
-  (`struct Bar[v: Int]`) — which is not the same as using a user-struct **value**
-  as a value-parameter type. Whether a user-defined struct value is accepted as a
-  value-parameter type is therefore not evidenced by the buch and is tracked in
-  `## Open Questions` (`mojov1/functions/parameters-and-generics`, "Value
-  parameters and how to choose", "Optional, keyword, and variadic parameters").
-  If Phase 7 finds it unsupported, the fallback is a `UInt8` id value parameter
-  plus documented constants.
+
+Errors: none in practice. The six named constants are the only `Alphabet`
+values in the public *contract*, so code that stays on public names never
+supplies an invalid alphabet (`go.md` §11 rejects the runtime `NewEncoding`
+panic). This is a documented convention boundary, not a compiler-enforced one:
+because Mojo has no access control, the `@doc_hidden` initializer is
+technically reachable inside the package (see **Parameters / preconditions**
+above), and the library defines behaviour only for `_id` values 0–5. Values
+outside that set are outside the API and their behaviour is unspecified.
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses a compile-time Alphabet value parameter
+because Go's runtime `variant` integer and Rust's `Alphabet::new` pay per-call
+branching/validation, while cppcodec's variant-as-type and Mojo's documented
+value-parameter specialization remove all runtime alphabet dispatch
+(`go.md` §7,§10; `rust.md` §12; `cpp.md` §10,§12;
+`mojov1/functions/parameters-and-generics` "value parameters for compile-time
+specialization"). The buch documents scalar (`factor: Int`) and `String`
+(`msg: String = "woof"`) value parameters plus a *parameterized struct type*
+(`struct Bar[v: Int]`) — which is not the same as using a user-struct **value**
+as a value-parameter type. Whether a user-defined struct value is accepted as a
+value-parameter type is therefore not evidenced by the buch and is tracked in
+`## Open Questions` (`mojov1/functions/parameters-and-generics`, "Value
+parameters and how to choose", "Optional, keyword, and variadic parameters").
+If Phase 7 finds it unsupported, the fallback is a `UInt8` id value parameter
+plus documented constants.
 
 ---
 
 ### `Padding` (encode policy)
+
+Status: planned
+
+Signature:
 
 ```mojo
 struct Padding(Equatable, ImplicitlyCopyable, Deinitable):
@@ -383,6 +447,8 @@ struct Padding(Equatable, ImplicitlyCopyable, Deinitable):
     comptime REQUIRED = Padding(0)   # emit '=' to complete the final quantum
     comptime OMITTED  = Padding(1)   # never emit '='
 ```
+
+Semantics:
 
 - **Parameters / preconditions:** used as `[padding: Padding = Padding.REQUIRED]`
   on `encode`/`encode_into`/`Encoder`. Only the two named `comptime` members are
@@ -397,17 +463,27 @@ struct Padding(Equatable, ImplicitlyCopyable, Deinitable):
   governed separately by `PaddingMode`, mirroring cppcodec's split of
   `generates_padding()` from `requires_padding()` (`cpp.md` §10).
 - **Ownership:** value type; compile-time only.
-- **Errors:** none.
 - **Stream I/O:** not applicable (compile-time value, no I/O).
-- **Justification:** `MojoAkku uses an explicit Padding value instead of an
-  implicit lax mode because Python's `validate=False` default, Java's
-  `withoutPadding()`, Go's `WithPadding`/`NoPadding` and Rust's `encode_padding`
-  all show users expect padding to be a deliberate, visible choice
-  (`python.md` §12; `java.md` §12.5; `go.md` §7; `rust.md` §7).`
+
+Errors: none.
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses an explicit Padding value instead of an
+implicit lax mode because Python's `validate=False` default, Java's
+`withoutPadding()`, Go's `WithPadding`/`NoPadding` and Rust's `encode_padding`
+all show users expect padding to be a deliberate, visible choice
+(`python.md` §12; `java.md` §12.5; `go.md` §7; `rust.md` §7).
 
 ---
 
 ### `PaddingMode` (decode policy)
+
+Status: planned
+
+Signature:
 
 ```mojo
 struct PaddingMode(Equatable, ImplicitlyCopyable, Deinitable):
@@ -420,6 +496,8 @@ struct PaddingMode(Equatable, ImplicitlyCopyable, Deinitable):
     comptime STRICT   = PaddingMode(0)   # require canonical padding / no padding
     comptime TOLERANT = PaddingMode(1)   # padding optional, but consistent if present
 ```
+
+Semantics:
 
 - **Parameters / preconditions:** used as
   `[padding_mode: PaddingMode = PaddingMode.STRICT]` on `decode`/`decode_into`/
@@ -445,27 +523,37 @@ struct PaddingMode(Equatable, ImplicitlyCopyable, Deinitable):
     the base16 overloads for API uniformity (Goal 1), but it selects no
     behaviour there.
 - **Ownership:** value type; compile-time only.
-- **Errors:** invalid padding under either mode raises `INVALID_PADDING` (or
-  `INVALID_LENGTH` for a structurally impossible remainder); the error is a data
-  error and is recoverable.
 - **Stream I/O:** not applicable (compile-time value, no I/O).
-- **Justification:** `MojoAkku uses a two-value PaddingMode because Rust's
-  `Indifferent`/`RequireCanonical` pair and Commons Codec's `CodecPolicy` show
-  that "padding present/absent" is a decode policy distinct from the encode
-  policy, while Java shows the tolerant mode is useful for real-world interop
-  (`rust.md` §12; `java.md` §10.6,§12.5).` Rust's third state, `RequireNone`
-  (padding *forbidden*), is deliberately **not** represented. Its reason is
-  narrow: `TOLERANT` already accepts an unpadded quantum, so a caller who must
-  reject `=` performs that one check itself — a `StringSpan`/`Span` scan for the
-  padding symbol before choosing the mode — and then decodes with `TOLERANT`.
-  `STRICT` is the complement and is the default. A third compile-time state would
-  add a policy that is exactly "TOLERANT plus a caller-side negative scan", at
-  the cost of a wider accepted-input model; the phrase
-  "three-state-compatible" was therefore dropped as inaccurate (`rust.md` §7).
+
+Errors: invalid padding under either mode raises `INVALID_PADDING` (or
+`INVALID_LENGTH` for a structurally impossible remainder); the error is a data
+error and is recoverable.
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses a two-value PaddingMode because Rust's
+`Indifferent`/`RequireCanonical` pair and Commons Codec's `CodecPolicy` show
+that "padding present/absent" is a decode policy distinct from the encode
+policy, while Java shows the tolerant mode is useful for real-world interop
+(`rust.md` §12; `java.md` §10.6,§12.5). Rust's third state, `RequireNone`
+(padding *forbidden*), is deliberately **not** represented. Its reason is
+narrow: `TOLERANT` already accepts an unpadded quantum, so a caller who must
+reject `=` performs that one check itself — a `StringSpan`/`Span` scan for the
+padding symbol before choosing the mode — and then decodes with `TOLERANT`.
+`STRICT` is the complement and is the default. A third compile-time state would
+add a policy that is exactly "TOLERANT plus a caller-side negative scan", at
+the cost of a wider accepted-input model; the phrase
+"three-state-compatible" was therefore dropped as inaccurate (`rust.md` §7).
 
 ---
 
 ### `Whitespace` (decode policy)
+
+Status: planned
+
+Signature:
 
 ```mojo
 struct Whitespace(Equatable, ImplicitlyCopyable, Deinitable):
@@ -479,6 +567,8 @@ struct Whitespace(Equatable, ImplicitlyCopyable, Deinitable):
     comptime IGNORE = Whitespace(1)   # skip space, tab, CR, LF, FF, VT
 ```
 
+Semantics:
+
 - **Parameters / preconditions:** used as
   `[whitespace: Whitespace = Whitespace.REJECT]` on `decode`/`decode_into`/
   `Decoder`/`is_valid`. With `IGNORE`, skipped bytes neither count toward the
@@ -488,18 +578,28 @@ struct Whitespace(Equatable, ImplicitlyCopyable, Deinitable):
   from the Mojo stdlib, which ignores whitespace in `b64decode`; `IGNORE`
   preserves that behaviour as an opt-in (`mojov1/stdlib/base64`).
 - **Ownership:** value type; compile-time only.
-- **Errors:** under `REJECT`, a whitespace byte raises `INVALID_SYMBOL`; under
-  `IGNORE` whitespace never fails.
 - **Stream I/O:** not applicable (compile-time value, no I/O).
-- **Justification:** `MojoAkku uses an explicit Whitespace value because
-  libsodium's `ignore` string with `NULL` meaning strict is the cleanest
-  precedent for caller-chosen skipping, while Go silently ignores CR/LF even
-  under `Strict()` and is explicitly rejected as a non-copy (`c.md` §10,§12;
-  `go.md` §11).`
+
+Errors: under `REJECT`, a whitespace byte raises `INVALID_SYMBOL`; under
+`IGNORE` whitespace never fails.
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses an explicit Whitespace value because
+libsodium's `ignore` string with `NULL` meaning strict is the cleanest
+precedent for caller-chosen skipping, while Go silently ignores CR/LF even
+under `Strict()` and is explicitly rejected as a non-copy (`c.md` §10,§12;
+`go.md` §11).
 
 ---
 
 ### `ErrorKind`
+
+Status: planned
+
+Signature:
 
 ```mojo
 struct ErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
@@ -519,6 +619,8 @@ struct ErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
         comptime NAME = ["INVALID_SYMBOL", "INVALID_LENGTH", "INVALID_PADDING"]
         writer.write(NAME[self._id])
 ```
+
+Semantics:
 
 - **Parameters / preconditions:** read from `Base64Error.kind`; never passed by a
   caller to a codec.
@@ -541,16 +643,26 @@ struct ErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
   not a distinct data condition, so it does not warrant a kind here
   (`rust.md` §4; `python.md` §4).
 - **Ownership:** value type; compile-time constants copied into the error value.
-- **Errors:** none.
 - **Stream I/O:** not applicable.
-- **Justification:** `MojoAkku uses a three-value discriminant because Rust and
-  data-encoding both carry a machine-usable kind plus an offset, and Elixir's
-  bare `:error` and Perl's "silently ignored" are the documented failure modes of
-  collapsing reasons (`rust.md` §4,§12; `elixir.md` §11; `perl.md` §11).`
+
+Errors: none.
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses a three-value discriminant because Rust and
+data-encoding both carry a machine-usable kind plus an offset, and Elixir's
+bare `:error` and Perl's "silently ignored" are the documented failure modes of
+collapsing reasons (`rust.md` §4,§12; `elixir.md` §11; `perl.md` §11).
 
 ---
 
 ### `Base64Error`
+
+Status: planned
+
+Signature:
 
 ```mojo
 @fieldwise_init
@@ -558,6 +670,8 @@ struct Base64Error(Copyable, Deinitable, Writable):
     var kind: ErrorKind
     var position: Int
 ```
+
+Semantics:
 
 - **Parameters / preconditions:** constructed by the library; callers read the
   two fields in an `except`/`try` block. `position` is the zero-based index into
@@ -580,22 +694,32 @@ struct Base64Error(Copyable, Deinitable, Writable):
   inspected. It is deliberately **not** `ImplicitlyCopyable`, so a re-raise must
   transfer with `raise e^`; `raise e` (which copies) does not compile for a
   non-`ImplicitlyCopyable` error type (`mojov1/errors/raising-and-propagation`).
-- **Errors:** it **is** the error. All decode failures are data errors and are
-  recoverable: the caller may fix the input, truncate at `position`, or switch
-  policy and retry. No decoder error is fatal or unrecoverable.
 - **Stream I/O:** EOF/EINTR/EAGAIN/close do not apply: a pure codec has no file
   descriptor, no blocking call and no external handle, so none of those
   conditions can arise. This is itself evidence that the codec sits above the
   I/O layer (research §6/§8 for every language; `c.md` §6, `go.md` §6).
-- **Justification:** `MojoAkku uses a struct with `kind`+`position` because
-  Rust's `DecodeError` offsets and cppcodec's `symbol_error` show that a codec
-  must report *where* and *why*, and Java's checked `IOException` and Commons
-  Codec's `Object`-bridge show how not to type the failure (`rust.md` §4,§12;
-  `cpp.md` §4,§12; `java.md` §11.1,§11.2).`
+
+Errors: it **is** the error. All decode failures are data errors and are
+recoverable: the caller may fix the input, truncate at `position`, or switch
+policy and retry. No decoder error is fatal or unrecoverable.
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses a struct with `kind`+`position` because
+Rust's `DecodeError` offsets and cppcodec's `symbol_error` show that a codec
+must report *where* and *why*, and Java's checked `IOException` and Commons
+Codec's `Object`-bridge show how not to type the failure (`rust.md` §4,§12;
+`cpp.md` §4,§12; `java.md` §11.1,§11.2).
 
 ---
 
 ### `encode`
+
+Status: planned
+
+Signature:
 
 ```mojo
 def encode[
@@ -609,6 +733,8 @@ def encode[
 ](input: StringSpan) -> String
 ```
 
+Semantics:
+
 - **Parameters / preconditions:** `input` is the raw bytes (first overload) or
   UTF-8 text treated as raw bytes (second overload; no UTF-8 conversion is
   performed, each byte is encoded). `input` is borrowed and may be empty; an
@@ -621,20 +747,30 @@ def encode[
   never copied or consumed). The returned `String` is newly allocated and owned
   by the caller; the library retains no reference to either. No hidden global
   state is read or written.
-- **Errors:** none for any `Span[UInt8]`/`StringSpan`; encode cannot fail. (This
-  matches libsodium's "encoding cannot fail except by programming error",
-  `c.md` §4.)
 - **Stream I/O:** EOF/EINTR/EAGAIN/close do not apply; encode is a pure
   in-memory transform with no descriptor and no blocking point.
-- **Justification:** `MojoAkku uses borrowed-bytes-in / owned-String-out
-  because the Mojo stdlib's `b64encode` and C++ base64pp's
-  `encode(std::span<uint8_t const>)` both borrow input while returning a fresh
-  value, and ES 2027's byte-first `Uint8Array` API confirms the direction
-  (`mojov1/stdlib/base64`; `cpp.md` §12; `js-ts.md` §12).`
+
+Errors: none for any `Span[UInt8]`/`StringSpan`; encode cannot fail. (This
+matches libsodium's "encoding cannot fail except by programming error",
+`c.md` §4.)
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses borrowed-bytes-in / owned-String-out
+because the Mojo stdlib's `b64encode` and C++ base64pp's
+`encode(std::span<uint8_t const>)` both borrow input while returning a fresh
+value, and ES 2027's byte-first `Uint8Array` API confirms the direction
+(`mojov1/stdlib/base64`; `cpp.md` §12; `js-ts.md` §12).
 
 ---
 
 ### `encode_into`
+
+Status: planned
+
+Signature:
 
 ```mojo
 def encode_into[
@@ -648,6 +784,8 @@ def encode_into[
 ](input: StringSpan, mut result: String) -> Int
 ```
 
+Semantics:
+
 - **Parameters / preconditions:** `input` is borrowed bytes (first overload) or
   UTF-8 text treated as raw bytes (second overload, matching `encode`'s
   `StringSpan` overload); `result` is a
@@ -660,21 +798,31 @@ def encode_into[
 - **Ownership:** caller owns `result` and controls its allocator. On return,
   `result` is valid and contains its prior contents plus the encoded text.
   `input` stays borrowed. The function never retains a reference to either.
-- **Errors:** none; encode cannot fail.
 - **Stream I/O:** EOF/EINTR/EAGAIN/close do not apply (pure transform).
-- **Justification:** MojoAkku uses an appending in-place `mut result` overload
-  because Go's incremental building block is the `Append*` family —
-  `AppendEncode(dst, src) []byte` grows the caller's buffer and returns the
-  extended slice, with no hidden global state (`go.md` §3, §10, §12) — and the
-  Mojo stdlib's `b64encode(input_bytes, mut result: String)` writes into the
-  caller's `String` while reserving capacity, so `result` may be a 0-capacity
-  string on entry (`mojov1/stdlib/base64`). Append, not overwrite-at-offset-0,
-  is the documented contract; a caller who wants offset-0 behaviour clears
-  `result` first.
+
+Errors: none; encode cannot fail.
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses an appending in-place `mut result` overload
+because Go's incremental building block is the `Append*` family —
+`AppendEncode(dst, src) []byte` grows the caller's buffer and returns the
+extended slice, with no hidden global state (`go.md` §3, §10, §12) — and the
+Mojo stdlib's `b64encode(input_bytes, mut result: String)` writes into the
+caller's `String` while reserving capacity, so `result` may be a 0-capacity
+string on entry (`mojov1/stdlib/base64`). Append, not overwrite-at-offset-0,
+is the documented contract; a caller who wants offset-0 behaviour clears
+`result` first.
 
 ---
 
 ### `decode`
+
+Status: planned
+
+Signature:
 
 ```mojo
 def decode[
@@ -690,6 +838,8 @@ def decode[
 ](input: Span[UInt8]) raises Base64Error -> List[UInt8]
 ```
 
+Semantics:
+
 - **Parameters / preconditions:** `input` is the encoded text (`StringSpan`) or
   the same bytes (`Span[UInt8]`); it is borrowed and may be empty (an empty
   input decodes to an empty `List[UInt8]`). The accepted symbol set, including
@@ -704,27 +854,37 @@ def decode[
   `IGNORE`, `decoded_len` is an upper bound.
 - **Ownership:** `input` is borrowed; the returned `List[UInt8]` is owned by the
   caller. The library holds no reference after return.
-- **Errors:** `raises Base64Error`. `INVALID_LENGTH` for an impossible quantum
-  remainder; `INVALID_PADDING` for missing/excess/misplaced `=`; `INVALID_SYMBOL`
-  for a byte outside the alphabet (including whitespace under `REJECT`) or for a
-  non-zero trailing bit under `STRICT` canonical checking. There is no
-  streaming-only kind: `decode` and a streaming `finish` report the same three
-  kinds for the same malformed input. All are recoverable data errors. On
-  failure no `List[UInt8]` value is produced — the allocating form is
-  atomic (contrast Go's partial output, which is available through
-  `decode_into`/`Decoder` instead; `go.md` §10).
 - **Stream I/O:** EOF/EINTR/EAGAIN/close do not apply: there is no stream, no
   descriptor and no partial-read concept; "short input" is a data-length error,
   not an I/O condition.
-- **Justification:** `MojoAkku uses a `raises Base64Error` decoder returning an
-  owned `List[UInt8]` because the Mojo stdlib's `b64decode` already raises and
-  returns fresh bytes, and Rust's typed `DecodeError` plus Python's
-  `binascii.Error` show the failure must carry a reason (`mojov1/stdlib/base64`;
-  `rust.md` §12; `python.md` §12).`
+
+Errors: `raises Base64Error`. `INVALID_LENGTH` for an impossible quantum
+remainder; `INVALID_PADDING` for missing/excess/misplaced `=`; `INVALID_SYMBOL`
+for a byte outside the alphabet (including whitespace under `REJECT`) or for a
+non-zero trailing bit under `STRICT` canonical checking. There is no
+streaming-only kind: `decode` and a streaming `finish` report the same three
+kinds for the same malformed input. All are recoverable data errors. On
+failure no `List[UInt8]` value is produced — the allocating form is
+atomic (contrast Go's partial output, which is available through
+`decode_into`/`Decoder` instead; `go.md` §10).
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses a `raises Base64Error` decoder returning an
+owned `List[UInt8]` because the Mojo stdlib's `b64decode` already raises and
+returns fresh bytes, and Rust's typed `DecodeError` plus Python's
+`binascii.Error` show the failure must carry a reason (`mojov1/stdlib/base64`;
+`rust.md` §12; `python.md` §12).
 
 ---
 
 ### `decode_into`
+
+Status: planned
+
+Signature:
 
 ```mojo
 def decode_into[
@@ -739,6 +899,8 @@ def decode_into[
     whitespace: Whitespace = Whitespace.REJECT,
 ](input: Span[UInt8], mut result: List[UInt8]) raises Base64Error -> Int
 ```
+
+Semantics:
 
 - **Parameters / preconditions:** `input` is borrowed encoded text (`StringSpan`)
   or the same bytes (`Span[UInt8]`); `result` is a caller-owned, mutable
@@ -755,25 +917,35 @@ def decode_into[
   read, written, error }` (`rust.md` §4), while keeping the return type simple.
 - **Ownership:** caller owns `result`; on both success and error `result` is
   valid. `input` stays borrowed.
-- **Errors:** same `Base64Error` kinds as `decode`, all recoverable. A partial
-  prefix may already be appended when the error is raised; the appended prefix
-  is always a whole number of bytes (complete quanta only), never a partial
-  byte.
 - **Stream I/O:** EOF/EINTR/EAGAIN/close do not apply (pure transform).
-- **Justification:** MojoAkku uses a partial-commit appending in-place decoder
-  because Go's `AppendDecode(dst, src) ([]byte, error)` grows the caller's
-  buffer and returns partial output alongside its error, and Go documents the
-  count as "the number of bytes successfully written and CorruptInputError"
-  (`go.md` §3, §4, §10, §12); data-encoding documents the same contract as
-  `DecodePartial{read, written, error}` (`rust.md` §4). This makes error recovery
-  first-class. cppcodec's `abort()` and base64pp's reasonless `optional` are
-  rejected (`cpp.md` §11). The append contract (not overwrite-at-offset-0)
-  matches the Mojo stdlib in-place style and keeps a caller's prior data intact
-  (`mojov1/stdlib/base64`).
+
+Errors: same `Base64Error` kinds as `decode`, all recoverable. A partial
+prefix may already be appended when the error is raised; the appended prefix
+is always a whole number of bytes (complete quanta only), never a partial
+byte.
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses a partial-commit appending in-place decoder
+because Go's `AppendDecode(dst, src) ([]byte, error)` grows the caller's
+buffer and returns partial output alongside its error, and Go documents the
+count as "the number of bytes successfully written and CorruptInputError"
+(`go.md` §3, §4, §10, §12); data-encoding documents the same contract as
+`DecodePartial{read, written, error}` (`rust.md` §4). This makes error recovery
+first-class. cppcodec's `abort()` and base64pp's reasonless `optional` are
+rejected (`cpp.md` §11). The append contract (not overwrite-at-offset-0)
+matches the Mojo stdlib in-place style and keeps a caller's prior data intact
+(`mojov1/stdlib/base64`).
 
 ---
 
 ### `encoded_len`
+
+Status: planned
+
+Signature:
 
 ```mojo
 def encoded_len[
@@ -781,6 +953,8 @@ def encoded_len[
     padding: Padding = Padding.REQUIRED,
 ](n: Int) -> Int
 ```
+
+Semantics:
 
 - **Parameters / preconditions:** `n` is the number of raw input bytes and must
   be `>= 0`; a negative argument is a caller programming error. Compile-time-
@@ -795,28 +969,40 @@ def encoded_len[
   - base16: `2 * n` for both padding values.
   `n = 0` returns `0` in every case.
 - **Ownership:** pure function; no allocation, no state, no lifetime.
-- **Errors:** none. The function is **total**: `n < 0` is a caller programming
-  error and is **defined** to return `0` (the empty-input length) rather than to
-  trap, keeping the function non-raising and compile-time-callable. Callers must
-  pass non-negative lengths; the defined `0` is a safety net, not a licence to
-  size a buffer for a negative count.
 - **Stream I/O:** not applicable; the function performs no I/O.
-- **Justification:** `MojoAkku uses a pure exact `encoded_len` because Perl's
-  `encoded_base64_length`, Go's `EncodedLen`, Commons Codec's
-  `getEncodedLength` and cppcodec's `encoded_size` all exist to pre-size a
-  buffer, and a total function is strictly better than C's two-call `dlen = 0`
-  size query (`perl.md` §12; `go.md` §12; `java.md` §12.9; `cpp.md` §12;
-  `c.md` §10).`
+
+Errors: none. The function is **total**: `n < 0` is a caller programming
+error and is **defined** to return `0` (the empty-input length) rather than to
+trap, keeping the function non-raising and compile-time-callable. Callers must
+pass non-negative lengths; the defined `0` is a safety net, not a licence to
+size a buffer for a negative count.
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses a pure exact `encoded_len` because Perl's
+`encoded_base64_length`, Go's `EncodedLen`, Commons Codec's
+`getEncodedLength` and cppcodec's `encoded_size` all exist to pre-size a
+buffer, and a total function is strictly better than C's two-call `dlen = 0`
+size query (`perl.md` §12; `go.md` §12; `java.md` §12.9; `cpp.md` §12;
+`c.md` §10).
 
 ---
 
 ### `decoded_len`
+
+Status: planned
+
+Signature:
 
 ```mojo
 def decoded_len[
     alphabet: Alphabet = Alphabet.B64_STANDARD,
 ](n: Int) -> Int
 ```
+
+Semantics:
 
 - **Parameters / preconditions:** `n` is the number of encoded symbols
   (`>= 0`). Compile-time-callable (pure, non-raising, no FFI).
@@ -832,18 +1018,28 @@ def decoded_len[
   bound whenever padding is present; the exact value is obtained from
   `decode`/`decode_into`. `n = 0` returns `0`.
 - **Ownership:** pure function; no allocation, no state.
-- **Errors:** none. Total function: `n < 0` is a caller programming error and is
-  **defined** to return `0`, consistent with `encoded_len`.
 - **Stream I/O:** not applicable.
-- **Justification:** `MojoAkku uses a maximum-size `decoded_len` because Rust's
-  `decoded_len_estimate`, Boost.Beast's `decoded_size` and Java's caller-buffer
-  contract all need a conservative output bound before decoding, and Mojo's
-  explicit buffer sizing benefits from a total function (`rust.md` §3,§12;
-  `cpp.md` §3; `java.md` §12.9).`
+
+Errors: none. Total function: `n < 0` is a caller programming error and is
+**defined** to return `0`, consistent with `encoded_len`.
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses a maximum-size `decoded_len` because Rust's
+`decoded_len_estimate`, Boost.Beast's `decoded_size` and Java's caller-buffer
+contract all need a conservative output bound before decoding, and Mojo's
+explicit buffer sizing benefits from a total function (`rust.md` §3,§12;
+`cpp.md` §3; `java.md` §12.9).
 
 ---
 
 ### `is_valid`
+
+Status: planned
+
+Signature:
 
 ```mojo
 def is_valid[
@@ -859,6 +1055,8 @@ def is_valid[
 ](input: Span[UInt8]) -> Bool
 ```
 
+Semantics:
+
 - **Parameters / preconditions:** `input` is the encoded text (`StringSpan`) or
   the same bytes (`Span[UInt8]`) to check, borrowed and possibly empty (an empty
   input is valid under every policy). The accepted symbol set and case policy
@@ -872,17 +1070,27 @@ def is_valid[
   output bytes (`go.md` §7; `rust.md` §7; `elixir.md` §10,§12).
 - **Ownership:** `input` borrowed; returns a scalar `Bool`; the function
   allocates nothing and retains nothing.
-- **Errors:** never raises. Every malformed condition is reported as `False`,
-  never as `Base64Error`.
 - **Stream I/O:** EOF/EINTR/EAGAIN/close do not apply; no I/O occurs.
-- **Justification:** `MojoAkku uses an allocation-free validity predicate because
-  Elixir's `valid64?`/`valid32?`/`valid16?` exist precisely to validate "without
-  allocating the decoded output", and the docs justify them as more efficient
-  than decode-then-discard (`elixir.md` §10,§12).`
+
+Errors: never raises. Every malformed condition is reported as `False`,
+never as `Base64Error`.
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses an allocation-free validity predicate because
+Elixir's `valid64?`/`valid32?`/`valid16?` exist precisely to validate "without
+allocating the decoded output", and the docs justify them as more efficient
+than decode-then-discard (`elixir.md` §10,§12).
 
 ---
 
 ### `Encoder` (streaming encode)
+
+Status: planned
+
+Signature:
 
 ```mojo
 @explicit_destroy("call finish() or discard() before this encoder leaves scope")
@@ -901,6 +1109,8 @@ struct Encoder[
     def discard(deinit self)
 ```
 
+Semantics:
+
 - **Parameters / preconditions:** `feed` accepts successive borrowed chunks of
   any length, including empty, as either raw bytes (`Span[UInt8]`) or text
   (`StringSpan`); the two overloads mirror the one-shot `encode`. `out` is a
@@ -917,9 +1127,6 @@ struct Encoder[
   borrows the chunk, which may be freed by the caller immediately after `feed`
   returns. `finish`/`discard` consume `self` (`deinit self`), so calling
   `finish` after `discard` or vice versa is impossible by construction.
-- **Errors:** none; encode cannot fail. `discard(deinit self)` drops the
-  remainder without emitting it — the explicit, non-silent way to abandon a
-  stream.
 - **Stream I/O / flush contract:** EOF is not an I/O event here: it is the
   caller's call to `finish`. EINTR/EAGAIN and close do not apply. An abandoned
   `Encoder` is a compile-time error, so the final flush can never be silently
@@ -929,17 +1136,30 @@ struct Encoder[
   declaration `struct Encoder[…](Deinitable where False):`, which the declaration
   above carries together with the required error-string argument
   (`mojov1/decorators/explicit-destroy`, "Pitfalls"; Mojo v1.0.0 release notes).
-- **Justification:** `MojoAkku uses a `feed`/`finish` value type with a
-  mandatory `finish` because Rust's `EncoderWriter::finish` and data-encoding's
-  `Encoder::finalize` are documented as "required for correctness", while Rust's
-  `Drop` suppresses write errors and is a rejected footgun (`rust.md` §9,§11,
-  §12); `@explicit_destroy` enforces the same contract with a compile-time
-  diagnostic.` The exact signature of the named destructor (extra `mut out`
-  argument plus `-> Int`) is a consciously open item; see `## Open Questions`.
+
+Errors: none; encode cannot fail. `discard(deinit self)` drops the
+remainder without emitting it — the explicit, non-silent way to abandon a
+stream.
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses a `feed`/`finish` value type with a
+mandatory `finish` because Rust's `EncoderWriter::finish` and data-encoding's
+`Encoder::finalize` are documented as "required for correctness", while Rust's
+`Drop` suppresses write errors and is a rejected footgun (`rust.md` §9,§11,
+§12); `@explicit_destroy` enforces the same contract with a compile-time
+diagnostic. The exact signature of the named destructor (extra `mut out`
+argument plus `-> Int`) is a consciously open item; see `## Open Questions`.
 
 ---
 
 ### `Decoder` (streaming decode)
+
+Status: planned
+
+Signature:
 
 ```mojo
 @explicit_destroy("call finish() or discard() before this decoder leaves scope")
@@ -958,6 +1178,8 @@ struct Decoder[
 
     def discard(deinit self)
 ```
+
+Semantics:
 
 - **Parameters / preconditions:** `feed` accepts successive borrowed encoded-text
   chunks of any length, as either `StringSpan` or `Span[UInt8]`; the two
@@ -1000,18 +1222,6 @@ struct Decoder[
   `mut self` — it **does not consume self**; the chunk is borrowed for the
   duration of the call only and may be freed immediately after `feed` returns.
   Only `finish`/`discard` take `deinit self` and consume the decoder.
-- **Errors:** `raises Base64Error`. `feed` can raise `INVALID_SYMBOL` (a byte
-  outside the alphabet, or whitespace under `REJECT`) and `INVALID_PADDING` (a
-  padding symbol seen mid-stream, i.e. while more input is still expected);
-  it **cannot** raise `INVALID_LENGTH`, because `feed` holds back every sub-quantum
-  remainder, so a total-length impossibility is only knowable at `finish`.
-  `finish` raises the full `decode` set — `INVALID_SYMBOL`, `INVALID_LENGTH`
-  (structurally impossible remainder) and `INVALID_PADDING` (non-canonical
-  padding on a structurally valid remainder) — identically to `decode`. There is
-  no streaming-only kind. All are recoverable data errors.
-  Complete quanta decoded before an error remain appended (partial-commit
-  semantics, as in `decode_into`). `is_valid` reports the same verdict as
-  `decode` for the same input and policies (see `### is_valid`).
 - **Post-error state:** `feed` takes `mut self` — a *borrow*, not ownership —
   and Mojo raises by returning an error value, not by unwinding, so a raise ends
   the call and returns control with the caller still owning an initialized
@@ -1033,12 +1243,30 @@ struct Decoder[
 - **Stream I/O / flush contract:** EOF is the caller's call to `finish`, not an
   I/O event; EINTR/EAGAIN and close do not apply. `@explicit_destroy` makes the
   final flush mandatory.
-- **Justification:** `MojoAkku uses a streaming decoder carrying ≤(quantum-1)
-  symbols because Rust's `DecoderReader` carries leftovers in fixed buffers and
-  JS's `setFromBase64 -> {read,written}` with `stop-before-partial` is the
-  documented userland pattern for exactly this carry, while Elixir/Python leave
-  it to the caller and are the gap this closes (`rust.md` §9,§12; `js-ts.md` §9,
-  §12; `elixir.md` §9,§11; `python.md` §12).`
+
+Errors: `raises Base64Error`. `feed` can raise `INVALID_SYMBOL` (a byte
+outside the alphabet, or whitespace under `REJECT`) and `INVALID_PADDING` (a
+padding symbol seen mid-stream, i.e. while more input is still expected);
+it **cannot** raise `INVALID_LENGTH`, because `feed` holds back every sub-quantum
+remainder, so a total-length impossibility is only knowable at `finish`.
+`finish` raises the full `decode` set — `INVALID_SYMBOL`, `INVALID_LENGTH`
+(structurally impossible remainder) and `INVALID_PADDING` (non-canonical
+padding on a structurally valid remainder) — identically to `decode`. There is
+no streaming-only kind. All are recoverable data errors.
+Complete quanta decoded before an error remain appended (partial-commit
+semantics, as in `decode_into`). `is_valid` reports the same verdict as
+`decode` for the same input and policies (see `### is_valid`).
+
+Tests:
+
+Implementation status: not implemented
+
+Rationale: MojoAkku uses a streaming decoder carrying ≤(quantum-1)
+symbols because Rust's `DecoderReader` carries leftovers in fixed buffers and
+JS's `setFromBase64 -> {read,written}` with `stop-before-partial` is the
+documented userland pattern for exactly this carry, while Elixir/Python leave
+it to the caller and are the gap this closes (`rust.md` §9,§12; `js-ts.md` §9,
+§12; `elixir.md` §9,§11; `python.md` §12).
 
 ## Error Surface
 
@@ -1085,6 +1313,38 @@ Rules:
 - **Diagnostics.** `Base64Error` implements `Writable`, so `print(e)` yields a
   readable, allocation-cheap message including the kind and position, in the
   spirit of cppcodec's allocation-free `symbol_error` (`cpp.md` §10).
+
+## Conventions
+
+These are the rules every entry in this document follows, and the rules every
+sibling MojoAkku library copies.
+
+- **One entry per public API member, in design order.** Names are stable; the
+  `## Public API` list and the `## Semantics` entries are in the same order.
+- **Identical field names and order in every entry.** Each entry uses exactly:
+  `Status:`, `Signature:`, `Semantics:`, `Errors:`, `Tests:`,
+  `Implementation status:`, `Rationale:`. No field is omitted, even when its
+  value is `none` or empty.
+- **Signature is the exact Mojo declaration.** It is copied verbatim from the
+  approved design; Phase 7 stubs it unchanged.
+- **Semantics is complete.** It covers parameters/preconditions,
+  return/meaning, ownership, and the stream-I/O / flush contract as applicable,
+  plus any entry-specific policy (for example the `Alphabet` case policy or the
+  `Decoder` end-of-stream state).
+- **Errors names every raised or returned error and says whether it is
+  recoverable.** Pure functions say `none`.
+- **Tests is present but empty in this phase.** Test names are added in the
+  test phase; the field is never removed.
+- **Rationale is a `MojoAkku uses X because Y` statement** carried over from the
+  design, naming the reference API and its research section.
+- **Status and implementation status are honest.** All entries are `planned`
+  and `not implemented` until a later phase changes them.
+- **No implementation and no tests are written in this phase.** This document
+  is documentation only.
+- **Terminology is shared.** Symbol, quantum, carry, padding and canonical are
+  defined once in `## Semantics ## Terminology` and used consistently.
+- **Markdown tables use `|`.** No pipe-escaping artifacts; sources are cited as
+  `<lang>.md §<section>`.
 
 ## Ownership and Lifecycle
 
@@ -1210,5 +1470,3 @@ Most decisions are closed against the reviewed research and the `mojov1` buch.
   rejection, so the Go corroboration for `B32_*` uppercase-only is a **GUESS**;
   Python (`casefold=False`) and cppcodec (uppercase-only tables) carry the claim.
   Phase 7 verifies the Go source before this is treated as established.
-
-
