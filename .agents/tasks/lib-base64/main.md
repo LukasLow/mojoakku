@@ -20,4 +20,5 @@ See mojoakku/base64/.research/README.md (selected languages, adapted question se
 1 research        done (C, C++, Go, Rust, Python, Perl, JS/TS, Java, Elixir + Mojo buch)
 2 research review APPROVED
 3 design          done; user approved the public API (BASE64_DOCS.md, 15 entries)
-4..13             pending
+4 design review   APPROVED (5 passes; 3 items open with Phase-7 compile checks)
+5..13             pending
