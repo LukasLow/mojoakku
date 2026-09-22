@@ -44,15 +44,20 @@ Run these from the repository root:
 More commands: `task current` (libraries in progress) and
 `task show -- <id>` (print one catalogue file).
 
-## CI and changes
+## CI, changes and release
 
-- **CI** (`.github/workflows/ci.yml`) runs exactly one command: `task ci`. The
-  root Taskfile auto-discovers every library, so a new library is tested the
-  moment its `mojoakku/<lib>/Taskfile.yml` exists — nothing to register.
-- **Changes** are recorded as one file per change in `.changes/`, with category
+- **`.changes/new/`** holds pending change files: one per change, with category
   lines (`NEW`, `FIX`, `SECURITY`, `PERFORMANCE`, `BREAKING`, `DEPRECATED`,
-  `INTERNAL`). `Release.md` turns them into `CHANGELOG.md` and the git tag;
-  versions stay on `0.x.y` and major is never bumped. See `.changes/README.md`.
+  `INTERNAL`). See `.changes/README.md`.
+- **Pull requests** run `.github/workflows/pull-request-check.yml`: it runs
+  `task ci` and requires exactly one new `.changes/new/*.md` file.
+- **Pushes to `main`** run `.github/workflows/main-push.yml`: it runs `task ci`,
+  and if `.changes/new/` is non-empty it releases — updates `CHANGELOG.md`,
+  moves the files to `.changes/archive/<tag>/`, and creates the next `0.x.y` tag
+  (`major` is never bumped).
+- `task ci` is the single test entry point; the root Taskfile auto-discovers
+  every library, so a new library is tested the moment its
+  `mojoakku/<lib>/Taskfile.yml` exists — nothing to register.
 
 ## License
 

@@ -89,11 +89,15 @@ The canonical reference is `.agents/workflows/LibraryLayout.md`.
 - **CI runs one command: `task ci`.** The root `Taskfile.yml` auto-discovers
   every `mojoakku/*/Taskfile.yml` and runs each library's `test` (and optional
   `ci`) task; no library is registered anywhere. Each library owns how it tests.
-- **`.changes/` drives the changelog and the tag.** Every notable change gets one
-  `.changes/new/<date>-<slug>.md` file with category lines (`NEW`, `FIX`, `SECURITY`,
-  `PERFORMANCE`, `BREAKING`, `DEPRECATED`, `INTERNAL`). Versions stay on `0.x.y`
-  and **major is never bumped**: `NEW`/`BREAKING`/`DEPRECATED` → minor,
-  the rest → patch (`task changes:version`). See `.changes/README.md`.
+  Two GitHub workflows drive it: `pull-request-check.yml` (PR: `task ci` + require
+  exactly one new `.changes/new/` file) and `main-push.yml` (main: `task ci`, then
+  release when `.changes/new/` is non-empty).
+- **`.changes/` drives the changelog and the tag.** `.changes/new/` holds pending
+  change files (`<date>-<slug>.md`, category lines `NEW`, `FIX`, `SECURITY`,
+  `PERFORMANCE`, `BREAKING`, `DEPRECATED`, `INTERNAL`); CI moves released files to
+  `.changes/archive/<tag>/` (CI-only). Versions stay on `0.x.y` and **major is
+  never bumped**: `NEW`/`BREAKING`/`DEPRECATED` → minor, the rest → patch
+  (`task changes:version` previews it). See `.changes/README.md`.
 - **The Manager starts NO Manager**.
 
 ## Mojo knowledge: the buch tool
@@ -153,6 +157,7 @@ The process lives in `.agents/workflows/`. Start at the index:
 
 - **Mojo runs in the smd container** (global `mojo`, version pinned by
   `pixi.toml` via smd.toml). Use `smd` for commands; never bare `bash`.
-- **CI** (`.github/workflows/ci.yml`) runs exactly `task ci` on push/PR.
+- **CI** (`.github/workflows/`) runs `task ci` on push and PR; on `main` it also
+  auto-releases when `.changes/new/` is non-empty (`main-push.yml`).
 - **Changes** are recorded in `.changes/` and drive the version tag; see
   `.changes/README.md`.

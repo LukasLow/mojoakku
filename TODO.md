@@ -18,11 +18,12 @@ records deferred work that no library owns.
 
 ## 2. Git tags and CI
 
-- **Status:** DONE (CI) / ready (tags). `.github/workflows/ci.yml` runs exactly
-  `task ci` on push and pull requests. The `.changes/` directory drives the
-  changelog and the version: `task changes:version` computes the next `0.x.y`
-  (major is never bumped), and `Release.md` writes `CHANGELOG.md` and creates
-  the tag. No release tag has been cut yet.
+- **Status:** DONE (CI) / ready (tags). `.github/workflows/main-push.yml` runs
+  `task ci` on every push to `main` and, when `.changes/new/` is non-empty, also
+  updates `CHANGELOG.md`, moves the files to `.changes/archive/<tag>/` and
+  creates the next `0.x.y` tag (major is never bumped). On pull requests,
+  `.github/workflows/pull-request-check.yml` runs `task ci` and requires exactly
+  one new `.changes/new/` file. No release tag has been cut yet.
 
 ## 3. Automatic upload to prefix.dev
 

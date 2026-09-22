@@ -42,7 +42,7 @@ hand-off from a finished library (or task) to CI and review.
    a title naming the change, a body that fills the checklist (CI green, change
    file present, inline `# API-DOCS` current, version derived).
 7. Manager reports the PR URL.
-8. CI runs on the PR (`.github/workflows/ci.yml` → `task ci`). A red CI blocks
+8. CI runs on the PR (`.github/workflows/pull-request-check.yml` → `task ci`). A red CI blocks
    merge; the Manager routes the failure to the owning workflow (`BugFix.md`,
    `BugInvestigation.md`, or back to the phase).
 9. On a green CI and an accepted review, the PR is merged (by the user or the
