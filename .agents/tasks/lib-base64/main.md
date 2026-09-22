@@ -25,4 +25,5 @@ See mojoakku/base64/.research/README.md (selected languages, adapted question se
 6 docs review     done (APPROVED; commit 20f2273)
 7 scaffold        done (compiles with Mojo 1.0.0; stubs use abort(...) instead of raise Error(...))
 8 scaffold review APPROVED (layout/stubs/inline docs verified; 3 non-blocking notes for phase 9: abort = process exit not catchable error, stdlib base64 name-collision check, .tmp mkdir)
-9..13             pending
+9 tests           done; red baseline 14 files / 0 passed / 14 failed (baseline.log); compile gate via consumer import passes. next: 10 tests review
+10..13            pending

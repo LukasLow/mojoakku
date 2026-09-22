@@ -28,8 +28,11 @@
 [dockerfile]
   lines = [
     "FROM docker.io/debian:bookworm-slim",
-    "RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl && rm -rf /var/lib/apt/lists/*",
+    "RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl bash bzip2 unzip && rm -rf /var/lib/apt/lists/*",
     "RUN sh -c \"$(curl -fsSL https://taskfile.dev/install.sh)\" -- -d -b /usr/local/bin",
+    "RUN curl -fsSL https://pixi.sh/install.sh | bash",
+    "ENV PATH=\"/root/.pixi/bin:${PATH}\"",
+    "RUN pixi global install -c https://conda.modular.com/max/ -c conda-forge mojo",
   ]
 
 # For more information see: smd --help | smd --agent | smd --toml

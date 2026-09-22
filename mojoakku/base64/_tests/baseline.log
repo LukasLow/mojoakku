@@ -1,0 +1,30 @@
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_alphabet.mojo
+   result: FAIL (non-zero exit)
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_decode.mojo
+   result: FAIL (non-zero exit)
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_decode_into.mojo
+   result: FAIL (non-zero exit)
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_decoded_len.mojo
+   result: FAIL (non-zero exit)
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_decoder.mojo
+   result: FAIL (non-zero exit)
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_encode.mojo
+   result: FAIL (non-zero exit)
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_encode_into.mojo
+   result: FAIL (non-zero exit)
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_encoded_len.mojo
+   result: FAIL (non-zero exit)
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_encoder.mojo
+   result: FAIL (non-zero exit)
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_errors.mojo
+   result: FAIL (non-zero exit)
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_is_valid.mojo
+   result: FAIL (non-zero exit)
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_padding.mojo
+   result: FAIL (non-zero exit)
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_padding_mode.mojo
+   result: FAIL (non-zero exit)
+== mojo run -I mojoakku mojoakku/base64/_tests/test_base64_whitespace.mojo
+   result: FAIL (non-zero exit)
+--------
+baseline: 14 files, 0 passed, 14 failed

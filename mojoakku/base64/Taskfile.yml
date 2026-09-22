@@ -6,7 +6,7 @@ version: '3'
 # file is a program with its own main(). The runner stops on the first failing
 # file and exits non-zero when any test fails.
 #
-# Mojo is provided by pixi (`pixi run mojo ...`), not by the smd container.
+# Mojo runs inside the smd container, where `mojo` is installed globally.
 # The per-library Taskfile runs from mojoakku/base64/, so `-I ..` puts the
 # package root (mojoakku/) on the import path and a test can write
 # `from base64 import ...`.
@@ -34,7 +34,7 @@ tasks:
           [ -f "$f" ] || continue
           found="yes"
           echo "== $f"
-          pixi run mojo run -I .. "$f"
+          mojo run -I .. "$f"
         done
         if [ -z "$found" ]; then
           echo "No tests yet in _tests/ (nothing to run)."
@@ -43,10 +43,20 @@ tasks:
         fi
 
   # --------------------------------------------------------------------------
-  # compile — compile the package (the Phase-7 compile gate).
+  # compile — the Phase-7/9 compile gate.
+  #
+  # `mojo precompile .` cannot be used directly here: the package directory
+  # contains `_tests/`, whose files define `main()` and are rejected inside a
+  # package. The container also has no C compiler for `mojo build`. The gate
+  # therefore compiles a consumer that imports the whole public surface (JIT),
+  # which type-checks every api/ file and the package entry point.
   # --------------------------------------------------------------------------
   compile:
-    desc: 'Compile the base64 package with mojo precompile.'
+    desc: 'Type-check the public API via a consumer import (JIT).'
     cmds:
-      - mkdir -p ../../.tmp
-      - pixi run mojo precompile . -o ../../.tmp/base64.mojoc
+      - |
+        set -e
+        mkdir -p ../../.tmp
+        printf 'from base64 import (Alphabet, Padding, PaddingMode, Whitespace, ErrorKind, Base64Error, encode, encode_into, decode, decode_into, encoded_len, decoded_len, is_valid, Encoder, Decoder)\n\ndef main():\n    pass\n' > ../../.tmp/base64_check.mojo
+        mojo run -I .. ../../.tmp/base64_check.mojo
+        echo "base64 public API compiles."
