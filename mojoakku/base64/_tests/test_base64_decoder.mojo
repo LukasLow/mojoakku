@@ -68,8 +68,14 @@ def test_feed_returns_bytes_appended_per_chunk() raises:
     assert_equal(len(out), 6)
 
 def test_feed_holds_sub_quantum_remainder() raises:
+    # A 2-symbol remainder is held by feed and completed by finish. Under the
+    # default PaddingMode.STRICT, `finish` on an unpadded partial quantum must
+    # raise INVALID_PADDING (see
+    # test_finish_raises_invalid_padding_for_missing_padding), so this test uses
+    # PaddingMode.TOLERANT, which is the policy that completes the remainder
+    # without padding.
     var out = List[UInt8]()
-    var dec = Decoder()
+    var dec = Decoder[Alphabet.B64_STANDARD, PaddingMode.TOLERANT, Whitespace.REJECT]()
     var fed = 0
     try:
         fed = dec.feed("Zm", out)

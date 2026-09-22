@@ -5,10 +5,10 @@
 # `Deinitable where False` makes abandoning an instance a compile-time error, so
 # the final flush can never be silently skipped.
 
-from std.os import abort
-
 from .options import Alphabet, Padding, PaddingMode, Whitespace
 from .errors import Base64Error
+
+from base64.src.engine import EncodeState, DecodeState
 
 
 # Encoder — stateful encode value type owning the sub-quantum byte carry.
@@ -30,6 +30,9 @@ struct Encoder[
     alphabet: Alphabet = Alphabet.B64_STANDARD,
     padding: Padding = Padding.REQUIRED,
 ](Deinitable where False):
+    # The encoder owns only the sub-quantum carry; it is never exposed.
+    var _state: EncodeState
+
     # __init__ — create an encoder with an empty carry.
     #
     # Parameters: none.
@@ -37,7 +40,7 @@ struct Encoder[
     # Errors: none.
     # Semantics (one line): start a fresh stream with no buffered bytes.
     def __init__(out self):
-        abort("MojoAkku: this API is not yet implemented")
+        self._state = EncodeState()
 
     # feed (Span[UInt8]) — encode a borrowed chunk of raw bytes.
     #
@@ -49,7 +52,7 @@ struct Encoder[
     # Semantics (one line): append whole-quantum output and retain the
     # sub-quantum carry.
     def feed(mut self, chunk: Span[UInt8, _], mut out: String) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._state.feed[Self.alphabet, Self.padding](chunk, out)
 
     # feed (StringSpan) — encode a borrowed chunk of text treated as raw bytes.
     #
@@ -60,7 +63,7 @@ struct Encoder[
     # Errors: none.
     # Semantics (one line): the text overload of Encoder.feed.
     def feed(mut self, chunk: StringSpan, mut out: String) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._state.feed[Self.alphabet, Self.padding](chunk.as_bytes(), out)
 
     # finish — encode the final partial quantum and append it (mandatory flush).
     #
@@ -71,7 +74,7 @@ struct Encoder[
     # Semantics (one line): consume the encoder and flush the remainder exactly
     # once.
     def finish(deinit self, mut out: String) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._state.finish[Self.alphabet, Self.padding](out)
 
     # discard — drop the remainder without emitting it.
     #
@@ -81,7 +84,7 @@ struct Encoder[
     # Errors: none.
     # Semantics (one line): the explicit, non-silent way to abandon a stream.
     def discard(deinit self):
-        abort("MojoAkku: this API is not yet implemented")
+        pass
 
 
 # Decoder — stateful decode value type owning the sub-quantum character carry.
@@ -106,6 +109,9 @@ struct Decoder[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](Deinitable where False):
+    # The decoder owns only the sub-quantum character carry; it is never exposed.
+    var _state: DecodeState
+
     # __init__ — create a decoder with an empty carry and a clear stream-ended
     # flag.
     #
@@ -114,7 +120,7 @@ struct Decoder[
     # Errors: none.
     # Semantics (one line): start a fresh stream with no buffered symbols.
     def __init__(out self):
-        abort("MojoAkku: this API is not yet implemented")
+        self._state = DecodeState()
 
     # feed (StringSpan) — decode a borrowed chunk of encoded text.
     #
@@ -129,7 +135,7 @@ struct Decoder[
     # Semantics (one line): append whole-quantum output and retain the
     # sub-quantum carry.
     def feed(mut self, chunk: StringSpan, mut out: List[UInt8]) raises Base64Error -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._state.feed_chunk[Self.alphabet, Self.padding_mode, Self.whitespace](chunk.as_bytes(), out)
 
     # feed (Span[UInt8]) — decode a borrowed chunk of encoded bytes.
     #
@@ -141,7 +147,7 @@ struct Decoder[
     # never INVALID_LENGTH.
     # Semantics (one line): the byte overload of Decoder.feed.
     def feed(mut self, chunk: Span[UInt8, _], mut out: List[UInt8]) raises Base64Error -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._state.feed_chunk[Self.alphabet, Self.padding_mode, Self.whitespace](chunk, out)
 
     # finish — validate and flush the final partial quantum (mandatory flush).
     #
@@ -155,7 +161,7 @@ struct Decoder[
     # Semantics (one line): consume the decoder and validate exactly what
     # remains, matching `decode` for the concatenated stream.
     def finish(deinit self, mut out: List[UInt8]) raises Base64Error -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._state.finish[Self.alphabet, Self.padding_mode](True, out)
 
     # discard — drop the retained carry without validating it.
     #
@@ -167,4 +173,4 @@ struct Decoder[
     # Semantics (one line): the explicit way to end a stream without flushing a
     # remainder.
     def discard(deinit self):
-        abort("MojoAkku: this API is not yet implemented")
+        pass

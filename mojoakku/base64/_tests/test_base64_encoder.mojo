@@ -100,12 +100,13 @@ def test_discard_drops_remainder_without_emitting() raises:
 def test_discard_after_complete_quanta_keeps_them() raises:
     var out = String()
     var enc = Encoder[Alphabet.B64_STANDARD, Padding.REQUIRED]()
-    _ = enc.feed("foobar", out)
+    # One base64 quantum is 3 input bytes, so feed 4 bytes: "foo" is encoded as
+    # one complete quantum, the trailing "b" is held in the carry.
+    _ = enc.feed("foob", out)
     var before = String(out)
     enc^.discard()
     assert_equal(out, before)
-    # "foo" is the one complete quantum in "foobar"; the remaining "bar" is held
-    # and dropped by discard.
+    # The complete quantum "foo" stays encoded; the held "b" is dropped.
     assert_equal(out, encode("foo"))
 
 def test_streaming_all_chunk_splits_equals_one_shot() raises:

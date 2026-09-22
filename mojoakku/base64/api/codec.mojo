@@ -4,10 +4,16 @@
 # String; decode borrows encoded text/bytes and returns an owned List[UInt8],
 # raising Base64Error. The length functions are pure and allocation-free.
 
-from std.os import abort
-
 from .options import Alphabet, Padding, PaddingMode, Whitespace
 from .errors import Base64Error
+
+from base64.src.engine import (
+    encode_all,
+    encoded_len_core,
+    decoded_len_core,
+    decode_into_core,
+    is_valid_core,
+)
 
 
 # encode (Span[UInt8]) — encode borrowed raw bytes to an owned String.
@@ -23,7 +29,9 @@ def encode[
     alphabet: Alphabet = Alphabet.B64_STANDARD,
     padding: Padding = Padding.REQUIRED,
 ](input: Span[UInt8, _]) -> String:
-    abort("MojoAkku: this API is not yet implemented")
+    var out = String()
+    encode_all[alphabet, padding](input, out)
+    return out^
 
 
 # encode (StringSpan) — encode borrowed UTF-8 text treated as raw bytes.
@@ -40,7 +48,9 @@ def encode[
     alphabet: Alphabet = Alphabet.B64_STANDARD,
     padding: Padding = Padding.REQUIRED,
 ](input: StringSpan) -> String:
-    abort("MojoAkku: this API is not yet implemented")
+    var out = String()
+    encode_all[alphabet, padding](input.as_bytes(), out)
+    return out^
 
 
 # encode_into (Span[UInt8]) — encode raw bytes into a caller-owned String.
@@ -55,7 +65,9 @@ def encode_into[
     alphabet: Alphabet = Alphabet.B64_STANDARD,
     padding: Padding = Padding.REQUIRED,
 ](input: Span[UInt8, _], mut result: String) -> Int:
-    abort("MojoAkku: this API is not yet implemented")
+    var start = result.byte_length()
+    encode_all[alphabet, padding](input, result)
+    return result.byte_length() - start
 
 
 # encode_into (StringSpan) — encode text into a caller-owned String.
@@ -69,7 +81,9 @@ def encode_into[
     alphabet: Alphabet = Alphabet.B64_STANDARD,
     padding: Padding = Padding.REQUIRED,
 ](input: StringSpan, mut result: String) -> Int:
-    abort("MojoAkku: this API is not yet implemented")
+    var start = result.byte_length()
+    encode_all[alphabet, padding](input.as_bytes(), result)
+    return result.byte_length() - start
 
 
 # decode (StringSpan) — decode encoded text to an owned List[UInt8].
@@ -91,7 +105,9 @@ def decode[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](input: StringSpan) raises Base64Error -> List[UInt8]:
-    abort("MojoAkku: this API is not yet implemented")
+    var result = List[UInt8]()
+    _ = decode_into_core[alphabet, padding_mode, whitespace](input.as_bytes(), result)
+    return result^
 
 
 # decode (Span[UInt8]) — decode encoded bytes to an owned List[UInt8].
@@ -109,7 +125,9 @@ def decode[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](input: Span[UInt8, _]) raises Base64Error -> List[UInt8]:
-    abort("MojoAkku: this API is not yet implemented")
+    var result = List[UInt8]()
+    _ = decode_into_core[alphabet, padding_mode, whitespace](input, result)
+    return result^
 
 
 # decode_into (StringSpan) — decode encoded text into a caller-owned List.
@@ -126,7 +144,7 @@ def decode_into[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](input: StringSpan, mut result: List[UInt8]) raises Base64Error -> Int:
-    abort("MojoAkku: this API is not yet implemented")
+    return decode_into_core[alphabet, padding_mode, whitespace](input.as_bytes(), result)
 
 
 # decode_into (Span[UInt8]) — decode encoded bytes into a caller-owned List.
@@ -143,7 +161,7 @@ def decode_into[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](input: Span[UInt8, _], mut result: List[UInt8]) raises Base64Error -> Int:
-    abort("MojoAkku: this API is not yet implemented")
+    return decode_into_core[alphabet, padding_mode, whitespace](input, result)
 
 
 # encoded_len — exact encoded length for n raw input bytes.
@@ -159,7 +177,7 @@ def encoded_len[
     alphabet: Alphabet = Alphabet.B64_STANDARD,
     padding: Padding = Padding.REQUIRED,
 ](n: Int) -> Int:
-    abort("MojoAkku: this API is not yet implemented")
+    return encoded_len_core[alphabet, padding](n)
 
 
 # decoded_len — maximum decoded byte count for n encoded symbols.
@@ -175,7 +193,7 @@ def encoded_len[
 def decoded_len[
     alphabet: Alphabet = Alphabet.B64_STANDARD,
 ](n: Int) -> Int:
-    abort("MojoAkku: this API is not yet implemented")
+    return decoded_len_core[alphabet](n)
 
 
 # is_valid (StringSpan) — allocation-free validity predicate.
@@ -193,7 +211,7 @@ def is_valid[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](input: StringSpan) -> Bool:
-    abort("MojoAkku: this API is not yet implemented")
+    return is_valid_core[alphabet, padding_mode, whitespace](input.as_bytes())
 
 
 # is_valid (Span[UInt8]) — allocation-free validity predicate over bytes.
@@ -211,4 +229,4 @@ def is_valid[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](input: Span[UInt8, _]) -> Bool:
-    abort("MojoAkku: this API is not yet implemented")
+    return is_valid_core[alphabet, padding_mode, whitespace](input)

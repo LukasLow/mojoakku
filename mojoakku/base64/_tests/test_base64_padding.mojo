@@ -14,6 +14,12 @@ from base64 import (
     decode,
 )
 
+def bytes_of(text: String) -> List[UInt8]:
+    var out = List[UInt8]()
+    for b in text.bytes():
+        out.append(b)
+    return out^
+
 def test_b64_required_pads_partial_quantum() raises:
     assert_equal(encode[Alphabet.B64_STANDARD, Padding.REQUIRED]("f"), "Zg==")
     assert_equal(encode[Alphabet.B64_STANDARD, Padding.REQUIRED]("fo"), "Zm8=")
@@ -50,10 +56,12 @@ def test_empty_input_yields_empty_string_for_both_policies() raises:
     assert_equal(encode[Alphabet.B32_STANDARD, Padding.OMITTED](""), "")
 
 def test_required_output_decodes_back_strict() raises:
-    # Padding.REQUIRED output is canonical under the default PaddingMode.STRICT.
+    # Padding.REQUIRED output is canonical under the default PaddingMode.STRICT
+    # and round-trips to the original bytes.
     var encoded = encode[Alphabet.B64_STANDARD, Padding.REQUIRED]("fo")
+    assert_equal(encoded, "Zm8=")
     var decoded = decode[Alphabet.B64_STANDARD, PaddingMode.STRICT](encoded)
-    assert_equal(decoded, decode("fo"))
+    assert_equal(decoded, bytes_of("fo"))
 
 def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()

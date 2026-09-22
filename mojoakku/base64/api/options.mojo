@@ -4,8 +4,6 @@
 # `_id` field and named `comptime` constants. Callers use the named constants;
 # the initializer is @doc_hidden and is an implementation detail.
 
-from std.os import abort
-
 
 # Alphabet — compile-time value type selecting the symbol table.
 #
