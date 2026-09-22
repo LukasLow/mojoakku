@@ -63,3 +63,31 @@ Triggered by a push to `main` (`.github/workflows/main-push.yml`):
    pushes both atomically (with retry if `main` moved meanwhile).
 
 With nothing in `new/`, nothing is released — the push only runs the tests.
+
+## What happens with several pending files (merge timing)
+
+A pull request must add **exactly one** file to `new/` (the PR check enforces
+this). How many *releases* result from several merges depends on timing, and both
+outcomes are correct:
+
+- **Merges with enough time between them:** push A releases PR1 and moves its
+  file to `archive/`; push B then sees only PR2 and releases it. Two tags, each
+  on its own commit. Normal.
+- **Merges close together (before the first run finishes):** the first run
+  fetches `origin/main` with **both** files still in `new/`, so it folds **all
+  pending files into one release** (one tag covering both changes). The second
+  run then finds `new/` empty and only tests.
+
+So pending files accumulate into the next release — nothing is lost, and no tag
+is ever created twice:
+
+- `concurrency: main-push` (`cancel-in-progress: false`) serialises the runs.
+- The release is committed and pushed **atomically** (`git push --atomic`), with
+  a 5× retry if `main` advanced meanwhile.
+- The workflow refuses to release if the latest tag is not an ancestor of `main`.
+
+This is the standard changesets-style behaviour (all pending changes fold into
+the next release). It is **not** an error to have several pending files; a
+release simply covers all of them. A hard error on >1 pending file is
+deliberately not used: with fast merges it would block releases until someone
+intervenes by hand.
