@@ -6,14 +6,14 @@ Prepare and cut a release: decide the version, write the changelog, verify docs 
 ## Inputs
 - Release scope: the libraries and changes included.
 - Current version and tag state.
-- `<LIB>_DOCS.md` for every included library.
+- The inline `# API-DOCS` blocks for every included library.
 - Test results for every included library.
 - Changelog draft or commit history since the last release.
 
 ## Preconditions
 - All included libraries have a green `_tests/` suite and passed their final reviews.
 - No open `NEEDS_DEBUG`, `NEEDS_COMPLIANCE` or rejected review gate remains.
-- `<LIB>_DOCS.md` for every included library is current (single source of truth).
+- The inline `# API-DOCS` blocks for every included library are current (single source of truth).
 - The release scope is frozen before the version decision.
 
 ## Roles
@@ -27,7 +27,7 @@ Prepare and cut a release: decide the version, write the changelog, verify docs 
 1. `manager` opens the task and freezes the release scope.
 2. `manager` decides the version per the project's versioning rule (breaking change => major, new user-visible behavior => minor, fix only => patch) and records the rationale.
 3. `docs` writes the changelog: one entry per user-visible change, grouped into features, fixes, performance, deprecations and breaking changes, each referencing the affected `mojoakku/<lib>/`.
-4. `docs` performs the docs check: `<LIB>_DOCS.md`, API and README references agree with the shipped code; broken or stale links are fixed.
+4. `docs` performs the docs check: the inline `# API-DOCS` blocks, API and README references agree with the shipped code; broken or stale links are fixed.
 5. `coder` runs the full test suite for every included library and attaches the output as release evidence.
 6. `reviewer` applies the release gate against scope, version, changelog completeness, docs consistency and test evidence.
 7. `manager` authorizes the tag, then creates and pushes it via direct host git.

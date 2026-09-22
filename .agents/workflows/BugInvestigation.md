@@ -7,7 +7,7 @@ Determine and evidence the root cause of a defect WITHOUT changing code, and del
 - Bug report or anomaly: observed vs. expected behavior, environment, reproduction steps.
 - Affected sibling library under `mojoakku/<lib>/`.
 - Logs, traces, benchmark output or failing test output.
-- `<LIB>_DOCS.md` of the affected library (intended behavior).
+- The inline `# API-DOCS` blocks in `mojoakku/<lib>/*.mojo` and `__init__.mojo` (intended behavior).
 
 ## Preconditions
 - The defect is reproducible, or enough evidence exists to reason about it.

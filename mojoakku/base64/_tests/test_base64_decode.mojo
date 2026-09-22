@@ -1,5 +1,5 @@
 # Concern: `decode` — borrowed encoded text/bytes to an owned `List[UInt8]`,
-# raising `Base64Error` (BASE64_DOCS.md `### decode`).
+# raising `Base64Error` (docs block in `../decode.mojo`).
 #
 # Covers: both overloads (StringSpan, Span[UInt8]); empty input decodes to an
 # empty List; the documented success path across alphabets; the allocating form

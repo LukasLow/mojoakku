@@ -24,9 +24,9 @@ NewLibPhase1Research -> NewLibPhase2ResearchReview -> NewLibPhase3Design
 | `NewLibPhase2ResearchReview.md` | Review the research for completeness, sources and relevance. |
 | `NewLibPhase3Design.md` | Design the public API, justify every decision, and get explicit user approval of the API before review. |
 | `NewLibPhase4DesignReview.md` | Review the API design against the research and the process rules. |
-| `NewLibPhase5Docs.md` | Write `<LIB>_DOCS.md` as the single source of truth. |
-| `NewLibPhase6DocsReview.md` | Review the docs for accuracy, completeness and justification. |
-| `NewLibPhase7Scaffold.md` | Scaffold `mojoakku/<lib>/` (`__init__.mojo`, `api/`, `src/`, `_tests/`, `Taskfile.yml`). |
+| `NewLibPhase5Docs.md` | Write `<LIB>_DESIGN.md` (shared sections + one seven-field block per API entry) as the design document to be materialised in Phase 7. |
+| `NewLibPhase6DocsReview.md` | Review the design document for accuracy, completeness and justification. |
+| `NewLibPhase7Scaffold.md` | Scaffold `mojoakku/<lib>/` from `<LIB>_DESIGN.md`: `__init__.mojo` (shared docs + re-exports), one file per API entry, optional `_internal/`, `_tests/`, `Taskfile.yml`; then delete `<LIB>_DESIGN.md`. |
 | `NewLibPhase8ScaffoldReview.md` | Review the scaffold against the agreed layout. |
 | `NewLibPhase9Tests.md` | Write tests before any implementation exists. |
 | `NewLibPhase10TestsReview.md` | Review the tests for coverage and correctness of intent. |

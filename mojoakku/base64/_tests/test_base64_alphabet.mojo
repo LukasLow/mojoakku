@@ -1,5 +1,5 @@
 # Concern: `Alphabet` — the six compile-time symbol tables and the per-alphabet
-# case policy (BASE64_DOCS.md `### Alphabet`, "Case policy (decode)").
+# case policy (docs block in `../alphabet.mojo`).
 #
 # Covers: B64_STANDARD, B64_URL, B32_STANDARD, B32_HEX, HEX_LOWER, HEX_UPPER.
 # The alphabet fixes the symbols, the symbols-per-quantum ratio and, on decode,

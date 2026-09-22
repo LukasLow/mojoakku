@@ -1,6 +1,6 @@
 # Concern: `ErrorKind` and `Base64Error` — the single typed error with a `kind`
-# discriminant and a `position` (BASE64_DOCS.md `### ErrorKind`,
-# `### Base64Error`, `## Error Surface`).
+# discriminant and a `position` (docs blocks in `../error_kind.mojo`,
+# `../base64_error.mojo`; shared in `../__init__.mojo`).
 #
 # Covers: the three kinds; `kind` and `position` are readable in an except
 # block; `print(err)` writes the symbolic kind name; position points at the

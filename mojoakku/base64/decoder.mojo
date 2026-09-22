@@ -1,90 +1,52 @@
-# MojoAkku base64 — explicit streaming (api area: streaming).
-#
-# Stateful `Encoder` and `Decoder` value types carry the sub-quantum remainder
-# between calls. `finish` is mandatory: `@explicit_destroy` plus
-# `Deinitable where False` makes abandoning an instance a compile-time error, so
-# the final flush can never be silently skipped.
+# API-DOCS-START
+# Decoder — stateful decode value type owning the sub-quantum character carry.
+# Status: implemented
+# Signature: @explicit_destroy("call finish() or discard() before this decoder
+#   leaves scope") struct Decoder[
+#   alphabet: Alphabet = Alphabet.B64_STANDARD,
+#   padding_mode: PaddingMode = PaddingMode.STRICT,
+#   whitespace: Whitespace = Whitespace.REJECT,
+# ](Deinitable where False):
+#   def __init__(out self)
+#   def feed(mut self, chunk: StringSpan, mut out: List[UInt8]) raises Base64Error -> Int
+#   def feed(mut self, chunk: Span[UInt8], mut out: List[UInt8]) raises Base64Error -> Int
+#   def finish(deinit self, mut out: List[UInt8]) raises Base64Error -> Int
+#   def discard(deinit self)
+# Semantics: feed accepts successive borrowed encoded-text chunks of any length,
+#   as StringSpan or Span[UInt8]; the two overloads mirror one-shot decode. `out`
+#   is caller-owned and appended to. finish/discard consume the decoder. The carry
+#   size is quantum_symbols-1 (base64 0-3, base32 0-7, base16 0-1) in a small
+#   fixed Array[UInt8, 8] plus a count; never exposed. feed decodes left to right,
+#   appends each complete quantum, holds back the sub-quantum remainder and
+#   returns the bytes appended for this chunk. finish validates the final partial
+#   quantum and mirrors decode exactly; a partial quantum that is structurally
+#   impossible raises INVALID_LENGTH, one lacking its canonical padding under
+#   STRICT raises INVALID_PADDING. A persistent stream-ended flag makes
+#   feed(c1);...;feed(cn);finish() equivalent to decode(c1++...+cn). feed takes
+#   mut self (borrow, not consume); only finish/discard take deinit self.
+#   EOF is the caller's call to finish, not an I/O event.
+# Errors: raises Base64Error. feed can raise INVALID_SYMBOL (byte outside the
+#   alphabet, or whitespace under REJECT) and INVALID_PADDING (a padding symbol
+#   seen mid-stream, or a symbol after the stream ended); it cannot raise
+#   INVALID_LENGTH because feed holds back every sub-quantum remainder. finish
+#   raises the full decode set (INVALID_SYMBOL, INVALID_LENGTH, INVALID_PADDING).
+#   All are recoverable data errors; complete quanta decoded before an error
+#   remain appended (partial-commit). discard cannot raise.
+# Tests: test_base64_decoder.mojo
+# Implementation status: implemented
+# Rationale: MojoAkku uses a streaming decoder carrying <=(quantum-1) symbols
+#   because Rust's DecoderReader carries leftovers in fixed buffers and JS's
+#   setFromBase64 -> {read,written} with stop-before-partial is the documented
+#   userland pattern for exactly this carry, while Elixir/Python leave it to the
+#   caller and are the gap this closes.
+# API-DOCS-END
 
-from .options import Alphabet, Padding, PaddingMode, Whitespace
-from .errors import Base64Error
+from .alphabet import Alphabet
+from .padding_mode import PaddingMode
+from .whitespace import Whitespace
+from .base64_error import Base64Error
 
-from base64.src.engine import EncodeState, DecodeState
-
-
-# Encoder — stateful encode value type owning the sub-quantum byte carry.
-#
-# Parameters / preconditions: the compile-time `alphabet` and `padding` mirror
-# one-shot `encode`. `feed` accepts successive borrowed chunks of any length,
-# including empty, as raw bytes (Span) or text (StringSpan); `out` is
-# caller-owned and appended to.
-# Return / meaning: `feed` returns the number of encoded characters appended for
-# this chunk, encoding only complete quanta and holding the remainder; `finish`
-# encodes the final partial quantum (with padding if REQUIRED) and returns the
-# number appended. `finish` is the only place padding is emitted.
-# Errors: none; encode cannot fail. `discard` drops the remainder without
-# emitting it.
-# Semantics (one line): feed complete quanta as they arrive, then finish exactly
-# once to emit the remainder.
-@explicit_destroy("call finish() or discard() before this encoder leaves scope")
-struct Encoder[
-    alphabet: Alphabet = Alphabet.B64_STANDARD,
-    padding: Padding = Padding.REQUIRED,
-](Deinitable where False):
-    # The encoder owns only the sub-quantum carry; it is never exposed.
-    var _state: EncodeState
-
-    # __init__ — create an encoder with an empty carry.
-    #
-    # Parameters: none.
-    # Return / meaning: an Encoder ready for the first `feed`.
-    # Errors: none.
-    # Semantics (one line): start a fresh stream with no buffered bytes.
-    def __init__(out self):
-        self._state = EncodeState()
-
-    # feed (Span[UInt8]) — encode a borrowed chunk of raw bytes.
-    #
-    # Parameters: `chunk` is borrowed bytes of any length, including empty;
-    # `out` is caller-owned and appended to.
-    # Return / meaning: the number of encoded characters appended for this
-    # chunk; only complete quanta are encoded and the remainder is held back.
-    # Errors: none.
-    # Semantics (one line): append whole-quantum output and retain the
-    # sub-quantum carry.
-    def feed(mut self, chunk: Span[UInt8, _], mut out: String) -> Int:
-        return self._state.feed[Self.alphabet, Self.padding](chunk, out)
-
-    # feed (StringSpan) — encode a borrowed chunk of text treated as raw bytes.
-    #
-    # Parameters: `chunk` is borrowed text treated byte by byte; `out` is
-    # caller-owned and appended to.
-    # Return / meaning: the number of encoded characters appended for this
-    # chunk; the sub-quantum remainder is held back.
-    # Errors: none.
-    # Semantics (one line): the text overload of Encoder.feed.
-    def feed(mut self, chunk: StringSpan, mut out: String) -> Int:
-        return self._state.feed[Self.alphabet, Self.padding](chunk.as_bytes(), out)
-
-    # finish — encode the final partial quantum and append it (mandatory flush).
-    #
-    # Parameters: `out` is caller-owned and appended to.
-    # Return / meaning: the number of encoded characters appended, including any
-    # required padding. This is the only place padding is emitted.
-    # Errors: none.
-    # Semantics (one line): consume the encoder and flush the remainder exactly
-    # once.
-    def finish(deinit self, mut out: String) -> Int:
-        return self._state.finish[Self.alphabet, Self.padding](out)
-
-    # discard — drop the remainder without emitting it.
-    #
-    # Parameters: none.
-    # Return / meaning: consumes the encoder; the sub-quantum remainder is
-    # abandoned and nothing is appended. `out` is not touched.
-    # Errors: none.
-    # Semantics (one line): the explicit, non-silent way to abandon a stream.
-    def discard(deinit self):
-        pass
+from base64._internal.engine import DecodeState
 
 
 # Decoder — stateful decode value type owning the sub-quantum character carry.

@@ -1,19 +1,24 @@
 # MojoAkku base64 — private implementation engine.
 #
-# Real logic lives here; the public api/ files only delegate. The compile-time
-# option values (Alphabet, Padding, PaddingMode, Whitespace, ErrorKind) are the
-# public value types from `base64.api`, used here as value parameters so table
-# lookups and branches resolve while compiling.
+# Real logic lives here; the public per-entry API files only delegate. The
+# compile-time option values (Alphabet, Padding, PaddingMode, Whitespace,
+# ErrorKind) are the public value types from the flat per-entry modules
+# (`base64.alphabet`, ...), used here as value parameters so table lookups and
+# branches resolve while compiling.
 #
-# Ids (from BASE64_DOCS.md):
+# Ids:
 #   Alphabet:      0 B64_STANDARD  1 B64_URL  2 B32_STANDARD  3 B32_HEX
 #                  4 HEX_LOWER     5 HEX_UPPER
 #   Padding:       0 REQUIRED      1 OMITTED
 #   PaddingMode:   0 STRICT        1 TOLERANT
 #   Whitespace:    0 REJECT        1 IGNORE
 
-from base64.api.options import Alphabet, Padding, PaddingMode, Whitespace
-from base64.api.errors import ErrorKind, Base64Error
+from base64.alphabet import Alphabet
+from base64.padding import Padding
+from base64.padding_mode import PaddingMode
+from base64.whitespace import Whitespace
+from base64.error_kind import ErrorKind
+from base64.base64_error import Base64Error
 
 
 # ---------------------------------------------------------------------------
@@ -97,8 +102,8 @@ def enc_symbol[a: Alphabet](v: Int) -> UInt8:
 
 
 # dec_value — map an encoded symbol to its value, or -1 if it is not in the
-# alphabet. Case policy is per alphabet and case-sensitive (BASE64_DOCS.md
-# `### Alphabet`, "Case policy (decode)").
+# alphabet. Case policy is per alphabet and case-sensitive (see the docs block
+# in `alphabet.mojo`).
 def dec_value[a: Alphabet](b: UInt8) -> Int:
     if a == Alphabet.B64_STANDARD:
         if b >= UInt8(65) and b <= UInt8(90):

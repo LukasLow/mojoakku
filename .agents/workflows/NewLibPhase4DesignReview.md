@@ -4,7 +4,7 @@
 Verify that the derived Mojo API design for `<lib>` is semantically complete, consistent with Mojo language constraints, and justified decision by decision.
 
 ## Inputs
-- `mojoakku/<lib>/<LIB>_DOCS.md` containing the design section from `NewLibPhase3Design.md`.
+- `mojoakku/<lib>/<LIB>_DESIGN.md` containing the design section from `NewLibPhase3Design.md`.
 - `mojoakku/<lib>/.research/<lang>.md` for all languages.
 - The approved research review verdict.
 - This workflow file.
@@ -20,7 +20,7 @@ Verify that the derived Mojo API design for `<lib>` is semantically complete, co
 - **coder / designer** (only on rework): fixes the specific findings; review is repeated.
 
 ## Steps
-1. Manager starts ONE `reviewer` with: "Review the design in `mojoakku/<lib>/<LIB>_DOCS.md`. Check semantic completeness, consistency with Mojo language constraints, and that every decision is justified with a named reference API. Report `APPROVED` or `NEEDS_WORK` with findings."
+1. Manager starts ONE `reviewer` with: "Review the design in `mojoakku/<lib>/<LIB>_DESIGN.md`. Check semantic completeness, consistency with Mojo language constraints, and that every decision is justified with a named reference API. Report `APPROVED` or `NEEDS_WORK` with findings."
 2. reviewer checks semantic completeness: for every public API entry, EOF, EINTR, EAGAIN, buffer/socket ownership, close behavior, error surface and recoverable-vs-unrecoverable errors are all documented. Missing items are listed per API entry.
 3. reviewer checks consistency with Mojo constraints: ownership and lifetime claims match Mojo's value/reference model, `raises` usage is coherent, no Python dependency is required by the design, and no hidden global state is relied upon.
 4. reviewer checks justification: every non-obvious decision carries a `MojoAkku uses X because Y` statement and names at least one reference API from the research files; unsourced or circular justifications are flagged.
@@ -34,7 +34,7 @@ Verify that the derived Mojo API design for `<lib>` is semantically complete, co
 12. Manager hands off to docs.
 
 ## Artifacts / Outputs
-- A written review verdict (`APPROVED` / `NEEDS_WORK`) with a findings list tied to `file:line` in `<LIB>_DOCS.md`.
+- A written review verdict (`APPROVED` / `NEEDS_WORK`) with a findings list tied to `file:line` in `<LIB>_DESIGN.md`.
 - Corrected design sections when a rework pass was required.
 - One `.agents/log.md` entry recording the verdict.
 - One git commit for the phase.

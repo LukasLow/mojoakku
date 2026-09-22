@@ -5,8 +5,8 @@ Review a sibling library or change for security weaknesses in input validation, 
 
 ## Inputs
 - Scope: the library or change under `mojoakku/<lib>/`.
-- `<LIB>_DOCS.md` and the `api/` files for the intended trust boundaries.
-- Any `unsafe`/FFI/interop code in `src/`.
+- The inline `# API-DOCS` blocks and the API files `mojoakku/<lib>/*.mojo` for the intended trust boundaries.
+- Any `unsafe`/FFI/interop code in `mojoakku/<lib>/*.mojo` or `mojoakku/<lib>/_internal/`.
 - TLS, socket and HTTP configuration if in scope.
 - Threat-relevant tests in `mojoakku/<lib>/_tests/`.
 

@@ -1,5 +1,5 @@
 # Concern: `Padding` — the compile-time encode padding policy REQUIRED vs OMITTED
-# (BASE64_DOCS.md `### Padding`).
+# (docs block in `../padding.mojo`).
 #
 # Covers: REQUIRED emits '=' to complete the final quantum; OMITTED never emits
 # '='; the choice is visible in the signature and affects base64/base32 output

@@ -1,5 +1,5 @@
 # Concern: `is_valid` — allocation-free validity predicate returning Bool, never
-# raising (BASE64_DOCS.md `### is_valid`).
+# raising (docs block in `../is_valid.mojo`).
 #
 # Covers: both overloads; empty input is valid under every policy; True iff
 # `decode` with the same parameters would succeed (symbol membership with the

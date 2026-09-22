@@ -45,16 +45,20 @@ names added later; this list is illustrative, not exhaustive.
 
 ```
 mojoakku/<lib>/
-  __init__.mojo      # public package entry point; re-exports from api/
-  api/               # public API surface, ONE file per API area (no API.mojo)
-    __init__.mojo    # re-exports every public member
-    <area>.mojo      # e.g. encode.mojo, decode.mojo — stubs + inline doc comments
-  src/               # private implementation details
-  <LIB>_DOCS.md      # single source of truth (e.g. SOCKET_DOCS.md)
+  __init__.mojo      # package entry point + shared (whole-library) docs block; re-exports every public name
+  <api_entry>.mojo   # ONE file per public API entry, name = API name lowercased
+                     #   e.g. encode.mojo, padding_mode.mojo, base64_error.mojo
+  _internal/         # private shared code — ONLY if there is genuinely shared code
   _tests/            # tests, one file per concern (no __init__.mojo)
   Taskfile.yml       # per-library test runner (task test)
   .research/         # phase-1 research notes, one file per reference language
 ```
+
+There is **no `api/` directory**, **no `API.mojo`** aggregator and **no `src/`
+directory**. Documentation lives **inline with the code** between the markers
+`# API-DOCS-START` / `# API-DOCS-END`: the shared whole-library docs in
+`__init__.mojo`, and one seven-field docs block per API in that API's own file.
+The canonical reference is `.agents/workflows/LibraryLayout.md`.
 
 ## Library independence rules
 
@@ -63,18 +67,20 @@ mojoakku/<lib>/
 - A library **MAY** depend on another library as a **graph edge**, e.g.
   `http -> tcp -> socket`.
 - Every dependency edge **must** be technically justified and documented in the
-  depending library's `<LIB>_DOCS.md`.
+  depending library's inline `# API-DOCS` shared block (`__init__.mojo`).
 - Dependency edges **MUST NOT** determine directory nesting. A dependency is a
   conceptual edge, never a physical parent/child relationship.
 
 ## Core process rules
 
 - **No implementation before research + API + scaffold + tests exist.**
-- `<LIB>_DOCS.md` is the **single source of truth** for a library.
+- The **inline `# API-DOCS` blocks** (`__init__.mojo` for the whole library, one
+  block per API in that API's file) are the **single source of truth** for a library.
 - Every API decision must be **justified in the docs**.
-- The public API lives in `api/` (one file per API area), never in a single
-  `API.mojo`; private logic lives in `src/`; every public function carries an
-  inline doc comment next to it.
+- The public API lives in **one file per API entry** directly under
+  `mojoakku/<lib>/`, never in a single `API.mojo`; private shared logic lives in
+  `mojoakku/<lib>/_internal/` (only if genuinely shared); every public function
+  carries its seven-field docs block next to it.
 - Each library ships its own `Taskfile.yml` with a `test` task for its `_tests/`.
 - **The API design is approved by the user** before the design review runs
   (`NewLibPhase3Design.md`, user review gate).
@@ -116,9 +122,9 @@ The process lives in `.agents/workflows/`. Start at the index:
 - `NewLibPhase2ResearchReview.md` — review the research output.
 - `NewLibPhase3Design.md` — design the public API.
 - `NewLibPhase4DesignReview.md` — review the API design.
-- `NewLibPhase5Docs.md` — write `<LIB>_DOCS.md` as source of truth.
-- `NewLibPhase6DocsReview.md` — review the docs.
-- `NewLibPhase7Scaffold.md` — create the library skeleton.
+- `NewLibPhase5Docs.md` — write `<LIB>_DESIGN.md` as the design document.
+- `NewLibPhase6DocsReview.md` — review the design document.
+- `NewLibPhase7Scaffold.md` — create the library skeleton and materialise the design.
 - `NewLibPhase8ScaffoldReview.md` — review the scaffold.
 - `NewLibPhase9Tests.md` — write tests before implementation.
 - `NewLibPhase10TestsReview.md` — review the tests.

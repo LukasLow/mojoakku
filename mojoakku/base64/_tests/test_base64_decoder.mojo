@@ -1,5 +1,5 @@
 # Concern: `Decoder` — the stateful streaming decoder with a mandatory `finish`
-# (BASE64_DOCS.md `### Decoder`).
+# (docs block in `../decoder.mojo`).
 #
 # Covers: both `feed` overloads (StringSpan, Span[UInt8]); feed returns the
 # bytes appended for the chunk and holds the sub-quantum remainder; finish

@@ -49,7 +49,7 @@ tasks:
   # contains `_tests/`, whose files define `main()` and are rejected inside a
   # package. The container also has no C compiler for `mojo build`. The gate
   # therefore compiles a consumer that imports the whole public surface (JIT),
-  # which type-checks every api/ file and the package entry point.
+  # which type-checks every API .mojo file and the package entry point.
   # --------------------------------------------------------------------------
   compile:
     desc: 'Type-check the public API via a consumer import (JIT).'

@@ -1,5 +1,5 @@
 # Concern: `Encoder` — the stateful streaming encoder with a mandatory `finish`
-# (BASE64_DOCS.md `### Encoder`).
+# (docs block in `../encoder.mojo`).
 #
 # Covers: both `feed` overloads (Span[UInt8], StringSpan); feed returns the
 # number of encoded characters appended for the chunk and holds the sub-quantum

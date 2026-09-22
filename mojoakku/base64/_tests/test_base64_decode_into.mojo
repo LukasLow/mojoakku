@@ -1,6 +1,6 @@
 # Concern: `decode_into` — decode into a caller-owned `mut result:
-# List[UInt8]` and return the number of bytes appended (BASE64_DOCS.md
-# `### decode_into`).
+# List[UInt8]` and return the number of bytes appended (docs block in
+# `../decode_into.mojo`).
 #
 # Covers: both overloads; append semantics (prior contents kept); the returned
 # count equals the bytes appended; partial-commit semantics on error (complete

@@ -4,8 +4,8 @@
 Restructure code without changing behavior, keeping the test suite green before and after.
 
 ## Inputs
-- Target scope in `mojoakku/<lib>/` (`api/`, `src/`, or tests).
-- `<LIB>_DOCS.md` of the affected library (defines the behavior that must not change).
+- Target scope in `mojoakku/<lib>/` (the API files `mojoakku/<lib>/*.mojo`, `_internal/`, or tests).
+- The inline `# API-DOCS` blocks in `mojoakku/<lib>/*.mojo` and `__init__.mojo` (define the behavior that must not change).
 - Current test suite in `mojoakku/<lib>/_tests/`.
 - The motivation: readability, duplication, dead code, naming or structure.
 
@@ -19,7 +19,7 @@ Restructure code without changing behavior, keeping the test suite green before 
 - `manager`: opens the task, approves scope, routes to agents. Manager starts NO Manager.
 - `coder`: performs the restructuring and runs the baseline and post-refactor test/benchmark commands (via `smd`) as evidence.
 - `reviewer`: owns the review gate.
-- `docs`: updates `<LIB>_DOCS.md` only if internal structure references changed (public docs must already match).
+- `docs`: updates the inline `# API-DOCS` blocks only if internal structure references changed (public docs must already match).
 - `idea-reviewer`: consulted when the refactoring touches an abstraction boundary.
 
 ## Steps
@@ -29,7 +29,7 @@ Restructure code without changing behavior, keeping the test suite green before 
 4. `coder` runs the full `_tests/` suite after every meaningful step and returns the result.
 5. `idea-reviewer` verifies that no abstraction boundary, public API or documented behavior was silently altered.
 6. `coder` re-runs the benchmark and compares against the baseline; a performance regression must be justified or fixed.
-7. `docs` updates `<LIB>_DOCS.md` only for internal references; public docs are unchanged.
+7. `docs` updates the inline `# API-DOCS` blocks only for internal references; public docs are unchanged.
 8. `reviewer` applies the review gate.
 9. `manager` commits the refactoring with a message naming the restructuring goal.
 

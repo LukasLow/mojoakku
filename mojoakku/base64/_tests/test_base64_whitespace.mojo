@@ -1,5 +1,5 @@
 # Concern: `Whitespace` — the compile-time decode whitespace policy REJECT vs
-# IGNORE (BASE64_DOCS.md `### Whitespace`).
+# IGNORE (docs block in `../whitespace.mojo`).
 #
 # Covers: REJECT makes any whitespace byte an INVALID_SYMBOL; IGNORE skips
 # space, tab, CR, LF, FF and VT, and skipped whitespace still advances the

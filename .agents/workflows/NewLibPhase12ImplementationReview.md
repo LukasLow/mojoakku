@@ -6,8 +6,8 @@ Review the implementation from `NewLibPhase11Implementation.md` for semantic fid
 
 ## Inputs
 
-- `mojoakku/<lib>/<LIB>_DOCS.md`.
-- `mojoakku/<lib>/api/` and `mojoakku/<lib>/src/`.
+- The inline `# API-DOCS` blocks in `mojoakku/<lib>/*.mojo` and `mojoakku/<lib>/__init__.mojo`.
+- `mojoakku/<lib>/*.mojo` API files and `mojoakku/<lib>/_internal/` (only if shared code exists).
 - `mojoakku/<lib>/_tests/` and the frozen baseline from the Tests phase.
 - Implementation diff and final green test log.
 - Documented dependency edges.
@@ -15,7 +15,7 @@ Review the implementation from `NewLibPhase11Implementation.md` for semantic fid
 ## Preconditions
 
 - `NewLibPhase11Implementation.md` completed and committed.
-- Reviewer has read `<LIB>_DOCS.md` and the implementation diff.
+- Reviewer has read the inline `# API-DOCS` blocks and the implementation diff.
 
 ## Roles
 
@@ -31,7 +31,7 @@ Review the implementation from `NewLibPhase11Implementation.md` for semantic fid
 5. Review resource/ownership correctness: ownership transfer, close/idempotent close, no leaks, no double-free or use-after-close.
 6. Review concurrency/IO correctness for non-blocking paths and `EINTR`/`EAGAIN` retry behavior as documented.
 7. Confirm no hidden nested-library structure exists under `mojoakku/<lib>/` and that each used dependency edge is documented in the depending library's docs.
-8. Confirm no undocumented API was invented and that every public symbol is justified in `<LIB>_DOCS.md`.
+8. Confirm no undocumented API was invented and that every public symbol is justified in its inline `# API-DOCS` block.
 9. Record findings per axis with file:line references and severity.
 10. If `NEEDS_WORK`, Manager returns the findings to `NewLibPhase11Implementation.md`.
 11. If `APPROVED`, Manager logs the verdict via `agentlog`.

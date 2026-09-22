@@ -1,5 +1,5 @@
 # Concern: `decoded_len` — maximum decoded byte count for n encoded symbols
-# (BASE64_DOCS.md `### decoded_len`).
+# (docs block in `../decoded_len.mojo`).
 #
 # Covers: the base64, base32 and base16 upper-bound formulas including the
 # partial-quantum contribution; n = 0 returns 0; the function is total and

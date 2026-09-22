@@ -1,5 +1,5 @@
 # Concern: `encoded_len` — exact encoded length for n raw input bytes
-# (BASE64_DOCS.md `### encoded_len`).
+# (docs block in `../encoded_len.mojo`).
 #
 # Covers: the exact formulas for base64 (REQUIRED/OMITTED), base32
 # (REQUIRED/OMITTED) and base16; n = 0 returns 0; the function is total and

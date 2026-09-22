@@ -1,5 +1,5 @@
 # Concern: `encode_into` — encode into a caller-owned `mut result: String` and
-# return the number of characters appended (BASE64_DOCS.md `### encode_into`).
+# return the number of characters appended (docs block in `../encode_into.mojo`).
 #
 # Covers: both overloads; append semantics (prior contents kept, capacity may
 # be zero on entry); the returned count equals the appended characters; empty

@@ -1,5 +1,5 @@
 # Concern: `PaddingMode` — the compile-time decode padding policy STRICT vs
-# TOLERANT (BASE64_DOCS.md `### PaddingMode`).
+# TOLERANT (docs block in `../padding_mode.mojo`).
 #
 # Covers: STRICT requires canonical RFC 4648 input (exact padding on a partial
 # final quantum, none on a full one, zero trailing bits); TOLERANT accepts a

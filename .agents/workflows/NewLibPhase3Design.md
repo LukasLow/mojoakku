@@ -1,7 +1,7 @@
 # NewLibPhase3Design
 
 ## Purpose
-Derive the Mojo public API for `<lib>` from the reviewed research and record every decision with its justification and reference API in `mojoakku/<lib>/<LIB>_DOCS.md`.
+Derive the Mojo public API for `<lib>` from the reviewed research and record every decision with its justification and reference API in the temporary design document `mojoakku/<lib>/<LIB>_DESIGN.md`.
 
 ## Inputs
 - `mojoakku/<lib>/.research/<lang>.md` for all languages.
@@ -16,20 +16,25 @@ Derive the Mojo public API for `<lib>` from the reviewed research and record eve
 
 ## Roles
 - **Manager**: owns the phase, starts ONE `coder` or `designer` (as appropriate) to write the design into the docs, starts `explore`/`researcher` when a fact must be checked.
-- **coder / designer**: writes the design sections into `mojoakku/<lib>/<LIB>_DOCS.md`, documenting semantics and justifications.
+- **coder / designer**: writes the design sections into `mojoakku/<lib>/<LIB>_DESIGN.md`, documenting semantics and justifications.
 - **reviewer**: not started here; invoked by `NewLibPhase4DesignReview.md`.
 
 ## Steps
-1. Manager opens `mojoakku/<lib>/<LIB>_DOCS.md` and adds (or completes) the design section set:
-   - `## Overview`
-   - `## Goals`
-   - `## Non-Goals`
-   - `## Reference APIs`
-   - `## Public API`
-   - `## Semantics`
-   - `## Error Surface`
-   - `## Ownership and Lifecycle`
-   - `## Open Questions`
+1. Manager opens `mojoakku/<lib>/<LIB>_DESIGN.md` and adds (or completes) the design section set. The design document has two parts, matching the layout convention:
+   - the **shared sections** (whole-library, later materialised into the `__init__.mojo` docs block):
+     - `## Purpose`
+     - `## Status legend`
+     - `## Dependencies`
+     - `## Overview`
+     - `## Goals`
+     - `## Non-Goals`
+     - `## Reference APIs`
+     - `## Public API`
+     - `## Error Surface`
+     - `## Conventions`
+     - `## Ownership and Lifecycle`
+     - `## Open Questions`
+   - **one block per public API entry** (later materialised into that entry's own file), each block carrying the seven fields `Status`, `Signature`, `Semantics`, `Errors`, `Tests`, `Implementation status`, `Rationale`.
 2. For every proposed API entry, write the signature and, below it, the full semantics — not only the type:
    - meaning and preconditions of every parameter and return value;
    - EOF behavior (what a read returns at end of stream);
@@ -42,15 +47,15 @@ Derive the Mojo public API for `<lib>` from the reviewed research and record eve
 3. For every non-obvious choice, write an explicit justification in the form `MojoAkku uses <name> because <reason>.` Name the reference APIs for the decision (from the research files), e.g. `MojoAkku uses \`recv\` because POSIX/C, Rust and Python all expose it and it maps directly onto a single syscall; Go's `Read` is rejected because ...`.
 4. Explicitly document decisions NOT to copy (referencing the `Decisions NOT to copy` section of the research files) and why they do not fit Mojo.
 5. Validate the design against Mojo language constraints: value vs. reference semantics, `raises` vs. error values, `var`/`borrowed`/`inout` usage, no hidden global state, and whether the design can be implemented in pure Mojo without a Python dependency.
-6. List every API entry in the `## Public API` section with a stable name that `NewLibPhase5Docs.md` will later document and `NewLibPhase7Scaffold.md` will stub.
+6. List every API entry in the `## Public API` section with a stable name that `NewLibPhase5Docs.md` will later document and `NewLibPhase7Scaffold.md` will materialise as one file per API entry.
 7. Record unresolved questions in `## Open Questions`; each must be answered before `NewLibPhase4DesignReview.md` can approve.
 8. Manager logs the design draft via `agentlog`.
 9. **User review gate (mandatory).** Manager presents the proposed public API to the user for discussion and approval before any review runs. The presentation must be readable for the low-vision user: the `## Public API` list with each signature and its one-line meaning, plus the decisions NOT to copy. The Manager uses the `question`/`show` tooling to collect the user's verdict. Only after the user explicitly approves (or the requested changes are applied and re-approved) does the phase continue. The user's decision and any requested changes are recorded in the `.agents/log.md` entry.
-10. Manager commits the phase: stages `mojoakku/<lib>/<LIB>_DOCS.md` and commits with a message naming the phase (e.g. `base64 phase 3: API design`).
+10. Manager commits the phase: stages `mojoakku/<lib>/<LIB>_DESIGN.md` and commits with a message naming the phase (e.g. `base64 phase 3: API design`).
 11. Manager hands the design to review.
 
 ## Artifacts / Outputs
-- `mojoakku/<lib>/<LIB>_DOCS.md` containing the derived design: goals, non-goals, reference APIs, public API list, full semantics, error surface, ownership/lifecycle, and per-decision justifications.
+- `mojoakku/<lib>/<LIB>_DESIGN.md` containing the derived design: shared sections (purpose, dependencies, goals, non-goals, reference APIs, public API list, error surface, conventions, ownership/lifecycle) plus one block per API entry with the seven fields and per-decision justifications. This is a temporary design artifact; `NewLibPhase7Scaffold.md` materialises it into the tree and then deletes it.
 - An explicit list of decisions NOT copied from other languages.
 - A `## Open Questions` list, ideally empty at handoff.
 - A recorded user verdict on the public API (approved / changes requested and applied).

@@ -1,5 +1,5 @@
 # Concern: `encode` — borrowed bytes/text to an owned String
-# (BASE64_DOCS.md `### encode`).
+# (docs block in `../encode.mojo`).
 #
 # Covers: both overloads (Span[UInt8], StringSpan); empty input returns an
 # empty String; the result length equals encoded_len; input is borrowed (the
