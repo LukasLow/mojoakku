@@ -302,7 +302,7 @@ Phase 7 stubs them, in this order.
 
 ## Semantics
 
-### Terminology
+#### Terminology
 
 - **Symbol** — one encoded character (one byte of the encoded text).
 - **Quantum** — the smallest group of input bytes that maps to a whole number
@@ -571,9 +571,9 @@ Semantics:
 
 - **Parameters / preconditions:** used as
   `[whitespace: Whitespace = Whitespace.REJECT]` on `decode`/`decode_into`/
-  `Decoder`/`is_valid`. With `IGNORE`, skipped bytes neither count toward the
-  quantum length nor appear in `position` arithmetic except as the reported
-  offending index for other errors.
+  `Decoder`/`is_valid`. With `IGNORE`, skipped whitespace advances the
+  original-stream index used for `position`; it is simply not part of any
+  quantum.
 - **Return / meaning:** makes whitespace tolerance explicit. `REJECT` differs
   from the Mojo stdlib, which ignores whitespace in `b64decode`; `IGNORE`
   preserves that behaviour as an opt-in (`mojov1/stdlib/base64`).
@@ -615,9 +615,7 @@ struct ErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
 
     # Writes the symbolic name, not the numeric _id, so `print(err)` reads
     # "INVALID_LENGTH" rather than "ErrorKind(_id=1)".
-    def write_to(self, mut writer: Some[Writer]):
-        comptime NAME = ["INVALID_SYMBOL", "INVALID_LENGTH", "INVALID_PADDING"]
-        writer.write(NAME[self._id])
+    def write_to(self, mut writer: Some[Writer])
 ```
 
 Semantics:
@@ -669,6 +667,10 @@ Signature:
 struct Base64Error(Copyable, Deinitable, Writable):
     var kind: ErrorKind
     var position: Int
+
+    # Readable diagnostic: writes the symbolic `kind` name and the `position`
+    # (the inherited `Writable` contract used by `print(err)`).
+    def write_to(self, mut writer: Some[Writer])
 ```
 
 Semantics:
@@ -1004,8 +1006,10 @@ def decoded_len[
 
 Semantics:
 
-- **Parameters / preconditions:** `n` is the number of encoded symbols
-  (`>= 0`). Compile-time-callable (pure, non-raising, no FFI).
+- **Parameters / preconditions:** `n` is the total input byte count used as a
+  conservative upper bound (number of encoded symbols, including any padding
+  and, under `Whitespace.IGNORE`, whitespace bytes; `>= 0`).
+  Compile-time-callable (pure, non-raising, no FFI).
 - **Return / meaning:** the **maximum** number of decoded bytes for `n` symbols:
   - base64: `(n // 4) * 3` plus the contribution of a partial final quantum
     (`n % 4` of 2 → 1, of 3 → 2, of 1 → 0 with strict validation rejecting it).
