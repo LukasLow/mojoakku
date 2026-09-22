@@ -43,7 +43,7 @@ jobs:
           f=$(printf '%s\n' "$files" | head -n1)
           bad=$(awk '
             /^[[:space:]]*$/ { next }
-            !/^(NEW|BREAKING|DEPRECATED|FIX|SECURITY|PERFORMANCE|INTERNAL):/ { print }
+            !/^(NEW|BREAKING|DEPRECATED|FIX|SECURITY|PERFORMANCE|INTERNAL|DOCS):/ { print }
           ' "$f")
           if [ -n "$bad" ]; then
             echo "error: $f: line without a valid category: '$bad'" >&2

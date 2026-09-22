@@ -40,7 +40,8 @@ The category lines drive the version. One file may carry several lines:
 | `FIX:` | a bug fix | **patch** |
 | `SECURITY:` | a security fix | **patch** |
 | `PERFORMANCE:` | a performance improvement | **patch** |
-| `INTERNAL:` | not user-visible (build, docs, refactor, tests) | **patch** |
+| `INTERNAL:` | not user-visible (build, refactor, tests) | **none** |
+| `DOCS:` | documentation only | **none** |
 
 ## Versioning rule (IMPORTANT)
 
@@ -49,7 +50,9 @@ bump (`0.x.0`), exactly like `NEW` and `DEPRECATED`. The version is derived from
 the current tag plus the categories of the pending files in `new/`:
 
 - any `NEW`, `BREAKING` or `DEPRECATED` → minor: `0.<x+1>.0`
-- only `FIX`, `SECURITY`, `PERFORMANCE` or `INTERNAL` → patch: `0.<x>.<y+1>`
+- only `FIX`, `SECURITY` or `PERFORMANCE` (no minor category) → patch: `0.<x>.<y+1>`
+- only `INTERNAL` and/or `DOCS` → **none**: no tag. The files stay in `new/` and
+  are released together with the next real change.
 
 ## The release flow
 
@@ -91,3 +94,6 @@ the next release). It is **not** an error to have several pending files; a
 release simply covers all of them. A hard error on >1 pending file is
 deliberately not used: with fast merges it would block releases until someone
 intervenes by hand.
+
+`INTERNAL`-only and `DOCS`-only files never force a tag on their own: they stay
+in `new/` and are folded into the next release that has a real change.

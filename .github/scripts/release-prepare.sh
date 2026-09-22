@@ -47,20 +47,29 @@ fi
 lines_file=$(mktemp)
 trap 'rm -f "$lines_file"' EXIT
 
-bump=patch
+bump=none
 for f in $pending; do
   bad=$(awk '
     /^[[:space:]]*$/ { next }
-    !/^(NEW|BREAKING|DEPRECATED|FIX|SECURITY|PERFORMANCE|INTERNAL):/ { print }
+    !/^(NEW|BREAKING|DEPRECATED|FIX|SECURITY|PERFORMANCE|INTERNAL|DOCS):/ { print }
   ' "$f")
   [ -z "$bad" ] || fail "$f: line without a valid category: '$bad'"
   if grep -qE '^(NEW|BREAKING|DEPRECATED):' "$f"; then
     bump=minor
+  elif [ "$bump" != "minor" ] && grep -qE '^(FIX|SECURITY|PERFORMANCE):' "$f"; then
+    bump=patch
   fi
-  awk '/^(NEW|BREAKING|DEPRECATED|FIX|SECURITY|PERFORMANCE|INTERNAL):/ { print }' "$f" >> "$lines_file"
+  awk '/^(NEW|BREAKING|DEPRECATED|FIX|SECURITY|PERFORMANCE|INTERNAL|DOCS):/ { print }' "$f" >> "$lines_file"
 done
 
 [ -s "$lines_file" ] || fail "pending files have no category lines"
+
+# Only non-releasing categories (INTERNAL, DOCS) pending: nothing to tag. The
+# files stay in new/ and are released together with the next real change.
+if [ "$bump" = "none" ]; then
+  echo "new=none"
+  exit 0
+fi
 
 # --- compute the next version --------------------------------------------
 current=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n1)
@@ -87,7 +96,7 @@ awk -v ver="$version" -v day="$today" '
     if (cat == "FIX") return "Fixed"
     if (cat == "SECURITY") return "Security"
     if (cat == "DEPRECATED") return "Deprecated"
-    return "Changed"   # BREAKING, PERFORMANCE, INTERNAL
+    return "Changed"   # BREAKING, PERFORMANCE, INTERNAL, DOCS
   }
   {
     split($0, p, ":")

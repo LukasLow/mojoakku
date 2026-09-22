@@ -63,14 +63,18 @@ tasks:
         patch=$(printf '%s' "$ver" | cut -d. -f3)
         [ -n "$minor" ] || minor=0
         [ -n "$patch" ] || patch=0
-        bump=patch
+        bump=none
         any=""
         for f in .changes/new/*.md; do
           [ -f "$f" ] || continue
           any="yes"
-          if grep -qE '^(NEW|BREAKING|DEPRECATED):' "$f"; then bump=minor; fi
+          if grep -qE '^(NEW|BREAKING|DEPRECATED):' "$f"; then
+            bump=minor
+          elif [ "$bump" != "minor" ] && grep -qE '^(FIX|SECURITY|PERFORMANCE):' "$f"; then
+            bump=patch
+          fi
         done
-        if [ -z "$any" ]; then
+        if [ -z "$any" ] || [ "$bump" = "none" ]; then
           echo "none"
         elif [ "$bump" = "minor" ]; then
           echo "0.$((minor + 1)).0"
