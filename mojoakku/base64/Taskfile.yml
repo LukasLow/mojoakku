@@ -48,4 +48,5 @@ tasks:
   compile:
     desc: 'Compile the base64 package with mojo precompile.'
     cmds:
+      - mkdir -p ../../.tmp
       - pixi run mojo precompile . -o ../../.tmp/base64.mojoc
