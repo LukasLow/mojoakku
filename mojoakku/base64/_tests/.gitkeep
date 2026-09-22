@@ -1,0 +1,2 @@
+# Keeps the test directory tracked while it is empty. Phase 9 adds the
+# _tests/*.mojo files here. Do not add __init__.mojo (library convention).

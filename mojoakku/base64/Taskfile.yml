@@ -1,0 +1,51 @@
+version: '3'
+
+# Per-library Taskfile for mojoakku/base64.
+#
+# Runs every test in _tests/ with `mojo run`. There is no `mojo test`: each test
+# file is a program with its own main(). The runner stops on the first failing
+# file and exits non-zero when any test fails.
+#
+# Mojo is provided by pixi (`pixi run mojo ...`), not by the smd container.
+# The per-library Taskfile runs from mojoakku/base64/, so `-I ..` puts the
+# package root (mojoakku/) on the import path and a test can write
+# `from base64 import ...`.
+
+silent: true
+
+tasks:
+
+  default:
+    desc: 'Run the base64 test suite (same as `task test`).'
+    cmds:
+      - task: test
+
+  # --------------------------------------------------------------------------
+  # test — run every _tests/*.mojo with `mojo run`, stop on the first failure.
+  # Exits 0 when _tests/ is empty or every test passes, non-zero otherwise.
+  # --------------------------------------------------------------------------
+  test:
+    desc: 'Run every _tests/*.mojo with mojo run; stop and fail on the first error.'
+    cmds:
+      - |
+        set -e
+        found=""
+        for f in _tests/*.mojo; do
+          [ -f "$f" ] || continue
+          found="yes"
+          echo "== $f"
+          pixi run mojo run -I .. "$f"
+        done
+        if [ -z "$found" ]; then
+          echo "No tests yet in _tests/ (nothing to run)."
+        else
+          echo "All base64 tests passed."
+        fi
+
+  # --------------------------------------------------------------------------
+  # compile — compile the package (the Phase-7 compile gate).
+  # --------------------------------------------------------------------------
+  compile:
+    desc: 'Compile the base64 package with mojo precompile.'
+    cmds:
+      - pixi run mojo precompile . -o ../../.tmp/base64.mojoc
