@@ -25,24 +25,28 @@ Prepare and cut a release: decide the version, write the changelog, verify docs 
 
 ## Steps
 1. `manager` opens the task and freezes the release scope.
-2. `manager` computes the version with `task changes:version` (always `0.x.y`: any
+2. `manager` runs `task missingMojo` and resolves the ledger: every marker older
+   than the installed Mojo is either upgraded (feature now exists) or re-stamped
+   to the installed version ("checked here, still true"). No stale marker may
+   survive the release. See `.agents/workflows/MissingMojo.md`.
+3. `manager` computes the version with `task changes:version` (always `0.x.y`: any
    `NEW`/`BREAKING`/`DEPRECATED` change is a minor bump, only
    `FIX`/`SECURITY`/`PERFORMANCE`/`INTERNAL` is a patch bump; **major is never
    bumped**) and records the rationale.
-3. `docs` writes the changelog: it groups the `.changes/*.md` category lines
+4. `docs` writes the changelog: it groups the `.changes/*.md` category lines
    (NEW → Added, FIX → Fixed, SECURITY → Security, PERFORMANCE → Changed,
    DEPRECATED → Deprecated, BREAKING → Changed/Breaking, INTERNAL → Changed)
    into the `CHANGELOG.md` section under the computed version, each referencing
    the affected `mojoakku/<lib>/`.
-4. `docs` performs the docs check: the inline `# API-DOCS` blocks, API and README
+5. `docs` performs the docs check: the inline `# API-DOCS` blocks, API and README
    references agree with the shipped code; broken or stale links are fixed.
-5. `coder` runs the full test suite (`task ci`) for every included library and
+6. `coder` runs the full test suite (`task ci`) for every included library and
    attaches the output as release evidence.
-6. `reviewer` applies the release gate against scope, version, changelog completeness, docs consistency and test evidence.
-7. `manager` authorizes the tag, then creates and pushes it via direct host git.
-8. `manager` moves the consumed `.changes/*.md` files to
+7. `reviewer` applies the release gate against scope, version, changelog completeness, docs consistency and test evidence.
+8. `manager` authorizes the tag, then creates and pushes it via direct host git.
+9. `manager` moves the consumed `.changes/*.md` files to
    `.changes/archive/<version>/`, so `.changes/` starts empty for the next cycle.
-9. `manager` records the release in the task log with the tag name and included libraries.
+10. `manager` records the release in the task log with the tag name and included libraries.
 
 ## Artifacts / Outputs
 - Changelog entry for the release.

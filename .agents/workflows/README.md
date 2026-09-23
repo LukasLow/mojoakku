@@ -50,4 +50,5 @@ Standalone workflows used whenever the matching situation occurs.
 | `SecurityReview.md` | Security and hardening review. |
 | `CreatePR.md` | Branch, `.changes/` entry, push and open the pull request. |
 | `Release.md` | Turn `.changes/` into `CHANGELOG.md` and tag the release. |
+| `MissingMojo.md` | The version-stamped workaround ledger: convention, `task missingMojo`, and the FFI triage rule. |
 | `LibraryLayout.md` | Canonical library layout and documentation convention (reference). |

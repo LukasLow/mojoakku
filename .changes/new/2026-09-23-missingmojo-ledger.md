@@ -1,0 +1,1 @@
+INTERNAL: add the MissingMojo version-stamped workaround ledger — `task missingMojo` scanner (root Taskfile), the `.agents/workflows/MissingMojo.md` convention, and the FFI triage rule; wired into `Release.md`.

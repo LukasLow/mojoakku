@@ -361,13 +361,152 @@ tasks:
         echo "task test: all libraries passed."
 
   # --------------------------------------------------------------------------
+  # missingMojo — surface the version-stamped workaround ledger.
+  #
+  # Scans mojoakku/**/*.mojo for MissingMojo comment blocks:
+  #   # MissingMojo - v1.0.0 - Start
+  #   # kind: FFI | PythonInterop | UnstableAPI | Deferred
+  #   # need: <what Mojo must provide>
+  #   # optimal: <the target solution>
+  #   # track: <reference>            (optional)
+  #   # MissingMojo - End
+  #
+  # The version in the Start line is the Mojo version at which the marker was
+  # LAST CONFIRMED TRUE. The task prints every marker whose stamp is OLDER than
+  # the installed Mojo version — i.e. everything that must be re-checked on the
+  # current toolchain: either upgrade the site, or re-stamp it to the installed
+  # version ("checked here, still true").
+  #
+  # Version source: `mojo --version` when the binary is available (container),
+  # otherwise the `pixi.toml` pin (`mojo = "~=1.0.0"`). Never guessed.
+  #
+  # Usage:
+  #   task missingMojo          show only markers older than the installed Mojo
+  #   task missingMojo -- all   show every marker, regardless of version
+  #
+  # See .agents/workflows/MissingMojo.md for the convention and the FFI triage
+  # rule.
+  # --------------------------------------------------------------------------
+  missingMojo:
+    desc: 'List MissingMojo markers older than the installed Mojo (use -- all for every marker).'
+    cmds:
+      - |
+        allmode=0
+        checkmode=0
+        case "{{.CLI_ARGS}}" in
+          all) allmode=1 ;;
+          check) checkmode=1 ;;
+        esac
+
+        # --- resolve the installed Mojo version (binary first, pin second) ---
+        cur=$(mojo --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
+        if [ -z "$cur" ] && [ -f pixi.toml ]; then
+          cur=$(grep -E '^[[:space:]]*mojo[[:space:]]*=' pixi.toml | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
+        fi
+        [ -n "$cur" ] || cur=0.0.0
+        curN=$(printf '%s' "$cur" | awk -F. '{ printf "%d", ($1*1000+$2)*1000+$3 }')
+
+        files=$(find mojoakku -name '*.mojo' -type f 2>/dev/null | sort)
+        if [ -z "$files" ]; then
+          echo "No Mojo sources under mojoakku/ (nothing to scan)."
+          exit 0
+        fi
+
+        out=$(printf '%s\n' "$files" | while IFS= read -r f; do
+          [ -f "$f" ] || continue
+          awk -v allmode="$allmode" -v curN="$curN" '
+            function norm(v,   n, a, i, s) {
+              sub(/^v/, "", v)
+              n = split(v, a, ".")
+              s = 0
+              for (i = 1; i <= 3; i++) s = s * 1000 + (a[i] + 0)
+              return s
+            }
+            function flush() {
+              if (curfile != "") printf "@@COUNT@ %d %d\n", found, (stale + 0)
+            }
+            FNR == 1 { flush(); curfile = FILENAME; inblock = 0; found = 0 }
+            /MissingMojo/ && /- *v[0-9]/ && /Start/ {
+              inblock = 1
+              startln = FNR
+              ver = ""
+              if (match($0, /v[0-9]+(\.[0-9]+)*/)) { ver = substr($0, RSTART, RLENGTH); sub(/^v/, "", ver) }
+              kind = ""; need = ""; optimal = ""; track = ""
+              next
+            }
+            /MissingMojo/ && /End/ {
+              if (inblock) {
+                found++
+                if (allmode == 1 || norm(ver) < curN) {
+                  printf "%s:%d  v%s  kind=%s\n", FILENAME, startln, ver, kind
+                  printf "    need:    %s\n", need
+                  printf "    optimal: %s\n", optimal
+                  if (track != "") printf "    track:   %s\n", track
+                  printf "\n"
+                  stale++
+                }
+              }
+              inblock = 0
+              next
+            }
+            inblock && /^[[:space:]]*#/ {
+              line = $0
+              sub(/^[[:space:]]*#[[:space:]]*/, "", line)
+              p = index(line, ":")
+              if (p > 0) {
+                key = substr(line, 1, p - 1)
+                val = substr(line, p + 1)
+                gsub(/^[[:space:]]+/, "", key); gsub(/[[:space:]]+$/, "", key)
+                gsub(/^[[:space:]]+/, "", val); gsub(/[[:space:]]+$/, "", val)
+                if (key == "kind") kind = val
+                else if (key == "need") need = val
+                else if (key == "optimal") optimal = val
+                else if (key == "track") track = val
+              }
+            }
+            END { flush() }
+          ' "$f"
+        done)
+
+        total=$(printf '%s\n' "$out" | grep -E '^@@COUNT@ ' | awk '{s += $2} END {print s + 0}' || true)
+        stale=$(printf '%s\n' "$out" | grep -E '^@@COUNT@ ' | awk '{s += $3} END {print s + 0}' || true)
+        body=$(printf '%s\n' "$out" | grep -vE '^@@COUNT@ ' || true)
+
+        if [ "$allmode" -eq 1 ]; then
+          echo "MissingMojo: all ${total} marker(s) (installed Mojo ${cur}):"
+        elif [ "$stale" -eq 0 ]; then
+          echo "MissingMojo: clean. ${total} marker(s), none older than installed Mojo ${cur}."
+          exit 0
+        else
+          echo "MissingMojo: ${stale} of ${total} marker(s) older than installed Mojo ${cur}:"
+        fi
+        echo ""
+        printf '%s\n' "$body"
+        echo "Action: upgrade the site if the feature now exists, or re-stamp the"
+        echo "version to v${cur} if it is still missing. See .agents/workflows/MissingMojo.md."
+
+        # Strict gate: `task missingMojo -- check` fails (exit 1) when any marker
+        # is stale. This is what `task ci` runs, so CI turns red instead of
+        # silently keeping a workaround whose feature may already exist.
+        if [ "$checkmode" -eq 1 ] && [ "$stale" -ne 0 ]; then
+          echo ""
+          echo "missingMojo: FAIL — ${stale} marker(s) older than installed Mojo ${cur}."
+          echo "Upgrade each site, or re-stamp it to v${cur} if Mojo still lacks the feature."
+          exit 1
+        fi
+
+  # --------------------------------------------------------------------------
   # ci — the single CI entry point. CI runs exactly `task ci`; everything else
   # is derived from it. It runs the full library test sweep (`task test`) and
   # then any optional per-library `ci` hook (a library may add extra checks in
   # its own Taskfile `ci` task). Repository-level checks live here too.
+  #
+  # The MissingMojo ledger check runs here as a repository-level gate: a marker
+  # older than the installed Mojo makes CI red, so a workaround whose feature may
+  # already exist cannot slip through silently.
   # --------------------------------------------------------------------------
   ci:
-    desc: 'CI entry point: run every library test plus per-library ci hooks.'
+    desc: 'CI entry point: run every library test, per-library ci hooks, and the MissingMojo gate.'
     cmds:
       - task: test
       - |
@@ -379,5 +518,8 @@ tasks:
             task -t "${d}Taskfile.yml" ci
           fi
         done
+        echo ""
+        echo "== task missingMojo -- check"
+        task missingMojo -- check
         echo ""
         echo "task ci: done."
