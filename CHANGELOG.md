@@ -5,6 +5,18 @@ All notable changes to MojoAkku are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions stay on `0.x.y`; major is never bumped.
 
+## v0.2.0 - 2026-09-26
+
+### Changed
+
+- document the accumulate-into-one-release behaviour for several pending .changes/new files (merge timing, no double tags).
+- add the MissingMojo version-stamped workaround ledger — `task missingMojo` scanner (root Taskfile), the `.agents/workflows/MissingMojo.md` convention, and the FFI triage rule; wired into `Release.md`.
+- upgrade to Mojo 1.1.0 — pixi pin `mojo = "~=1.1.0"` and the resolved lock now select mojo 1.1.0; the base64 suite passes on 1.1.0 and `task missingMojo -- check` is clean.
+
+### Added
+
+- base64 — first MojoAkku library, 15-entry public API (RFC 4648 base64/base64url/base32/base32hex/base16) with compile-time alphabet/padding/whitespace policies, a typed Base64Error with kind+position, allocation-free is_valid and encoded_len/decoded_len, and streaming Encoder/Decoder with a mandatory finish. 132 tests, 0 failing. Phase 13 final review: GO.
+
 ## v0.1.0 - 2026-09-22
 
 ### Added
