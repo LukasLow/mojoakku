@@ -572,7 +572,7 @@ wrong one.)
 - **Two separate exception/error systems (`ios_base::failure` vs
   `std::error_code`) plus sentinels plus `expected`.** Four mechanisms for one
   job; the C++23 `<expected>` shows the standard now prefers the value-or-error
-  shape. Source: <https://en.cppreference.com/w/cpp/header>.
+  shape. Source: <https://en.cppreference.com/w/cpp/header/expected>.
 - **`tie()`'s implicit cross-stream flushing**, which can deadlock if two
   streams are tied to each other (documented as UB). Source:
   <https://en.cppreference.com/w/cpp/io/basic_ios/tie>.
