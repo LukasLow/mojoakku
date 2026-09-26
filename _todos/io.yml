@@ -1,5 +1,5 @@
 id: io
 name: IO
-status: todo
+status: current
 depends_on: []
 summary: Byte and text streams.
