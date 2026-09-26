@@ -457,13 +457,17 @@ Sources: <https://nodejs.org/api/stream.html>,
 <https://streams.spec.whatwg.org/>, <https://jsr.io/@std/io/doc>,
 <https://www.npmjs.com/package/bl>.
 
+Cross-language note: Python's `io` docs state the same rule in one sentence —
+"Less than size bytes being returned does not imply that EOF is imminent"
+(Source: <https://docs.python.org/3/library/io.html>; see `python.md` §9) — so a
+short read meaning "not EOF" is a shared property, not a Node quirk.
+
 Two sharp edges worth recording:
 
 - **A short read is never EOF by itself.** `readable.read()` docs: "When reading
   a large file, `.read()` might return `null` temporarily, indicating that it has
   consumed all buffered content but there may be more data yet to be buffered."
-  Node also says: "Less than size bytes being returned does not imply that EOF is
-  imminent." Source: <https://nodejs.org/api/stream.html>.
+  Source: <https://nodejs.org/api/stream.html>.
 - **Reading after end is silently `null`.** "Calling `stream.read([size])` after
   the `'end'` event has been emitted will return `null`. No runtime error will be
   raised." Source: <https://nodejs.org/api/stream.html>.

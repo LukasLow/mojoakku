@@ -52,11 +52,13 @@ community libraries are event loops / buffered-stream frameworks rather than
 
 Sources:
 - libuv MIT and stream model: <https://docs.libuv.org/en/v1.x/stream.html>
-  (stream-handle docs) and the project README license (MIT).
+  (stream-handle docs); licence MIT (`libuv/libuv:LICENSE` —
+  <https://github.com/libuv/libuv/blob/v1.x/LICENSE>).
 - libevent `bufferevent`: <https://libevent.org/doc/bufferevent_8h.html>
   ("Functions for buffering data for network sending or receiving. ...
   A bufferevent provides input and output buffers that get filled and drained
-  automatically."). License BSD-3-Clause (libevent project).
+  automatically."). Licence BSD-3-Clause (`libevent/libevent:LICENSE` —
+  <https://github.com/libevent/libevent/blob/master/LICENSE>).
 - OpenSSL BIO: <https://docs.openssl.org/master/man7/bio/> ("A BIO is an I/O
   abstraction ... There are two types of BIO, a source/sink BIO and a filter
   BIO."). License: the page footer states "Licensed under the Apache License
@@ -519,7 +521,9 @@ ecosystem itself adopted.)
   Mojo traits (`mojov1/keywords/trait`) give the same "any source is a stream"
   extensibility with compile-time conformance instead of a `void*` cookie plus
   four raw function pointers. The hook signatures to model on are
-  `read(buf, size) -> n` / `write(buf, size) -> n` (with 0 = EOF for read).
+  `read(buf, size) -> n` / `write(buf, size) -> n`; C's convention of returning
+  `0` to mean EOF is the `-1`/`0`/`EOF`-sentinel ambiguity that item 2 below
+  deliberately replaces with a distinct EOF outcome.
   Source: <https://man7.org/linux/man-pages/man3/fopencookie.3.html>; Mojo
   trait mechanism: `mojov1/keywords/trait`.
 - **A typed error that separates EOF, short read and failure.** C collapses

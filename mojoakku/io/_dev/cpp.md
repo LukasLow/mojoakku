@@ -226,8 +226,7 @@ choice is the most unusual of them:
    C file. Source: <https://en.cppreference.com/w/cpp/io/c>.
 4. **`std::expected` (C++23)** — the modern vocabulary type for value-or-error,
    available but not used by iostreams. Source:
-   <https://en.cppreference.com/w/cpp/header/print> (header list shows
-   `<expected>`), and the header list at <https://en.cppreference.com/w/cpp/header>.
+   <https://en.cppreference.com/w/cpp/header/expected>.
 
 Community shape: Boost.Iostreams reports errors **by throwing** — "Errors
 which occur during the execution of member functions `read` or
@@ -298,6 +297,9 @@ carry explicit "must outlive" warnings.)
 - **Iostreams are blocking and single-threaded by default.** There is no
   non-blocking mode; a read from an empty device blocks. The only hint of
   partial availability is `in_avail()` / `showmanyc()` and `readsome()`.
+  (Assessment: derived from the absence of any non-blocking iostream mode in the
+  standard; the `streambuf` virtuals `showmanyc`/`underflow` are the only
+  partial-availability hooks — <https://en.cppreference.com/w/cpp/io/basic_streambuf>.)
 - **`readsome` is the explicit "non-blocking-ish" call and it is documented as
   unreliable.** "Extracts up to `count` immediately available characters ...
   If `rdbuf()->in_avail() == 0`, extracts no characters." And the Notes warn:
