@@ -413,6 +413,10 @@ Errors: none.
 Tests:
 
 - `test_io_error.mojo`
+  - `test_error_kind_eq`
+  - `test_error_kind_all_members_distinct`
+  - `test_error_kind_write_to_names_kind`
+  - `test_error_kind_unexpected_eof_write_to`
 
 Implementation status: not implemented
 
@@ -471,6 +475,10 @@ the process or unrecoverable in the "cannot proceed" sense.
 Tests:
 
 - `test_io_error.mojo`
+  - `test_error_fields_kind_op_detail`
+  - `test_error_write_to_includes_op`
+  - `test_error_copyable_and_deinitable`
+  - `test_error_not_implicitly_copyable`
 
 Implementation status: not implemented
 
@@ -526,6 +534,11 @@ matches the write side, where a zero-length `write` without error is `OTHER`.)
 Tests:
 
 - `test_io_reader.mojo`
+  - `test_read_result_data_then_eof`
+  - `test_read_result_zero_count_is_eof`
+  - `test_read_result_short_read_is_not_eof`
+  - `test_read_result_zero_false_is_rejected_by_helpers`
+  - `test_read_result_write_to_reports_count_and_eof`
 
 Implementation status: not implemented
 
@@ -587,6 +600,10 @@ Errors: none.
 Tests:
 
 - `test_io_seek.mojo`
+  - `test_seek_from_comptime_bases`
+  - `test_seek_from_start_with_offset`
+  - `test_seek_from_end_negative_offset`
+  - `test_seek_from_eq_compares_offset`
 
 Implementation status: not implemented
 
@@ -647,6 +664,12 @@ condition is fatal to the process.
 Tests:
 
 - `test_io_reader.mojo`
+  - `test_read_short_read_is_not_eof`
+  - `test_read_fills_at_most_len_buf`
+  - `test_read_exact_raises_unexpected_eof`
+  - `test_read_exact_retries_interrupted`
+  - `test_read_to_end_reads_until_eof`
+  - `test_read_to_end_raises_other_on_no_progress`
 
 Implementation status: not implemented
 
@@ -694,6 +717,11 @@ raises `OTHER` ("write zero") if `write` returns `0` without error.
 Tests:
 
 - `test_io_byte_writer.mojo`
+  - `test_write_short_write_is_not_error`
+  - `test_write_all_loops_until_written`
+  - `test_write_all_raises_other_on_zero_write`
+  - `test_write_all_retries_interrupted`
+  - `test_flush_reports_error`
 
 Implementation status: not implemented
 
@@ -749,6 +777,11 @@ recoverable (adjust the target / reopen).
 Tests:
 
 - `test_io_seek.mojo`
+  - `test_seek_returns_new_absolute_position`
+  - `test_seek_negative_target_raises_other`
+  - `test_seek_past_end_allowed`
+  - `test_seek_unseekable_raises_other`
+  - `test_seek_closed_handle_raises_closed`
 
 Implementation status: not implemented
 
@@ -796,6 +829,11 @@ Errors: `raises IoError` — `OTHER` on an out-of-range seek.
 Tests:
 
 - `test_io_cursor.mojo`
+  - `test_cursor_read_moves_position`
+  - `test_cursor_read_at_end_reports_eof`
+  - `test_cursor_write_moves_position`
+  - `test_cursor_seek_out_of_range_raises_other`
+  - `test_cursor_owns_buffer`
 
 Implementation status: not implemented
 
@@ -849,6 +887,11 @@ Errors: `raises IoError` — `OTHER` on an out-of-range seek. It cannot raise a
 Tests:
 
 - `test_io_cursor.mojo`
+  - `test_span_cursor_read_moves_position`
+  - `test_span_cursor_read_at_end_reports_eof`
+  - `test_span_cursor_has_no_write`
+  - `test_span_cursor_seek_out_of_range_raises_other`
+  - `test_span_cursor_borrows_buffer`
 
 Implementation status: not implemented
 
@@ -899,6 +942,12 @@ reports a zero-length non-EOF read (`ErrNoProgress` analogue).
 Tests:
 
 - `test_io_buffered_reader.mojo`
+  - `test_buffered_reader_serves_from_buffer`
+  - `test_buffered_reader_refills_when_empty`
+  - `test_buffered_reader_short_inner_read_is_normal`
+  - `test_buffered_reader_eof_only_after_drain`
+  - `test_buffered_reader_retries_interrupted_on_refill`
+  - `test_buffered_reader_raises_other_on_no_progress`
 
 Implementation status: not implemented
 
@@ -968,6 +1017,12 @@ Errors: `raises IoError` — from `_inner`; `OTHER` ("write zero"); `CLOSED` fro
 Tests:
 
 - `test_io_buffered_writer.mojo`
+  - `test_buffered_writer_flushes_when_full`
+  - `test_buffered_writer_flush_writes_to_inner`
+  - `test_buffered_writer_flush_reports_inner_error`
+  - `test_buffered_writer_close_flushes_and_marks_closed`
+  - `test_buffered_writer_close_is_idempotent`
+  - `test_buffered_writer_after_close_raises_closed`
 
 Implementation status: not implemented
 
@@ -1015,6 +1070,10 @@ Errors: `raises IoError` — as `_inner`.
 Tests:
 
 - `test_io_limit_reader.mojo`
+  - `test_limit_reader_reads_at_most_limit`
+  - `test_limit_reader_exhausted_reports_eof`
+  - `test_limit_reader_negative_limit_behaves_as_zero`
+  - `test_limit_reader_never_touches_inner_after_limit`
 
 Implementation status: not implemented
 
@@ -1054,6 +1113,10 @@ Errors: `raises IoError` — from `_inner` or `_sink`.
 Tests:
 
 - `test_io_tee_reader.mojo`
+  - `test_tee_reader_mirrors_read_bytes_to_sink`
+  - `test_tee_reader_returns_inner_read_result`
+  - `test_tee_reader_sink_error_surfaces`
+  - `test_tee_reader_inner_error_surfaces`
 
 Implementation status: not implemented
 
@@ -1099,6 +1162,11 @@ Errors: `raises IoError` — from the active reader.
 Tests:
 
 - `test_io_multi_reader.mojo`
+  - `test_multi_reader_concatenates_in_order`
+  - `test_multi_reader_advances_on_inner_eof`
+  - `test_multi_reader_eof_only_after_last_reader`
+  - `test_multi_reader_variadic_construct`
+  - `test_multi_reader_active_reader_error_surfaces`
 
 Implementation status: not implemented
 
@@ -1146,6 +1214,11 @@ see the return rule above.
 Tests:
 
 - `test_io_copy.mojo`
+  - `test_copy_pumps_until_eof`
+  - `test_copy_returns_total_bytes`
+  - `test_copy_handles_short_reads_and_writes`
+  - `test_copy_retries_interrupted`
+  - `test_copy_error_op_names_failing_side`
 
 Implementation status: not implemented
 
