@@ -4,8 +4,9 @@ End-user documentation lives inline in the `*.mojo` files (the `# API-DOCS`
 blocks) and in `__init__.mojo`. This file keeps the developer-facing reasoning:
 status bookkeeping, tests, rationale, reference-API comparisons, non-goals and
 open questions. It reflects the state after Phase 12/13 (implementation review
-approved). The only still-open point is the Go base32 decode-case verification
-(see `## Open Questions`).
+approved). Two points remain open: the pending **stdlib-first adoption**
+(`std.base64` wrapper, which blocks `done`) and the Go base32 decode-case
+verification (see `## Open Questions`).
 -->
 
 # base64 — Design Record
@@ -21,6 +22,39 @@ streaming with a mandatory flush. It is the **design record**, not end-user
 documentation: end-user docs live inline in the `*.mojo` files. It keeps the
 status bookkeeping, tests, rationale, reference-API comparisons, non-goals and
 open questions; the implementation and its tests live in the code tree.
+
+## Stdlib-first adoption (PENDING — blocks `done`)
+
+**Status of this library: NOT done. The catalogue entry stays `current`.**
+
+Under the standard-library rule (`AGENTS.md`, "Stdlib-first: we wrap, we do not
+duplicate"; `.agents/workflows/MojoUpdate.md`) a library is **not** finished
+while it reimplements a concept the Mojo standard library already provides.
+
+The Mojo stdlib `base64` package (`mojov1/stdlib/base64`) already ships
+`b64encode` (with the `mut result: String` overload), `b64decode`, `b16encode`
+and `b16decode`. This library currently implements **all of that from scratch**
+in `_internal/engine.mojo` and never calls `std.base64`.
+
+The adoption owed here (per-version pass, `MojoUpdate.md` step 5), choosing
+option **A** (delegate only where behaviour is identical):
+
+| MojoAkku entry | Classification | Action |
+| --- | --- | --- |
+| `encode` / `encode_into` (standard base64, `Padding.REQUIRED`) | **wrapper** | forward to `std.base64.b64encode` |
+| `decode` / `decode_into` (standard base64, canonical strict) | **wrapper** | forward to `std.base64.b64decode` |
+| `Alphabet.HEX_LOWER` / `HEX_UPPER` paths | **wrapper** | forward to `std.base64.b16encode`/`b16decode` |
+| base64url, base32, base32hex | **extension** | stdlib has no alphabet parameter and no base32 — keep own engine |
+| `Padding`/`PaddingMode`/`Whitespace` policies, `Base64Error`+`position`, `is_valid`, `Encoder`/`Decoder`, `encoded_len`/`decoded_len` | **extension** | the stdlib has none of these — keep own engine |
+
+Consequences for the adoption: this is an **internal** body change for the
+overlapping paths (behaviour-preserving; all existing tests must stay green
+without weakening) plus a `# API-DOCS` note naming the forwarded `std.*` symbol.
+Because the public signatures do not change, this is a `MojoUpdate` pass
+(`INTERNAL` change file), not a re-run of the NewLib pipeline.
+
+Until that pass runs, the Phase-13 stdlib-first gate stays open and `base64`
+cannot move to `status: done`.
 
 ## Status legend
 

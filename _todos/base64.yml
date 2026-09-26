@@ -3,3 +3,4 @@ name: Base64
 status: current
 depends_on: []
 summary: Base64 and base32 encoding.
+note: NOT done. The Mojo stdlib already provides b64encode/b64decode/b16encode/b16decode; mojoakku/base64 reimplements them from scratch. Pending stdlib-first adoption (wrapper) before status can become done. See mojoakku/base64/_dev/DESIGN.md ("Stdlib-first adoption") and .agents/workflows/MojoUpdate.md.

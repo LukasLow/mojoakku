@@ -9,7 +9,8 @@ Research the problem space for one new MojoAkku library across many reference la
 - The language groups to cover (see Step 2).
 - The standardized question set (see Step 3).
 - Access to web research and to the reference implementations' source or documentation.
-- The `mojov1` buch for the Mojo side.
+- The `mojov1` buch for the Mojo side — including its `stdlib/` pages, which must
+  be checked for what the Mojo standard library **already** provides for `<lib>`.
 
 ## Preconditions
 - The Manager has decided that a new MojoAkku library is the next sensible step and has named `<lib>`.
@@ -50,6 +51,15 @@ Research the problem space for one new MojoAkku library across many reference la
    10. Which interesting design decisions are worth studying?
    11. Which decisions should explicitly NOT be copied into MojoAkku, and why?
    12. Which ideas fit Mojo specifically (ownership model, `raises`, `var`/`borrowed`, value semantics, compile-time features)?
+3.1. **Mojo stdlib coverage (mandatory, stdlib-first).** In addition to the
+   per-language answers, the Manager records what the **Mojo standard library**
+   already provides for `<lib>`, read from the `mojov1` buch `stdlib/` pages
+   (never from memory or the open web). State the exact `std.*` symbols,
+   signatures and stability; if the concept is absent, say so explicitly. This
+   record is the input to Phase 3's per-API **wrapper vs. extension** decision:
+   anything the stdlib already provides is a **wrapper** candidate, anything it
+   lacks is a candidate **extension** (see `AGENTS.md`, "Stdlib-first: we wrap,
+   we do not duplicate").
 4. Manager starts at most ONE `researcher` agent per selected language group, in parallel where possible (**upper bound: 6 researchers total**), each with this prompt contract: "Research `<lib>` in the languages of your group: `<langs>`. Answer the standardized question set in the given order. Write your findings **directly** into `mojoakku/<lib>/.research/<lang>.md`, one file per language of your group. Every factual claim needs a source (URL or file:line in a reference repo). Mark any guess explicitly as `GUESS:`."
 5. Each `researcher` writes one file per language of its group to `mojoakku/<lib>/.research/<lang>.md`, following exactly this structure:
    - `# <lib> research: <lang>`

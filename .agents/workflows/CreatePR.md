@@ -46,8 +46,11 @@ hand-off from a finished library (or task) to CI and review.
    merge; the Manager routes the failure to the owning workflow (`BugFix.md`,
    `BugInvestigation.md`, or back to the phase).
 9. On a green CI and an accepted review, the PR is merged (by the user or the
-   Manager when authorized). The library's catalogue status may then move to
-   `done`.
+   Manager when authorized). The catalogue flip is already done: on the GO
+   verdict, `NewLibPhase13FinalReview.md` (Step 8.2) sets `_todos/<lib>.yml` to
+   `status: done` in the phase commit. A library is only PR-ready when its
+   catalogue entry is `done` and its stdlib-first gate passed (every entry is a
+   `wrapper` or a justified `extension`; see `MojoUpdate.md` otherwise).
 10. Manager records the PR in the task log with its URL and number.
 
 ## Artifacts / Outputs

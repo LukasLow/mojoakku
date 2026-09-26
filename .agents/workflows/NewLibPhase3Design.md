@@ -34,7 +34,20 @@ Derive the Mojo public API for `<lib>` from the reviewed research and record eve
      - `## Conventions`
      - `## Ownership and Lifecycle`
      - `## Open Questions`
-   - **one block per public API entry** (later materialised into that entry's own file), each block carrying the seven fields `Status`, `Signature`, `Semantics`, `Errors`, `Tests`, `Implementation status`, `Rationale`.
+    - **one block per public API entry** (later materialised into that entry's own file), each block carrying the seven fields `Status`, `Signature`, `Semantics`, `Errors`, `Tests`, `Implementation status`, `Rationale`.
+2.0. **Stdlib-first classification (mandatory).** For every proposed API entry,
+   first compare it with the Mojo standard library (the Phase-1 record of
+   `mojov1` `stdlib/` coverage) and label it explicitly:
+   - **wrapper** — the stdlib already provides this concept; the entry forwards
+     to a named `std.*` symbol and keeps MojoAkku's uniform surface. The
+     `Rationale` names the forwarded symbol.
+   - **extension** — the stdlib lacks the capability (or our shape is
+     deliberately different/better); the entry is MojoAkku's own implementation.
+     The `Rationale` states the capability the stdlib lacks and why the
+     divergence is warranted.
+   No entry may be left unclassified. An extension that merely repeats a stdlib
+   symbol without adding behaviour is rejected here and turned into a wrapper
+   (see `AGENTS.md`, "Stdlib-first: we wrap, we do not duplicate").
 2. For every proposed API entry, write the signature and, below it, the full semantics — not only the type:
    - meaning and preconditions of every parameter and return value;
    - EOF behavior (what a read returns at end of stream);
