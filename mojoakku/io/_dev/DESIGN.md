@@ -668,6 +668,7 @@ Tests:
   - `test_read_fills_at_most_len_buf`
   - `test_read_exact_raises_unexpected_eof`
   - `test_read_exact_retries_interrupted`
+  - `test_read_exact_does_not_retry_would_block`
   - `test_read_to_end_reads_until_eof`
   - `test_read_to_end_raises_other_on_no_progress`
 
@@ -721,6 +722,7 @@ Tests:
   - `test_write_all_loops_until_written`
   - `test_write_all_raises_other_on_zero_write`
   - `test_write_all_retries_interrupted`
+  - `test_write_all_does_not_retry_would_block`
   - `test_flush_reports_error`
 
 Implementation status: not implemented
@@ -772,7 +774,13 @@ Semantics:
 
 Errors: `raises IoError` — `OTHER` for an invalid target **and** for a
 non-seekable stream; `CLOSED` only when the underlying handle is closed. Both
-recoverable (adjust the target / reopen).
+recoverable (adjust the target / reopen). Release-1 test scope: the non-seekable
+(`OTHER`) and closed-handle (`CLOSED`) contracts are expressed by the trait
+itself and have **no release-1 library target to test** — `CLOSED` belongs to the
+future file/socket layer that owns a descriptor, and a non-seekable source does
+not exist in this byte-only release; a test-local `Seeker` asserting those kinds
+would only echo the fixture's own hard-coded kind (a tautology), so those two
+cases are deliberately not tested.
 
 Tests:
 
@@ -780,8 +788,6 @@ Tests:
   - `test_seek_returns_new_absolute_position`
   - `test_seek_negative_target_raises_other`
   - `test_seek_past_end_allowed`
-  - `test_seek_unseekable_raises_other`
-  - `test_seek_closed_handle_raises_closed`
 
 Implementation status: not implemented
 
@@ -1218,6 +1224,8 @@ Tests:
   - `test_copy_returns_total_bytes`
   - `test_copy_handles_short_reads_and_writes`
   - `test_copy_retries_interrupted`
+  - `test_copy_does_not_retry_would_block`
+  - `test_copy_partial_progress_writer_keeps_first_chunk`
   - `test_copy_error_op_names_failing_side`
 
 Implementation status: not implemented
@@ -1270,7 +1278,11 @@ Rules:
   `read_to_end` and `copy` lose the bytes/`List` accumulated before the raise.
   A caller who needs partial progress uses `read` into a caller-owned
   `MutSpan[UInt8, _]` (which accumulates the bytes in that caller-owned buffer)
-  or drives the loop directly (`rust.md` §4; `go.md` §4).
+  or drives the loop directly (`rust.md` §4; `go.md` §4). For `read_to_end` the
+  `List` is a local, so the accumulated bytes are unreachable after the raise:
+  this loss is consciously accepted and **not separately testable** (the value
+  cannot be observed). For `copy`, the partial progress *is* observable in the
+  writer and is covered by `test_copy_partial_progress_writer_keeps_first_chunk`.
 - **No OS errno leak.** `detail` may contain an OS message, but the *kind* is the
   closed set; callers branch on `kind`, never on strings (`rust.md` §11).
 - **Diagnostics.** `IoError` implements `Writable`, so `print(e)` yields a

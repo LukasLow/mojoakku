@@ -4,8 +4,9 @@
 # Covers: the reader is drained into the writer until it reports eof; the
 # returned Int is the total number of bytes copied; short reads and short
 # writes are handled internally by continuing the loop; `INTERRUPTED` is
-# retried on either side; when a side fails, the raised `IoError` has an `op`
-# naming which side failed.
+# retried on either side but `WOULD_BLOCK` is not; when a side fails, the raised
+# `IoError` has an `op` naming which side failed; on a mid-copy failure no count
+# is returned while the writer keeps the chunks already written.
 #
 # `ScriptedReader` and `TrackingSink` are test-local concrete streams with real
 # bodies, so the assertions express the documented pump behaviour.
@@ -22,28 +23,34 @@ def bytes_of(*values: UInt8) -> List[UInt8]:
 
 
 # ScriptedReader — yields from an owned list, at most `chunk` bytes per call,
-# and can inject `INTERRUPTED` before a read.
+# and can inject `INTERRUPTED` or `WOULD_BLOCK` before a read.
 struct ScriptedReader(Reader):
     var _data: List[UInt8]
     var _pos: Int
     var _chunk: Int
     var _interrupts: Int
+    var _would_blocks: Int
 
     def __init__(
         out self,
         var data: List[UInt8],
         chunk: Int = 1073741824,
         interrupts: Int = 0,
+        would_blocks: Int = 0,
     ):
         self._data = data^
         self._pos = 0
         self._chunk = chunk
         self._interrupts = interrupts
+        self._would_blocks = would_blocks
 
     def read(mut self, buf: MutSpan[UInt8, _]) raises IoError -> ReadResult:
         if self._interrupts > 0:
             self._interrupts -= 1
             raise IoError(IoErrorKind.INTERRUPTED, "read", "injected interrupt")
+        if self._would_blocks > 0:
+            self._would_blocks -= 1
+            raise IoError(IoErrorKind.WOULD_BLOCK, "read", "injected would-block")
         var remaining = len(self._data) - self._pos
         if remaining <= 0:
             return ReadResult(0, True)
@@ -59,7 +66,8 @@ struct ScriptedReader(Reader):
 
 
 # TrackingSink — accepts at most `chunk` bytes per call into an externally
-# owned destination and records the total in stats[0]; can inject `INTERRUPTED`.
+# owned destination and records the total in stats[0]; can inject `INTERRUPTED`
+# or `WOULD_BLOCK`.
 struct TrackingSink[
     dst_origin: Origin[mut=True], stat_origin: Origin[mut=True]
 ](ByteWriter):
@@ -67,6 +75,7 @@ struct TrackingSink[
     var _stats: MutSpan[Int, Self.stat_origin]
     var _chunk: Int
     var _interrupts: Int
+    var _would_blocks: Int
 
     def __init__(
         out self,
@@ -74,16 +83,21 @@ struct TrackingSink[
         stats: MutSpan[Int, Self.stat_origin],
         chunk: Int = 1073741824,
         interrupts: Int = 0,
+        would_blocks: Int = 0,
     ):
         self._dst = dst
         self._stats = stats
         self._chunk = chunk
         self._interrupts = interrupts
+        self._would_blocks = would_blocks
 
     def write(mut self, data: Span[UInt8, _]) raises IoError -> Int:
         if self._interrupts > 0:
             self._interrupts -= 1
             raise IoError(IoErrorKind.INTERRUPTED, "write", "injected interrupt")
+        if self._would_blocks > 0:
+            self._would_blocks -= 1
+            raise IoError(IoErrorKind.WOULD_BLOCK, "write", "injected would-block")
         var n = len(data)
         if self._chunk < n:
             n = self._chunk
@@ -112,6 +126,39 @@ struct FailingSink(ByteWriter):
 
     def write(mut self, data: Span[UInt8, _]) raises IoError -> Int:
         raise IoError(IoErrorKind.OTHER, "write", "sink failed")
+
+    def flush(mut self) raises IoError:
+        pass
+
+
+# FailOnSecondWriteSink — records the first accepted chunk into an externally
+# owned destination, then fails on the next write. Used to prove that copy
+# returns no count on failure while the already-written chunk is retained.
+struct FailOnSecondWriteSink[
+    dst_origin: Origin[mut=True], stat_origin: Origin[mut=True]
+](ByteWriter):
+    var _dst: MutSpan[UInt8, Self.dst_origin]
+    var _stats: MutSpan[Int, Self.stat_origin]
+    var _writes: Int
+
+    def __init__(
+        out self,
+        dst: MutSpan[UInt8, Self.dst_origin],
+        stats: MutSpan[Int, Self.stat_origin],
+    ):
+        self._dst = dst
+        self._stats = stats
+        self._writes = 0
+
+    def write(mut self, data: Span[UInt8, _]) raises IoError -> Int:
+        self._writes += 1
+        if self._writes > 1:
+            raise IoError(IoErrorKind.OTHER, "write", "sink failed after first chunk")
+        var start = self._stats[0]
+        for i in range(len(data)):
+            self._dst[start + i] = data[i]
+        self._stats[0] = start + len(data)
+        return len(data)
 
     def flush(mut self) raises IoError:
         pass
@@ -162,6 +209,53 @@ def test_copy_retries_interrupted() raises:
     var copied = copy(reader, sink)
     assert_equal(copied, 3)
     assert_equal(stats[0], 3)
+
+
+def test_copy_does_not_retry_would_block() raises:
+    # Only INTERRUPTED is retried; WOULD_BLOCK from the reader is surfaced
+    # (retrying would spin on a non-blocking handle).
+    var dst = Array[UInt8, 8](fill=0)
+    var stats = Array[Int, 1](fill=0)
+    var reader = ScriptedReader(bytes_of(1, 2, 3), would_blocks=1)
+    var sink = TrackingSink(MutSpan(dst), MutSpan(stats))
+    var kind = IoErrorKind.OTHER
+    var op = ""
+    var caught = False
+    try:
+        _ = copy(reader, sink)
+    except e:
+        caught = True
+        kind = e.kind
+        op = e.op
+    assert_true(caught)
+    assert_equal(kind, IoErrorKind.WOULD_BLOCK)
+    assert_equal(op, "read")
+
+
+def test_copy_partial_progress_writer_keeps_first_chunk() raises:
+    # A sink that succeeds on the first write then fails: copy raises (no count
+    # is returned), but the first chunk is already observable in the writer.
+    var dst = Array[UInt8, 8](fill=0)
+    var stats = Array[Int, 1](fill=0)
+    # Two-byte chunks force copy into a second write after the first succeeds.
+    var reader = ScriptedReader(bytes_of(1, 2, 3, 4), chunk=2)
+    var sink = FailOnSecondWriteSink(MutSpan(dst), MutSpan(stats))
+    var kind = IoErrorKind.UNEXPECTED_EOF
+    var op = ""
+    var caught = False
+    try:
+        _ = copy(reader, sink)
+    except e:
+        caught = True
+        kind = e.kind
+        op = e.op
+    assert_true(caught)
+    assert_equal(kind, IoErrorKind.OTHER)
+    assert_equal(op, "write")
+    # The partial progress is not returned, but the first chunk is retained.
+    assert_equal(stats[0], 2)
+    assert_equal(dst[0], 1)
+    assert_equal(dst[1], 2)
 
 
 def test_copy_error_op_names_failing_side() raises:

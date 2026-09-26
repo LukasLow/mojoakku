@@ -23,3 +23,7 @@
 --------
 baseline: 11 files, 0 passed, 11 failed
   failures: 11 stub abort, 0 compile/import error, 0 other
+note: the suite holds 75 test functions across 11 files. A stub
+      `abort` stops the process on its first call, so no per-test
+      passed/failed count is reachable in the red phase; the file count
+      (11) is the honest measure.

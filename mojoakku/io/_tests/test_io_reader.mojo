@@ -5,9 +5,9 @@
 # Covers: the three documented result shapes (data+eof, zero+eof, short read
 # is not eof); a `count = 0, eof = False` read is rejected by the helpers as
 # `OTHER`; `ReadResult` prints count and eof; `read` fills at most `len(buf)`;
-# `read_exact` raises `UNEXPECTED_EOF` on premature EOF and retries
-# `INTERRUPTED`; `read_to_end` reads until eof and raises `OTHER` on no
-# progress.
+# `read_exact` raises `UNEXPECTED_EOF` on premature EOF, retries `INTERRUPTED`,
+# and does NOT retry `WOULD_BLOCK`; `read_to_end` reads until eof and raises
+# `OTHER` on no progress.
 #
 # The `ScriptedReader` below is a test-local concrete `Reader` used to drive the
 # provided helpers. Its body is real (not a stub) so the assertions express the
@@ -28,14 +28,15 @@ def bytes_of(*values: UInt8) -> List[UInt8]:
 
 
 # ScriptedReader — a concrete Reader that returns at most `chunk` bytes per
-# call, can inject `INTERRUPTED` before a read, and can be made to report
-# `{0, False}` forever (a non-conforming reader) to exercise the helpers'
-# no-progress guard.
+# call, can inject `INTERRUPTED` before a read, can inject `WOULD_BLOCK`, and
+# can be made to report `{0, False}` forever (a non-conforming reader) to
+# exercise the helpers' no-progress guard.
 struct ScriptedReader(Reader):
     var _data: List[UInt8]
     var _pos: Int
     var _chunk: Int
     var _interrupts: Int
+    var _would_blocks: Int
     var _no_progress: Bool
 
     def __init__(
@@ -43,18 +44,23 @@ struct ScriptedReader(Reader):
         var data: List[UInt8],
         chunk: Int = 1073741824,
         interrupts: Int = 0,
+        would_blocks: Int = 0,
         no_progress: Bool = False,
     ):
         self._data = data^
         self._pos = 0
         self._chunk = chunk
         self._interrupts = interrupts
+        self._would_blocks = would_blocks
         self._no_progress = no_progress
 
     def read(mut self, buf: MutSpan[UInt8, _]) raises IoError -> ReadResult:
         if self._interrupts > 0:
             self._interrupts -= 1
             raise IoError(IoErrorKind.INTERRUPTED, "read", "injected interrupt")
+        if self._would_blocks > 0:
+            self._would_blocks -= 1
+            raise IoError(IoErrorKind.WOULD_BLOCK, "read", "injected would-block")
         if self._no_progress:
             return ReadResult(0, False)
         var remaining = len(self._data) - self._pos
@@ -183,6 +189,25 @@ def test_read_exact_retries_interrupted() raises:
     assert_equal(buf[0], 4)
     assert_equal(buf[1], 5)
     assert_equal(buf[2], 6)
+
+
+def test_read_exact_does_not_retry_would_block() raises:
+    # Only INTERRUPTED is retried; WOULD_BLOCK is surfaced, never hidden or
+    # retried (which would hang on a non-blocking handle).
+    var reader = ScriptedReader(bytes_of(4, 5, 6), would_blocks=1)
+    var buf = Array[UInt8, 3](fill=0)
+    var kind = IoErrorKind.OTHER
+    var op = ""
+    var caught = False
+    try:
+        reader.read_exact(buf)
+    except e:
+        caught = True
+        kind = e.kind
+        op = e.op
+    assert_true(caught)
+    assert_equal(kind, IoErrorKind.WOULD_BLOCK)
+    assert_equal(op, "read")
 
 
 def test_read_to_end_reads_until_eof() raises:

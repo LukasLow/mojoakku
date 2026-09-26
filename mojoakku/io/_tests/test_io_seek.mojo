@@ -4,17 +4,18 @@
 #
 # Covers: the three comptime bases; the signed offset constructors; equality
 # compares both origin and offset; `seek` returns the new absolute position;
-# past-the-end seeks are allowed; a negative target raises `OTHER`; a
-# non-seekable stream raises `OTHER`; a closed underlying handle raises
-# `CLOSED`. The last two use test-local concrete `Seeker`s, because this layer
-# defines no close and no unseekable adapter — they assert the documented error
-# contract of the trait.
+# past-the-end seeks are allowed; a negative target raises `OTHER`.
 #
-# The real library call is `Cursor.seek`; the fixtures carry real bodies (not
-# stubs) so the assertions express the documented behaviour.
+# The concrete release-1 library call is `Cursor.seek`. The non-seekable and
+# closed-handle contracts have no release-1 library target to test: `CLOSED`
+# belongs to the future file/socket layer that owns a descriptor, and a
+# non-seekable stream is an `OTHER` condition of a future source. Asserting
+# those kinds against a test-local fixture would only echo the fixture's own
+# hard-coded kind, so they are deliberately not tested here (see the note in
+# `_dev/DESIGN.md`, `Seeker`).
 
 from std.testing import assert_equal, assert_true, assert_false, TestSuite
-from io import SeekFrom, Seeker, Cursor, IoError, IoErrorKind
+from io import SeekFrom, Cursor, IoErrorKind
 
 
 def bytes_of(*values: UInt8) -> List[UInt8]:
@@ -22,26 +23,6 @@ def bytes_of(*values: UInt8) -> List[UInt8]:
     for v in values:
         out.append(v)
     return out^
-
-
-# UnseekableSource — an open stream that simply cannot seek; every seek raises
-# OTHER, as the docs require for a non-seekable stream (never CLOSED).
-struct UnseekableSource(Seeker):
-    def __init__(out self):
-        pass
-
-    def seek(mut self, whence: SeekFrom) raises IoError -> Int:
-        raise IoError(IoErrorKind.OTHER, "seek", "stream is not seekable")
-
-
-# ClosedHandleSource — stands in for the future file/socket layer whose
-# underlying handle is closed. CLOSED is distinct from OTHER.
-struct ClosedHandleSource(Seeker):
-    def __init__(out self):
-        pass
-
-    def seek(mut self, whence: SeekFrom) raises IoError -> Int:
-        raise IoError(IoErrorKind.CLOSED, "seek", "underlying handle is closed")
 
 
 # --- SeekFrom -------------------------------------------------------------
@@ -105,36 +86,6 @@ def test_seek_past_end_allowed() raises:
     var cursor = Cursor(bytes_of(1, 2, 3))
     var pos = cursor.seek(SeekFrom.start(10))
     assert_equal(pos, 10)
-
-
-def test_seek_unseekable_raises_other() raises:
-    var source = UnseekableSource()
-    var kind = IoErrorKind.CLOSED
-    var op = ""
-    var caught = False
-    try:
-        _ = source.seek(SeekFrom.START)
-    except e:
-        caught = True
-        kind = e.kind
-        op = e.op
-    assert_true(caught)
-    assert_equal(kind, IoErrorKind.OTHER)
-    assert_equal(op, "seek")
-
-
-def test_seek_closed_handle_raises_closed() raises:
-    # A closed handle is CLOSED, distinct from an open-but-unseekable OTHER.
-    var source = ClosedHandleSource()
-    var kind = IoErrorKind.OTHER
-    var caught = False
-    try:
-        _ = source.seek(SeekFrom.START)
-    except e:
-        caught = True
-        kind = e.kind
-    assert_true(caught)
-    assert_equal(kind, IoErrorKind.CLOSED)
 
 
 def main() raises:

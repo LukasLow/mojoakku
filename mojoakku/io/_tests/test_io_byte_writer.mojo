@@ -4,9 +4,9 @@
 #
 # Covers: a short `write` return is normal and not an error; `write_all` loops
 # until every byte is accepted; `write_all` raises `OTHER` ("write zero") when a
-# `write` returns 0 without an error; `write_all` retries `INTERRUPTED`; `flush`
-# is explicit and fallible, so an implementation's flush failure surfaces
-# instead of being swallowed.
+# `write` returns 0 without an error; `write_all` retries `INTERRUPTED` but not
+# `WOULD_BLOCK`; `flush` is explicit and fallible, so an implementation's flush
+# failure surfaces instead of being swallowed.
 #
 # The `CollectingSink` fixture below carries a real body so the assertions
 # express the documented behaviour; the RED baseline comes from the library's
@@ -24,12 +24,13 @@ def bytes_of(*values: UInt8) -> List[UInt8]:
 
 
 # CollectingSink — a concrete ByteWriter that accepts at most `chunk` bytes per
-# write (a short write), can inject `INTERRUPTED`, and can be told to always
-# accept zero bytes without an error.
+# write (a short write), can inject `INTERRUPTED` or `WOULD_BLOCK`, and can be
+# told to always accept zero bytes without an error.
 struct CollectingSink(ByteWriter):
     var _data: List[UInt8]
     var _chunk: Int
     var _interrupts: Int
+    var _would_blocks: Int
     var _zero: Bool
     var _flush_error: Bool
 
@@ -37,12 +38,14 @@ struct CollectingSink(ByteWriter):
         out self,
         chunk: Int = 1073741824,
         interrupts: Int = 0,
+        would_blocks: Int = 0,
         zero: Bool = False,
         flush_error: Bool = False,
     ):
         self._data = List[UInt8]()
         self._chunk = chunk
         self._interrupts = interrupts
+        self._would_blocks = would_blocks
         self._zero = zero
         self._flush_error = flush_error
 
@@ -50,6 +53,9 @@ struct CollectingSink(ByteWriter):
         if self._interrupts > 0:
             self._interrupts -= 1
             raise IoError(IoErrorKind.INTERRUPTED, "write", "injected interrupt")
+        if self._would_blocks > 0:
+            self._would_blocks -= 1
+            raise IoError(IoErrorKind.WOULD_BLOCK, "write", "injected would-block")
         if self._zero:
             return 0
         var n = len(data)
@@ -112,6 +118,26 @@ def test_write_all_retries_interrupted() raises:
     var data = bytes_of(7, 8, 9)
     sink.write_all(Span(data))
     assert_equal(sink.written(), bytes_of(7, 8, 9))
+
+
+def test_write_all_does_not_retry_would_block() raises:
+    # Only INTERRUPTED is retried; WOULD_BLOCK is surfaced, never retried
+    # (retrying would spin on a non-blocking handle).
+    var sink = CollectingSink(would_blocks=1)
+    var data = bytes_of(7, 8, 9)
+    var kind = IoErrorKind.OTHER
+    var op = ""
+    var caught = False
+    try:
+        sink.write_all(Span(data))
+    except e:
+        caught = True
+        kind = e.kind
+        op = e.op
+    assert_true(caught)
+    assert_equal(kind, IoErrorKind.WOULD_BLOCK)
+    assert_equal(op, "write")
+    assert_equal(len(sink.written()), 0)
 
 
 def test_flush_reports_error() raises:

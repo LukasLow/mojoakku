@@ -21,14 +21,17 @@ for f in mojoakku/io/_tests/test_*.mojo; do
   echo "== mojo run -I mojoakku $f"
   # Capture combined stdout+stderr and the exit code. The informative abort
   # line goes to stdout, compile/import diagnostics go to stderr, so combined
-  # capture classifies reliably.
+  # capture classifies reliably. Check the runtime stub marker `ABORT:` FIRST:
+  # a compile error can quote a stub source line (and its "not yet implemented"
+  # text), and classifying by `error:` before `ABORT:` would then mislabel that
+  # compile error as a stub abort.
   if mojo run -I mojoakku "$f" >"$tmp" 2>&1; then
     passed=$((passed + 1))
     echo "   result: PASS"
   else
     rc=$?
     failed=$((failed + 1))
-    if grep -q "not yet implemented" "$tmp"; then
+    if grep -q "ABORT:" "$tmp"; then
       reason="stub abort"
       stub_aborts=$((stub_aborts + 1))
       # The abort prints the API file relative to the test file (../io/…);
@@ -49,7 +52,13 @@ for f in mojoakku/io/_tests/test_*.mojo; do
     echo "   result: FAIL (exit $rc) [$reason] $detail"
   fi
 done
+# Suite size, computed from the sources so the note never drifts.
+tests="$(grep -h '^def test_' mojoakku/io/_tests/test_*.mojo 2>/dev/null | wc -l | tr -d ' ')"
 echo "--------"
 echo "baseline: $total files, $passed passed, $failed failed"
 echo "  failures: $stub_aborts stub abort, $compile_errors compile/import error, $other_failures other"
+echo "note: the suite holds $tests test functions across $total files. A stub"
+echo "      \`abort\` stops the process on its first call, so no per-test"
+echo "      passed/failed count is reachable in the red phase; the file count"
+echo "      ($total) is the honest measure."
 exit 0
