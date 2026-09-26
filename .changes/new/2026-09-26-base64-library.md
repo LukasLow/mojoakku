@@ -1,0 +1,1 @@
+NEW: base64 — first MojoAkku library, 15-entry public API (RFC 4648 base64/base64url/base32/base32hex/base16) with compile-time alphabet/padding/whitespace policies, a typed Base64Error with kind+position, allocation-free is_valid and encoded_len/decoded_len, and streaming Encoder/Decoder with a mandatory finish. 132 tests, 0 failing. Phase 13 final review: GO.

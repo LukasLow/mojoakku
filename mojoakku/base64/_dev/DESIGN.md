@@ -3,9 +3,9 @@ Design record for mojoakku/base64 — NOT end-user documentation.
 End-user documentation lives inline in the `*.mojo` files (the `# API-DOCS`
 blocks) and in `__init__.mojo`. This file keeps the developer-facing reasoning:
 status bookkeeping, tests, rationale, reference-API comparisons, non-goals and
-open questions. It reflects the state after Phase 12/13 (implementation review
-approved). The only still-open point is the Go base32 decode-case verification
-(see `## Open Questions`).
+open questions. It reflects the state after Phase 13 (final review: GO). The
+only still-open point is the Go base32 decode-case verification, accepted as a
+non-blocking follow-up (see `## Open Questions`).
 -->
 
 # base64 — Design Record
@@ -1495,14 +1495,19 @@ Most decisions are closed against the reviewed research and the `mojov1` buch.
   (see `## Non-Goals`), so this is not an open item.
 - There is no I/O, so EOF/EINTR/EAGAIN/close are structurally not applicable.
 
-**Open**
+**Open (accepted, non-blocking)**
 
 - **Go base32 decode case sensitivity.** `go.md` §7 says only that base32's
   `decodeMap` is built from the uppercase alphabet and is silent on lowercase
   rejection, so the Go corroboration for `B32_*` uppercase-only is a **GUESS**;
   Python (`casefold=False`) and cppcodec (uppercase-only tables) carry the claim.
   Still unverified against the Go source; the Mojo behaviour follows
-  Python/cppcodec and RFC 4648.
+  Python/cppcodec and RFC 4648. **Phase-13 disposition: accepted.** This is a
+  research-corroboration note, not a defect — the shipped behaviour is already
+  correct per RFC 4648 §6 and two independent references; the Go source check
+  only affects one citation's strength. Owner: research (next Phase-1 run for a
+  sibling library that touches base32, or a `MojoUpdate` pass). Severity: low;
+  the fix is a one-line note in `go.md`, no code change.
 
 **Resolved during implementation (Phase 7 / 11)**
 
