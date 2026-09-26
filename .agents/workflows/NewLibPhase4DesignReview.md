@@ -27,13 +27,6 @@ Verify that the derived Mojo API design for `<lib>` is semantically complete, co
 5. reviewer checks for silent invention: any API whose shape cannot be traced back to the research files is flagged as an invented API.
 6. reviewer checks that the documented `Decisions NOT to copy` match the research and are reasoned, not arbitrary.
 7. reviewer checks that all `## Open Questions` are resolved or consciously accepted with a written rationale.
-7.1. reviewer checks the **stdlib-first classification**: every public API entry
-   is labelled `wrapper` or `extension` (Step 2.0 of `NewLibPhase3Design.md`); a
-   `wrapper` names the forwarded `std.*` symbol; an `extension` states the
-   capability the stdlib lacks and justifies the divergence. An entry that
-   duplicates a stdlib symbol with no added behaviour is flagged and must become
-   a wrapper. The check uses the Phase-1 `mojov1` `stdlib/` coverage record as
-   its source of truth, not memory or the open web.
 8. reviewer returns `APPROVED` or `NEEDS_WORK` with a numbered findings list, each finding with `file:line` and the required fix.
 9. If `NEEDS_WORK`, Manager sends the findings back into `NewLibPhase3Design.md`, then repeats this review once.
 10. If `APPROVED`, Manager logs the verdict via `agentlog`.

@@ -34,22 +34,7 @@ Serve as the end-to-end gate proving that docs, API, tests and implementation fo
 6. Confirm the library directory layout is complete and independent: `__init__.mojo`, one `.mojo` file per public API entry directly under `mojoakku/<lib>/` (no `api/`, no `API.mojo`, no `src/`), optional `_internal/` only if shared code exists, `_tests/` (without `__init__.mojo`), `Taskfile.yml`.
 7. Assemble the open follow-ups list (non-blocking defects, deferred APIs, doc gaps) with owner and severity.
 8. Issue the explicit go/no-go decision.
-8.1. **Stdlib-first gate (mandatory).** Confirm every public API entry is
-   classified `wrapper` (forwarding to a named `std.*` symbol, recorded in the
-   `# API-DOCS`) or `extension` (stating the capability the stdlib still lacks),
-   using the `mojov1` `stdlib/` pages as the source of truth. The library **must
-   not** go `done` while an entry still reimplements a concept the stdlib now
-   provides and no adoption is planned: that work belongs to
-   `.agents/workflows/MojoUpdate.md`. A pending wrapper adoption is a blocking
-   finding (no-go for `done`).
-8.2. **Catalogue status flip (mandatory).** On a **go** decision, flip the
-   library's catalogue entry `_todos/<lib>.yml` from `status: current` to
-   `status: done` (that is the single, deterministic place the flip happens in
-   the new-library pipeline). Do this as part of the phase commit in Step 9, so
-   the commit that names the GO verdict also carries the status change. On a
-   **no-go** decision the status stays `current`.
-9. If go, Manager commits the phase with a message naming the phase, the decision
-   and the catalogue flip (e.g. `base64 phase 13: final review GO; _todos/base64.yml current -> done`).
+9. If go, Manager commits the phase with a message naming the phase and decision (e.g. `base64 phase 13: final review GO`).
 
 ## Artifacts / Outputs
 
@@ -59,9 +44,8 @@ Serve as the end-to-end gate proving that docs, API, tests and implementation fo
 
 ## Review Gate
 
-- Go only if: docs, API, tests and implementation are consistent; test evidence shows `X passed, 0 failed`; every used dependency edge is documented; every API entry is classified `wrapper`/`extension` under the stdlib-first rule and no entry reimplements a concept the stdlib now provides (Step 8.1); and no blocking findings remain.
-- No-go returns to the specific failing phase (Design, Docs, Scaffold, Tests or Implementation) with the blocking findings attached. A pending stdlib adoption blocks `done` and is routed to `MojoUpdate.md`.
-- On go, the catalogue entry `_todos/<lib>.yml` is flipped `current -> done` in the same phase commit (Step 8.2).
+- Go only if: docs, API, tests and implementation are consistent; test evidence shows `X passed, 0 failed`; every used dependency edge is documented; and no blocking findings remain.
+- No-go returns to the specific failing phase (Design, Docs, Scaffold, Tests or Implementation) with the blocking findings attached.
 - The phase is committed.
 
 ## Handoff: `CreatePR.md`

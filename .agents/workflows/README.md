@@ -44,7 +44,6 @@ Standalone workflows used whenever the matching situation occurs.
 | `BugFix.md` | Fix a known bug, with a regression test. |
 | `BugInvestigation.md` | Root-cause an unclear failure before changing code. |
 | `Refactor.md` | Restructure code without changing behavior. |
-| `MojoUpdate.md` | Per-version pass: check new language features **and** new stdlib APIs, then adopt (wrapper first, delete second) so MojoAkku shrinks as the stdlib grows. |
 | `DependencyReview.md` | Review a library dependency edge and justify it in the docs. |
 | `APIReview.md` | Review an API change against the design rules. |
 | `PerformanceInvestigation.md` | Investigate a performance problem and fix it. |

@@ -11,12 +11,6 @@ official Mojo standard library. It focuses on sockets, TCP, HTTP and closely
 related layers, and is built agentically for a low-vision user — so APIs,
 naming and docs are designed to be predictable, consistent and easy to read.
 
-It is **not** a permanent replacement for the standard library: where the stdlib
-already provides a concept, MojoAkku wraps it; where the stdlib is silent or its
-shape is wrong for us, MojoAkku extends it — and the extensions shrink back into
-wrappers, and then into nothing, as the stdlib grows. See the core rules below
-and `.agents/workflows/MojoUpdate.md`.
-
 ## Repository architecture
 
 ```
@@ -83,23 +77,6 @@ The canonical reference is `.agents/workflows/LibraryLayout.md`.
 - The **inline `# API-DOCS` blocks** (`__init__.mojo` for the whole library, one
   block per API in that API's file) are the **single source of truth** for a library.
 - Every API decision must be **justified in the docs**.
-- **Stdlib-first: we wrap, we do not duplicate.** If the Mojo standard library
-  already exposes an API for a concept, MojoAkku **uses that API** and builds a
-  **wrapper** around it. MojoAkku writes its **own, divergent implementation**
-  only when it deliberately does it **differently — better or extended** — and
-  that divergence is explicitly justified in the library's inline `# API-DOCS`.
-  Wrapping the stdlib is the default; a reimplementation is the exception and
-  must be earned. Design rule: an API entry that merely repeats a stdlib
-  function is a **wrapper** and names the stdlib symbol it forwards to; an entry
-  that adds alphabet/policy/typed-error/streaming behaviour the stdlib lacks is
-  an **extension** and states why.
-- **MojoAkku is not a permanent stdlib alternative.** The goal is the opposite:
-  as the standard library grows, MojoAkku should **shrink**. Each new stdlib
-  capability turns a MojoAkku implementation into a wrapper and eventually into
-  nothing. The per-version **MojoUpdate** workflow (`.agents/workflows/MojoUpdate.md`)
-  is how we find those places: every Mojo version is checked for **new language
-  features AND new stdlib APIs**, and anything that now exists is adopted
-  (wrapper first, code deleted second).
 - The public API lives in **one file per API entry** directly under
   `mojoakku/<lib>/`, never in a single `API.mojo`; private shared logic lives in
   `mojoakku/<lib>/_internal/` (only if genuinely shared); every public function
@@ -171,7 +148,6 @@ The process lives in `.agents/workflows/`. Start at the index:
 - `BugFix.md` — fix a known bug with a test.
 - `BugInvestigation.md` — root-cause an unclear failure.
 - `Refactor.md` — restructure without changing behavior.
-- `MojoUpdate.md` — per-version check for new language features and new stdlib APIs: adopt (wrapper first, delete second) so MojoAkku shrinks as the stdlib grows.
 - `DependencyReview.md` — review and justify dependency edges.
 - `APIReview.md` — review an API change.
 - `PerformanceInvestigation.md` — investigate and fix performance.
