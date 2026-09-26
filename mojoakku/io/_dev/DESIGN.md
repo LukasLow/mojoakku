@@ -3,8 +3,8 @@ Design record for mojoakku/io — NOT end-user documentation.
 End-user documentation lives inline in the `*.mojo` files (the `# API-DOCS`
 blocks) and in `__init__.mojo`. This file keeps the developer-facing reasoning:
 status bookkeeping, tests, rationale, reference-API comparisons, non-goals and
-open questions. It reflects the state after Phase 3 (API design; **approved by
-the user**; pending the Phase-4 design review).
+open questions. It reflects the state after Phase 6 (docs; design review APPROVED
+in Phase 4; pending Phase-7 scaffold).
 -->
 
 # io — Design Record
@@ -1292,8 +1292,8 @@ sibling MojoAkku library copies.
   return/meaning, ownership, and the stream-I/O / flush contract as applicable.
 - **Errors names every raised error and says whether it is recoverable.** Pure
   functions say `none`.
-- **Tests names the test file that covers the entry.** Present for every entry;
-  the field is never removed.
+- **Tests names the test file that covers the entry and its planned
+  test-function names.** Present for every entry; the field is never removed.
 - **Rationale is a `MojoAkku uses X because Y` statement** naming the reference
   API and its research section.
 - **Status and implementation status are honest.** All entries are `planned` /
