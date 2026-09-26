@@ -48,6 +48,6 @@ Review the implementation from `NewLibPhase11Implementation.md` for semantic fid
 
 - Go only if: implementation matches the documented semantics, there is no test tampering, error handling and resource/ownership are correct, and no hidden nested-library structure exists.
 - Any semantic mismatch, test edit, ownership bug or undocumented API is a blocking finding and returns to `NewLibPhase11Implementation.md`.
-- The phase is committed.
+- The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
 
 ## Handoff: `NewLibPhase13FinalReview.md`

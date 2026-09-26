@@ -51,7 +51,9 @@ mojoakku/<lib>/
   _internal/         # private shared code — ONLY if there is genuinely shared code
   _tests/            # tests, one file per concern (no __init__.mojo)
   Taskfile.yml       # per-library test runner (task test)
-  .research/         # phase-1 research notes, one file per reference language
+  _dev/              # development folder: phase-1 research notes (one file per
+                     # reference language), README.md (frozen run config) and
+                     # DESIGN.md (the design record)
 ```
 
 There is **no `api/` directory**, **no `API.mojo`** aggregator and **no `src/`
@@ -86,6 +88,14 @@ The canonical reference is `.agents/workflows/LibraryLayout.md`.
   (`NewLibPhase3Design.md`, user review gate).
 - **Every workflow phase ends with a git commit** naming the phase (and, for a
   review phase, its verdict), so each phase boundary is visible in history.
+- **One branch per library; never commit to `main`.** All work for a library
+  happens on a single long-lived branch named `<lib>-library` (created at Phase 1
+  and checked out for every phase commit). `main` is **never** written directly.
+  A library reaches `main` only through **exactly one pull request** per library,
+  opened by `CreatePR.md` after Phase 13 passes, and merged only when CI on the
+  PR is green. `main-push.yml` then auto-releases from `.changes/new/`.
+  Consequence: a phase commit must be made on the library branch, and
+  `git push origin main` from an agent is forbidden.
 - **CI runs one command: `task ci`.** The root `Taskfile.yml` auto-discovers
   every `mojoakku/*/Taskfile.yml` and runs each library's `test` (and optional
   `ci`) task; no library is registered anywhere. Each library owns how it tests.

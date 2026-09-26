@@ -5,6 +5,20 @@ where its documentation lives. Every phase workflow and every task workflow
 points here instead of repeating the layout. If the layout changes, change it
 HERE first.
 
+## Branch model (one branch per library, one PR per library)
+
+Every phase commit for a library goes to that library's **own long-lived branch
+`<lib>-library`**, created at Phase 1 (`git checkout -b <lib>-library`) and
+checked out for every phase. **`main` is never written directly.**
+
+- A library reaches `main` through **exactly one pull request**, opened by
+  `CreatePR.md` after `NewLibPhase13FinalReview.md` returns GO.
+- The PR is merged only when CI on the PR (`pull-request-check.yml` → `task ci`,
+  and exactly one new `.changes/new/*.md` file) is green.
+- `main-push.yml` then auto-releases from `.changes/new/`.
+- Consequence for every phase: the phase commit must be made on the library
+  branch, and `git push origin main` from an agent is forbidden.
+
 ## Directory layout
 
 ```
@@ -62,8 +76,8 @@ readers:
 
 Everything that is neither of those — the design rationale, the reference-API
 comparisons, the status bookkeeping — is **noise for the end user** and must NOT
-appear in the API docs block or the shared block. It lives in the temporary
-`<LIB>_DESIGN.md` (Phase 3-6) and in git history.
+appear in the API docs block or the shared block. It lives in the persistent
+design record `_dev/DESIGN.md` (Phase 3-6, kept afterwards) and in git history.
 
 ### 1. Per-API docs — in the API's own file, between markers, at the BOTTOM
 
@@ -128,7 +142,7 @@ Keep it user-facing and lean:
 
 There is no `<LIB>_DOCS.md`, no separate docs artifact in the shipped library.
 The per-API blocks and the `__init__.mojo` block together are the end-user docs;
-the design record lives in `<LIB>_DESIGN.md` and git history.
+the design record lives in `_dev/DESIGN.md` and git history.
 
 ## The design record (lives in `_dev/DESIGN.md`)
 

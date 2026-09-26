@@ -49,6 +49,6 @@ Implement the real bodies in the `mojoakku/<lib>/*.mojo` API files (and, only wh
 
 - Entry gate for `NewLibPhase12ImplementationReview.md`: baseline tests are green (0 failing) without test edits, all documented semantics are implemented, and no undocumented API was added.
 - Weakening documented semantics or changing tests to pass is a blocking violation and returns to the Design workflow.
-- The phase is committed.
+- The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
 
 ## Handoff: `NewLibPhase12ImplementationReview.md`

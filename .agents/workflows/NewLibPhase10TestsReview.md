@@ -46,6 +46,6 @@ Verify that the test suite authored in `NewLibPhase9Tests.md` genuinely encodes 
 
 - Go only if: tests test the documented semantics, all listed edge cases are covered, no tautological tests exist, and the failing baseline is reproduced.
 - Any missing concern/edge case or unverifiable baseline is a blocking finding and returns to `NewLibPhase9Tests.md`.
-- The phase is committed.
+- The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
 
 ## Handoff: `NewLibPhase11Implementation.md`
