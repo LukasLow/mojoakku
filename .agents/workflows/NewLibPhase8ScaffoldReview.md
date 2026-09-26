@@ -31,7 +31,7 @@ Review the scaffold produced by `NewLibPhase7Scaffold.md` and decide whether the
 3. Compile the library via the consumer-import check (`mojo run -I .. <checkfile>` importing every public name) and confirm it compiles without errors.
 4. Enumerate every public symbol documented in the inline `# API-DOCS` blocks and verify a corresponding stub exists in the API files (name, parameter list, return type) — one by one. The docs block of API `X` lives in `mojoakku/<lib>/<x>.mojo`.
 5. Verify each stub aborts with the standard "not yet implemented" message and does not return fabricated values.
-6. Confirm every API file carries its `# API-DOCS` block (the seven fields) and that `__init__.mojo` carries the shared docs block.
+6. Confirm every API file carries its end-user `# API-DOCS` block (fields per `LibraryLayout.md`: summary, `Signature`, `What it does`, `Returns`, `Errors`, `Example`) and that `__init__.mojo` carries the shared docs block.
 7. Confirm no real implementation leaked into the API files or any stub (no working logic that would make tests pass prematurely).
 8. Confirm `_internal/` contains no nested library structure (`mojoakku/<lib>/<lib>/`), keeping the sibling rule intact. (If a private implementation file is later placed there, it is not part of the public surface.)
 9. Confirm `Taskfile.yml` exists and its `test` task actually runs the files under `_tests/`.

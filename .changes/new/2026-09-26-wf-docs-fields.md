@@ -1,0 +1,1 @@
+DOCS: workflows — fix the Phase 7/8 wording: the inline `# API-DOCS` blocks use the `LibraryLayout.md` end-user field set (summary, Signature, What it does, Returns, Errors, Example), NOT the seven design fields (those stay in `_dev/DESIGN.md`).
