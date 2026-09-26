@@ -1,16 +1,16 @@
 # NewLibPhase7Scaffold
 
 ## Purpose
-Create the compile-ready skeleton for `mojoakku/<lib>/` from the approved design, with one file per public API entry carrying stub bodies that abort with "not yet implemented", and with no real implementation. This phase materialises the temporary `mojoakku/<lib>/<LIB>_DESIGN.md` into the tree and then deletes it.
+Create the compile-ready skeleton for `mojoakku/<lib>/` from the approved design, with one file per public API entry carrying stub bodies that abort with "not yet implemented", and with no real implementation. This phase materialises `mojoakku/<lib>/_dev/DESIGN.md` into the inline end-user `# API-DOCS` blocks and keeps the design record in `_dev/DESIGN.md` (persistent; see `LibraryLayout.md`).
 
 ## Inputs
-- `mojoakku/<lib>/<LIB>_DESIGN.md` as the temporary design artifact (approved by `NewLibPhase6DocsReview.md`).
+- `mojoakku/<lib>/_dev/DESIGN.md` as the design record (approved by `NewLibPhase6DocsReview.md`).
 - The approved design review verdict.
 - `AGENTS.md`, `.agents/workflows/LibraryLayout.md` and this workflow file.
 
 ## Preconditions
 - `NewLibPhase6DocsReview.md` returned `APPROVED`.
-- The public API member list and signatures are frozen in `<LIB>_DESIGN.md`.
+- The public API member list and signatures are frozen in `_dev/DESIGN.md`.
 - No `mojoakku/<lib>/` implementation tree exists yet for this library, or it is being created fresh.
 - The Manager starts no Manager subagent.
 
@@ -27,9 +27,9 @@ Create the compile-ready skeleton for `mojoakku/<lib>/` from the approved design
    - `mojoakku/<lib>/_internal/` — private shared implementation, **only if the design identified genuinely shared code**. If every API file is self-contained, `_internal/` must not exist. There is **no `src/` directory**.
    - `mojoakku/<lib>/_tests/` — tests directory, and it MUST NOT contain an `__init__.mojo`.
    - `mojoakku/<lib>/Taskfile.yml` — the per-library test runner (see Step 9).
-   - `mojoakku/<lib>/<LIB>_DESIGN.md` is **deleted** once its content has been materialised (Step 4).
+   - `mojoakku/<lib>/_dev/DESIGN.md` — the persistent design record (kept; see Step 4).
 3. Materialise the design: for each API entry, create its file and place the design's API block into the file between the markers `# API-DOCS-START` and `# API-DOCS-END` (the seven fields `Status`, `Signature`, `Semantics`, `Errors`, `Tests`, `Implementation status`, `Rationale`). Place the design's shared sections into `__init__.mojo` between the same markers. Declare each public API member with its exact documented signature.
-4. Delete `mojoakku/<lib>/<LIB>_DESIGN.md` after materialisation. The git history keeps the design record; from here on the inline `# API-DOCS` blocks are the authoritative docs.
+4. Keep `mojoakku/<lib>/_dev/DESIGN.md` as the persistent design record (see `LibraryLayout.md`); it is **not** deleted. From here on the inline `# API-DOCS` blocks are the authoritative end-user docs, while `_dev/DESIGN.md` keeps the developer-facing reasoning (status, rationale, non-goals, references, open questions).
 5. Every public function/method in an API file carries, in the docs block directly above it, the seven documented fields, with `Implementation status: not implemented` in this phase.
 6. Each function and each public method body must be a stub that does exactly:
    `abort("MojoAkku: this API is not yet implemented")`
@@ -37,7 +37,7 @@ Create the compile-ready skeleton for `mojoakku/<lib>/` from the approved design
 7. Ensure the API files are syntactically valid and compile: use the documented types and signatures, import what is strictly needed, and keep the files free of implementation details.
 8. In `__init__.mojo`, re-export the public API from the API files so `from <lib> import ...` works, and nothing more.
 9. Create `mojoakku/<lib>/Taskfile.yml`: a small Taskfile with a `test` task that runs every `_tests/*.mojo` file with `mojo run` (there is no `mojo test`; each test file is a program with its own `main()`), stops on the first failure, and exits non-zero when any test fails. It may also provide a `compile`/`check` task for the library (see Step 11 for the consumer-import pattern). It uses the same portable shell style as the root `Taskfile.yml`.
-10. Manager verifies that `_tests/` exists and has no `__init__.mojo`, and that `<LIB>_DESIGN.md` no longer exists.
+10. Manager verifies that `_tests/` exists and has no `__init__.mojo`, and that `_dev/DESIGN.md` is present (kept as the design record).
 11. Manager runs the compile gate: delegate to `coder` to compile/check `mojoakku/<lib>/`. The container Mojo is the global `mojo` (no pixi), and `mojo precompile .` does not work here because `_tests/` contains its own `main()` inside the package. Instead use a **consumer import**: write a small check file that imports every public name and run `mojo run -I .. <checkfile>` (see the `compile` task in `mojoakku/base64/Taskfile.yml` as the template). The scaffold is only complete when this consumer import compiles with the stubs.
 12. If compilation fails, coder fixes the straightforward syntax/signature errors and Step 11 is repeated. Unclear failures are routed by the Manager, not delegated as guesses.
 13. Manager logs the scaffold result and the compile evidence via `agentlog`.
@@ -50,19 +50,19 @@ Create the compile-ready skeleton for `mojoakku/<lib>/` from the approved design
 - `mojoakku/<lib>/_internal/` — only when the design identified shared code.
 - `mojoakku/<lib>/_tests/` (no `__init__.mojo`)
 - `mojoakku/<lib>/Taskfile.yml` — per-library `test` (and optional `compile`) task.
-- The deleted `<LIB>_DESIGN.md` (absent after this phase).
+- `mojoakku/<lib>/_dev/DESIGN.md` — the persistent design record (kept in place).
 - A successful compile/check result as evidence.
 - One `.agents/log.md` entry recording the phase result and the compile evidence.
 - One git commit for the phase.
 
 ## Review Gate
 - The agreed layout exists: `__init__.mojo`, one file per public API entry directly under `mojoakku/<lib>/` (no `api/`, no `API.mojo`), optional `_internal/`, `_tests/` (no `__init__.mojo`), `Taskfile.yml`.
-- `<LIB>_DESIGN.md` has been materialised into the inline `# API-DOCS` blocks and deleted.
+- `_dev/DESIGN.md` has been materialised into the inline `# API-DOCS` blocks and is kept as the persistent design record.
 - Every public API member from the design exists as a stub with its documented signature and its seven-field docs block.
 - Every stub aborts with the exact message `MojoAkku: this API is not yet implemented`.
 - `Taskfile.yml` exists and its `test` task runs the `_tests/` files.
 - The scaffold compiles via the consumer-import check.
 - No real implementation exists in the API files or `__init__.mojo`.
-- The phase is committed.
+- The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
 
 ## Handoff: `NewLibPhase8ScaffoldReview.md`

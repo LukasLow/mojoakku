@@ -1,0 +1,2 @@
+DOCS: workflows — align phases 1-8 with the canonical `_dev/` layout (research in `_dev/`, persistent `_dev/DESIGN.md`, no `.research/`, no temporary `<LIB>_DESIGN.md`).
+DOCS: workflows — PR-only model: one long-lived branch `<lib>-library` per library and exactly one pull request per library; `main` is never written directly. Phase 1 creates the branch, every phase commits to it, CreatePR opens the single PR after Phase 13.

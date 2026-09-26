@@ -1,10 +1,10 @@
 # NewLibPhase6DocsReview
 
 ## Purpose
-Verify that every designed API for `<lib>` has a complete, consistent block in `mojoakku/<lib>/<LIB>_DESIGN.md` and that the design matches the approved design exactly.
+Verify that every designed API for `<lib>` has a complete, consistent block in `mojoakku/<lib>/_dev/DESIGN.md` and that the design matches the approved design exactly.
 
 ## Inputs
-- `mojoakku/<lib>/<LIB>_DESIGN.md`.
+- `mojoakku/<lib>/_dev/DESIGN.md`.
 - The approved design sections and the design review verdict.
 - The list of public API members from `NewLibPhase3Design.md`.
 - This workflow file.
@@ -20,7 +20,7 @@ Verify that every designed API for `<lib>` has a complete, consistent block in `
 - **coder** (only on rework): fixes the specific docs findings; review is repeated.
 
 ## Steps
-1. Manager starts ONE `reviewer` with: "Review `mojoakku/<lib>/<LIB>_DESIGN.md`. Check that every designed API has a documented block, that each block has Status, Signature, Semantics, Errors, Tests and Implementation status (plus Rationale), and that the design matches the approved design. Report `APPROVED` or `NEEDS_WORK` with findings."
+1. Manager starts ONE `reviewer` with: "Review `mojoakku/<lib>/_dev/DESIGN.md`. Check that every designed API has a documented block, that each block has Status, Signature, Semantics, Errors, Tests and Implementation status (plus Rationale), and that the design matches the approved design. Report `APPROVED` or `NEEDS_WORK` with findings."
 2. reviewer builds the set of designed API members and the set of documented blocks and diffs them in both directions: missing blocks and undocumented extra blocks are both findings.
 3. reviewer checks every block for the required fields: `Status`, `Signature`, `Semantics`, `Errors`, `Tests`, `Implementation status` (and `Rationale`). Any missing field is a finding with `file:line`.
 4. reviewer checks field consistency: identical field names and order across all blocks; predictable navigation for a low-vision reader.
@@ -35,7 +35,7 @@ Verify that every designed API for `<lib>` has a complete, consistent block in `
 
 ## Artifacts / Outputs
 - A written review verdict (`APPROVED` / `NEEDS_WORK`) with a findings list tied to `file:line`.
-- Corrected `mojoakku/<lib>/<LIB>_DESIGN.md` when a rework pass was required.
+- Corrected `mojoakku/<lib>/_dev/DESIGN.md` when a rework pass was required.
 - One `.agents/log.md` entry recording the verdict.
 - One git commit for the phase.
 

@@ -8,7 +8,9 @@ phase you are in and follow the matching workflow.
 
 The full path for a new library, in order. Each phase has a review gate before
 the next phase starts, and each phase ends with a git commit naming the phase
-(and, for a review phase, its verdict).
+(and, for a review phase, its verdict). All phases for a library commit to the
+**library's own branch `<lib>-library`** (created in Phase 1); `main` is never
+written directly — the library reaches `main` through exactly one PR at the end.
 
 ```
 NewLibPhase1Research -> NewLibPhase2ResearchReview -> NewLibPhase3Design
@@ -16,12 +18,12 @@ NewLibPhase1Research -> NewLibPhase2ResearchReview -> NewLibPhase3Design
   -> NewLibPhase7Scaffold -> NewLibPhase8ScaffoldReview -> NewLibPhase9Tests
   -> NewLibPhase10TestsReview -> NewLibPhase11Implementation
   -> NewLibPhase12ImplementationReview -> NewLibPhase13FinalReview
-  -> CreatePR -> CI (task ci) -> merge -> Release
+  -> CreatePR (one PR per library) -> CI (task ci) -> merge -> Release
 ```
 
 | Phase workflow | Purpose |
 | --- | --- |
-| `NewLibPhase1Research.md` | Research the problem space and prior art: at most 6 researchers, one per language group, each writes `.research/<lang>.md` directly. |
+| `NewLibPhase1Research.md` | Research the problem space and prior art: at most 6 researchers, one per language group, each writes `_dev/<lang>.md` directly. |
 | `NewLibPhase2ResearchReview.md` | Review the research for completeness, sources and relevance. |
 | `NewLibPhase3Design.md` | Design the public API, justify every decision, and get explicit user approval of the API before review. |
 | `NewLibPhase4DesignReview.md` | Review the API design against the research and the process rules. |

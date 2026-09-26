@@ -46,6 +46,6 @@ Write the complete behavioral test suite for `mojoakku/<lib>` from the documente
 - Entry gate for `NewLibPhase10TestsReview.md`: every documented concern has a test file, all required edge cases are present, and a reproducible failing baseline with an explicit failing-test count exists.
 - The per-library `Taskfile.yml test` task runs the suite.
 - Tests failing at this stage is the intended state; green tests here indicate a leaked implementation and block the phase.
-- The phase is committed.
+- The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
 
 ## Handoff: `NewLibPhase10TestsReview.md`

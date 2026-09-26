@@ -1,12 +1,12 @@
 # NewLibPhase5Docs
 
 ## Purpose
-Turn the approved design into the complete `mojoakku/<lib>/<LIB>_DESIGN.md` design document, with one fully specified block per API entry (seven fields) and the shared (whole-library) sections, ready to be materialised into the tree by `NewLibPhase7Scaffold.md`.
+Turn the approved design into the complete `mojoakku/<lib>/_dev/DESIGN.md` design record, with one fully specified block per API entry (seven fields) and the shared (whole-library) sections, ready to be materialised into the tree by `NewLibPhase7Scaffold.md`.
 
 ## Inputs
-- `mojoakku/<lib>/<LIB>_DESIGN.md` containing the approved design sections.
+- `mojoakku/<lib>/_dev/DESIGN.md` containing the approved design sections.
 - The approved design review verdict from `NewLibPhase4DesignReview.md`.
-- `mojoakku/<lib>/.research/<lang>.md` for reference names and rationale.
+- `mojoakku/<lib>/_dev/<lang>.md` for reference names and rationale.
 - This workflow file.
 
 ## Preconditions
@@ -16,7 +16,7 @@ Turn the approved design into the complete `mojoakku/<lib>/<LIB>_DESIGN.md` desi
 
 ## Roles
 - **Manager**: owns the phase, starts ONE `coder` to expand the docs, tracks progress with `agentlog`.
-- **coder**: writes the full `<LIB>_DESIGN.md` shared sections and per-API blocks; changes only this file and the design is not reconsidered.
+- **coder**: writes the full `_dev/DESIGN.md` shared sections and per-API blocks; changes only this file and the design is not reconsidered.
 - **reviewer**: not started here; invoked by `NewLibPhase6DocsReview.md`.
 
 ## Steps
@@ -46,11 +46,11 @@ Turn the approved design into the complete `mojoakku/<lib>/<LIB>_DESIGN.md` desi
 5. Ensure no API from the design is missing and no API appears that is not in the design. Newly discovered APIs are not added here; they go back through design.
 6. For every dependency edge, state the justification (e.g. `http -> tcp -> socket`) and confirm the dependency does not imply physical nesting.
 7. Manager logs the completed docs via `agentlog`.
-8. Manager commits the phase: stages `mojoakku/<lib>/<LIB>_DESIGN.md` and commits with a message naming the phase (e.g. `base64 phase 5: docs`).
+8. Manager commits the phase: stages `mojoakku/<lib>/_dev/DESIGN.md` and commits with a message naming the phase (e.g. `base64 phase 5: docs`).
 9. Manager hands the docs to review.
 
 ## Artifacts / Outputs
-- `mojoakku/<lib>/<LIB>_DESIGN.md` in the final format: shared sections plus one fully specified block per API member, and a documented dependency section. The design document is temporary; `NewLibPhase7Scaffold.md` materialises it into the tree and deletes it.
+- `mojoakku/<lib>/_dev/DESIGN.md` in the final format: shared sections plus one fully specified block per API member, and a documented dependency section. The design record is persistent; `NewLibPhase7Scaffold.md` materialises it into the inline end-user docs and keeps it in `_dev/DESIGN.md` (see `LibraryLayout.md`).
 - Every API block carries Status, Signature, Semantics, Errors, Tests, Implementation status and Rationale.
 - One `.agents/log.md` entry recording the phase result.
 - One git commit for the phase.
@@ -61,6 +61,6 @@ Turn the approved design into the complete `mojoakku/<lib>/<LIB>_DESIGN.md` desi
 - Every dependency edge has a written justification.
 - Status defaults to `planned`; implementation status is `not implemented`.
 - No implementation or tests are written in this phase.
-- The phase is committed.
+- The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
 
 ## Handoff: `NewLibPhase6DocsReview.md`
