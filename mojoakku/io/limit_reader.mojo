@@ -21,6 +21,8 @@ struct LimitReader[R: Stream](Reader):
         if self._remaining < n:
             n = self._remaining
         var result = self._inner.read(buf[0:n])
+        # Defensive: a conforming inner returns at most `n`, but clamp anyway so
+        # a misbehaving reader cannot drive `_remaining` negative.
         if result.count > self._remaining:
             result.count = self._remaining
         self._remaining -= result.count

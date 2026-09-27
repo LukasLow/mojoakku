@@ -12,7 +12,16 @@ struct MultiReader[R: Stream](Reader):
 
     def __init__(out self, var *readers: Self.R):
         # The variadic pack must be owned (`var`) so its elements can be moved
-        # into the List storage. `*readers^` transfers the whole pack.
+        # into the List storage. `*readers^` transfers the whole pack into the
+        # List's variadic constructor; that constructor requires the internal
+        # `__list_literal__` keyword because Mojo exposes no public way to build
+        # a List from an owned variadic pack of non-Copyable values.
+        # MissingMojo - v1.1.0 - Start
+        # kind: UnstableAPI
+        # need: a public List[T] constructor from an owned variadic pack of non-Copyable values
+        # optimal: replace `__list_literal__=None` with the public constructor
+        # track: https://mojolang.org/docs/std/collections/list/List/
+        # MissingMojo - End
         self._readers = List[Self.R](*readers^, __list_literal__=None)
         self._index = 0
 
@@ -43,7 +52,7 @@ struct MultiReader[R: Stream](Reader):
 #   struct MultiReader[R: Stream](Reader):
 #       var _readers: List[Self.R]
 #       var _index: Int
-#       def __init__(out self, *readers: Self.R)
+#       def __init__(out self, var *readers: Self.R)
 #       def read(mut self, buf: MutSpan[UInt8, _]) raises IoError -> ReadResult
 # What it does:
 #   Constructed from one or more readers with a variadic constructor

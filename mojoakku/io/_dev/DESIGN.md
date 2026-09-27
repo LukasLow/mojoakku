@@ -3,8 +3,8 @@ Design record for mojoakku/io — NOT end-user documentation.
 End-user documentation lives inline in the `*.mojo` files (the `# API-DOCS`
 blocks) and in `__init__.mojo`. This file keeps the developer-facing reasoning:
 status bookkeeping, tests, rationale, reference-API comparisons, non-goals and
-open questions. It reflects the state after Phase 6 (docs; design review APPROVED
-in Phase 4; pending Phase-7 scaffold).
+open questions. It reflects the state after Phase 12 (implementation review; all
+15 entries implemented, 75 tests green).
 -->
 
 # io — Design Record
@@ -45,8 +45,9 @@ Every API entry carries a `Status:` field with exactly one of these values:
 | `implemented` | Implemented and passing its tests. Default after Phase 12/13. |
 | `benchmarked` | Implemented, tested and measured against the performance goals. |
 
-All 15 entries in this document are `planned` after Phase 3, and every entry's
-`Implementation status:` is `not implemented`.
+All 15 entries in this document are `implemented` after Phase 12, and every
+entry's `Implementation status:` is `implemented`. They were `planned` /
+`not implemented` from Phase 3 through Phase 10.
 
 ## Dependencies
 
@@ -362,7 +363,7 @@ adapter does so.
 
 ### `IoErrorKind`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -418,7 +419,7 @@ Tests:
   - `test_error_kind_write_to_names_kind`
   - `test_error_kind_unexpected_eof_write_to`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a **closed** seven-value discriminant because Rust's
 `#[non_exhaustive]` `ErrorKind` with ~45 OS-derived variants is explicitly
@@ -436,7 +437,7 @@ and a new member is additive when the need is proven.
 
 ### `IoError`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -480,7 +481,7 @@ Tests:
   - `test_error_copyable_and_deinitable`
   - `test_error_not_implicitly_copyable`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a struct with `kind`+`op`+`detail` because Rust's
 `io::Error` carries a kind plus context and Go's `*os.PathError`/`*net.OpError`
@@ -492,7 +493,7 @@ Go's `(n, err)`-both-populated return show how *not* to type the failure
 
 ### `ReadResult`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -540,7 +541,7 @@ Tests:
   - `test_read_result_zero_false_is_rejected_by_helpers`
   - `test_read_result_write_to_reports_count_and_eof`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses an explicit `{count, eof}` result because Java's in-band
 `-1`, JS's `null`, Rust's `Ok(0)`-as-EOF-or-empty, C's `EOF`+`feof`/`ferror` and
@@ -553,7 +554,7 @@ C++'s separate `gcount()` query is rejected because it is reset by
 
 ### `SeekFrom`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -605,7 +606,7 @@ Tests:
   - `test_seek_from_end_negative_offset`
   - `test_seek_from_eq_compares_offset`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a named origin plus a signed offset because C's
 `fseek`/`SEEK_*`, Go's `io.Seeker` and Rust's `SeekFrom` all take exactly an
@@ -616,7 +617,7 @@ origin plus an offset, and this is the smallest complete shape (`c.md` §3;
 
 ### `Reader`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -672,7 +673,7 @@ Tests:
   - `test_read_to_end_reads_until_eof`
   - `test_read_to_end_raises_other_on_no_progress`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses **one required buffer method plus provided helpers**
 because Go's `io.Reader` (one `Read`) and Rust's `Read` (one `read` with ~15
@@ -686,7 +687,7 @@ provided operations) are the minimal-contract lesson, and the Mojo stdlib's own
 
 ### `ByteWriter`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -705,7 +706,9 @@ Semantics:
 - **Return / meaning:** `write` returns the number of bytes accepted; a short
   write is normal and is **not** an error. `write_all` loops until every byte is
   written or raises. `flush` pushes any buffered bytes to the underlying sink;
-  it is **explicit and fallible** (see Rationale).
+  it is **explicit and fallible**. The trait provides a **default no-op `flush`**
+  (a plain unbuffered sink has nothing to flush); buffered/adapter sinks override
+  it.
 - **Ownership:** `mut self`; `data` borrowed and never retained.
 - **Close behavior:** no `close` (this trait is not an owned handle); `CLOSED` is
   raised only when a wrapped handle (future file/socket layer) is closed.
@@ -725,7 +728,7 @@ Tests:
   - `test_write_all_does_not_retry_would_block`
   - `test_flush_reports_error`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a **byte**-writer trait named `ByteWriter` because the
 stdlib already owns the name `Writer` for the *text* formatting trait
@@ -747,7 +750,7 @@ because Rust's `BufWriter` `Drop` flush "ignores" errors — a documented footgu
 
 ### `Seeker`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -789,7 +792,7 @@ Tests:
   - `test_seek_negative_target_raises_other`
   - `test_seek_past_end_allowed`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a separate `Seeker` trait because Go's `io.Seeker`,
 Rust's `Seek` and C's `fseek` are all *optional* capabilities kept apart from the
@@ -803,7 +806,7 @@ branch on it.
 
 ### `Cursor`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -841,7 +844,7 @@ Tests:
   - `test_cursor_seek_out_of_range_raises_other`
   - `test_cursor_owns_buffer`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses an owned `Cursor` because C's `open_memstream` is the
 owned, writable in-memory stream and Rust's `Cursor<T>` over an owned `T` is the
@@ -853,7 +856,7 @@ distinction cannot live in one type (`mojov1/types/collections`).
 
 ### `SpanCursor`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -899,7 +902,7 @@ Tests:
   - `test_span_cursor_seek_out_of_range_raises_other`
   - `test_span_cursor_borrows_buffer`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a separate borrowed `SpanCursor` because Go's
 `bytes.Reader` is exactly a read-only view over a caller's byte slice, and Mojo
@@ -910,7 +913,7 @@ cannot express "owned or borrowed" in one struct field type
 
 ### `BufferedReader`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -955,7 +958,7 @@ Tests:
   - `test_buffered_reader_retries_interrupted_on_refill`
   - `test_buffered_reader_raises_other_on_no_progress`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a value-semantics wrapper with an inline,
 compile-time-sized buffer because Rust's `BufReader<R>` (a buffer + inner) and
@@ -969,7 +972,7 @@ buffer owned and drained deterministically (`rust.md` §11).
 
 ### `BufferedWriter`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1030,7 +1033,7 @@ Tests:
   - `test_buffered_writer_close_is_idempotent`
   - `test_buffered_writer_after_close_raises_closed`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses an **explicit, fallible `flush`/`close` and no destructor
 flush** because Rust's `BufWriter` `Drop` "attempt[s] to flush … any errors …
@@ -1045,7 +1048,7 @@ against Mojo 1.x (`mojov1/functions/parameters-and-generics`).
 
 ### `LimitReader`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1065,8 +1068,10 @@ Semantics:
   **defined to behave as `limit = 0`** (the reader immediately reports EOF),
   consistent with the total-function style used elsewhere in MojoAkku — not a
   trap.
-- **Return / meaning:** reads from `_inner` but never beyond `_remaining`; when
-  `_remaining` hits 0 it reports `{0, eof: True}` without touching `_inner`.
+- **Return / meaning:** reads from `_inner` but never beyond `_remaining`. The
+  call that returns the last permitted bytes reports that count with
+  `eof = False`; only the **next** read (when no bytes remain) reports
+  `{0, eof: True}` without touching `_inner` again.
 - **Ownership:** owns `_inner`; `limit` is a plain `Int`.
 - **Close behavior:** no `close` (value type); delegates no close to `_inner`.
 - **Stream I/O:** as `_inner`.
@@ -1081,7 +1086,7 @@ Tests:
   - `test_limit_reader_negative_limit_behaves_as_zero`
   - `test_limit_reader_never_touches_inner_after_limit`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a composable `LimitReader` because Go's
 `io.LimitReader` shows a byte cap is a small, reusable wrapper over any reader
@@ -1091,7 +1096,7 @@ Rationale: MojoAkku uses a composable `LimitReader` because Go's
 
 ### `TeeReader`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1109,7 +1114,9 @@ Semantics:
 - **Parameters / preconditions:** every byte read from `_inner` is also written
   to `_sink`.
 - **Return / meaning:** returns the `ReadResult` from `_inner` after mirroring
-  the bytes; a sink write failure raises `IoError` (the read is not delivered).
+  the bytes. If the sink write fails, the bytes are already in the caller's
+  `buf` (the read from `_inner` succeeded) but the `ReadResult` is withheld: the
+  call raises `IoError` from the `_sink` (`op == "write"`).
 - **Ownership:** owns both `_inner` and `_sink`; `buf` borrowed.
 - **Close behavior:** no `close` (value type); no close is delegated.
 - **Stream I/O:** as `_inner`; sink errors surface.
@@ -1124,7 +1131,7 @@ Tests:
   - `test_tee_reader_sink_error_surfaces`
   - `test_tee_reader_inner_error_surfaces`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a composable `TeeReader` because Go's `io.TeeReader`
 shows read-mirroring is a small wrapper, useful for hashing/logging as a stream
@@ -1134,7 +1141,7 @@ is consumed (`go.md` §3, §12).
 
 ### `MultiReader`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1143,7 +1150,7 @@ struct MultiReader[R: Stream](Reader):
     var _readers: List[Self.R]
     var _index: Int
 
-    def __init__(out self, *readers: Self.R)
+    def __init__(out self, var *readers: Self.R)
     def read(mut self, buf: MutSpan[UInt8, _]) raises IoError -> ReadResult
 ```
 
@@ -1151,11 +1158,16 @@ Semantics:
 
 - **Parameters / preconditions:** constructed from one or more readers; the
   constructor is variadic (`MultiReader(r1, r2, r3)`) but the readers are
-  **homogeneous** (all the same type `R`) and are appended into a `List[Self.R]`,
-  so the count is a runtime value and there is no boxing. A heterogeneous set of
-  readers is out of scope for the first release (it would need `Variant`).
+  **homogeneous** (all the same type `R`) and are moved into a `List[Self.R]`,
+  so the count is a runtime value and there is no boxing. The pack parameter is
+  `var *readers` (an owned transfer) because a `Movable`-but-not-`Copyable`
+  reader cannot be copied into the list. A heterogeneous set of readers is out of
+  scope for the first release (it would need `Variant`).
   (The `List`-backed form was verified to compile; a variadic type-pack stored
-  directly in a `Tuple` does **not** compile in Mojo 1.x and is rejected.)
+  directly in a `Tuple` does **not** compile in Mojo 1.x and is rejected. The
+  `List[Self.R](*readers^, __list_literal__=None)` construction relies on the
+  internal `__list_literal__` keyword — a documented `MissingMojo` `UnstableAPI`
+  workaround carried in `multi_reader.mojo`.)
 - **Return / meaning:** reads from the current reader; when it reports `eof`,
   advances `_index` to the next and retries; reports `{0, eof: True}` only after
   the last reader ends.
@@ -1174,7 +1186,7 @@ Tests:
   - `test_multi_reader_variadic_construct`
   - `test_multi_reader_active_reader_error_surfaces`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a `MultiReader` because Go's `io.MultiReader` shows
 concatenation is a core composition (`go.md` §3, §12). Storage is a
@@ -1187,7 +1199,7 @@ homogeneous `R` bound still allows any single reader type, and Go's own
 
 ### `copy`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1228,7 +1240,7 @@ Tests:
   - `test_copy_partial_progress_writer_keeps_first_chunk`
   - `test_copy_error_op_names_failing_side`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a free generic `copy` because Go's `io.Copy` and
 Rust's `io::copy` both express the pump as a function over the traits, keeping
@@ -1308,8 +1320,9 @@ sibling MojoAkku library copies.
   test-function names.** Present for every entry; the field is never removed.
 - **Rationale is a `MojoAkku uses X because Y` statement** naming the reference
   API and its research section.
-- **Status and implementation status are honest.** All entries are `planned` /
-  `not implemented` after Phase 3.
+- **Status and implementation status are honest.** All entries were `planned` /
+  `not implemented` from Phase 3 through Phase 10, and are `implemented` from
+  Phase 11/12.
 - **Terminology is shared.** Stream, short read, EOF and buffer borrow are
   defined once in `## Semantics ## Terminology`.
 - **Markdown tables use `|`.** Sources are cited as `<lang>.md §<section>`.

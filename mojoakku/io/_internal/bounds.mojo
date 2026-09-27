@@ -4,8 +4,8 @@
 # adapter can own it in a struct field. `Reader`/`ByteWriter` come from the
 # public per-entry traits; these aliases name the full bound once.
 
-from io.reader import Reader
-from io.byte_writer import ByteWriter
+from ..reader import Reader
+from ..byte_writer import ByteWriter
 
 
 # Stream — the bound a stored, owned reader must satisfy.
