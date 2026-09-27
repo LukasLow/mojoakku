@@ -384,10 +384,10 @@ none — it is a discriminant, not an operation.
 
 Tests:
 
-- `test_bit_error_kind_distinct_ids` — each of the five `comptime` members has a
+- `test_error_kind_distinct_ids` — each of the five `comptime` members has a
   distinct `_id`.
-- `test_bit_error_kind_eq` — `==` compares `_id` only.
-- `test_bit_error_kind_writable` — `write_to` prints the symbolic name, never the
+- `test_error_kind_eq` — `==` compares `_id` only.
+- `test_error_kind_writable` — `write_to` prints the symbolic name, never the
   number.
 
 Implementation status:
@@ -442,9 +442,9 @@ none — `BitError` *is* the error; constructing it cannot fail.
 
 Tests:
 
-- `test_bit_error_writable` — `print(e)` yields kind + op + detail.
-- `test_bit_error_reraise_transfer` — a caught error re-raises with `raise e^`.
-- `test_bit_error_op_names_call` — `op` names the failing call.
+- `test_error_writable` — `print(e)` yields kind + op + detail.
+- `test_error_reraise_transfer` — a caught error re-raises with `raise e^`.
+- `test_error_op_names_call` — `op` names the failing call.
 
 Implementation status:
 

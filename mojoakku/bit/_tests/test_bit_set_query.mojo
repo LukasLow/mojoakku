@@ -44,7 +44,9 @@ def test_bitset_capacity_ctor_is_a_hint_only() raises:
     var bits = BitSet(capacity=128)
     assert_equal(len(bits), 0)
     assert_equal(bits.count(), 0)
-    assert_equal(bits.capacity(), 128)
+    # A capacity hint guarantees at least the requested room; an implementation
+    # may round up, so assert the lower bound, not an exact value.
+    assert_true(bits.capacity() >= 128)
     assert_true(bits.is_empty())
 
 
@@ -85,6 +87,25 @@ def test_bitset_equality_ignores_capacity() raises:
     var other = BitSet()
     other.set(6)
     assert_false(small == other)
+
+
+def test_bitset_write_to_set_notation() raises:
+    # write_to prints a compact set notation, e.g. {0, 3, 5}.
+    var bits = BitSet()
+    bits.set(0)
+    bits.set(3)
+    bits.set(5)
+    var text = String(bits)
+    assert_true("0" in text)
+    assert_true("3" in text)
+    assert_true("5" in text)
+    assert_true("{" in text)
+    assert_true("}" in text)
+    # An empty set prints the empty notation, never a stray index.
+    var empty = BitSet()
+    var empty_text = String(empty)
+    assert_true("{" in empty_text)
+    assert_true("}" in empty_text)
 
 
 def main() raises:

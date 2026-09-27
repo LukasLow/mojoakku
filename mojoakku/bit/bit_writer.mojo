@@ -77,6 +77,6 @@ struct BitWriter(Copyable, Deinitable, Writable):
 #   w.write_bits(0b101, 3)     # bits 6..4 -> 1,0,1
 #   w.align()                  # zero-fill the rest of the byte
 #   var bytes = w.to_bytes()   # -> [0b1101_0000]
-#   print(w.bit_len())         # -> 4
+#   print(w.bit_len())         # -> 8 (4 written bits + 4 zero-filled by align)
 #   w.write_bit(False)         # writer stays usable
 # API-DOCS-END

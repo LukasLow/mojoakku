@@ -192,5 +192,14 @@ def test_bitwriter_count_range_raises() raises:
     assert_equal(w.byte_len(), 0)
 
 
+def test_bitwriter_write_to_hex() raises:
+    # write_to prints the writer's bytes as hex for debugging.
+    var w = BitWriter(BitOrder.MSB_FIRST)
+    w.write_bits(UInt64(0xFF), 8)
+    var text = String(w)
+    # The byte 0xFF appears in some hex form (upper or lower case).
+    assert_true("ff" in text or "FF" in text)
+
+
 def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()
