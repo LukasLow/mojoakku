@@ -8,7 +8,7 @@ from std.bit import bit_width
 # set_bits — insert a field into the inclusive [hi:lo] range of an integral
 # value. Generic over the carrier's dtype; the field bound is the carrier's own
 # width.
-def set_bits[dtype: DType](value: Scalar[dtype], hi: Int, lo: Int, field: Scalar[dtype]) raises BitError -> Scalar[dtype] where dtype.is_integral():
+def set_bits[dtype: DType](value: Scalar[dtype], hi: Int, lo: Int, field: Scalar[dtype]) raises BitError -> Scalar[dtype] where dtype.is_unsigned():
     var total_bits = Int(bit_width(~Scalar[dtype](0)))
     if lo < 0 or hi > total_bits - 1:
         raise BitError(
@@ -37,7 +37,7 @@ def set_bits[dtype: DType](value: Scalar[dtype], hi: Int, lo: Int, field: Scalar
 # Signature:
 #   def set_bits[dtype: DType](value: Scalar[dtype], hi: Int, lo: Int,
 #       field: Scalar[dtype]) raises BitError -> Scalar[dtype]
-#       where dtype.is_integral()
+#       where dtype.is_unsigned()
 # What it does:
 #   `value` is the carrier; `[hi:lo]` is the inclusive field, with
 #   `0 <= lo <= hi <= bit_width - 1`, where `bit_width` is the carrier's own

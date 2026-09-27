@@ -9,13 +9,19 @@ from std.bit import bit_width
 # being duplicated. It is not part of the public surface: `__init__.mojo` does
 # not re-export it.
 #
+# The mask is defined for **unsigned** integral carriers. Signed carriers are
+# deliberately excluded: `~Scalar[dtype](0)` is `-1` for a signed type, so
+# `bit_width(~0)` is 0 rather than the type width, and the mask/width derivation
+# would be wrong. The public `get_bits`/`set_bits` enforce the same
+# unsigned-only bound.
+#
 # The mask has a 1 in every bit position `lo..hi` and 0 elsewhere. A width equal
 # to the carrier's full width would require `1 << total_bits`, which is
 # undefined for a fixed-width integer, so the full-width case is special-cased
 # to all-ones instead of computing that shift. The carrier width comes from
 # `bit_width(~0)` — `bit_width(0)` is 0, not the type width, so it cannot be
 # used for the bound.
-def field_mask[dtype: DType](lo: Int, hi: Int) -> Scalar[dtype] where dtype.is_integral():
+def field_mask[dtype: DType](lo: Int, hi: Int) -> Scalar[dtype] where dtype.is_unsigned():
     var width = hi - lo + 1
     var total_bits = Int(bit_width(~Scalar[dtype](0)))
     if width >= total_bits:

@@ -101,9 +101,9 @@ from .bit_writer import BitWriter
 #   [lo, hi] with lo <= hi; lo > hi is BAD_RANGE and a negative bound is RANGE.
 #   `BitSet` byte serialisation is little-endian, LSB-first and minimal length.
 #   Ordering is explicit and per reader/writer, never global. The bitfield
-#   carrier is generic over any integral dtype; the field bound is the carrier's
-#   own width. Names are snake_case for functions and methods, CamelCase for
-#   types and SCREAMING_CASE for comptime constants. There are no sentinels —
-#   absence is Optional and a bad input is a typed error — and no hidden global
-#   state.
+#   carrier is generic over any unsigned integral dtype; the field bound is the
+#   carrier's own width. Names are snake_case for functions and methods,
+#   CamelCase for types and SCREAMING_CASE for comptime constants. There are no
+#   sentinels — absence is Optional and a bad input is a typed error — and no
+#   hidden global state.
 # API-DOCS-END

@@ -77,13 +77,16 @@ def test_bitset_complement_negative_width_raises() raises:
     assert_equal(kind, BitErrorKind.RANGE)
 
     caught = False
+    var op = ""
     try:
         a.complement_with(-1)
     except e:
         caught = True
         kind = e.kind
+        op = e.op
     assert_true(caught)
     assert_equal(kind, BitErrorKind.RANGE)
+    assert_equal(op, "complement_with")
 
 
 def test_bitset_complement_narrower_than_set() raises:

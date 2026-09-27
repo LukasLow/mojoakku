@@ -202,7 +202,7 @@ release-1 deferral records are preserved in git history (phase-13 commit
 - **Generic bitfield carriers** — Rust `T::BITS`, Go width-in-the-name
   (`rust.md` §7, `go.md` §7). `get_bits` / `set_bits` become generic over
   `[dtype: DType]` with a `Scalar[dtype]` carrier constrained by
-  `where dtype.is_integral()` (verified: `Scalar[dtype]` shifts and `bit_width`
+  `where dtype.is_unsigned()` (verified: `Scalar[dtype]` shifts and `bit_width`
   work under a `dtype` parameter). The field bound is now the carrier's own width
   (`hi <= bit_width - 1`) instead of a hard-coded 63, so `UInt8` fields go to 7,
   `UInt16` to 15, `UInt64` to 63 unchanged. Every existing `UInt64` call keeps
@@ -279,7 +279,7 @@ raises what:
 | --- | --- | --- |
 | `BitSet` index setters (`set`, `clear`, `toggle`, `set_to`, `test`), range setters (`set_range`, `clear_range`, `toggle_range`) and `complement` / `complement_with` | `BitError` | `RANGE` (negative index / negative `lo` / negative `width`), `BAD_RANGE` (`lo > hi`) |
 | `BitSet` queries (`find_next`, `count`, `is_empty`, `all`, `any`, `none`, `is_subset_of`, `is_superset_of`, `is_disjoint`, `to_list`, `reserve`, `shrink`, `clear_all`, `__len__`, `capacity`) and algebra (`union`, `intersection`, `difference`, `symmetric_difference`, `*_with`) | none | — |
-| `get_bits` / `set_bits` | `BitError` | `RANGE` (`lo < 0` or `hi > 63`), `BAD_RANGE` (`hi < lo`), `OVERFLOW` (`set_bits` field does not fit) |
+| `get_bits` / `set_bits` | `BitError` | `RANGE` (`lo < 0` or `hi > bit_width - 1`), `BAD_RANGE` (`hi < lo`), `OVERFLOW` (`set_bits` field does not fit) |
 | `BitReader.read_bit` | `BitError` | `EOF` (no bits remaining) |
 | `BitReader.read_bits` | `BitError` | `EOF` (not enough bits), `RANGE` (`count < 1` or `count > 64`) |
 | `BitReader.align`, `bit_pos`, `bits_left`, `has_bits`, `order` | none | — |
@@ -864,13 +864,13 @@ Signature:
 ```mojo
 def get_bits[dtype: DType](value: Scalar[dtype], hi: Int, lo: Int)
     raises BitError -> Scalar[dtype]
-    where dtype.is_integral()
+    where dtype.is_unsigned()
 ```
 
 Semantics:
 
 - **Parameters / preconditions:** `value` is the carrier of type `Scalar[dtype]`
-  for any integral `dtype`; `[hi:lo]` is the inclusive field with
+  for any **unsigned** integral `dtype`; `[hi:lo]` is the inclusive field with
   `0 <= lo <= hi <= bit_width - 1`, where `bit_width` is the carrier's own width
   (`bit_width(~0)`; 8/16/32/64). `lo < 0` or `hi > bit_width - 1` raises `RANGE`;
   `hi < lo` raises `BAD_RANGE`. The `dtype` parameter is inferred from `value` or
@@ -895,7 +895,7 @@ Tests:
 - `test_get_bits_crossing_nibble` — a field spanning a nibble boundary.
 - `test_get_bits_full_width` — `[63:0]` returns `value`; the mask special-case
   at `hi == 63`.
-- `test_get_bits_out_of_range_raises` — `RANGE` for `lo < 0` / `hi > 63`.
+- `test_get_bits_out_of_range_raises` — `RANGE` for `lo < 0` / `hi > bit_width - 1`.
 - `test_get_bits_reversed_raises` — `BAD_RANGE` for `hi < lo`.
 - `test_get_bits_uint8` / `test_get_bits_uint16_uint32` — per-width carriers.
 - `test_get_bits_uint64_unchanged` — release-1 UInt64 behaviour preserved.
@@ -927,13 +927,13 @@ Signature:
 ```mojo
 def set_bits[dtype: DType](value: Scalar[dtype], hi: Int, lo: Int,
     field: Scalar[dtype]) raises BitError -> Scalar[dtype]
-    where dtype.is_integral()
+    where dtype.is_unsigned()
 ```
 
 Semantics:
 
 - **Parameters / preconditions:** `value` is the carrier of type `Scalar[dtype]`
-  for any integral `dtype`; `[hi:lo]` is the inclusive field
+  for any **unsigned** integral `dtype`; `[hi:lo]` is the inclusive field
   (`0 <= lo <= hi <= bit_width - 1`); `field` is the value to insert into that
   range, in the carrier's own type. `lo < 0` or `hi > bit_width - 1` raises
   `RANGE`; `hi < lo` raises `BAD_RANGE`. If `field` has any bit set above the
@@ -949,7 +949,7 @@ Semantics:
 
 Errors:
 
-- `RANGE` — `lo < 0` or `hi > 63`.
+- `RANGE` — `lo < 0` or `hi > bit_width - 1`.
 - `BAD_RANGE` — `hi < lo`.
 - `OVERFLOW` — `field` does not fit in the field width.
 
@@ -1194,6 +1194,7 @@ value with no bits and is rejected as meaningless.`
 | Container equality ignores capacity | `java.md` §10, `go.md` §3 | `BitSet.__eq__` |
 | Stdlib-first scalar layer (wrap `std.bit`) | `mojov1/stdlib/bit` | Dependencies; Purpose |
 | No `unsafe_*` bit API | `c.md` §11, `js-ts.md` §11 | Non-Goals |
-| Generic widths are a Non-Goal | `rust.md` §7, `go.md` §7 | Non-Goals; `get_bits`/`set_bits` |
-| `complement` deferred (width semantics) | `c.md` §10, `julia.md` §12, `go.md` §3 | Non-Goals |
-| `BitSet` byte serialisation deferred | `go.md` §3, `java.md` §3 | Non-Goals |
+| Generic (unsigned) widths | `rust.md` §7, `go.md` §7 | Release 2 additions; `get_bits`/`set_bits` |
+| `complement` (explicit width) | `c.md` §10, `julia.md` §12, `go.md` §3 | Release 2 additions; `BitSet.complement` |
+| `BitSet` byte serialisation | `go.md` §3, `java.md` §3 | Release 2 additions; `BitSet.to_bytes`/`from_bytes` |
+| Full iteration over set bits | `julia.md` §3, `go.md` §3, `js-ts.md` §3 | Release 2 additions; `BitSet.__iter__`/`BitSetIter` |
