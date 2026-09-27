@@ -1,11 +1,31 @@
-from std.os import abort
-
 from .bit_error import BitError
+from .bit_error_kind import BitErrorKind
+from bit._internal.field_mask import field_mask
 
 
 # set_bits — insert a field into the inclusive [hi:lo] range of a UInt64.
 def set_bits(value: UInt64, hi: Int, lo: Int, field: UInt64) raises BitError -> UInt64:
-    abort("MojoAkku: this API is not yet implemented")
+    if lo < 0 or hi > 63:
+        raise BitError(
+            BitErrorKind.RANGE,
+            "set_bits",
+            "field bounds must satisfy 0 <= lo and hi <= 63",
+        )
+    if hi < lo:
+        raise BitError(BitErrorKind.BAD_RANGE, "set_bits", "hi is less than lo")
+    var width = hi - lo + 1
+    # A field with any bit above the field width does not fit: raise instead of
+    # silently truncating. `width == 64` is the whole carrier, so nothing can
+    # be above it and no `field >> 64` shift is evaluated.
+    if width < 64 and (field >> UInt64(width)) != UInt64(0):
+        raise BitError(
+            BitErrorKind.OVERFLOW,
+            "set_bits",
+            "field has bits above the field width",
+        )
+    var mask = field_mask(lo, hi)
+    return (value & ~mask) | (field << UInt64(lo))
+
 
 # API-DOCS-START
 # set_bits — insert a field into the inclusive bit range [hi:lo] of a value.

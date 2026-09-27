@@ -31,7 +31,9 @@ def test_bitset_set_range_word_boundary() raises:
     assert_true(bits.test(63))
     assert_true(bits.test(64))
     assert_true(bits.test(65))
-    assert_false(bits.test(66))
+    # Inclusive [62, 66] sets bit 66 too; bit 67 is beyond the addressed range.
+    assert_true(bits.test(66))
+    assert_false(bits.test(67))
     assert_equal(bits.count(), 5)
     assert_equal(len(bits), 67)
     assert_equal(bits.to_list(), ints_of(62, 63, 64, 65, 66))

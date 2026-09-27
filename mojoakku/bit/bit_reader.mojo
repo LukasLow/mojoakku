@@ -1,6 +1,5 @@
-from std.os import abort
-
 from .bit_error import BitError
+from .bit_error_kind import BitErrorKind
 from .bit_order import BitOrder
 
 
@@ -11,28 +10,82 @@ struct BitReader[origin: Origin[mut=False]](Deinitable):
     var _bit_pos: Int
 
     def __init__(out self, buffer: Span[UInt8, Self.origin], order: BitOrder):
-        abort("MojoAkku: this API is not yet implemented")
+        self._buffer = buffer
+        self._order = order
+        self._bit_pos = 0
 
     def read_bit(mut self) raises BitError -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        if self._bit_pos >= len(self._buffer) * 8:
+            raise BitError(
+                BitErrorKind.EOF, "read_bit", "no bits remain in the buffer"
+            )
+        var bit = self._bit_at(self._bit_pos)
+        self._bit_pos += 1
+        return bit
 
     def read_bits(mut self, count: Int) raises BitError -> UInt64:
-        abort("MojoAkku: this API is not yet implemented")
+        if count < 1 or count > 64:
+            raise BitError(
+                BitErrorKind.RANGE,
+                "read_bits",
+                "count must be between 1 and 64",
+            )
+        var total = len(self._buffer) * 8
+        # Atomic: check availability before advancing _bit_pos, so an EOF
+        # leaves the reader unchanged and the caller can retry with a smaller
+        # count.
+        if self._bit_pos + count > total:
+            raise BitError(
+                BitErrorKind.EOF,
+                "read_bits",
+                "not enough bits remain in the buffer",
+            )
+        var value = UInt64(0)
+        var msb = self._order == BitOrder.MSB_FIRST
+        for i in range(count):
+            var bit = self._bit_at(self._bit_pos)
+            self._bit_pos += 1
+            var place = i
+            if msb:
+                place = count - 1 - i
+            if bit:
+                value |= UInt64(1) << UInt64(place)
+        return value
 
     def align(mut self):
-        abort("MojoAkku: this API is not yet implemented")
+        var total = len(self._buffer) * 8
+        var next = (self._bit_pos + 7) // 8 * 8
+        # Clamp to the total bit count so bits_left never goes negative.
+        if next > total:
+            next = total
+        self._bit_pos = next
 
     def bit_pos(self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._bit_pos
 
     def bits_left(self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return len(self._buffer) * 8 - self._bit_pos
 
     def has_bits(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self.bits_left() > 0
 
     def order(self) -> BitOrder:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._order
+
+    # ----------------------------------------------------------------------
+    # Private helpers (not part of the public surface).
+    # ----------------------------------------------------------------------
+
+    def _bit_at(self, pos: Int) -> Bool:
+        # MSB_FIRST visits bit 7 of a byte first; LSB_FIRST visits bit 0 first.
+        var byte_index = pos // 8
+        var bit_in_byte = pos % 8
+        var shift: UInt8
+        if self._order == BitOrder.MSB_FIRST:
+            shift = UInt8(7 - bit_in_byte)
+        else:
+            shift = UInt8(bit_in_byte)
+        return ((self._buffer[byte_index] >> shift) & UInt8(1)) == UInt8(1)
 
 # API-DOCS-START
 # BitReader — read individual bits and up to 64-bit groups from borrowed bytes.

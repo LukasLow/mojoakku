@@ -392,7 +392,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -448,7 +448,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -512,7 +512,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -716,7 +716,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -772,7 +772,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -826,7 +826,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -921,7 +921,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -1015,7 +1015,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 

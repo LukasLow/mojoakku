@@ -1,11 +1,23 @@
-from std.os import abort
-
 from .bit_error import BitError
+from .bit_error_kind import BitErrorKind
+from bit._internal.field_mask import field_mask
 
 
 # get_bits — extract the inclusive field [hi:lo] of a UInt64, right-aligned.
 def get_bits(value: UInt64, hi: Int, lo: Int) raises BitError -> UInt64:
-    abort("MojoAkku: this API is not yet implemented")
+    if lo < 0 or hi > 63:
+        raise BitError(
+            BitErrorKind.RANGE,
+            "get_bits",
+            "field bounds must satisfy 0 <= lo and hi <= 63",
+        )
+    if hi < lo:
+        raise BitError(BitErrorKind.BAD_RANGE, "get_bits", "hi is less than lo")
+    # Shift the field down so its least significant bit is bit 0, then keep
+    # only the field's `hi - lo + 1` bits. `field_mask` guards the width-64
+    # case (a `1 << 64` shift).
+    return (value & field_mask(lo, hi)) >> UInt64(lo)
+
 
 # API-DOCS-START
 # get_bits — extract the inclusive bit field [hi:lo] of a value, right-aligned.

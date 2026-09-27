@@ -1,6 +1,3 @@
-from std.os import abort
-
-
 # BitErrorKind — compile-time discriminant for BitError.
 struct BitErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     var _id: UInt8
@@ -11,7 +8,7 @@ struct BitErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
 
     # Written explicitly so equality compares the discriminant only.
     def __eq__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._id == other._id
 
     comptime RANGE     = BitErrorKind(0)   # an index/position/count is outside its addressable span
     comptime BAD_RANGE = BitErrorKind(1)   # a range is specified backwards (hi < lo)
@@ -21,7 +18,18 @@ struct BitErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
 
     # write_to — symbolic name, not the numeric _id.
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        # Symbolic names, not the numeric _id. An if/elif chain is used because
+        # the `comptime NAME[...]` runtime-index form does not compile.
+        if self._id == 0:
+            writer.write("RANGE")
+        elif self._id == 1:
+            writer.write("BAD_RANGE")
+        elif self._id == 2:
+            writer.write("OVERFLOW")
+        elif self._id == 3:
+            writer.write("EOF")
+        else:
+            writer.write("OTHER")
 
 # API-DOCS-START
 # BitErrorKind — the machine-testable reason a bit operation failed.

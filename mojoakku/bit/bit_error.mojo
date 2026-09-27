@@ -1,5 +1,3 @@
-from std.os import abort
-
 from .bit_error_kind import BitErrorKind
 
 
@@ -11,7 +9,7 @@ struct BitError(Copyable, Deinitable, Writable):
     var detail: String
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write("BitError(", self.kind, ", op=", self.op, ", detail=", self.detail, ")")
 
 # API-DOCS-START
 # BitError — the one typed error every fallible bit operation declares.

@@ -113,7 +113,10 @@ def test_bitwriter_roundtrip_mixed_bit_and_bits() raises:
     assert_equal(msb_r.read_bits(3), UInt64(0b010))
     assert_false(msb_r.read_bit())
     assert_equal(msb_r.read_bits(5), UInt64(0b1_1111))
-    assert_false(msb_r.has_bits())
+    # 10 bits were written; to_bytes() emits whole bytes (16 bits), so 6
+    # byte-padding bits remain. (The writer is not byte-aligned, so the reader
+    # cannot know the logical length — it sees the padding.)
+    assert_equal(msb_r.bits_left(), 6)
 
     var lsb_w = BitWriter(BitOrder.LSB_FIRST)
     lsb_w.write_bit(True)
@@ -127,7 +130,8 @@ def test_bitwriter_roundtrip_mixed_bit_and_bits() raises:
     assert_equal(lsb_rr.read_bits(3), UInt64(0b010))
     assert_false(lsb_rr.read_bit())
     assert_equal(lsb_rr.read_bits(5), UInt64(0b1_1111))
-    assert_false(lsb_rr.has_bits())
+    # Same as the MSB case: 6 byte-padding bits remain.
+    assert_equal(lsb_rr.bits_left(), 6)
 
 
 def test_bitwriter_roundtrip_full_width_64() raises:

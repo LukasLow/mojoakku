@@ -1,6 +1,3 @@
-from std.os import abort
-
-
 # BitOrder — the sequence in which the bits of a byte are visited.
 struct BitOrder(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     var _id: UInt8
@@ -11,14 +8,18 @@ struct BitOrder(Equatable, ImplicitlyCopyable, Deinitable, Writable):
 
     # Written explicitly so equality compares the discriminant only.
     def __eq__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._id == other._id
 
     comptime MSB_FIRST = BitOrder(0)   # most significant bit of a byte first (bit 7 .. bit 0)
     comptime LSB_FIRST = BitOrder(1)   # least significant bit of a byte first (bit 0 .. bit 7)
 
     # write_to — symbolic name, not the numeric _id.
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        # Symbolic names, not the numeric _id (0 = MSB_FIRST, 1 = LSB_FIRST).
+        if self._id == 0:
+            writer.write("MSB_FIRST")
+        else:
+            writer.write("LSB_FIRST")
 
 # API-DOCS-START
 # BitOrder — the sequence in which the bits of a byte are read or written.
