@@ -5,6 +5,18 @@ All notable changes to MojoAkku are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions stay on `0.x.y`; major is never bumped.
 
+## v0.3.0 - 2026-09-27
+
+### Added
+
+- io — byte stream library (Phase 13 GO). 15-entry public API: a closed IoErrorKind discriminant; IoError (kind/op/detail); ReadResult {count, eof} as explicit EOF (no -1/0/null sentinel); SeekFrom; the Reader and ByteWriter traits (one required buffer method + provided helpers) and the optional Seeker trait; and the adapters Cursor, SpanCursor, BufferedReader, BufferedWriter (explicit fallible flush/close), LimitReader, TeeReader, MultiReader, plus the free copy pump. Read targets are MutSpan[UInt8, _], write inputs Span[UInt8, _] (borrowed); streams own their state; one typed error; blocking core (no async). Fills the stdlib's missing read side (the stdlib has Writer/Writable but no Reader trait). 75 tests, 0 failing; compile gate green; missingMojo clean.
+
+### Changed
+
+- workflows — align phases 1-8 with the canonical `_dev/` layout (research in `_dev/`, persistent `_dev/DESIGN.md`, no `.research/`, no temporary `<LIB>_DESIGN.md`).
+- workflows — PR-only model: one long-lived branch `<lib>-library` per library and exactly one pull request per library; `main` is never written directly. Phase 1 creates the branch, every phase commits to it, CreatePR opens the single PR after Phase 13.
+- workflows — fix the Phase 7/8 wording: the inline `# API-DOCS` blocks use the `LibraryLayout.md` end-user field set (summary, Signature, What it does, Returns, Errors, Example), NOT the seven design fields (those stay in `_dev/DESIGN.md`).
+
 ## v0.2.0 - 2026-09-26
 
 ### Changed
