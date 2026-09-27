@@ -44,11 +44,12 @@ struct BitError(Copyable, Deinitable, Writable):
 # Errors:
 #   none — BitError *is* the error; constructing it cannot fail.
 # Example:
+#   var bits = BitSet()
 #   try:
-#       _ = bits.count_at(70)
+#       bits.set(-1)          # a negative index raises
 #   except e:
 #       print(e.kind)      # -> RANGE
-#       print(e.op)        # -> names the failing call
+#       print(e.op)        # -> set
 #       print(e.detail)    # -> opaque context
 #   # Re-raise a caught error by transfer:
 #   #   except e:
