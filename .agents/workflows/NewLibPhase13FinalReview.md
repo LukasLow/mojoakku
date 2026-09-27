@@ -45,7 +45,7 @@ Serve as the end-to-end gate proving that docs, API, tests and implementation fo
 
 ## Review Gate
 
-- Go only if: docs, API, tests and implementation are consistent; test evidence shows `X passed, 0 failed`; every used dependency edge is documented; and no blocking findings remain.
+- Go only if: docs, API, tests and implementation are consistent; test evidence shows `X passed, 0 failed`; every used dependency edge is documented; the `_dev/TODO.md` backlog is accurate (shipped items removed, remaining candidates listed); and no blocking findings remain.
 - No-go returns to the specific failing phase (Design, Docs, Scaffold, Tests or Implementation) with the blocking findings attached.
 - The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
 

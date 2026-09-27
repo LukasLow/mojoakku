@@ -19,7 +19,3 @@ state. Format and rules: `.agents/workflows/LibraryLayout.md`.
 - `custom alphabets` — an `Alphabet::new`-style user-supplied symbol table. (origin: `rust.md` §11)
 - `exotic variants` — Crockford base32, BIN_HEX, BCRYPT, IMAP-MUTF7. (origin: `rust.md` §11; `cpp.md` §7)
 - `decode casefold policy` — a lenient cross-case decode option. (origin: `perl.md` §11; `cpp.md` §7; `python.md` §7)
-
-## Research follow-ups (not API)
-
-- `Go base32 decode case sensitivity` — verify against the Go source whether lowercase base32 is rejected; the current citation is a GUESS. (origin: `go.md` §7; `_dev/DESIGN.md` Open Questions)

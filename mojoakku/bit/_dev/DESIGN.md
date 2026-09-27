@@ -328,15 +328,18 @@ No operation is fatal and none aborts.
 
 ## Open Questions
 
-None block this design. The two items that could have been open are closed
-explicitly as **release-1 Non-Goals** with rationale above:
+None block this design. Two items were open in release 1 and are now **closed by
+the Release 2 additions** (see that section above):
 
-- *Generic integer widths for the bitfield carrier* → Non-Goal for release 1;
-  carrier fixed to `UInt64`. Revisit with a verified Mojo integer-conversion
-  trait; the `get_bits`/`set_bits` names stay stable so widening later is
-  additive.
-- *A full `__iter__` over set bits* → Non-Goal for release 1; `find_next` +
-  `to_list` cover the need. Adding `Iterable`/`Iterator` later is additive.
+- *Generic integer widths for the bitfield carrier* → **shipped in release 2**
+  as `get_bits`/`set_bits[dtype]` over unsigned `Scalar[dtype]`. Signed carriers
+  remain a backlog item (`_dev/TODO.md`).
+- *A full `__iter__` over set bits* → **shipped in release 2** as
+  `BitSet.__iter__` / `BitSetIter`. The `find_next` primitive and `to_list`
+  convenience remain.
+
+All indices and lengths are in bits. Release-1 carriers were `UInt64`; release 2
+generalises the bitfield carrier to any unsigned integral `Scalar[dtype]`.
 
 ---
 
@@ -352,8 +355,9 @@ explicitly as **release-1 Non-Goals** with rationale above:
 - **Set bit** — a bit whose value is 1; its index is what `find_next`/`to_list`
   return.
 
-All indices and lengths are in bits. All carriers in release 1 are `UInt64`;
-signed/sub-word carriers are a documented Non-Goal.
+All indices and lengths are in bits. Release-1 carriers were `UInt64`; the
+release-2 bitfield carrier is any unsigned integral `Scalar[dtype]`. Signed
+carriers are a backlog item (`_dev/TODO.md`).
 
 ---
 

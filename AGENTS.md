@@ -79,16 +79,16 @@ Every library carries a backlog at `mojoakku/<lib>/_dev/TODO.md`. It is the
 home for **every API the research showed is theoretically possible in Mojo but
 which the current implementation did not ship** — deferred entry points, later
 variants, ideas surfaced in `_dev/<lang>.md` / `_dev/DESIGN.md` that were
-consciously left out. The workflow keeps it in sync (see
-`NewLibPhase1Research.md`, `NewLibPhase3Design.md`, `NewLibPhase7Scaffold.md`
-and `NewLibPhase13FinalReview.md`).
+consciously left out. The phase workflows keep it in sync (Phase 1 seeds it,
+Phase 3 classifies, Phase 4 reviews it, Phase 7 ensures it exists, Phase 11
+records anything not shipped, Phase 13 audits it; `CreatePR.md` requires it).
 
 Rules:
 
-- **The catalogue is a live backlog, not a history.** A finished item is
-  **removed** from the file, never struck through and never marked done. An
-  empty `TODO.md` is a valid and expected state — it means the library has no
-  open, researched-but-unshipped ideas.
+- **The backlog is live, not a history.** A finished item is **removed** from
+  the file, never struck through and never marked done. An empty `TODO.md` is a
+  valid and expected state — it means the library has no open,
+  researched-but-unshipped ideas.
 - **Anything deferred must be recorded here**, not only in prose inside
   `DESIGN.md`. If a Non-Goal, an Open Question or a "future addition" is a
   concrete API candidate, it belongs in `TODO.md` as one line.

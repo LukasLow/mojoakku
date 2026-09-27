@@ -56,7 +56,7 @@ Derive the Mojo public API for `<lib>` from the reviewed research and record eve
 
 ## Artifacts / Outputs
 - `mojoakku/<lib>/_dev/DESIGN.md` containing the derived design: shared sections (purpose, dependencies, goals, non-goals, reference APIs, public API list, error surface, conventions, ownership/lifecycle) plus one block per API entry with the seven fields and per-decision justifications. This is the persistent design record; `NewLibPhase7Scaffold.md` materialises it into the tree and keeps it (see `LibraryLayout.md`).
-- `mojoakku/<lib>/_dev/TODO.md` updated: every deferred API candidate that is theoretically possible in Mojo but not in scope is recorded there (one line, with research origin), moved out of the seed backlog already shipped.
+- `mojoakku/<lib>/_dev/TODO.md` updated: every deferred API candidate that is theoretically possible in Mojo but not in scope is recorded there (one line, with research origin); any seed item the design now ships is removed.
 - An explicit list of decisions NOT copied from other languages.
 - A `## Open Questions` list, ideally empty at handoff.
 - A recorded user verdict on the public API (approved / changes requested and applied).

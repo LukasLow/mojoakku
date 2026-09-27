@@ -45,7 +45,7 @@ Review the scaffold produced by `NewLibPhase7Scaffold.md` and decide whether the
 
 ## Review Gate
 
-- Go only if: the scaffold compiles, every public API from the inline `# API-DOCS` blocks has a stub with its docs block, all stubs abort with the standard "not yet implemented" message, `_tests/` exists without `__init__.mojo`, `Taskfile.yml` runs the tests, `_dev/DESIGN.md` is present, and no implementation leaked.
+- Go only if: the scaffold compiles, every public API from the inline `# API-DOCS` blocks has a stub with its docs block, all stubs abort with the standard "not yet implemented" message, `_tests/` exists without `__init__.mojo`, `Taskfile.yml` runs the tests, `_dev/DESIGN.md` and `_dev/TODO.md` are present, and no implementation leaked.
 - Any missing symbol, compilation error, missing docs block, silently faked return value or leaked implementation is a blocking finding and returns to `NewLibPhase7Scaffold.md`.
 - The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
 

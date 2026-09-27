@@ -52,6 +52,7 @@ Create the compile-ready skeleton for `mojoakku/<lib>/` from the approved design
 - `mojoakku/<lib>/_tests/` (no `__init__.mojo`)
 - `mojoakku/<lib>/Taskfile.yml` — per-library `test` (and optional `compile`) task.
 - `mojoakku/<lib>/_dev/DESIGN.md` — the persistent design record (kept in place).
+- `mojoakku/<lib>/_dev/TODO.md` — the per-library backlog (created if not already seeded).
 - A successful compile/check result as evidence.
 - One `.agents/log.md` entry recording the phase result and the compile evidence.
 - One git commit for the phase.
