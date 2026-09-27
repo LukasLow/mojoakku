@@ -1,0 +1,29 @@
+== mojo run -I mojoakku mojoakku/io/_tests/test_io_buffered_reader.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/io/buffered_reader.mojo:17:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/io/_tests/test_io_buffered_writer.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/io/buffered_writer.mojo:15:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/io/_tests/test_io_byte_writer.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/io/byte_writer.mojo:11:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/io/_tests/test_io_copy.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/io/copy.mojo:9:10: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/io/_tests/test_io_cursor.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/io/cursor.mojo:17:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/io/_tests/test_io_error.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/io/io_error_kind.mojo:14:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/io/_tests/test_io_limit_reader.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/io/limit_reader.mojo:15:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/io/_tests/test_io_multi_reader.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/io/multi_reader.mojo:15:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/io/_tests/test_io_reader.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/io/reader.mojo:12:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/io/_tests/test_io_seek.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/io/seek_from.mojo:24:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/io/_tests/test_io_tee_reader.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/io/span_cursor.mojo:16:14: MojoAkku: this API is not yet implemented
+--------
+baseline: 11 files, 0 passed, 11 failed
+  failures: 11 stub abort, 0 compile/import error, 0 other
+note: the suite holds 75 test functions across 11 files. A stub
+      `abort` stops the process on its first call, so no per-test
+      passed/failed count is reachable in the red phase; the file count
+      (11) is the honest measure.

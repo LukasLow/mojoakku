@@ -1,0 +1,66 @@
+version: '3'
+
+# Per-library Taskfile for mojoakku/io.
+#
+# Runs every test in _tests/ with `mojo run`. There is no `mojo test`: each test
+# file is a program with its own main(). The runner stops on the first failing
+# file and exits non-zero when any test fails.
+#
+# Mojo runs inside the smd container, where `mojo` is installed globally.
+# The per-library Taskfile runs from mojoakku/io/, so `-I ..` puts the
+# package root (mojoakku/) on the import path and a test can write
+# `from io import ...`.
+
+silent: true
+
+tasks:
+
+  default:
+    desc: 'Run the io test suite (same as `task test`).'
+    cmds:
+      - task: test
+
+  # --------------------------------------------------------------------------
+  # test — run every _tests/*.mojo with `mojo run`, stop on the first failure.
+  # Exits 0 when _tests/ is empty or every test passes, non-zero otherwise.
+  # `dir` pins the working directory to this Taskfile's own folder, so the task
+  # behaves the same whether run here or dispatched from the root Taskfile.
+  # --------------------------------------------------------------------------
+  test:
+    desc: 'Run every _tests/*.mojo with mojo run; stop and fail on the first error.'
+    dir: '{{.TASKFILE_DIR}}'
+    cmds:
+      - |
+        set -e
+        found=""
+        for f in _tests/*.mojo; do
+          [ -f "$f" ] || continue
+          found="yes"
+          echo "== $f"
+          mojo run -I .. "$f"
+        done
+        if [ -z "$found" ]; then
+          echo "No tests yet in _tests/ (nothing to run)."
+        else
+          echo "All io tests passed."
+        fi
+
+  # --------------------------------------------------------------------------
+  # compile — the Phase-7/9 compile gate.
+  #
+  # `mojo precompile .` cannot be used directly here: the package directory
+  # contains `_tests/`, whose files define `main()` and are rejected inside a
+  # package. The container also has no C compiler for `mojo build`. The gate
+  # therefore compiles a consumer that imports the whole public surface (JIT),
+  # which type-checks every API .mojo file and the package entry point.
+  # --------------------------------------------------------------------------
+  compile:
+    desc: 'Type-check the public API via a consumer import (JIT).'
+    dir: '{{.TASKFILE_DIR}}'
+    cmds:
+      - |
+        set -e
+        mkdir -p ../../.tmp
+        printf 'from io import (IoErrorKind, IoError, ReadResult, SeekFrom, Reader, ByteWriter, Seeker, Cursor, SpanCursor, BufferedReader, BufferedWriter, LimitReader, TeeReader, MultiReader, copy)\n\ndef main():\n    pass\n' > ../../.tmp/io_check.mojo
+        mojo run -I .. ../../.tmp/io_check.mojo
+        echo "io public API compiles."
