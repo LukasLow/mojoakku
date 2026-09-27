@@ -32,7 +32,7 @@ Implement the real bodies in the `mojoakku/<lib>/*.mojo` API files (and, only wh
 4. Run the tests after each increment (`run tests -> fix -> run tests`) and track the failing count trending to zero.
 5. Stop only when the run reports 0 failing tests; record the final passing count.
 6. Implement documented edge-case handling explicitly: EOF, `EINTR`/`EAGAIN`, non-blocking, ownership/close, timeouts, invalid input.
-7. If a needed API is missing from the inline `# API-DOCS` blocks, do not silently invent it: return to `NewLibPhase3Design.md` / `NewLibPhase5Docs.md`, document and justify it, then resume here.
+7. If a needed API is missing from the inline `# API-DOCS` blocks, do not silently invent it: return to `NewLibPhase3Design.md` / `NewLibPhase5Docs.md`, document and justify it, then resume here. If an API that **was** designed turns out to be implementable in Mojo but is consciously not shipped in this pass (e.g. it does not compile and is deferred), it must be recorded in `mojoakku/<lib>/_dev/TODO.md` as one line with its research origin — never dropped silently and never faked with a stub left behind.
 8. Keep dependency edges within the documented direction; never introduce a nested library structure under `mojoakku/<lib>/`.
 9. Preserve `_tests/` unchanged; if a test seems wrong, return to `NewLibPhase9Tests.md` instead of editing it.
 10. Commit implementation and the final green test log with a message naming the phase (e.g. `base64 phase 11: implementation, 0 failing`).
@@ -41,6 +41,7 @@ Implement the real bodies in the `mojoakku/<lib>/*.mojo` API files (and, only wh
 
 - Implemented `mojoakku/<lib>/*.mojo` API files (real bodies + docs blocks preserved).
 - `mojoakku/<lib>/_internal/` implementation files only if shared code was factored out.
+- `mojoakku/<lib>/_dev/TODO.md` updated: any designed API not shipped in this pass is recorded there (one line, with research origin), and any backlog item that shipped is removed.
 - Final test log showing 0 failing tests with the exact command.
 - Notes on edge-case handling and any documented API additions.
 - One git commit for the phase.

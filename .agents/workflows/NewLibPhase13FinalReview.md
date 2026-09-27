@@ -32,19 +32,20 @@ Serve as the end-to-end gate proving that docs, API, tests and implementation fo
 4. Verify test integrity across the whole history: `_tests/` matches the reviewed baseline, no post-review weakening.
 5. Verify each dependency edge used by the library is documented and justified in the depending library's docs, and that no physical nesting exists.
 6. Confirm the library directory layout is complete and independent: `__init__.mojo`, one `.mojo` file per public API entry directly under `mojoakku/<lib>/` (no `api/`, no `API.mojo`, no `src/`), optional `_internal/` only if shared code exists, `_tests/` (without `__init__.mojo`), `Taskfile.yml`.
-7. Assemble the open follow-ups list (non-blocking defects, deferred APIs, doc gaps) with owner and severity.
-8. Issue the explicit go/no-go decision.
-9. If go, Manager commits the phase with a message naming the phase and decision (e.g. `base64 phase 13: final review GO`).
+7. Confirm the backlog `mojoakku/<lib>/_dev/TODO.md` is accurate: every shipped API has been **removed** from it (never struck through), every researched-but-unshipped candidate is present with its research origin, and an empty file is accepted only when nothing is outstanding. This is the moment the backlog is the true "what is left" list for the library.
+8. Assemble the open follow-ups list (non-blocking defects, deferred APIs, doc gaps) with owner and severity — the deferred-API half of this list must match `_dev/TODO.md`.
+9. Issue the explicit go/no-go decision.
+10. If go, Manager commits the phase with a message naming the phase and decision (e.g. `base64 phase 13: final review GO`).
 
 ## Artifacts / Outputs
 
-- Final review report: consistency matrix, test evidence (`X passed, 0 failed`), dependency-edge audit, layout audit.
+- Final review report: consistency matrix, test evidence (`X passed, 0 failed`), dependency-edge audit, layout audit, backlog audit (`_dev/TODO.md`).
 - Explicit go/no-go decision and the list of open follow-ups.
 - One git commit for the phase.
 
 ## Review Gate
 
-- Go only if: docs, API, tests and implementation are consistent; test evidence shows `X passed, 0 failed`; every used dependency edge is documented; and no blocking findings remain.
+- Go only if: docs, API, tests and implementation are consistent; test evidence shows `X passed, 0 failed`; every used dependency edge is documented; the `_dev/TODO.md` backlog is accurate (shipped items removed, remaining candidates listed); and no blocking findings remain.
 - No-go returns to the specific failing phase (Design, Docs, Scaffold, Tests or Implementation) with the blocking findings attached.
 - The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
 

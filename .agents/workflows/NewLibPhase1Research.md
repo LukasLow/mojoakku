@@ -68,17 +68,19 @@ Research the problem space for one new MojoAkku library across many reference la
    - `## Sources`
 6. Each `researcher` marks every statement with a citation to a source (URL, RFC number, or `repo/path:line`). Where no source could be found, the statement is written as `GUESS:` and the reason no source exists is stated.
 7. Manager waits for all `researcher` agents, then verifies completeness against the frozen selection of this run from Step 2: Mojo is satisfied by the `mojov1` buch and every other selected language must have its `_dev/<lang>.md` file present and non-empty, exactly one file per selected language.
-8. Manager appends a status line to `.agents/log.md` via `agentlog` naming `<lib>`, the languages covered, and the research directory.
-9. Manager commits the phase: stages `mojoakku/<lib>/_dev/` and commits with a message naming the phase and the covered languages (e.g. `base64 phase 1: research corpus (9 languages + README)`).
-10. Manager hands the aggregate to the next workflow, where a `reviewer` will check completeness, contradictions, missing sources, and evidence-based cross-language conclusions.
+8. Manager creates the per-library backlog `mojoakku/<lib>/_dev/TODO.md` from the research: every API candidate the research showed is **theoretically possible in Mojo** but that the run does not intend to ship goes in as one line (name — one-phrase meaning — origin `<lang>.md` §N). This is the seed of the live backlog; see `LibraryLayout.md`, "The per-library backlog". At Phase 1 the design does not exist yet, so the list is generous — later phases move items out as they ship.
+9. Manager appends a status line to `.agents/log.md` via `agentlog` naming `<lib>`, the languages covered, and the research directory.
+10. Manager commits the phase: stages `mojoakku/<lib>/_dev/` (research files, `README.md` and `TODO.md`) and commits with a message naming the phase and the covered languages (e.g. `base64 phase 1: research corpus (9 languages + README)`).
+11. Manager hands the aggregate to the next workflow, where a `reviewer` will check completeness, contradictions, missing sources, and evidence-based cross-language conclusions.
 
 ## Artifacts / Outputs
 - `mojoakku/<lib>/_dev/<lang>.md` — one file per language in the frozen selection, written directly by the `researcher` of the owning group. No `docs` materialization pass exists.
 - Every file contains the 12 answer sections and a `Sources` section.
 - All sources are real and traceable; all unsourced statements are marked `GUESS:`.
+- `mojoakku/<lib>/_dev/TODO.md` — the seed backlog: every researched API candidate that is theoretically possible in Mojo but not in scope for this run, one line each (see `LibraryLayout.md`).
 - The Mojo side of the research is covered by the `mojov1` buch rather than by a generated `_dev/mojo.md`; if a `_dev/mojo.md` is kept, it only links to the buch pages instead of duplicating them.
 - One `.agents/log.md` entry recording the phase result.
-- One git commit for the phase containing the research directory.
+- One git commit for the phase containing the research directory (incl. `README.md` and `TODO.md`).
 
 ## Review Gate
 - `NewLibPhase1Research.md` is complete when every language of the frozen selection of this run (recorded in `_dev/README.md`) is covered — Mojo by the `mojov1` buch (optionally linked from `_dev/mojo.md`) and each other language by a non-empty `_dev/<lang>.md` — and every question is answered or explicitly marked `GUESS:`.

@@ -26,7 +26,7 @@ Review the scaffold produced by `NewLibPhase7Scaffold.md` and decide whether the
 
 ## Steps
 
-1. Confirm the library directory contains exactly the agreed layout: `__init__.mojo`, one `.mojo` file per public API entry directly under `mojoakku/<lib>/` (no `api/` directory, no `API.mojo`), optional `_internal/` only if shared code exists, `_dev/` (research + persistent `DESIGN.md`), `_tests/`, `Taskfile.yml`; and that `_dev/DESIGN.md` is still present.
+1. Confirm the library directory contains exactly the agreed layout: `__init__.mojo`, one `.mojo` file per public API entry directly under `mojoakku/<lib>/` (no `api/` directory, no `API.mojo`), optional `_internal/` only if shared code exists, `_dev/` (research + persistent `DESIGN.md` + `TODO.md`), `_tests/`, `Taskfile.yml`; and that `_dev/DESIGN.md` and `_dev/TODO.md` are still present.
 2. Confirm `mojoakku/<lib>/_tests/` exists and contains no `__init__.mojo` (tests are plain files, not a package).
 3. Compile the library via the consumer-import check (`mojo run -I .. <checkfile>` importing every public name) and confirm it compiles without errors.
 4. Enumerate every public symbol documented in the inline `# API-DOCS` blocks and verify a corresponding stub exists in the API files (name, parameter list, return type) — one by one. The docs block of API `X` lives in `mojoakku/<lib>/<x>.mojo`.
@@ -45,7 +45,7 @@ Review the scaffold produced by `NewLibPhase7Scaffold.md` and decide whether the
 
 ## Review Gate
 
-- Go only if: the scaffold compiles, every public API from the inline `# API-DOCS` blocks has a stub with its docs block, all stubs abort with the standard "not yet implemented" message, `_tests/` exists without `__init__.mojo`, `Taskfile.yml` runs the tests, `_dev/DESIGN.md` is present, and no implementation leaked.
+- Go only if: the scaffold compiles, every public API from the inline `# API-DOCS` blocks has a stub with its docs block, all stubs abort with the standard "not yet implemented" message, `_tests/` exists without `__init__.mojo`, `Taskfile.yml` runs the tests, `_dev/DESIGN.md` and `_dev/TODO.md` are present, and no implementation leaked.
 - Any missing symbol, compilation error, missing docs block, silently faked return value or leaked implementation is a blocking finding and returns to `NewLibPhase7Scaffold.md`.
 - The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
 

@@ -25,16 +25,18 @@ Verify that the derived Mojo API design for `<lib>` is semantically complete, co
 3. reviewer checks consistency with Mojo constraints: ownership and lifetime claims match Mojo's value/reference model, `raises` usage is coherent, no Python dependency is required by the design, and no hidden global state is relied upon.
 4. reviewer checks justification: every non-obvious decision carries a `MojoAkku uses X because Y` statement and names at least one reference API from the research files; unsourced or circular justifications are flagged.
 5. reviewer checks for silent invention: any API whose shape cannot be traced back to the research files is flagged as an invented API.
-6. reviewer checks that the documented `Decisions NOT to copy` match the research and are reasoned, not arbitrary.
+6. reviewer checks that the documented `Decisions NOT to copy` match the research and are reasoned, not arbitrary, and that every deferred item which is a concrete API candidate possible in Mojo is mirrored in `mojoakku/<lib>/_dev/TODO.md`.
 7. reviewer checks that all `## Open Questions` are resolved or consciously accepted with a written rationale.
-8. reviewer returns `APPROVED` or `NEEDS_WORK` with a numbered findings list, each finding with `file:line` and the required fix.
-9. If `NEEDS_WORK`, Manager sends the findings back into `NewLibPhase3Design.md`, then repeats this review once.
-10. If `APPROVED`, Manager logs the verdict via `agentlog`.
-11. Manager commits the phase with a message naming the phase and verdict (e.g. `base64 phase 4: design review APPROVED`).
-12. Manager hands off to docs.
+8. reviewer checks the backlog `mojoakku/<lib>/_dev/TODO.md`: it exists, follows the one-line format (`LibraryLayout.md`), and every entry names a research origin; an empty backlog is allowed only if the design ships every researched candidate.
+9. reviewer returns `APPROVED` or `NEEDS_WORK` with a numbered findings list, each finding with `file:line` and the required fix.
+10. If `NEEDS_WORK`, Manager sends the findings back into `NewLibPhase3Design.md`, then repeats this review once.
+11. If `APPROVED`, Manager logs the verdict via `agentlog`.
+12. Manager commits the phase with a message naming the phase and verdict (e.g. `base64 phase 4: design review APPROVED`).
+13. Manager hands off to docs.
 
 ## Artifacts / Outputs
 - A written review verdict (`APPROVED` / `NEEDS_WORK`) with a findings list tied to `file:line` in `_dev/DESIGN.md`.
+- A backlog check result for `mojoakku/<lib>/_dev/TODO.md`.
 - Corrected design sections when a rework pass was required.
 - One `.agents/log.md` entry recording the verdict.
 - One git commit for the phase.
