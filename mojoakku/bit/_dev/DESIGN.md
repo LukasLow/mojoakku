@@ -291,7 +291,7 @@ No operation is fatal and none aborts.
 - **`BitSet` is an owning value type.** It owns a `List[UInt64]`; a `BitSet`
   value is independent of every other after a move or an explicit `.copy()`
   (`List` is copyable, not implicitly copyable, in 1.x — `mojov1/types/overview`).
-  `BitSet` conforms to `Equatable, Copyable, Deinitable, Writable`.
+  `BitSet` conforms to `Sized, Equatable, Copyable, Deinitable, Writable`.
 - **The caller owns every buffer.** `BitReader` borrows a `Span[UInt8, _]` and
   never copies or retains the data (the `SpanCursor` pattern,
   `mojoakku/io/span_cursor.mojo`). `BitWriter` owns its `List[UInt8]` and hands
@@ -533,7 +533,7 @@ Status: planned
 Signature:
 
 ```mojo
-struct BitSet(Equatable, Copyable, Deinitable, Writable):
+struct BitSet(Sized, Equatable, Copyable, Deinitable, Writable):
     var _words: List[UInt64]
     var _len: Int            # logical length in bits = highest set index + 1
 
