@@ -1369,8 +1369,7 @@ dependency. `unsafe_ptr` would only appear in a caller's own construction of a
 
 Most decisions are closed against the reviewed research and the `mojov1` buch.
 The items below are the remaining open points; each is **consciously accepted**
-for release 1 (deferred with a written reason), so none blocks the Phase-4
-approval.
+for release 1 (deferred with a written reason), so none blocks sign-off.
 
 **Closed (decided in the Phase-4 rework)**
 
@@ -1385,12 +1384,12 @@ approval.
   type-pack→`Tuple` form does **not** compile and is rejected; heterogeneous
   readers are out of scope.
 
-**Open**
+**Open (accepted for release 1; re-deferred at Phase 13)**
 
-- **`ReadResult` construction ergonomics.** Whether the implementation should
-  expose a `comptime ReadResult.eof()` / `.data(count)` constructor pair for
-  readability is deferred to Phase 7; it affects only construction, not the
-  public shape.
+- **`ReadResult` construction ergonomics.** A `comptime ReadResult.eof()` /
+  `.data(count)` constructor pair was considered for readability. It was **not
+  adopted** in release 1 (the field-wise form shipped); deferred as a possible
+  ergonomic addition.
 - **Text adapter scope.** A text `Reader`/`TextReader` (byte → UTF-8 decode) is
   deliberately **not** in release 1 (the `INVALID_UTF8` kind reserves the place;
   see `## Non-Goals`). **Resolved for release 1: bytes only.** Whether a future
@@ -1398,7 +1397,7 @@ approval.
   separate, later decision — not a blocker for this design.
 - **Timeout representation.** A per-operation `timeout: Optional[...]` is
   recorded as the intended direction (`rust.md` §12; `go.md` §11) but no timeout
-  argument is in the first-release signatures; `TIMED_OUT` reserves the kind.
+  argument is in the release-1 signatures; `TIMED_OUT` reserves the kind.
   Whether to add the argument now or in a follow-up is deferred.
 
 **Closed**
