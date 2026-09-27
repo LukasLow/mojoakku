@@ -103,6 +103,15 @@ def test_bitset_with_ops_len_growth() raises:
     assert_true(grow_before.capacity() >= before)
     assert_equal(len(grow_before), 3)
 
+    # Regression: an over-allocated `other` (via capacity=...) whose words
+    # exceed its logical length must not index out of bounds in union_with.
+    var over = BitSet(capacity=256)   # several words allocated, len == 0
+    var target = BitSet()
+    target.set(1)
+    target.union_with(over)           # must not abort; no bits come from over
+    assert_equal(target.to_list(), ints_of(1))
+    assert_equal(len(target), 2)
+
 
 def test_bitset_subset_superset_disjoint() raises:
     var small = bits_of(0, 2, 3)

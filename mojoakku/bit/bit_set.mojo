@@ -204,9 +204,13 @@ struct BitSet(Equatable, Copyable, Deinitable, Writable, Sized):
     def union_with(mut self, other: BitSet):
         if other._len > 0:
             self._ensure_words(other._len // 64 + 1)
-        var n = len(other._words)
+        # Iterate self's allocation, not other's: other may be over-allocated
+        # beyond its logical length (via `reserve` or `capacity=...`), and its
+        # trailing words hold no set bit. `_word_or_zero` pads beyond other's
+        # words, so this cannot index out of bounds.
+        var n = len(self._words)
         for i in range(n):
-            self._words[i] |= other._words[i]
+            self._words[i] |= other._word_or_zero(i)
         # The union's highest set bit is the max of the two.
         if other._len > self._len:
             self._len = other._len

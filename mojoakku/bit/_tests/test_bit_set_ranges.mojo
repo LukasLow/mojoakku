@@ -23,7 +23,7 @@ def ints_of(*values: Int) -> List[Int]:
 
 def test_bitset_set_range_word_boundary() raises:
     # [62, 66] spans the 64-bit word boundary: bits 62, 63 in word 0 and bits
-    # 0, 1 in word 1 (index 64, 65).
+    # 0, 1, 2 in word 1 (indices 64, 65, 66).
     var bits = BitSet()
     bits.set_range(62, 66)
     assert_false(bits.test(61))
