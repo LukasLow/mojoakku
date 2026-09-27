@@ -73,10 +73,10 @@ struct BitWriter(Copyable, Deinitable, Writable):
 #   (atomic). All are recoverable.
 # Example:
 #   var w = BitWriter(BitOrder.MSB_FIRST)
-#   w.write_bit(True)
-#   w.write_bits(0b101, 3)
-#   w.align()
-#   var bytes = w.to_bytes()   # -> [0b1011_0100]
+#   w.write_bit(True)          # bit 7 -> 1
+#   w.write_bits(0b101, 3)     # bits 6..4 -> 1,0,1
+#   w.align()                  # zero-fill the rest of the byte
+#   var bytes = w.to_bytes()   # -> [0b1101_0000]
 #   print(w.bit_len())         # -> 4
 #   w.write_bit(False)         # writer stays usable
 # API-DOCS-END

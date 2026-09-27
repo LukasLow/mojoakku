@@ -1,0 +1,31 @@
+== mojo run -I mojoakku mojoakku/bit/_tests/test_bit_error.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/bit/bit_error_kind.mojo:14:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/bit/_tests/test_bit_field.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/bit/get_bits.mojo:8:10: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/bit/_tests/test_bit_order.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/bit/bit_order.mojo:14:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/bit/_tests/test_bit_reader.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/bit/bit_reader.mojo:14:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/bit/_tests/test_bit_roundtrip.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/bit/bit_writer.mojo:14:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/bit/_tests/test_bit_set_algebra.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/bit/bit_set.mojo:12:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/bit/_tests/test_bit_set_growth.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/bit/bit_set.mojo:12:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/bit/_tests/test_bit_set_indexing.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/bit/bit_set.mojo:12:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/bit/_tests/test_bit_set_query.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/bit/bit_set.mojo:12:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/bit/_tests/test_bit_set_ranges.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/bit/bit_set.mojo:12:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/bit/_tests/test_bit_set_search.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/bit/bit_set.mojo:12:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/bit/_tests/test_bit_writer.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/bit/bit_writer.mojo:14:14: MojoAkku: this API is not yet implemented
+--------
+baseline: 12 files, 0 passed, 12 failed
+  failures: 12 stub abort, 0 compile/import error, 0 other
+note: the suite holds 81 test functions across 12 files. A stub
+      `abort` stops the process on its first call, so no per-test
+      passed/failed count is reachable in the red phase; the file count
+      (12) is the honest measure.
