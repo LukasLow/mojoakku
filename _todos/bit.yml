@@ -1,5 +1,5 @@
 id: bit
 name: Bit
-status: current
+status: done
 depends_on: []
 summary: Bit twiddling and bitsets.

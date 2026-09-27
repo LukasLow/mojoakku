@@ -9,7 +9,8 @@
 # grows to the max of the two lengths, the other three collapse to the highest
 # surviving set bit) and that capacity is never reduced; subset/superset/disjoint
 # including the empty-set edges (the empty set is a subset of everything and
-# disjoint with everything).
+# disjoint with everything). Also covers the regression that an over-allocated
+# `other` (via `capacity=...`) must not index out of bounds in `union_with`.
 
 from std.testing import assert_equal, assert_true, assert_false, TestSuite
 from bit import BitSet
