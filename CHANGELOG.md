@@ -5,6 +5,16 @@ All notable changes to MojoAkku are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions stay on `0.x.y`; major is never bumped.
 
+## v0.4.0 - 2026-09-27
+
+### Added
+
+- bit — new library: BitSet (set algebra, complement, iteration, byte serialisation), get_bits/set_bits (generic over unsigned integral carriers), BitReader/BitWriter with explicit bit order, closed BitError surface
+
+### Changed
+
+- agents — per-library _dev/TODO.md backlog system wired into AGENTS.md, LibraryLayout.md and the phase workflows
+
 ## v0.3.0 - 2026-09-27
 
 ### Added
