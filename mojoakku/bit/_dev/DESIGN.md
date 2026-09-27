@@ -163,6 +163,19 @@ reference and why it does not fit Mojo.
   `js-ts.md` §10. Release 1 ships **materialising** (`union`, …) and
   **in-place** (`union_with`, …) only; the cardinality-only variants are a
   documented future addition, not release 1.
+- **`complement` is deferred to a later release** — `c.md` §10 (`bitmap_complement`),
+  `julia.md` §12 (word-parallel complement). Its width semantics are the hard
+  part (a growable set has no fixed universe: complement over what width?). Go's
+  container simply has no complement (`go.md` §3), which shows the four
+  set-algebra ops are the irreducible core; `complement` is therefore a
+  documented Non-Goal for release 1 and is added, with an explicit width
+  parameter, once the fixed-width view exists. The gap premise in `_dev/README.md`
+  lists it as a target; this Non-Goal records *when* it lands, not *whether*.
+- **Byte serialisation of a `BitSet` is deferred to a later release** — Go
+  `WriteTo`/`ReadFrom` (`go.md` §3), Java `toByteArray`/`valueOf` (`java.md` §3).
+  Release 1 keeps `BitSet` unconnected to the bit-I/O layer; a `BitSet` gains
+  `to_bytes`/`from_bytes` once the exact word/bit-order serialisation contract is
+  fixed, so a low-vision user is not given a byte layout that might change.
 - **A full `__iter__` protocol over set bits** (Julia `BitSet`, Go `EachSet`
   closure, JS `[Symbol.iterator]`) — `julia.md` §3, `go.md` §3, `js-ts.md` §3.
   Release 1 ships the primitive `find_next` and the convenience `to_list`.
@@ -191,10 +204,11 @@ right column are the reference APIs cited in the justifications below.
 | Iteration over set bits | Go `NextSet/EachSet`; Java `nextSetBit`/`stream`; Rust `ones()`; Python `search(1)`; C++ `find_first/find_next` | `go.md` §3; `java.md` §3; `rust.md` §3; `python.md` §3; `cpp.md` §3 |
 | Optional over sentinel | Rust `Option`; Go `(value, ok)`; Java `-1` (rejected) | `rust.md` §4,§10; `go.md` §10; `java.md` §11 |
 | Growth / shrink contract | Go grows to highest set bit, never auto-shrinks; Java doubling `ensureCapacity`; Rust `grow/shrink`; JS `resize/trim` | `go.md` §10; `java.md` §10; `rust.md` §10; `js-ts.md` §10 |
-| Bitfield `get/set` over `[hi:lo]` | C `bitmap_read/write`; C++ explicit `get_bits(hi,lo)/set_bits(hi,lo,value)`; Elixir named pair; Julia `BitOperations.bget/bset` (zero-based LSB-up, reverse ranges rejected) | `c.md` §10; `cpp.md` §12; `elixir.md` §12; `julia.md` §12 |
+| Bitfield read/write over a bit range | C kernel `bitmap_read(map, start, nbits)` / `bitmap_write(map, value, start, nbits)`; Julia `BitOperations.bget/bset` (zero-based, LSB-up, reverse ranges rejected) | `c.md` §10; `julia.md` §12 |
 | Mask-driven gather/scatter (future) | Java `Integer.compress/expand`; Go `Extract/Deposit`; Rust `extract_bits/deposit_bits` | `java.md` §3; `go.md` §3; `rust.md` §3 |
 | Bit-I/O read/write pair | Go `ReadBits(n)/WriteBits(v,n)`; Java `readBits(int)/readBit()`; JS `readBits/writeBits`; Rust `read::<N,_>()/write/write_var` | `go.md` §3; `java.md` §3; `js-ts.md` §3; `rust.md` §3 |
 | Bit-I/O ordering as explicit parameter | Rust generic `Endianness`; Java `ByteOrder`; numpy `bitorder`; C++ `LSBFirst/MSBFirst`; Rust `Lsb0/Msb0` | `rust.md` §3,§7; `java.md` §7; `python.md` §7; `cpp.md` §12; `rust.md` §7 |
+| Container equality | Go `Equal(c)`; Java `equals` (ignores capacity); JS `equals()`; Julia `==` | `go.md` §3; `java.md` §3,§10; `js-ts.md` §3; `julia.md` §3 |
 | Bit-I/O cursor + byte align | Java `alignWithByteBoundary()/bitsAvailable()`; Go `Align()`; Python `pos/bytealign()`; JS `bitsLeft/index` | `java.md` §3; `go.md` §3; `python.md` §3; `js-ts.md` §3 |
 | Bit-I/O EOF signalling | Go `(value, error)`; Java `-1` for premature EOS; Python `ReadError`; Rust `Result` | `go.md` §3; `java.md` §3; `python.md` §4; `rust.md` §4 |
 | Typed error + closed kind | Rust `ErrorKind` (non-exhaustive); Go sentinels + `OpError`; Java checked `IOException`; and MojoAkku `io`'s `IoError`/`IoErrorKind` | `rust.md` §4; `go.md` §4; `java.md` §4; `mojoakku/io/_dev/DESIGN.md` |
@@ -240,12 +254,14 @@ raises what:
 
 | API | Raises | Kinds |
 | --- | --- | --- |
-| `BitSet` index/range setters (`set`, `clear`, `toggle`, `set_to`, `set_range`, `clear_range`, `toggle_range`, `test`), `find_next`, algebra | `BitError` | `RANGE` (negative index / negative range bound), `BAD_RANGE` (`lo > hi`) |
-| `BitSet` queries (`count`, `is_empty`, `all`, `any`, `none`, `is_subset_of`, `is_superset_of`, `is_disjoint`, `to_list`, `reserve`, `shrink`, `clear_all`, `__len__`, `capacity`) | none | — |
-| `get_bits` / `set_bits` | `BitError` | `RANGE` (`lo < 0` or `hi > 63`), `BAD_RANGE` (`hi < lo`), `OVERFLOW` (field does not fit) |
-| `BitReader.read_bit` / `read_bits` | `BitError` | `EOF` (not enough bits), `RANGE` (count < 1 or > 64) |
-| `BitWriter.write_bits` | `BitError` | `RANGE` (count < 0 or > 64) |
-| `BitWriter.write_bit`, `align`, `bit_len`, `byte_len`, `to_bytes` | none | — |
+| `BitSet` index setters (`set`, `clear`, `toggle`, `set_to`, `test`) and range setters (`set_range`, `clear_range`, `toggle_range`) | `BitError` | `RANGE` (negative index / negative `lo`), `BAD_RANGE` (`lo > hi`) |
+| `BitSet` queries (`find_next`, `count`, `is_empty`, `all`, `any`, `none`, `is_subset_of`, `is_superset_of`, `is_disjoint`, `to_list`, `reserve`, `shrink`, `clear_all`, `__len__`, `capacity`) and algebra (`union`, `intersection`, `difference`, `symmetric_difference`, `*_with`) | none | — |
+| `get_bits` / `set_bits` | `BitError` | `RANGE` (`lo < 0` or `hi > 63`), `BAD_RANGE` (`hi < lo`), `OVERFLOW` (`set_bits` field does not fit) |
+| `BitReader.read_bit` | `BitError` | `EOF` (no bits remaining) |
+| `BitReader.read_bits` | `BitError` | `EOF` (not enough bits), `RANGE` (`count < 1` or `count > 64`) |
+| `BitReader.align`, `bit_pos`, `bits_left`, `has_bits`, `order` | none | — |
+| `BitWriter.write_bits` | `BitError` | `RANGE` (`count < 0` or `count > 64`), `OVERFLOW` (nonzero `value` bits above `count`) |
+| `BitWriter.write_bit`, `align`, `bit_len`, `byte_len`, `to_bytes`, `order` | none | — |
 
 Recoverability: every `BitError` is a recoverable **data** error — the caller can
 retry with a corrected index/range/count, extend the buffer, or read fewer bits.
@@ -275,7 +291,7 @@ No operation is fatal and none aborts.
 - **`BitSet` is an owning value type.** It owns a `List[UInt64]`; a `BitSet`
   value is independent of every other after a move or an explicit `.copy()`
   (`List` is copyable, not implicitly copyable, in 1.x — `mojov1/types/overview`).
-  `BitSet` conforms to `Copyable, Deinitable, Writable`.
+  `BitSet` conforms to `Equatable, Copyable, Deinitable, Writable`.
 - **The caller owns every buffer.** `BitReader` borrows a `Span[UInt8, _]` and
   never copies or retains the data (the `SpanCursor` pattern,
   `mojoakku/io/span_cursor.mojo`). `BitWriter` owns its `List[UInt8]` and hands
@@ -404,9 +420,13 @@ struct BitError(Copyable, Deinitable, Writable):
 Semantics:
 
 - **Parameters / preconditions:** constructed by the library on failure; read in
-  an `except` block. Fields: `kind` (see `BitErrorKind`), `op` (short operation
-  name: `"set"`, `"set_range"`, `"get_bits"`, `"set_bits"`, `"read_bits"`,
-  `"write_bits"`), `detail` (opaque human-readable context; must not be parsed).
+  an `except` block. Fields: `kind` (see `BitErrorKind`), `op` (a short operation
+  name, e.g. `"set"`, `"clear"`, `"toggle"`, `"set_to"`, `"test"`,
+  `"set_range"`, `"clear_range"`, `"toggle_range"`, `"get_bits"`, `"set_bits"`,
+  `"read_bit"`, `"read_bits"`, `"write_bits"`), `detail` (opaque human-readable
+  context; must not be parsed). The `op` list is illustrative, not a closed enum:
+  `op` names whichever call failed. Because `range` methods and `find_next` do not
+  all fail, only the operations that can raise appear in practice.
 - **Return / meaning:** raised, never returned. Every condition is recoverable:
   correct the index/range (`RANGE`/`BAD_RANGE`), widen the field (`OVERFLOW`),
   read fewer bits or supply more bytes (`EOF`).
@@ -472,7 +492,9 @@ Semantics:
   `BigEndian()/LittleEndian()` switch is explicitly rejected (`go.md` §11).
   Rust's `Lsb0`/`Msb0` type parameter is the strongest model (`rust.md` §7); a
   runtime value is chosen instead of a type parameter to keep one `BitReader`
-  type and readable signatures for a low-vision user.
+  type and readable signatures for a low-vision user. Both constructors require
+  an explicit `order`; there is **no parameter default** (the "never a hidden
+  default" rule in `## Overview`).
 
 Errors:
 
@@ -492,10 +514,10 @@ Rationale:
 `MojoAkku uses an explicit BitOrder value because Java (ByteOrder), Rust
 (bitstream-io Endianness) and C++ (LSBFirst/MSBFirst) all make order explicit
 per stream rather than global (java.md §7, rust.md §3, cpp.md §12), and Go's
-global switch is a documented anti-pattern (go.md §11). The default for a
-reader/writer is MSB_FIRST because wire formats are MSB-canonical (elixir.md
-§7); the container indexes LSB-first because that is the cross-language
-consensus for bitsets (java.md §7).`
+global switch is a documented anti-pattern (go.md §11). There is no default: a
+caller must name the order. The recommended order is MSB_FIRST because wire
+formats are MSB-canonical (elixir.md §7); the container indexes LSB-first because
+that is the cross-language consensus for bitsets (java.md §7).`
 
 ---
 
@@ -506,7 +528,7 @@ Status: planned
 Signature:
 
 ```mojo
-struct BitSet(Copyable, Deinitable, Writable):
+struct BitSet(Equatable, Copyable, Deinitable, Writable):
     var _words: List[UInt64]
     var _len: Int            # logical length in bits = highest set index + 1
 
@@ -514,6 +536,7 @@ struct BitSet(Copyable, Deinitable, Writable):
     def __init__(out self, *, capacity: Int)
 
     def __len__(self) -> Int                 # logical length (highest set + 1)
+    def __eq__(self, other: Self) -> Bool    # same set bits; capacity ignored
     def capacity(self) -> Int                # addressable bits (_words.len * 64)
     def count(self) -> Int                   # number of set bits (cardinality)
     def is_empty(self) -> Bool
@@ -536,7 +559,7 @@ struct BitSet(Copyable, Deinitable, Writable):
     def reserve(mut self, bits: Int)
     def shrink(mut self)
 
-    def find_next(self, from_index: Int) raises BitError -> Optional[Int]
+    def find_next(self, from_index: Int) -> Optional[Int]
     def to_list(self) -> List[Int]
 
     def union(self, other: BitSet) -> BitSet
@@ -573,6 +596,18 @@ Semantics:
   - `capacity()` — addressable bits currently allocated (`_words.len * 64`).
   - `count()` — cardinality: how many bits are set.
   A low-vision user never has to guess which of the three a name means.
+- **Growth and allocation contract.** `set`/`set_range`/`toggle_range` grow the
+  word list to cover the highest touched index, doubling/`reserve`-style so
+  repeated growth is amortized. As in Go's container (`go.md` §10), the list
+  never shrinks implicitly; only `shrink()` releases trailing all-zero words. A
+  very large index (or `reserve(bits)`) requests a correspondingly large
+  allocation; release 1 documents **no cap** and lets the underlying allocator
+  fail — Mojo has no recoverable allocation-failure surface (`mojov1/memory/
+  allocators`), so a cap is a future addition, not a release-1 guarantee.
+- **Equality (`__eq__`).** Two `BitSet`s are equal iff they have the same set
+  bits; **capacity and `_len` do not participate** below the highest set bit
+  (Java's `equals` ignores capacity, `java.md` §10; Go's `Equal`, `go.md` §3).
+  `{5}` is equal to another `{5}` that has a larger reserved capacity.
 - **Index rules (total for queries, bounded mutations):**
   - `test(index)` — `False` when `index >= len(self)` (a not-yet-set bit is not
     an error; Go `Test` returns false out of range, `go.md` §9). A **negative**
@@ -588,7 +623,10 @@ Semantics:
 - **Ranges (`set_range`/`clear_range`/`toggle_range`, inclusive `[lo, hi]`):**
   `lo > hi` raises `BAD_RANGE` (Julia rejects reverse ranges, `julia.md` §12); a
   negative `lo` raises `RANGE`; `hi` may exceed `len(self)` and grows the
-  container for `set_range`/`toggle_range`.
+  container for `set_range`/`toggle_range`. `clear_range` with `hi >= len(self)`
+  is defined: it clears every in-range bit and leaves `_len` at the highest
+  remaining set bit (0 when none remain) — a clear past the end is a no-op, not
+  an error, mirroring `clear(index)`.
 - **`clear_all`** — clears every bit and resets `_len` to 0; capacity is kept.
 - **`reserve(bits)`** — ensures at least `bits` bits are addressable; never
   changes `len()` or `count()`. A non-positive `bits` is a no-op.
@@ -596,9 +634,15 @@ Semantics:
   never changes `len()` or `count()`.
 - **`find_next(from_index)`** — the lowest set index `>= from_index`, or `None`.
   The primitive behind iteration (Go `NextSet`, Java `nextSetBit`, Rust
-  `ones()` — `go.md` §3, `java.md` §3, `rust.md` §3). `from_index < 0` is
-  treated as 0 (defined, not an error); a `from_index` past the end returns
-  `None`. **`Optional`, never `-1`** (`java.md` §11 rejected).
+  `ones()` — `go.md` §3, `java.md` §3, `rust.md` §3). A **negative `from_index`
+  is defined as 0** rather than raising: `find_next` is a total *query* like
+  `test`, not an addressing mutation, and making it total keeps the iteration
+  idiom `var i = -1; while ...` free of a special first-step branch. This is a
+  deliberate deviation from Java's `nextSetBit`, which throws
+  `IndexOutOfBoundsException` on a negative index (`java.md` §4) — the same
+  total-query reasoning that makes `test(-)` `RANGE`-only and `clear` a no-op
+  past the end. A `from_index` past the end returns `None`. **`Optional`, never
+  `-1`** (`java.md` §11 rejected).
 - **`to_list()`** — the set indices in ascending order as a `List[Int]`. Derived
   from `find_next`; a convenience for release 1 in place of a full iterator
   (Non-Goal).
@@ -613,8 +657,18 @@ Semantics:
   set (JS `change`/`xor`).
 - **Set algebra (in-place):** `union_with`/`…with` mutate `self` in place and
   return nothing (Rust's `*_with` convention, `rust.md` §3; Go `InPlace*`,
-  `go.md` §3). These are the two styles shipped in release 1; the cardinality-only
-  third style is a Non-Goal.
+  `go.md` §3). Their `_len`/growth rule is defined per op:
+  - `union_with(other)` — grows `self` to cover `other`'s highest set bit;
+    `_len` becomes the max of the two logical lengths.
+  - `intersection_with(other)` — keeps only bits present in both; `_len`
+    becomes the highest surviving set bit (0 when none remain).
+  - `difference_with(other)` — removes `other`'s bits from `self`; `_len`
+    becomes the highest surviving set bit (0 when none remain).
+  - `symmetric_difference_with(other)` — XOR; `_len` becomes the highest
+    surviving set bit.
+  Capacity is never reduced by any `*_with`; call `shrink()` explicitly. These
+  are the two styles shipped in release 1; the cardinality-only third style is a
+  Non-Goal.
 - **Relation queries:** `is_subset_of`, `is_superset_of` (Boost's
   `is_subset_of`/`is_superset` — `cpp.md` §3), `is_disjoint` (Java `intersects`
   negated — `java.md` §3). All are `False` for the empty-set edge cases in the
@@ -674,9 +728,9 @@ Semantics:
   `RANGE`; `hi < lo` raises `BAD_RANGE`.
 - **Return / meaning:** the field, **right-aligned**: `(value >> lo) &
   ((1 << (hi - lo + 1)) - 1)`. The width is `hi - lo + 1`; the result's high bits
-  above the field width are zero. This is the extract half of the `get_bits`/
-  `set_bits` pair named by C's `bitmap_read`, C++'s explicit pair, Elixir and
-  Julia (`c.md` §10, `cpp.md` §12, `elixir.md` §12, `julia.md` §12).
+  above the field width are zero. This is the extract half of the read/write pair
+  on a raw carrier: C's kernel `bitmap_read(map, start, nbits)` (`c.md` §10) and
+  Julia's zero-based LSB-up `BitOperations.bget` (`julia.md` §12).
 - **Defined edges:** `hi == lo` is a one-bit field. `hi == 63` is a full-width
   field (the `1 << 64` case is special-cased to an all-ones mask).
 
@@ -697,12 +751,12 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses get_bits(value, hi, lo) because it is the exact pair named by the
-reference languages (cpp.md §12, elixir.md §12) and matches C's bitmap_read
-over [start, nbits) (c.md §10) and Julia's zero-based LSB-up BitOperations model
-(julia.md §12); a (offset, width) argument pair is the alternative and is
-rejected because inclusive [hi:lo] reads the same as the value's own bit
-positions, which is easier for a low-vision user to verify.`
+`MojoAkku uses get_bits(value, hi, lo) because it is the extract half of the
+read/write pair the reference languages put on a raw carrier: C's kernel
+bitmap_read(map, start, nbits) (c.md §10) and Julia BitOperations.bget with a
+zero-based LSB-up range (julia.md §12). A (offset, width) argument pair is the
+alternative and is rejected because inclusive [hi:lo] reads the same as the
+value's own bit positions, which is easier for a low-vision user to verify.`
 
 ---
 
@@ -725,7 +779,8 @@ Semantics:
   `OVERFLOW`** — silent truncation is explicitly rejected (`elixir.md` §11).
 - **Return / meaning:** the new carrier with bits `[hi:lo]` replaced by `field`
   and every other bit preserved: `(value & ~mask) | ((field << lo) & mask)`.
-  This is the insert half of the pair (`cpp.md` §12, `elixir.md` §12).
+  This is the insert half of the pair (C `bitmap_write`, `c.md` §10; Julia
+  `bset`, `julia.md` §12).
 - **Defined edges:** `field == 0` clears the field. `hi == lo` inserts a single
   bit and requires `field` to be 0 or 1.
 
@@ -748,10 +803,10 @@ not implemented
 Rationale:
 
 `MojoAkku uses set_bits(value, hi, lo, field) -> UInt64 because extracting and
-reinserting is the round-trip the reference languages pair together (cpp.md §12,
-elixir.md §12); it raises OVERFLOW instead of truncating because Elixir's silent
-truncation is a documented trap (elixir.md §11), and a low-vision user must not
-lose bits without a signal.`
+reinserting is the round-trip that C's bitmap_read/bitmap_write pair and Julia's
+bget/bset pair provide together (c.md §10, julia.md §12); it raises OVERFLOW
+instead of truncating because Elixir's silent truncation is a documented trap
+(elixir.md §11), and a low-vision user must not lose bits without a signal.`
 
 ---
 
@@ -791,17 +846,26 @@ Semantics:
 - **`read_bits(count)`** — reads the next `count` bits (`1..64`) as a `UInt64`.
   The **first bit read is the most significant** of the returned value when
   `order == MSB_FIRST`, and the **least significant** when `order == LSB_FIRST`
-  — the caller never has to reverse. `count < 1` or `count > 64` raises `RANGE`.
-  Not enough bits remaining raises `EOF`; **no partial value is returned** — a
-  short read is an error, not a truncated result (Python `ReadError`/Rust
-  `Result`, `python.md` §4, `rust.md` §4; Java's `-1` premature-EOS sentinel is
-  rejected, `java.md` §3).
+  — the caller never has to reverse. `count < 1` or `count > 64` raises `RANGE`
+  (a count of 0 is **not** a no-op here: a zero-bit read is meaningless, so it is
+  rejected — unlike `write_bits(_, 0)`, where a zero-bit write is a harmless
+  no-op; the asymmetry is deliberate, see Rationale). Not enough bits remaining
+  raises `EOF`; **the read is atomic** — `_bit_pos` is advanced only when all
+  `count` bits were available, so after an `EOF` the reader is unchanged and the
+  caller can retry with a smaller `count` (the io convention for explicit
+  partial progress, `mojoakku/io/_dev/DESIGN.md`). **No partial value is
+  returned** — a short read is an error, not a truncated result (Python
+  `ReadError`/Rust `Result`, `python.md` §4, `rust.md` §4; Java's `-1`
+  premature-EOS sentinel is rejected, `java.md` §3).
 - **`align`** — advances `_bit_pos` to the next byte boundary (a no-op when
-  already aligned). The byte-alignment cursor reset from Java
-  `alignWithByteBoundary`, Go `Align`, Python `bytealign` (`java.md` §3,
+  already aligned). Advancing past the last bit **clamps `_bit_pos` to the total
+  bit count** so `bits_left()` never goes negative; alignment on a
+  non-whole-byte buffer is therefore safe. The byte-alignment cursor reset from
+  Java `alignWithByteBoundary`, Go `Align`, Python `bytealign` (`java.md` §3,
   `go.md` §3, `python.md` §3).
-- **`bit_pos`** — the absolute bit offset consumed so far.
-- **`bits_left`** — total bits minus `bit_pos`.
+- **`bit_pos`** — the absolute bit offset consumed so far (never exceeds the
+  total bit count).
+- **`bits_left`** — total bits minus `bit_pos`; always `>= 0`.
 - **`has_bits`** — `bits_left() > 0`.
 - **`order`** — the reader's order, for inspection.
 
@@ -853,7 +917,7 @@ struct BitWriter(Copyable, Deinitable, Writable):
 
     def bit_len(self) -> Int
     def byte_len(self) -> Int
-    def to_bytes(self) -> List[UInt8]
+    def to_bytes(mut self) -> List[UInt8]
     def order(self) -> BitOrder
     def write_to(self, mut writer: Some[Writer])
 ```
@@ -870,28 +934,40 @@ Semantics:
 - **`write_bits(value, count)`** — writes the low `count` bits (`0..64`) of
   `value`, first-written bit being the most significant of those `count` when
   `order == MSB_FIRST` (least significant when `LSB_FIRST`), so it is the exact
-  inverse of `BitReader.read_bits`. `count == 0` is a no-op; `count < 0` or
-  `count > 64` raises `RANGE`. There is no overflow: only the low `count` bits of
-  `value` are used (`value` beyond `count` must already be zero at the call site;
-  writing more than `count` bits is out of scope by construction).
+  inverse of `BitReader.read_bits`. `count < 0` or `count > 64` raises `RANGE`.
+  **`count == 0` with `value == 0` is a no-op; `count == 0` with a nonzero
+  `value` raises `OVERFLOW`** (a nonzero value cannot be written in zero bits).
+  **If `value` has any bit set above `count` (`value >> count != 0`),
+  `write_bits` raises `OVERFLOW`** — silent bit-drop is rejected (Go's
+  `WriteBits(0x1234, 8)` quietly writing `0x34` is a documented trap, `go.md`
+  §11). The caller who genuinely wants to write the low `count` bits of a wider
+  value masks explicitly first. A failing `write_bits` writes nothing (atomic).
+  For `count == 64` the check is "no bits above 64 exist", so it is trivially
+  satisfied and no `>> 64` is evaluated.
 - **`align`** — zero-fills the remainder of the current partial byte and starts a
   fresh byte; a no-op when already byte-aligned.
 - **`bit_len`** — total bits written (including the partial byte's bits).
 - **`byte_len`** — number of bytes currently held (`_bytes.len`).
-- **`to_bytes`** — returns the owned `List[UInt8]` by value; the final partial
-  byte is zero-padded in its unused bits.
+- **`to_bytes(mut self)`** — returns the writer's bytes as a **`List[UInt8]`
+  copy**; the writer keeps its contents and stays writable. Taking `mut self`
+  documents that this is a live read of the writer's buffer, not a destructive
+  consume; a consuming variant is not offered in release 1 (the caller can drop
+  the writer afterwards). The final partial byte is zero-padded in its unused
+  bits.
 - **`write_to`** — prints the writer's bytes as hex for debugging.
 
 Errors:
 
 - `RANGE` — `write_bits` with `count < 0` or `count > 64`.
+- `OVERFLOW` — `write_bits` with a `value` that has nonzero bits above `count`.
 
 Tests:
 
 - planned: round-trip with `BitReader` for both orders; filling a byte MSB-first
-  vs LSB-first; `write_bits(count=0)` no-op; `align` zero-filling; `byte_len`/
-  `bit_len` accounting; `to_bytes` zero-padding the final partial byte; `RANGE`
-  for count 65 and count -1.
+  vs LSB-first; `write_bits(count=0)` no-op; `OVERFLOW` when a value has bits
+  above `count`; `align` zero-filling; `byte_len`/`bit_len` accounting;
+  `to_bytes` zero-padding the final partial byte and leaving the writer
+  writable; `RANGE` for count 65 and count -1.
 
 Implementation status:
 
@@ -904,8 +980,11 @@ caller-side buffer sizing that the reference stream writers push onto the caller
 (c.md §11 length-less pointers) and matches Python's BitArray build model
 (python.md §3); write_bits(value, count) is the Go/Java/JS pair (go.md §3, java.md
 §3, js-ts.md §3) with an explicit BitOrder (java.md §7). Silent bit-drop on a
-too-wide write is rejected (go.md §11) and replaced by a count bound that raises
-RANGE.`
+too-wide write is rejected (go.md §11) and replaced by an OVERFLOW signal, the
+same "never silently lose bits" rule that set_bits follows (elixir.md §11). The
+count-0 asymmetry (write is a no-op, read raises) is deliberate: a zero-bit write
+is a harmless uniform-loop convenience, while a zero-bit read would return a
+value with no bits and is rejected as meaningless.`
 
 ---
 
@@ -916,12 +995,16 @@ RANGE.`
 | LSB-first container indexing | `java.md` §7, `c.md` §7, `cpp.md` §7, `go.md` §7, `julia.md` §7 | `BitSet` Semantics; Conventions |
 | Four set operations + in-place | `go.md` §3, `rust.md` §3, `js-ts.md` §3, `julia.md` §3 | `BitSet` Semantics |
 | `Optional` over `-1` | `java.md` §11, `rust.md` §10 | `BitSet.find_next`; `BitError` |
-| Inclusive `[hi:lo]` ranges | `julia.md` §12, `cpp.md` §12 | Conventions; `get_bits`/`set_bits` |
-| Raise on overflow, never truncate | `elixir.md` §11 | `set_bits`; `BitErrorKind.OVERFLOW` |
+| Inclusive `[hi:lo]` ranges | `julia.md` §12, `c.md` §10 | Conventions; `get_bits`/`set_bits` |
+| Raise on overflow, never truncate | `elixir.md` §11, `go.md` §11 | `set_bits`; `BitWriter.write_bits`; `BitErrorKind.OVERFLOW` |
 | Explicit order, no global switch | `go.md` §11, `java.md` §7, `rust.md` §7 | `BitOrder`; `BitReader`/`BitWriter` |
 | `read_bits`/`write_bits` pair | `go.md` §3, `java.md` §3, `js-ts.md` §3 | `BitReader`/`BitWriter` |
+| Atomic read (no partial progress on EOF) | `mojoakku/io` convention, `rust.md` §4 | `BitReader.read_bits` |
 | Short read is an error, not a partial value | `python.md` §4, `rust.md` §4 | `BitReader.read_bits` |
 | Named quantity separation (len/capacity/count) | `java.md` §11, `rust.md` §11 | `BitSet` Semantics |
+| Container equality ignores capacity | `java.md` §10, `go.md` §3 | `BitSet.__eq__` |
 | Stdlib-first scalar layer (wrap `std.bit`) | `mojov1/stdlib/bit` | Dependencies; Purpose |
 | No `unsafe_*` bit API | `c.md` §11, `js-ts.md` §11 | Non-Goals |
 | Generic widths are a Non-Goal | `rust.md` §7, `go.md` §7 | Non-Goals; `get_bits`/`set_bits` |
+| `complement` deferred (width semantics) | `c.md` §10, `julia.md` §12, `go.md` §3 | Non-Goals |
+| `BitSet` byte serialisation deferred | `go.md` §3, `java.md` §3 | Non-Goals |
