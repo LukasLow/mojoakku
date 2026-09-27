@@ -158,36 +158,56 @@ reference and why it does not fit Mojo.
 - **A proxy reference type / a packed `vector<bool>` specialisation** (C++
   `std::vector<bool>::reference`) — `cpp.md` §11. `BitSet` exposes
   `test`/`set`/`clear`, never a borrowable bit reference.
-- **Three algebra styles for every operation in release 1** (Go/Rust/JS
-  materialise / in-place / cardinality-only) — `go.md` §10, `rust.md` §10,
-  `js-ts.md` §10. Release 1 ships **materialising** (`union`, …) and
-  **in-place** (`union_with`, …) only; the cardinality-only variants are a
-  documented future addition, not release 1.
-- **`complement` is deferred to a later release** — `c.md` §10 (`bitmap_complement`),
-  `julia.md` §12 (word-parallel complement). Its width semantics are the hard
-  part (a growable set has no fixed universe: complement over what width?). Go's
-  container simply has no complement (`go.md` §3), which shows the four
-  set-algebra ops are the irreducible core; `complement` is therefore a
-  documented Non-Goal for release 1 and is added, with an explicit width
-  parameter, once the fixed-width view exists. The gap premise in `_dev/README.md`
-  lists it as a target; this Non-Goal records *when* it lands, not *whether*.
-- **Byte serialisation of a `BitSet` is deferred to a later release** — Go
-  `WriteTo`/`ReadFrom` (`go.md` §3), Java `toByteArray`/`valueOf` (`java.md` §3).
-  Release 1 keeps `BitSet` unconnected to the bit-I/O layer; a `BitSet` gains
-  `to_bytes`/`from_bytes` once the exact word/bit-order serialisation contract is
-  fixed, so a low-vision user is not given a byte layout that might change.
-- **A full `__iter__` protocol over set bits** (Julia `BitSet`, Go `EachSet`
-  closure, JS `[Symbol.iterator]`) — `julia.md` §3, `go.md` §3, `js-ts.md` §3.
-  Release 1 ships the primitive `find_next` and the convenience `to_list`.
-  An `Iterable`/`Iterator` conformance is a future addition.
-- **Generic over every integer width** (Rust `T::BITS`, Go width-in-the-name) —
-  `rust.md` §7, `go.md` §7. Release 1 fixes the bitfield carrier to `UInt64`
-  (the container's word type). Signed and sub-word generics are a future
-  addition; this keeps the signatures small and unambiguous for a low-vision
-  user and avoids depending on an unverified integer-conversion trait.
+- **Three algebra styles for every operation** (Go/Rust/JS materialise /
+  in-place / cardinality-only) — `go.md` §10, `rust.md` §10, `js-ts.md` §10.
+  `bit` ships **materialising** (`union`, …) and **in-place** (`union_with`, …);
+  the cardinality-only third style stays a documented future addition.
 - **`Bool <: Integer` coercion, `~n == -n-1` sign traps, negative shifts
   silently reversing** (Julia) — `julia.md` §11. `bit` keeps `Bool` and the bit
   operations separate and treats invalid ranges as errors.
+
+## Release 2 additions
+
+The four items below were release-1 Non-Goals and are **now shipped** (release
+2), implemented additively with no change to any release-1 behaviour. The
+release-1 deferral records are preserved in git history (phase-13 commit
+`f335381`).
+
+- **`BitSet.complement` / `complement_with`** — `c.md` §10
+  (`bitmap_complement`), `julia.md` §12 (word-parallel complement). The hard
+  part was the universe (a growable set has no fixed width); the resolution is an
+  **explicit `width` argument**. `complement(width)` returns a new set of the
+  bits `0..width-1` that are **not** set in the receiver; bits at or above
+  `width` are outside the universe and are 0. `complement_with(width)` does the
+  same in place. A negative `width` raises `RANGE`; `width == 0` yields the empty
+  set. This matches Julia `BitSet`'s `complement` over a stated range and keeps
+  Go's observation (`go.md` §3) that the four ops are the core — complement is
+  added *on top*, not baked in.
+- **`BitSet.to_bytes` / `BitSet.from_bytes`** — Go `WriteTo`/`ReadFrom`
+  (`go.md` §3), Java `toByteArray`/`valueOf` (`java.md` §3). The fixed contract
+  is **little-endian, LSB-first, minimal length**: byte 0 bit 0 is bit index 0,
+  and the length is `ceil(len / 8)` (0 bytes for the empty set). `from_bytes`
+  reverses it exactly, so `from_bytes(to_bytes(x)) == x` for every set. This is
+  the layout the earlier deferral was waiting for: stable, one bit-order, aligned
+  with the container's own LSB-first indexing.
+- **Full iteration over set bits** — Julia `BitSet`, Go `EachSet`, JS
+  `[Symbol.iterator]` (`julia.md` §3, `go.md` §3, `js-ts.md` §3). `BitSet.__iter__`
+  returns a public `BitSetIter` that yields the set indices in ascending order,
+  so `for i in bits:` works without `find_next` boilerplate. `BitSetIter` uses
+  Mojo's iteration protocol (`__has_next__` / `__next__`; verified in the
+  container, `mojov1/types/collections`). It holds a **snapshot copy** of the
+  words, so mutating the set while iterating is safe and deterministic (the
+  iterator sees the state at `__iter__` time). `find_next` and `to_list` remain
+  the primitive and the bulk convenience.
+- **Generic bitfield carriers** — Rust `T::BITS`, Go width-in-the-name
+  (`rust.md` §7, `go.md` §7). `get_bits` / `set_bits` become generic over
+  `[dtype: DType]` with a `Scalar[dtype]` carrier constrained by
+  `where dtype.is_integral()` (verified: `Scalar[dtype]` shifts and `bit_width`
+  work under a `dtype` parameter). The field bound is now the carrier's own width
+  (`hi <= bit_width - 1`) instead of a hard-coded 63, so `UInt8` fields go to 7,
+  `UInt16` to 15, `UInt64` to 63 unchanged. Every existing `UInt64` call keeps
+  its exact behaviour and error kinds; the change is a widening, not a
+  redefinition.
 
 ## Reference APIs
 
@@ -231,20 +251,23 @@ Phase 7 stubs them, in this order.
 **Container layer**
 
 4. `BitSet` — a growable, word-packed set of bits with LSB-first indexing,
-   set algebra, cardinality and ascending search.
+   set algebra (incl. `complement` over an explicit width), cardinality,
+   ascending search, full iteration and byte serialisation.
+5. `BitSetIter` — ascending iterator over a `BitSet`'s set-bit indices, returned
+   by `BitSet.__iter__` (snapshot semantics).
 
 **Bitfield layer**
 
-5. `get_bits` — extract the inclusive field `[hi:lo]` of a `UInt64` as a
-   right-aligned `UInt64`.
-6. `set_bits` — insert a field into the inclusive `[hi:lo]` range of a `UInt64`,
-   returning the new value.
+6. `get_bits` — extract the inclusive field `[hi:lo]` of an integral value as a
+   right-aligned value of the same type (generic over the dtype).
+7. `set_bits` — insert a field into the inclusive `[hi:lo]` range of an integral
+   value, returning the new value (generic over the dtype).
 
 **Bit-I/O layer**
 
-7. `BitReader` — read individual bits and up to 64-bit groups over a borrowed
+8. `BitReader` — read individual bits and up to 64-bit groups over a borrowed
    byte span, in an explicit bit order.
-8. `BitWriter` — write individual bits and up to 64-bit groups into an owned
+9. `BitWriter` — write individual bits and up to 64-bit groups into an owned
    byte buffer, in an explicit bit order.
 
 ## Error Surface
@@ -254,7 +277,7 @@ raises what:
 
 | API | Raises | Kinds |
 | --- | --- | --- |
-| `BitSet` index setters (`set`, `clear`, `toggle`, `set_to`, `test`) and range setters (`set_range`, `clear_range`, `toggle_range`) | `BitError` | `RANGE` (negative index / negative `lo`), `BAD_RANGE` (`lo > hi`) |
+| `BitSet` index setters (`set`, `clear`, `toggle`, `set_to`, `test`), range setters (`set_range`, `clear_range`, `toggle_range`) and `complement` / `complement_with` | `BitError` | `RANGE` (negative index / negative `lo` / negative `width`), `BAD_RANGE` (`lo > hi`) |
 | `BitSet` queries (`find_next`, `count`, `is_empty`, `all`, `any`, `none`, `is_subset_of`, `is_superset_of`, `is_disjoint`, `to_list`, `reserve`, `shrink`, `clear_all`, `__len__`, `capacity`) and algebra (`union`, `intersection`, `difference`, `symmetric_difference`, `*_with`) | none | — |
 | `get_bits` / `set_bits` | `BitError` | `RANGE` (`lo < 0` or `hi > 63`), `BAD_RANGE` (`hi < lo`), `OVERFLOW` (`set_bits` field does not fit) |
 | `BitReader.read_bit` | `BitError` | `EOF` (no bits remaining) |
@@ -581,6 +604,15 @@ struct BitSet(Sized, Equatable, Copyable, Deinitable, Writable):
     def is_superset_of(self, other: BitSet) -> Bool
     def is_disjoint(self, other: BitSet) -> Bool
 
+    def complement(self, width: Int) raises BitError -> BitSet
+    def complement_with(mut self, width: Int) raises BitError
+
+    def to_bytes(self) -> List[UInt8]
+    @staticmethod
+    def from_bytes(bytes: Span[UInt8, _]) -> BitSet
+
+    def __iter__(self) -> BitSetIter
+
     def write_to(self, mut writer: Some[Writer])
 ```
 
@@ -678,14 +710,37 @@ Semantics:
   `is_subset_of`/`is_superset` — `cpp.md` §3), `is_disjoint` (Java `intersects`
   negated — `java.md` §3). All are `False` for the empty-set edge cases in the
   usual way (`is_subset_of` of an empty set is `True`).
+- **Complement (release 2):** `complement(width)` returns a new `BitSet` of the
+  bits `0..width-1` that are **not** set in the receiver; `complement_with(width)`
+  does the same in place. Bits at or above `width` are outside the universe and
+  become 0. `width < 0` raises `RANGE`; `width == 0` yields the empty set. The
+  explicit `width` resolves the release-1 open question (a growable set has no
+  fixed universe). The materialising form is a copy + in-place op, so the
+  receiver is unchanged. Source: `c.md` §10 (`bitmap_complement`), `julia.md`
+  §12 (word-parallel complement).
+- **Byte serialisation (release 2):** `to_bytes` returns an owned `List[UInt8]`
+  in the fixed layout little-endian, LSB-first, minimal length — byte `i` bit `j`
+  is index `i * 8 + j`, length is `ceil(len / 8)`, and the empty set is 0 bytes.
+  The `@staticmethod` `from_bytes(Span[UInt8, _])` is its exact inverse, so
+  `from_bytes(to_bytes(x)) == x` for every set. Trailing zero bytes carry no set
+  bit, so the decoded logical length is the highest set index + 1. Sources:
+  `go.md` §3 (`WriteTo`/`ReadFrom`), `java.md` §3 (`toByteArray`/`valueOf`).
+- **Iteration (release 2):** `__iter__` returns a public `BitSetIter` that yields
+  the set indices in ascending order, so `for i in bits:` works without
+  `find_next` boilerplate. It uses Mojo's iteration protocol (`__has_next__` /
+  `__next__`; `mojov1/types/collections`) and holds a **snapshot copy** of the
+  words taken at `__iter__` time, so mutating the set during iteration is safe
+  and deterministic. `find_next` remains the primitive and `to_list` the bulk
+  convenience. Sources: `julia.md` §3, `go.md` §3, `js-ts.md` §3.
 - **`Writable`** — `write_to` prints a compact set notation (e.g.
   `{0, 3, 5}`); it never allocates a temporary `String` beyond the writer's own.
 
 Errors:
 
 - `RANGE` — a negative `index`/`lo` in `set`/`clear`/`toggle`/`test`/`set_to` and
-  the range methods. (`find_next` is the one place a negative `from_index` is
-  defined as 0 rather than an error.)
+  the range methods, and a negative `width` in `complement`/`complement_with`.
+  (`find_next` is the one place a negative `from_index` is defined as 0 rather
+  than an error.)
 - `BAD_RANGE` — `lo > hi` in a range method.
 
 Tests:
@@ -713,6 +768,13 @@ Tests:
 - `test_bitset_equality_ignores_capacity` — `{5}` equals a `{5}` with larger
   capacity.
 - `test_bitset_negative_index_and_reverse_range_raise` — `RANGE` / `BAD_RANGE`.
+- `test_bitset_write_to_set_notation` — `write_to` prints `{0, 3, 5}`.
+- `test_bitset_complement_*` — hand-checked complement, width 0, negative width
+  RANGE, narrower/wider than the set, double-complement identity.
+- `test_bitset_to_bytes_*` / `test_bitset_from_bytes_*` — LSB-first minimal
+  layout, empty set, word-boundary crossing, decode and round-trip.
+- `test_bitset_iter_*` / `test_bitsetiter_protocol_manual_loop` — ascending
+  iteration, empty set, snapshot semantics after and inside the loop.
 
 Implementation status:
 
@@ -729,7 +791,67 @@ because Mojo has `comptime` value parameters if a fixed size is ever wanted, and
 a growable value type is the more general base block. It uses UInt64 words
 (Julia/Java/Go agree on 64, julia.md §7, java.md §7, go.md §7) and exposes
 test/set/clear instead of a bit reference because C++'s proxy reference
-(cpp.md §11) is a known complexity to avoid.`
+(cpp.md §11) is a known complexity to avoid. The release-2 `complement` takes an
+explicit `width` because a growable set has no fixed universe (c.md §10,
+julia.md §12); `to_bytes`/`from_bytes` fix one stable little-endian LSB-first
+layout (go.md §3, java.md §3); and `__iter__` snapshots the words so mutation
+during iteration is safe (julia.md §3, go.md §3).`
+
+---
+
+### `BitSetIter`
+
+Status: planned
+
+Signature:
+
+```mojo
+struct BitSetIter(Deinitable):
+    var _words: List[UInt64]
+    var _next: Int
+
+    def __init__(out self, var words: List[UInt64])
+    def __has_next__(self) -> Bool
+    def __next__(mut self) -> Int
+```
+
+Semantics:
+
+- **Parameters / preconditions:** returned by `BitSet.__iter__`; constructing one
+  directly is possible but not needed. It holds a copy of the set's words, so it
+  is independent of the set from the moment it is created.
+- **Return / meaning:** `__next__` returns the next set index in ascending order;
+  `__has_next__` is the loop guard. `for i in bits:` yields exactly the indices
+  `to_list` returns.
+- **Snapshot semantics:** mutating the set after `__iter__` ran — including
+  inside the loop — does not change what the iterator yields. The iterator sees
+  the state at `__iter__` time.
+
+Errors:
+
+none — iterating a `BitSet` cannot fail.
+
+Tests:
+
+- `test_bitset_iter_ascending` — ascending across a word boundary.
+- `test_bitset_iter_empty_yields_nothing` — the empty set yields nothing.
+- `test_bitsetiter_protocol_manual_loop` — manual `__has_next__`/`__next__` loop.
+- `test_bitset_iter_snapshot_after_iter` / `_snapshot_inside_loop` — snapshot
+  semantics.
+
+Implementation status:
+
+implemented
+
+Rationale:
+
+`MojoAkku uses a public BitSetIter over a snapshot because Julia's BitSet and
+Go's EachSet iterate set bits as a first-class operation (julia.md §3, go.md
+§3), and Mojo's iteration protocol is __iter__ returning a type with
+__has_next__/__next__ (mojov1/types/collections). The snapshot is deliberate:
+returning a borrowing iterator would make every mutation during iteration a
+compile error, which is unfriendly for a low-vision user; the copy is cheap (a
+word list) and makes the loop total.`
 
 ---
 
@@ -740,25 +862,31 @@ Status: planned
 Signature:
 
 ```mojo
-def get_bits(value: UInt64, hi: Int, lo: Int) raises BitError -> UInt64
+def get_bits[dtype: DType](value: Scalar[dtype], hi: Int, lo: Int)
+    raises BitError -> Scalar[dtype]
+    where dtype.is_integral()
 ```
 
 Semantics:
 
-- **Parameters / preconditions:** `value` is the carrier; `[hi:lo]` is the
-  inclusive field with `0 <= lo <= hi <= 63`. `lo < 0` or `hi > 63` raises
-  `RANGE`; `hi < lo` raises `BAD_RANGE`.
-- **Return / meaning:** the field, **right-aligned**: `(value >> lo) &
-  ((1 << (hi - lo + 1)) - 1)`. The width is `hi - lo + 1`; the result's high bits
+- **Parameters / preconditions:** `value` is the carrier of type `Scalar[dtype]`
+  for any integral `dtype`; `[hi:lo]` is the inclusive field with
+  `0 <= lo <= hi <= bit_width - 1`, where `bit_width` is the carrier's own width
+  (`bit_width(~0)`; 8/16/32/64). `lo < 0` or `hi > bit_width - 1` raises `RANGE`;
+  `hi < lo` raises `BAD_RANGE`. The `dtype` parameter is inferred from `value` or
+  named explicitly.
+- **Return / meaning:** the field, **right-aligned**, in the carrier's own type:
+  `(value & field_mask) >> lo`. The width is `hi - lo + 1`; the result's high bits
   above the field width are zero. This is the extract half of the read/write pair
   on a raw carrier: C's kernel `bitmap_read(map, start, nbits)` (`c.md` §10) and
   Julia's zero-based LSB-up `BitOperations.bget` (`julia.md` §12).
-- **Defined edges:** `hi == lo` is a one-bit field. `hi == 63` is a full-width
-  field (the `1 << 64` case is special-cased to an all-ones mask).
+- **Defined edges:** `hi == lo` is a one-bit field. `hi == bit_width - 1` is a
+  full-width field (the `1 << bit_width` case is special-cased to an all-ones
+  mask). Every release-1 `UInt64` call keeps its exact behaviour.
 
 Errors:
 
-- `RANGE` — `lo < 0` or `hi > 63`.
+- `RANGE` — `lo < 0` or `hi > bit_width - 1`.
 - `BAD_RANGE` — `hi < lo`.
 
 Tests:
@@ -769,6 +897,9 @@ Tests:
   at `hi == 63`.
 - `test_get_bits_out_of_range_raises` — `RANGE` for `lo < 0` / `hi > 63`.
 - `test_get_bits_reversed_raises` — `BAD_RANGE` for `hi < lo`.
+- `test_get_bits_uint8` / `test_get_bits_uint16_uint32` — per-width carriers.
+- `test_get_bits_uint64_unchanged` — release-1 UInt64 behaviour preserved.
+- `test_get_bits_per_width_bounds_raise_range` — bound is the carrier width.
 
 Implementation status:
 
@@ -776,12 +907,14 @@ implemented
 
 Rationale:
 
-`MojoAkku uses get_bits(value, hi, lo) because it is the extract half of the
-read/write pair the reference languages put on a raw carrier: C's kernel
-bitmap_read(map, start, nbits) (c.md §10) and Julia BitOperations.bget with a
-zero-based LSB-up range (julia.md §12). A (offset, width) argument pair is the
-alternative and is rejected because inclusive [hi:lo] reads the same as the
-value's own bit positions, which is easier for a low-vision user to verify.`
+`MojoAkku uses get_bits[dtype](value, hi, lo) because it is the extract half of
+the read/write pair the reference languages put on a raw carrier (C's kernel
+bitmap_read, c.md §10; Julia BitOperations.bget, julia.md §12). It is generic
+over Scalar[dtype] because Rust parameterizes the carrier width (rust.md §7) and
+Go encodes it in the function name (go.md §7); the field bound is the carrier's
+own width. A (offset, width) argument pair is the alternative and is rejected
+because inclusive [hi:lo] reads the same as the value's own bit positions, which
+is easier for a low-vision user to verify.`
 
 ---
 
@@ -792,22 +925,27 @@ Status: planned
 Signature:
 
 ```mojo
-def set_bits(value: UInt64, hi: Int, lo: Int, field: UInt64) raises BitError -> UInt64
+def set_bits[dtype: DType](value: Scalar[dtype], hi: Int, lo: Int,
+    field: Scalar[dtype]) raises BitError -> Scalar[dtype]
+    where dtype.is_integral()
 ```
 
 Semantics:
 
-- **Parameters / preconditions:** `value` is the carrier; `[hi:lo]` is the
-  inclusive field (`0 <= lo <= hi <= 63`); `field` is the value to insert into
-  that range. `lo < 0` or `hi > 63` raises `RANGE`; `hi < lo` raises `BAD_RANGE`.
-  If `field` has any bit set above the field width (`hi - lo + 1`), it **raises
-  `OVERFLOW`** — silent truncation is explicitly rejected (`elixir.md` §11).
+- **Parameters / preconditions:** `value` is the carrier of type `Scalar[dtype]`
+  for any integral `dtype`; `[hi:lo]` is the inclusive field
+  (`0 <= lo <= hi <= bit_width - 1`); `field` is the value to insert into that
+  range, in the carrier's own type. `lo < 0` or `hi > bit_width - 1` raises
+  `RANGE`; `hi < lo` raises `BAD_RANGE`. If `field` has any bit set above the
+  field width (`hi - lo + 1`), it **raises `OVERFLOW`** — silent truncation is
+  explicitly rejected (`elixir.md` §11).
 - **Return / meaning:** the new carrier with bits `[hi:lo]` replaced by `field`
-  and every other bit preserved: `(value & ~mask) | ((field << lo) & mask)`.
-  This is the insert half of the pair (C `bitmap_write`, `c.md` §10; Julia
-  `bset`, `julia.md` §12).
+  and every other bit preserved: `(value & ~mask) | (field << lo)`, in the
+  carrier's own type. This is the insert half of the pair (C `bitmap_write`,
+  `c.md` §10; Julia `bset`, `julia.md` §12).
 - **Defined edges:** `field == 0` clears the field. `hi == lo` inserts a single
-  bit and requires `field` to be 0 or 1.
+  bit and requires `field` to be 0 or 1. Every release-1 `UInt64` call keeps its
+  exact behaviour.
 
 Errors:
 
@@ -823,6 +961,11 @@ Tests:
 - `test_set_bits_exact_capacity_ok` — a `field` that exactly fills passes.
 - `test_set_bits_overflow_raises` — `field` one bit too wide raises `OVERFLOW`.
 - `test_set_bits_out_of_range_and_reversed_raise` — `RANGE` / `BAD_RANGE`.
+- `test_set_bits_uint8` / `test_set_bits_uint16_uint32` — per-width carriers.
+- `test_set_bits_uint64_unchanged` — release-1 UInt64 behaviour preserved.
+- `test_set_bits_overflow_per_width` — OVERFLOW is per carrier width.
+- `test_get_set_roundtrip_per_width` — per-width extract/reinsert round-trip.
+- `test_explicit_dtype_parameter` — the `[dtype]` parameter form.
 
 Implementation status:
 
@@ -830,11 +973,13 @@ implemented
 
 Rationale:
 
-`MojoAkku uses set_bits(value, hi, lo, field) -> UInt64 because extracting and
-reinserting is the round-trip that C's bitmap_read/bitmap_write pair and Julia's
-bget/bset pair provide together (c.md §10, julia.md §12); it raises OVERFLOW
-instead of truncating because Elixir's silent truncation is a documented trap
-(elixir.md §11), and a low-vision user must not lose bits without a signal.`
+`MojoAkku uses set_bits[dtype](value, hi, lo, field) -> Scalar[dtype] because
+extracting and reinserting is the round-trip that C's bitmap_read/bitmap_write
+pair and Julia's bget/bset pair provide together (c.md §10, julia.md §12); it is
+generic over Scalar[dtype] like Rust's width parameterization (rust.md §7); it
+raises OVERFLOW instead of truncating because Elixir's silent truncation is a
+documented trap (elixir.md §11), and a low-vision user must not lose bits
+without a signal.`
 
 ---
 

@@ -25,9 +25,9 @@ struct BitError(Copyable, Deinitable, Writable):
 #   except/try block. It carries:
 #     kind   — what went wrong (see BitErrorKind).
 #     op     — a short operation name ("set", "clear", "toggle", "set_to",
-#              "test", "set_range", "clear_range", "toggle_range", "get_bits",
-#              "set_bits", "read_bit", "read_bits", "write_bits"), so you can
-#              tell which call failed.
+#              "test", "set_range", "clear_range", "toggle_range",
+#              "complement_with", "get_bits", "set_bits", "read_bit",
+#              "read_bits", "write_bits"), so you can tell which call failed.
 #     detail — an opaque, human-readable string. It must not be parsed; it is not
 #              part of the API surface.
 #   EOF is a bit-read condition only: there is no "end of set", and find_next

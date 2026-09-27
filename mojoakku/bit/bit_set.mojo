@@ -1,5 +1,6 @@
 from .bit_error import BitError
 from .bit_error_kind import BitErrorKind
+from .bit_set_iter import BitSetIter
 from bit._internal.field_mask import field_mask
 
 from std.bit import pop_count, bit_width, count_trailing_zeros
@@ -252,6 +253,75 @@ struct BitSet(Equatable, Copyable, Deinitable, Writable, Sized):
                 return False
         return True
 
+    def complement(self, width: Int) raises BitError -> BitSet:
+        var result = self.copy()
+        result.complement_with(width)
+        return result^
+
+    def complement_with(mut self, width: Int) raises BitError:
+        if width < 0:
+            raise BitError(
+                BitErrorKind.RANGE, "complement_with", "width is negative"
+            )
+        if width == 0:
+            self.clear_all()
+            self._words.shrink(0)
+            self._len = 0
+            return
+        # The complement universe is bits 0..width-1: every bit inside it is
+        # flipped relative to the receiver; anything at or above `width` is
+        # outside the universe and becomes 0.
+        var new_words = List[UInt64]()
+        var word_count = (width - 1) // 64 + 1
+        for i in range(word_count):
+            var inverted = ~self._word_or_zero(i)
+            # Keep only the in-universe bits. The last word holds the partial
+            # tail; a mask of the bits `(width-1) % 64` down to 0 trims it.
+            if i == word_count - 1:
+                var tail = (width - 1) % 64
+                inverted &= field_mask[DType.uint64](i * 64, i * 64 + tail)
+            new_words.append(inverted)
+        self._words = new_words^
+        self._recompute_len()
+
+    def to_bytes(self) -> List[UInt8]:
+        # Little-endian, LSB-first, minimal length: byte i bit j is index
+        # i * 8 + j; the length is ceil(len / 8), so the empty set is 0 bytes.
+        var out = List[UInt8]()
+        if self._len == 0:
+            return out^
+        var byte_count = (self._len - 1) // 8 + 1
+        for i in range(byte_count):
+            var value = UInt8(0)
+            for j in range(8):
+                var index = i * 8 + j
+                if index < len(self._words) * 64:
+                    var bit = (self._words[index // 64] >> UInt64(index % 64)) & UInt64(1)
+                    if bit == UInt64(1):
+                        value |= UInt8(1) << UInt8(j)
+            out.append(value)
+        return out^
+
+    @staticmethod
+    def from_bytes(bytes: Span[UInt8, _]) -> BitSet:
+        # Exact inverse of `to_bytes`: byte i bit j is index i * 8 + j. Trailing
+        # zero bytes carry no set bit, so the result's logical length is the
+        # highest set index + 1.
+        var result = BitSet()
+        for i in range(len(bytes)):
+            var value = bytes[i]
+            if value == UInt8(0):
+                continue
+            for j in range(8):
+                if (value >> UInt8(j)) & UInt8(1) == UInt8(1):
+                    result._set_bit(i * 8 + j)
+        return result^
+
+    def __iter__(self) -> BitSetIter:
+        # A snapshot: the iterator copies the words, so mutating the set during
+        # iteration is safe and does not change what the iterator yields.
+        return BitSetIter(self._words.copy())
+
     def write_to(self, mut writer: Some[Writer]):
         # Compact set notation: `{0, 3, 5}`; the empty set prints `{}`.
         writer.write("{")
@@ -311,13 +381,13 @@ struct BitSet(Equatable, Copyable, Deinitable, Writable, Sized):
         var lo_w = lo // 64
         var hi_w = hi // 64
         if lo_w == hi_w:
-            var mask = field_mask(lo % 64, hi % 64)
+            var mask = field_mask[DType.uint64](lo % 64, hi % 64)
             self._apply_mask(lo_w, mask, op)
             return
-        self._apply_mask(lo_w, field_mask(lo % 64, 63), op)
+        self._apply_mask(lo_w, field_mask[DType.uint64](lo % 64, 63), op)
         for w in range(lo_w + 1, hi_w):
             self._apply_mask(w, ~UInt64(0), op)
-        self._apply_mask(hi_w, field_mask(0, hi % 64), op)
+        self._apply_mask(hi_w, field_mask[DType.uint64](0, hi % 64), op)
 
     def _apply_mask(mut self, w: Int, mask: UInt64, op: Int):
         if op == 0:
@@ -375,6 +445,12 @@ struct BitSet(Equatable, Copyable, Deinitable, Writable, Sized):
 #       def is_subset_of(self, other: BitSet) -> Bool
 #       def is_superset_of(self, other: BitSet) -> Bool
 #       def is_disjoint(self, other: BitSet) -> Bool
+#       def complement(self, width: Int) raises BitError -> BitSet
+#       def complement_with(mut self, width: Int) raises BitError
+#       def to_bytes(self) -> List[UInt8]
+#       @staticmethod
+#       def from_bytes(bytes: Span[UInt8, _]) -> BitSet
+#       def __iter__(self) -> BitSetIter
 #       def write_to(self, mut writer: Some[Writer])
 # What it does:
 #   A growable set of bits stored as 64-bit words. Bit `i` is bit `i % 64` of
@@ -395,14 +471,24 @@ struct BitSet(Equatable, Copyable, Deinitable, Writable, Sized):
 #   Ranges are inclusive `[lo, hi]`. The four materialising setters (`union`,
 #   `intersection`, `difference`, `symmetric_difference`) return a new BitSet and
 #   leave the receiver unchanged; the four `*_with` methods mutate in place and
-#   return nothing. `write_to` prints a compact set notation, e.g. `{0, 3, 5}`.
+#   return nothing. `complement(width)` returns a new set of the bits `0..width-1`
+#   that are NOT set in the receiver (bits at or above `width` are outside the
+#   universe and are 0); `complement_with(width)` does the same in place; a
+#   negative `width` raises RANGE and `width == 0` yields the empty set.
+#   `to_bytes()` serialises little-endian, LSB-first, minimal length (byte 0 bit 0
+#   is index 0; length is ceil(len/8), 0 bytes for the empty set); the static
+#   `from_bytes(span)` is its exact inverse. `for i in bits:` iterates the set
+#   indices in ascending order through the public `BitSetIter`, which snapshots
+#   the words at `__iter__` time. `write_to` prints a compact set notation, e.g.
+#   `{0, 3, 5}`.
 # Returns:
-#   A BitSet owns its words; the materialising operators return a new BitSet,
-#   `to_list` returns an owned List[Int] in ascending order, and `find_next`
-#   returns Optional[Int].
+#   A BitSet owns its words; the materialising operators (`union`, …,
+#   `complement`) return a new BitSet, `to_bytes` returns an owned List[UInt8],
+#   `to_list` returns an owned List[Int] in ascending order, `find_next` returns
+#   Optional[Int], and `__iter__` returns a `BitSetIter`.
 # Errors:
-#   raises BitError — RANGE on a negative index/lo; BAD_RANGE when lo > hi in a
-#   range method. All other operations cannot fail.
+#   raises BitError — RANGE on a negative index/lo or a negative complement width;
+#   BAD_RANGE when lo > hi in a range method. All other operations cannot fail.
 # Example:
 #   var flags = BitSet()
 #   flags.set(0)
@@ -414,4 +500,7 @@ struct BitSet(Equatable, Copyable, Deinitable, Writable, Sized):
 #   var other = BitSet()
 #   other.set(5)
 #   var both = flags.union(other)  # -> {0, 3, 5}; flags unchanged
+#   print(flags.complement(4))     # -> {1, 2}  (universe 0..3, {0, 3} set)
+#   for i in flags:                # ascending set indices
+#       print(i)                   # -> 0, 3
 # API-DOCS-END
