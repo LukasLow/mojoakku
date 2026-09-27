@@ -60,7 +60,7 @@ Summary [ 0.001 ] 5 tests run: 5 passed , 0 failed , 0 skipped
 == _tests/test_bit_reader.mojo
 
 Running 8 tests for /workspace/mojoakku/bit/_tests/test_bit_reader.mojo 
-    PASS [ 0.004 ] test_bitreader_read_bit_across_byte
+    PASS [ 0.001 ] test_bitreader_read_bit_across_byte
     PASS [ 0.001 ] test_bitreader_lsb_first_visits_lsb
     PASS [ 0.001 ] test_bitreader_read_bits_up_to_64
     PASS [ 0.001 ] test_bitreader_align_to_next_byte
@@ -69,7 +69,7 @@ Running 8 tests for /workspace/mojoakku/bit/_tests/test_bit_reader.mojo
     PASS [ 0.001 ] test_bitreader_count_range_raises
     PASS [ 0.001 ] test_bitreader_pos_and_left_accounting
 --------
-Summary [ 0.005 ] 8 tests run: 8 passed , 0 failed , 0 skipped 
+Summary [ 0.003 ] 8 tests run: 8 passed , 0 failed , 0 skipped 
 
 == _tests/test_bit_roundtrip.mojo
 
@@ -95,7 +95,7 @@ Running 7 tests for /workspace/mojoakku/bit/_tests/test_bit_set_algebra.mojo
     PASS [ 0.001 ] test_bitset_subset_superset_disjoint
     PASS [ 0.001 ] test_bitset_empty_set_edges
 --------
-Summary [ 0.009 ] 7 tests run: 7 passed , 0 failed , 0 skipped 
+Summary [ 0.010 ] 7 tests run: 7 passed , 0 failed , 0 skipped 
 
 == _tests/test_bit_set_complement.mojo
 
@@ -104,7 +104,7 @@ Running 7 tests for /workspace/mojoakku/bit/_tests/test_bit_set_complement.mojo
     PASS [ 0.001 ] test_bitset_complement_with_in_place
     PASS [ 0.001 ] test_bitset_complement_width_zero
     PASS [ 0.001 ] test_bitset_complement_negative_width_raises
-    PASS [ 0.002 ] test_bitset_complement_narrower_than_set
+    PASS [ 0.001 ] test_bitset_complement_narrower_than_set
     PASS [ 0.001 ] test_bitset_complement_wider_than_set
     PASS [ 0.001 ] test_bitset_complement_roundtrip_identity
 --------
@@ -113,12 +113,12 @@ Summary [ 0.007 ] 7 tests run: 7 passed , 0 failed , 0 skipped
 == _tests/test_bit_set_growth.mojo
 
 Running 4 tests for /workspace/mojoakku/bit/_tests/test_bit_set_growth.mojo 
-    PASS [ 0.014 ] test_bitset_growth_on_set
+    PASS [ 0.002 ] test_bitset_growth_on_set
     PASS [ 0.001 ] test_bitset_reserve_is_a_hint
     PASS [ 0.001 ] test_bitset_no_implicit_shrink_on_clear
     PASS [ 0.001 ] test_bitset_shrink_frees_trailing_words
 --------
-Summary [ 0.014 ] 4 tests run: 4 passed , 0 failed , 0 skipped 
+Summary [ 0.002 ] 4 tests run: 4 passed , 0 failed , 0 skipped 
 
 == _tests/test_bit_set_indexing.mojo
 
@@ -134,7 +134,7 @@ Summary [ 0.003 ] 5 tests run: 5 passed , 0 failed , 0 skipped
 == _tests/test_bit_set_iteration.mojo
 
 Running 5 tests for /workspace/mojoakku/bit/_tests/test_bit_set_iteration.mojo 
-    PASS [ 0.003 ] test_bitset_iter_ascending
+    PASS [ 0.002 ] test_bitset_iter_ascending
     PASS [ 0.001 ] test_bitset_iter_empty_yields_nothing
     PASS [ 0.001 ] test_bitsetiter_protocol_manual_loop
     PASS [ 0.001 ] test_bitset_iter_snapshot_after_iter
@@ -148,10 +148,10 @@ Running 5 tests for /workspace/mojoakku/bit/_tests/test_bit_set_query.mojo
     PASS [ 0.002 ] test_bitset_len_capacity_count
     PASS [ 0.001 ] test_bitset_capacity_ctor_is_a_hint_only
     PASS [ 0.001 ] test_bitset_emptiness_predicates
-    PASS [ 0.012 ] test_bitset_equality_ignores_capacity
+    PASS [ 0.013 ] test_bitset_equality_ignores_capacity
     PASS [ 0.001 ] test_bitset_write_to_set_notation
 --------
-Summary [ 0.015 ] 5 tests run: 5 passed , 0 failed , 0 skipped 
+Summary [ 0.017 ] 5 tests run: 5 passed , 0 failed , 0 skipped 
 
 == _tests/test_bit_set_ranges.mojo
 
@@ -182,18 +182,18 @@ Summary [ 0.003 ] 5 tests run: 5 passed , 0 failed , 0 skipped
 
 Running 6 tests for /workspace/mojoakku/bit/_tests/test_bit_set_serialization.mojo 
     PASS [ 0.001 ] test_bitset_to_bytes_empty_is_zero_bytes
-    PASS [ 0.003 ] test_bitset_to_bytes_single_bits
+    PASS [ 0.006 ] test_bitset_to_bytes_single_bits
     PASS [ 0.001 ] test_bitset_to_bytes_word_boundary_crossing
     PASS [ 0.001 ] test_bitset_from_bytes_lsb_first
     PASS [ 0.001 ] test_bitset_from_bytes_roundtrip
     PASS [ 0.001 ] test_bitset_from_bytes_empty_and_zero_spans
 --------
-Summary [ 0.006 ] 6 tests run: 6 passed , 0 failed , 0 skipped 
+Summary [ 0.009 ] 6 tests run: 6 passed , 0 failed , 0 skipped 
 
 == _tests/test_bit_writer.mojo
 
 Running 9 tests for /workspace/mojoakku/bit/_tests/test_bit_writer.mojo 
-    PASS [ 0.003 ] test_bitwriter_fill_byte_msb_vs_lsb
+    PASS [ 0.004 ] test_bitwriter_fill_byte_msb_vs_lsb
     PASS [ 0.001 ] test_bitwriter_count_zero_noop
     PASS [ 0.001 ] test_bitwriter_count_zero_nonzero_overflow
     PASS [ 0.001 ] test_bitwriter_overflow_high_bits
@@ -203,6 +203,6 @@ Running 9 tests for /workspace/mojoakku/bit/_tests/test_bit_writer.mojo
     PASS [ 0.001 ] test_bitwriter_count_range_raises
     PASS [ 0.001 ] test_bitwriter_write_to_hex
 --------
-Summary [ 0.004 ] 9 tests run: 9 passed , 0 failed , 0 skipped 
+Summary [ 0.006 ] 9 tests run: 9 passed , 0 failed , 0 skipped 
 
 All bit tests passed.

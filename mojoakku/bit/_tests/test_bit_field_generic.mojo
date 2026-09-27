@@ -1,5 +1,5 @@
 # Concern: the generic bitfield layer — `get_bits` / `set_bits` over a
-# `Scalar[dtype]` carrier for any integral `dtype` (docs blocks in
+# `Scalar[dtype]` carrier for any unsigned integral `dtype` (docs blocks in
 # `../get_bits.mojo`, `../set_bits.mojo`; contract: `_dev/DESIGN.md`
 # § "Release 2 additions").
 #

@@ -28,6 +28,7 @@ Create the compile-ready skeleton for `mojoakku/<lib>/` from the approved design
    - `mojoakku/<lib>/_tests/` — tests directory, and it MUST NOT contain an `__init__.mojo`.
    - `mojoakku/<lib>/Taskfile.yml` — the per-library test runner (see Step 9).
    - `mojoakku/<lib>/_dev/DESIGN.md` — the persistent design record (kept; see Step 4).
+   - `mojoakku/<lib>/_dev/TODO.md` — the per-library backlog (create it empty-but-with-heading if Phase 1/3 did not already seed it; it must exist from this phase on).
 3. Materialise the design: for each API entry, create its file and place the **end-user** docs block into the file between the markers `# API-DOCS-START` and `# API-DOCS-END` using the field set from `LibraryLayout.md` (`<Name> — summary`, `Signature`, `What it does`, `Returns`, `Errors`, `Example` — NOT the seven design fields; status/rationale/tests stay in `_dev/DESIGN.md`). Place the design's shared user-facing sections (Purpose, Overview, Dependencies, Public API, Error Surface, Conventions) into `__init__.mojo` between the same markers. Declare each public API member with its exact documented signature.
 4. Keep `mojoakku/<lib>/_dev/DESIGN.md` as the persistent design record (see `LibraryLayout.md`); it is **not** deleted. From here on the inline `# API-DOCS` blocks are the authoritative end-user docs, while `_dev/DESIGN.md` keeps the developer-facing reasoning (status, rationale, non-goals, references, open questions).
 5. Every public function/method in an API file carries, in the end-user docs block at the bottom of that file, the `LibraryLayout.md` field set (summary, `Signature`, `What it does`, `Returns`, `Errors`, `Example`). The seven design fields (`Status`, `Signature`, `Semantics`, `Errors`, `Tests`, `Implementation status`, `Rationale`) live only in `_dev/DESIGN.md`, never in the end-user block.
@@ -58,6 +59,7 @@ Create the compile-ready skeleton for `mojoakku/<lib>/` from the approved design
 ## Review Gate
 - The agreed layout exists: `__init__.mojo`, one file per public API entry directly under `mojoakku/<lib>/` (no `api/`, no `API.mojo`), optional `_internal/`, `_tests/` (no `__init__.mojo`), `Taskfile.yml`.
 - `_dev/DESIGN.md` has been materialised into the inline `# API-DOCS` blocks and is kept as the persistent design record.
+- `_dev/TODO.md` exists (the per-library backlog).
 - Every public API member from the design exists as a stub with its documented signature and its end-user `# API-DOCS` block (`LibraryLayout.md` fields).
 - Every stub aborts with the exact message `MojoAkku: this API is not yet implemented`.
 - `Taskfile.yml` exists and its `test` task runs the `_tests/` files.

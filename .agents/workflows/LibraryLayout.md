@@ -32,6 +32,7 @@ mojoakku/<lib>/
     README.md          # frozen run config (selected languages, question set)
     <lang>.md          # phase-1 research notes, one file per reference language
     DESIGN.md          # the design record (see below)
+    TODO.md            # the per-library backlog: researched-but-unshipped APIs
   _tests/              # tests, one file per concern; MUST NOT contain __init__.mojo
     test_<lib>_<concern>.mojo
   Taskfile.yml         # per-library test runner (task test)
@@ -53,9 +54,9 @@ Rules:
   that each API file is self-contained, `_internal/` must not exist.
 - **`_dev/` is the development folder.** It holds everything that is for the
   developer, not the end user: the phase-1 research (`<lang>.md` plus the frozen
-  `README.md`) and the design record (`DESIGN.md`). It is part of the repo (so
-  the reasoning is preserved and reviewable) but is never shipped and is never
-  end-user documentation.
+  `README.md`), the design record (`DESIGN.md`) and the backlog (`TODO.md`). It
+  is part of the repo (so the reasoning is preserved and reviewable) but is never
+  shipped and is never end-user documentation.
 - **`_tests/` never contains `__init__.mojo`.** Tests are plain programs, each
   with its own `main()`; they are run with `mojo run`.
 
@@ -176,6 +177,44 @@ keep only what a user needs. From Phase 8 onward the authoritative end-user docs
 are the inline blocks in `mojoakku/<lib>/*.mojo` and `__init__.mojo`; the
 authoritative design reasoning is `mojoakku/<lib>/_dev/DESIGN.md`.
 
+## The per-library backlog (lives in `_dev/TODO.md`)
+
+`mojoakku/<lib>/_dev/TODO.md` is the **live backlog** of every API the research
+showed is theoretically possible in Mojo but which the current implementation
+did **not** ship. It captures deferred entry points, later variants, and ideas
+from `_dev/<lang>.md` / `_dev/DESIGN.md` that were consciously left out. It is
+the single place where "this could exist in Mojo, but we did not build it yet"
+is recorded, so a later pass can pick it up without re-reading the research.
+
+Canonical format (one candidate per line, short and readable for a low-vision
+user):
+
+```markdown
+# <lib> — open backlog
+
+API candidates the research showed are possible in Mojo but that are not
+implemented. Remove a line once it ships; an empty list is the expected
+end state.
+
+## <theme> (e.g. "Container additions")
+
+- `name` — one-phrase meaning. (origin: `<lang>.md` §N)
+```
+
+Rules:
+
+- **A finished item is removed, never struck through and never marked done.**
+  The file is a live backlog, not a history; git history is the history.
+- **An empty backlog is valid and expected.** When every researched candidate has
+  shipped (or been consciously dropped), the file holds only its heading and the
+  "empty list is the expected end state" note.
+- **One line per candidate**: the name, a one-phrase meaning, and the research
+  origin. No implementation detail, no status, no owner bookkeeping.
+- **Deferred Non-Goals, Open Questions and "future additions" are mirrored here**
+  when they are concrete API candidates — the design record keeps the reasoning,
+  `TODO.md` keeps the item itself.
+- It is a developer record: never shipped, never end-user documentation.
+
 ## Where an agent looks for "the docs"
 
 | Question | Look at |
@@ -184,5 +223,6 @@ authoritative design reasoning is `mojoakku/<lib>/_dev/DESIGN.md`.
 | What is API `X` for? | `mojoakku/<lib>/<x>.mojo` docs block |
 | The full ordered public API | `# Public API` in `__init__.mojo` docs block |
 | Why was X designed this way? | `mojoakku/<lib>/_dev/DESIGN.md` |
+| Which APIs were researched but not shipped? | `mojoakku/<lib>/_dev/TODO.md` |
 | Prior art / why a decision was made | `mojoakku/<lib>/_dev/<lang>.md` and `_dev/DESIGN.md` |
 | How do I compile/test? | `mojoakku/<lib>/Taskfile.yml` |

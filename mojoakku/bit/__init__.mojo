@@ -31,9 +31,9 @@ from .bit_writer import BitWriter
 #        ascending search (`find_next`), full iteration (`for i in bits`),
 #        and byte serialisation (`to_bytes` / `from_bytes`).
 #     2. Bitfield layer — get_bits / set_bits. Extract or insert an inclusive
-#        [hi:lo] sub-range of any integral carrier (generic over dtype), with
-#        defined bounds and a defined overflow policy (a field that does not fit
-#        raises, never truncates).
+#        [hi:lo] sub-range of any unsigned integral carrier (generic over dtype),
+#        with defined bounds and a defined overflow policy (a field that does not
+#        fit raises, never truncates).
 #     3. Bit-I/O layer — BitReader / BitWriter. Read and write individual bits
 #        and up to 64-bit groups over bytes, with an explicit bit order passed
 #        by the caller — never a global switch and never a hidden default.
@@ -56,10 +56,10 @@ from .bit_writer import BitWriter
 #                        ascending search, iteration and byte serialisation.
 #     5. BitSetIter   — ascending iterator over a BitSet's set-bit indices,
 #                        returned by `BitSet.__iter__` (snapshot semantics).
-#     6. get_bits     — extract the inclusive field [hi:lo] of an integral value
-#                        as a right-aligned value of the same type.
+#     6. get_bits     — extract the inclusive field [hi:lo] of an unsigned
+#                        integral value as a right-aligned value of the same type.
 #     7. set_bits     — insert a field into the inclusive [hi:lo] range of an
-#                        integral value, returning the new value.
+#                        unsigned integral value, returning the new value.
 #     8. BitReader    — read individual bits and up to 64-bit groups over a
 #                        borrowed byte span, in an explicit bit order.
 #     9. BitWriter    — write individual bits and up to 64-bit groups into an

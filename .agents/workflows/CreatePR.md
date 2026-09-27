@@ -23,6 +23,8 @@ the only way the library reaches `main`.
 - `task ci` is green locally (it auto-discovers every library and runs its
   tests).
 - There is at least one `.changes/new/<yyyy-mm-dd>-<slug>.md` file for the change.
+- For a library, `mojoakku/<lib>/_dev/TODO.md` exists and is accurate (shipped
+  items removed, remaining candidates listed).
 - The Manager starts no Manager subagent.
 
 ## Roles

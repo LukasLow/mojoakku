@@ -52,8 +52,8 @@ mojoakku/<lib>/
   _tests/            # tests, one file per concern (no __init__.mojo)
   Taskfile.yml       # per-library test runner (task test)
   _dev/              # development folder: phase-1 research notes (one file per
-                     # reference language), README.md (frozen run config) and
-                     # DESIGN.md (the design record)
+                     # reference language), README.md (frozen run config),
+                     # DESIGN.md (the design record) and TODO.md (the backlog)
 ```
 
 There is **no `api/` directory**, **no `API.mojo`** aggregator and **no `src/`
@@ -72,6 +72,32 @@ The canonical reference is `.agents/workflows/LibraryLayout.md`.
   depending library's inline `# API-DOCS` shared block (`__init__.mojo`).
 - Dependency edges **MUST NOT** determine directory nesting. A dependency is a
   conceptual edge, never a physical parent/child relationship.
+
+## Per-library backlog: `_dev/TODO.md`
+
+Every library carries a backlog at `mojoakku/<lib>/_dev/TODO.md`. It is the
+home for **every API the research showed is theoretically possible in Mojo but
+which the current implementation did not ship** — deferred entry points, later
+variants, ideas surfaced in `_dev/<lang>.md` / `_dev/DESIGN.md` that were
+consciously left out. The workflow keeps it in sync (see
+`NewLibPhase1Research.md`, `NewLibPhase3Design.md`, `NewLibPhase7Scaffold.md`
+and `NewLibPhase13FinalReview.md`).
+
+Rules:
+
+- **The catalogue is a live backlog, not a history.** A finished item is
+  **removed** from the file, never struck through and never marked done. An
+  empty `TODO.md` is a valid and expected state — it means the library has no
+  open, researched-but-unshipped ideas.
+- **Anything deferred must be recorded here**, not only in prose inside
+  `DESIGN.md`. If a Non-Goal, an Open Question or a "future addition" is a
+  concrete API candidate, it belongs in `TODO.md` as one line.
+- **One line per candidate**, kept short and readable for a low-vision user:
+  the candidate name, a one-phrase meaning, and the research origin (e.g.
+  `rust.md §12`). No implementation detail, no status bookkeeping.
+- It is not end-user documentation and is never shipped; like the rest of
+  `_dev/`, it stays in the repo as the developer record. The canonical format is
+  defined in `.agents/workflows/LibraryLayout.md`.
 
 ## Core process rules
 
