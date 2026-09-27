@@ -384,8 +384,11 @@ none — it is a discriminant, not an operation.
 
 Tests:
 
-- planned: each `comptime` member has a distinct `_id`; `==` compares `_id`
-  only; `write_to` prints the symbolic name, never the number.
+- `test_bit_error_kind_distinct_ids` — each of the five `comptime` members has a
+  distinct `_id`.
+- `test_bit_error_kind_eq` — `==` compares `_id` only.
+- `test_bit_error_kind_writable` — `write_to` prints the symbolic name, never the
+  number.
 
 Implementation status:
 
@@ -439,8 +442,9 @@ none — `BitError` *is* the error; constructing it cannot fail.
 
 Tests:
 
-- planned: `print(e)` yields kind + op + detail; a re-raise transfers with
-  `raise e^`; `op` names the failing call.
+- `test_bit_error_writable` — `print(e)` yields kind + op + detail.
+- `test_bit_error_reraise_transfer` — a caught error re-raises with `raise e^`.
+- `test_bit_error_op_names_call` — `op` names the failing call.
 
 Implementation status:
 
@@ -502,8 +506,9 @@ none — it is a value, not an operation.
 
 Tests:
 
-- planned: the two members differ; `==` compares `_id`; `write_to` prints
-  `MSB_FIRST`/`LSB_FIRST`.
+- `test_bit_order_distinct` — the two members differ.
+- `test_bit_order_eq` — `==` compares `_id`.
+- `test_bit_order_writable` — `write_to` prints `MSB_FIRST`/`LSB_FIRST`.
 
 Implementation status:
 
@@ -685,12 +690,29 @@ Errors:
 
 Tests:
 
-- planned: LSB-first indexing (`set(0)` sets word 0 bit 0); `len`/`capacity`/
-  `count` distinctions; growth on `set`, no shrink on `clear`; `set_range`
-  across a word boundary; `clear_all` resets `len`; `shrink` frees trailing zero
-  words; `find_next` ascending across words and `None` past the end; `to_list`
-  ordering; each algebra op on a hand-checked pair; `is_subset_of`/`is_disjoint`
-  edge cases; negative index and reverse range raise the right kind.
+- `test_bitset_lsb_first_indexing` — `set(0)` sets word 0 bit 0.
+- `test_bitset_len_capacity_count` — the three quantities stay distinct.
+- `test_bitset_growth_on_set` — `set` grows; `clear` never shrinks capacity.
+- `test_bitset_set_range_word_boundary` — a range spanning a 64-bit boundary.
+- `test_bitset_clear_range_beyond_len` — `clear_range` past the end is a no-op
+  and updates `_len` to the highest remaining set bit.
+- `test_bitset_clear_all_resets_len` — `clear_all` resets `len` to 0, keeps
+  capacity.
+- `test_bitset_shrink_frees_trailing_words` — `shrink` releases trailing zero
+  words without changing `len`/`count`.
+- `test_bitset_find_next_ascending` — `find_next` ascends across words.
+- `test_bitset_find_next_none_past_end` — `None` past the end; negative
+  `from_index` behaves as 0.
+- `test_bitset_to_list_ordering` — ascending order.
+- `test_bitset_union` / `test_bitset_intersection` / `test_bitset_difference` /
+  `test_bitset_symmetric_difference` — each on a hand-checked pair, receiver
+  unchanged.
+- `test_bitset_with_ops_len_growth` — `*_with` follow the documented `_len`
+  rules; capacity never reduced.
+- `test_bitset_subset_superset_disjoint` — edge cases incl. the empty set.
+- `test_bitset_equality_ignores_capacity` — `{5}` equals a `{5}` with larger
+  capacity.
+- `test_bitset_negative_index_and_reverse_range_raise` — `RANGE` / `BAD_RANGE`.
 
 Implementation status:
 
@@ -741,9 +763,12 @@ Errors:
 
 Tests:
 
-- planned: single-bit field; crossing word/nibble boundaries; full-width
-  `[63:0]` returns `value`; the mask special-case at `hi == 63`; error kinds for
-  out-of-range and reversed fields.
+- `test_get_bits_single_bit_field` — `hi == lo`.
+- `test_get_bits_crossing_nibble` — a field spanning a nibble boundary.
+- `test_get_bits_full_width` — `[63:0]` returns `value`; the mask special-case
+  at `hi == 63`.
+- `test_get_bits_out_of_range_raises` — `RANGE` for `lo < 0` / `hi > 63`.
+- `test_get_bits_reversed_raises` — `BAD_RANGE` for `hi < lo`.
 
 Implementation status:
 
@@ -792,9 +817,12 @@ Errors:
 
 Tests:
 
-- planned: insert/clear a field; preserving the surrounding bits; the `hi == lo`
-  single-bit case; `field` exactly at capacity passes; `field` one bit too wide
-  raises `OVERFLOW`; out-of-range and reversed fields raise the right kind.
+- `test_set_bits_insert_clear` — insert then clear a field.
+- `test_set_bits_preserves_surrounding` — bits outside `[hi:lo]` unchanged.
+- `test_set_bits_single_bit` — `hi == lo` with `field` 0 or 1.
+- `test_set_bits_exact_capacity_ok` — a `field` that exactly fills passes.
+- `test_set_bits_overflow_raises` — `field` one bit too wide raises `OVERFLOW`.
+- `test_set_bits_out_of_range_and_reversed_raise` — `RANGE` / `BAD_RANGE`.
 
 Implementation status:
 
@@ -876,11 +904,20 @@ Errors:
 
 Tests:
 
-- planned: MSB-first and LSB-first round-trips against a `BitWriter`; `read_bit`
-  sequence across a byte boundary; `read_bits` up to 64; `align` skipping to the
-  next byte; `EOF` on exhaustion (no partial value); `RANGE` for count 0 and 65;
-  `bits_left`/`bit_pos` accounting; the reader cannot outlive its span (compile
-  check, documented).
+- `test_bitreader_roundtrip_msb_first` — against a `BitWriter`.
+- `test_bitreader_roundtrip_lsb_first` — against a `BitWriter`.
+- `test_bitreader_read_bit_across_byte` — `read_bit` sequence across a byte
+  boundary.
+- `test_bitreader_read_bits_up_to_64` — `read_bits` up to 64 bits.
+- `test_bitreader_align_to_next_byte` — `align` skips to the next byte.
+- `test_bitreader_align_clamps_at_end` — `align` near the end clamps `_bit_pos`,
+  `bits_left` stays `>= 0`.
+- `test_bitreader_eof_atomic` — `EOF` on exhaustion leaves `_bit_pos` unchanged
+  (no partial value).
+- `test_bitreader_count_range_raises` — `RANGE` for count 0 and 65.
+- `test_bitreader_pos_and_left_accounting` — `bits_left`/`bit_pos` accounting.
+- `test_bitreader_cannot_outlive_span` — compile-time: the reader cannot
+  outlive its borrowed span (documented).
 
 Implementation status:
 
@@ -963,11 +1000,18 @@ Errors:
 
 Tests:
 
-- planned: round-trip with `BitReader` for both orders; filling a byte MSB-first
-  vs LSB-first; `write_bits(count=0)` no-op; `OVERFLOW` when a value has bits
-  above `count`; `align` zero-filling; `byte_len`/`bit_len` accounting;
-  `to_bytes` zero-padding the final partial byte and leaving the writer
-  writable; `RANGE` for count 65 and count -1.
+- `test_bitwriter_roundtrip_both_orders` — against a `BitReader`.
+- `test_bitwriter_fill_byte_msb_vs_lsb` — bit placement in a full byte.
+- `test_bitwriter_count_zero_noop` — `write_bits(0, 0)` writes nothing.
+- `test_bitwriter_count_zero_nonzero_overflow` — `write_bits(1, 0)` raises
+  `OVERFLOW`.
+- `test_bitwriter_overflow_high_bits` — a value with bits above `count` raises
+  `OVERFLOW` and writes nothing (atomic).
+- `test_bitwriter_align_zero_fills` — `align` zero-fills the partial byte.
+- `test_bitwriter_len_accounting` — `byte_len`/`bit_len` accounting.
+- `test_bitwriter_to_bytes_pads_and_keeps_writable` — `to_bytes` zero-pads the
+  final partial byte and the writer stays writable.
+- `test_bitwriter_count_range_raises` — `RANGE` for count 65 and count -1.
 
 Implementation status:
 
