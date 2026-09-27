@@ -1,6 +1,5 @@
-from std.os import abort
-
 from .io_error import IoError
+from .io_error_kind import IoErrorKind
 from .read_result import ReadResult
 from .reader import Reader
 from io._internal.bounds import Stream
@@ -12,12 +11,55 @@ struct BufferedReader[R: Stream, capacity: Int = 4096](Reader):
     var _buf: Array[UInt8, Self.capacity]
     var _start: Int
     var _end: Int
+    # Private: records that the inner reader has reported eof, so EOF can be
+    # reported once the buffer drains (never before).
+    var _eof: Bool
 
     def __init__(out self, var inner: Self.R):
-        abort("MojoAkku: this API is not yet implemented")
+        self._inner = inner^
+        self._buf = Array[UInt8, Self.capacity](fill=0)
+        self._start = 0
+        self._end = 0
+        self._eof = False
 
     def read(mut self, buf: MutSpan[UInt8, _]) raises IoError -> ReadResult:
-        abort("MojoAkku: this API is not yet implemented")
+        # Serve from the buffer; refill only when empty.
+        if self._start >= self._end:
+            if self._eof:
+                return ReadResult(0, True)
+            _ = self._refill()
+        var n = len(buf)
+        if self._end - self._start < n:
+            n = self._end - self._start
+        for i in range(n):
+            buf[i] = self._buf[self._start + i]
+        self._start += n
+        return ReadResult(n, self._eof and self._start >= self._end)
+
+    def _refill(mut self) raises IoError -> Bool:
+        # Fill the buffer from the inner reader. Returns False on inner EOF.
+        # INTERRUPTED is retried; a zero-length non-EOF inner read is OTHER.
+        while True:
+            var result: ReadResult
+            try:
+                result = self._inner.read(MutSpan(self._buf))
+            except e:
+                if e.kind == IoErrorKind.INTERRUPTED:
+                    continue
+                raise e^
+            if result.count > 0:
+                self._start = 0
+                self._end = result.count
+                self._eof = result.eof
+                return True
+            if result.eof:
+                self._start = 0
+                self._end = 0
+                self._eof = True
+                return False
+            raise IoError(
+                IoErrorKind.OTHER, "read", "buffered reader made no progress"
+            )
 
 # API-DOCS-START
 # BufferedReader — buffer reads from any Reader to reduce call overhead.

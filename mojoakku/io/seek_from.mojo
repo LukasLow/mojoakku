@@ -1,6 +1,3 @@
-from std.os import abort
-
-
 # SeekFrom — where a seek starts: a named origin plus a signed byte offset.
 struct SeekFrom(Equatable, ImplicitlyCopyable, Deinitable):
     var _id: UInt8
@@ -13,7 +10,7 @@ struct SeekFrom(Equatable, ImplicitlyCopyable, Deinitable):
 
     # Written explicitly so equality compares both the origin and the offset.
     def __eq__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._id == other._id and self.offset == other.offset
 
     comptime START   = SeekFrom(0, 0)   # offset from the start of the stream
     comptime CURRENT = SeekFrom(1, 0)   # offset from the current position
@@ -21,15 +18,15 @@ struct SeekFrom(Equatable, ImplicitlyCopyable, Deinitable):
 
     @staticmethod
     def start(offset: Int) -> SeekFrom:
-        abort("MojoAkku: this API is not yet implemented")
+        return SeekFrom(0, offset)
 
     @staticmethod
     def current(offset: Int) -> SeekFrom:
-        abort("MojoAkku: this API is not yet implemented")
+        return SeekFrom(1, offset)
 
     @staticmethod
     def end(offset: Int) -> SeekFrom:
-        abort("MojoAkku: this API is not yet implemented")
+        return SeekFrom(2, offset)
 
 # API-DOCS-START
 # SeekFrom — where a seek starts: one of three origins plus a signed byte offset.

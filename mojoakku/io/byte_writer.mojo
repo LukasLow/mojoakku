@@ -1,6 +1,5 @@
-from std.os import abort
-
 from .io_error import IoError
+from .io_error_kind import IoErrorKind
 
 
 # ByteWriter — one required buffer method plus provided helpers.
@@ -8,10 +7,27 @@ trait ByteWriter:
     def write(mut self, data: Span[UInt8, _]) raises IoError -> Int: ...
 
     def write_all(mut self, data: Span[UInt8, _]) raises IoError:
-        abort("MojoAkku: this API is not yet implemented")
+        # Loop until every byte is accepted. INTERRUPTED is retried; a zero
+        # byte return without an error is OTHER ("write zero"); other kinds
+        # surface.
+        var offset = 0
+        var total = len(data)
+        while offset < total:
+            var n: Int
+            try:
+                n = self.write(data[offset:])
+            except e:
+                if e.kind == IoErrorKind.INTERRUPTED:
+                    continue
+                raise e^
+            if n == 0:
+                raise IoError(IoErrorKind.OTHER, "write", "write zero")
+            offset += n
 
     def flush(mut self) raises IoError:
-        abort("MojoAkku: this API is not yet implemented")
+        # Default: a plain sink has nothing buffered, so a no-op flush cannot
+        # fail. Buffered sinks override it.
+        pass
 
 # API-DOCS-START
 # ByteWriter — write raw bytes from a borrowed buffer to a stream.

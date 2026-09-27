@@ -1,5 +1,3 @@
-from std.os import abort
-
 from .io_error import IoError
 from .read_result import ReadResult
 from .reader import Reader
@@ -12,10 +10,16 @@ struct TeeReader[R: Stream, W: Sink](Reader):
     var _sink: Self.W
 
     def __init__(out self, var inner: Self.R, var sink: Self.W):
-        abort("MojoAkku: this API is not yet implemented")
+        self._inner = inner^
+        self._sink = sink^
 
     def read(mut self, buf: MutSpan[UInt8, _]) raises IoError -> ReadResult:
-        abort("MojoAkku: this API is not yet implemented")
+        # Read from the inner reader, then mirror exactly the bytes delivered.
+        # A sink failure surfaces before the result is returned.
+        var result = self._inner.read(buf)
+        if result.count > 0:
+            self._sink.write_all(Span(buf)[0 : result.count])
+        return result^
 
 # API-DOCS-START
 # TeeReader — mirror every byte read into a second stream.

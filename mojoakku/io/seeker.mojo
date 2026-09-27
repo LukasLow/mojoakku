@@ -1,5 +1,3 @@
-from std.os import abort
-
 from .io_error import IoError
 from .seek_from import SeekFrom
 

@@ -1,6 +1,5 @@
-from std.os import abort
-
 from .io_error import IoError
+from .io_error_kind import IoErrorKind
 from .read_result import ReadResult
 from .seek_from import SeekFrom
 from .reader import Reader
@@ -14,16 +13,46 @@ struct Cursor(Reader, ByteWriter, Seeker):
     var _pos: Int
 
     def __init__(out self, var buffer: List[UInt8]):
-        abort("MojoAkku: this API is not yet implemented")
+        self._buffer = buffer^
+        self._pos = 0
 
     def read(mut self, buf: MutSpan[UInt8, _]) raises IoError -> ReadResult:
-        abort("MojoAkku: this API is not yet implemented")
+        var length = len(self._buffer)
+        if self._pos >= length:
+            return ReadResult(0, True)
+        var n = len(buf)
+        if length - self._pos < n:
+            n = length - self._pos
+        for i in range(n):
+            buf[i] = self._buffer[self._pos + i]
+        self._pos += n
+        return ReadResult(n, self._pos >= length)
 
     def write(mut self, data: Span[UInt8, _]) raises IoError -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        var n = len(data)
+        for i in range(n):
+            var at = self._pos + i
+            if at < len(self._buffer):
+                self._buffer[at] = data[i]
+            else:
+                self._buffer.append(data[i])
+        self._pos += n
+        return n
 
     def seek(mut self, whence: SeekFrom) raises IoError -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        var target: Int
+        if whence._id == 0:
+            target = whence.offset
+        elif whence._id == 1:
+            target = self._pos + whence.offset
+        else:
+            target = len(self._buffer) + whence.offset
+        if target < 0:
+            raise IoError(
+                IoErrorKind.OTHER, "seek", "seek target is before the start"
+            )
+        self._pos = target
+        return target
 
 # API-DOCS-START
 # Cursor — read, write and seek over an in-memory buffer you hand over.

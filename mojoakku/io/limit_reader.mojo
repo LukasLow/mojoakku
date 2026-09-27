@@ -1,5 +1,3 @@
-from std.os import abort
-
 from .io_error import IoError
 from .read_result import ReadResult
 from .reader import Reader
@@ -12,10 +10,21 @@ struct LimitReader[R: Stream](Reader):
     var _remaining: Int
 
     def __init__(out self, var inner: Self.R, limit: Int):
-        abort("MojoAkku: this API is not yet implemented")
+        self._inner = inner^
+        # A negative limit is defined to behave as 0.
+        self._remaining = limit if limit > 0 else 0
 
     def read(mut self, buf: MutSpan[UInt8, _]) raises IoError -> ReadResult:
-        abort("MojoAkku: this API is not yet implemented")
+        if self._remaining == 0:
+            return ReadResult(0, True)
+        var n = len(buf)
+        if self._remaining < n:
+            n = self._remaining
+        var result = self._inner.read(buf[0:n])
+        if result.count > self._remaining:
+            result.count = self._remaining
+        self._remaining -= result.count
+        return result^
 
 # API-DOCS-START
 # LimitReader — read at most a fixed number of bytes from an inner reader.

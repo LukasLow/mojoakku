@@ -1,6 +1,3 @@
-from std.os import abort
-
-
 # IoErrorKind — compile-time discriminant for IoError.
 struct IoErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     var _id: UInt8
@@ -11,7 +8,7 @@ struct IoErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
 
     # Written explicitly so equality compares the discriminant only.
     def __eq__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._id == other._id
 
     comptime INTERRUPTED    = IoErrorKind(0)   # interrupted; the operation may be retried
     comptime WOULD_BLOCK    = IoErrorKind(1)   # would block on a non-blocking handle
@@ -23,7 +20,22 @@ struct IoErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
 
     # write_to — symbolic name, not the numeric _id.
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        # Symbolic names, not the numeric _id. An if/elif chain is used because
+        # the `comptime NAME[...]` runtime-index form does not compile.
+        if self._id == 0:
+            writer.write("INTERRUPTED")
+        elif self._id == 1:
+            writer.write("WOULD_BLOCK")
+        elif self._id == 2:
+            writer.write("CLOSED")
+        elif self._id == 3:
+            writer.write("TIMED_OUT")
+        elif self._id == 4:
+            writer.write("INVALID_UTF8")
+        elif self._id == 5:
+            writer.write("UNEXPECTED_EOF")
+        else:
+            writer.write("OTHER")
 
 # API-DOCS-START
 # IoErrorKind — the machine-testable reason a stream operation failed.

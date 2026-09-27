@@ -1,6 +1,5 @@
-from std.os import abort
-
 from .io_error import IoError
+from .io_error_kind import IoErrorKind
 from .byte_writer import ByteWriter
 from io._internal.bounds import Sink
 
@@ -10,18 +9,55 @@ struct BufferedWriter[W: Sink, capacity: Int = 4096](ByteWriter):
     var _inner: Self.W
     var _buf: Array[UInt8, Self.capacity]
     var _len: Int
+    # Private: set by close(); write/flush after it raise CLOSED.
+    var _closed: Bool
 
     def __init__(out self, var inner: Self.W):
-        abort("MojoAkku: this API is not yet implemented")
+        self._inner = inner^
+        self._buf = Array[UInt8, Self.capacity](fill=0)
+        self._len = 0
+        self._closed = False
 
     def write(mut self, data: Span[UInt8, _]) raises IoError -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        if self._closed:
+            raise IoError(IoErrorKind.CLOSED, "write", "writer is closed")
+        var offset = 0
+        var total = len(data)
+        while offset < total:
+            if self._len == Self.capacity:
+                self._write_buffer()
+            var space = Self.capacity - self._len
+            var n = total - offset
+            if space < n:
+                n = space
+            for i in range(n):
+                self._buf[self._len + i] = data[offset + i]
+            self._len += n
+            offset += n
+        return total
 
     def flush(mut self) raises IoError:
-        abort("MojoAkku: this API is not yet implemented")
+        if self._closed:
+            raise IoError(IoErrorKind.CLOSED, "flush", "writer is closed")
+        self._write_buffer()
+        self._inner.flush()
 
     def close(mut self) raises IoError:
-        abort("MojoAkku: this API is not yet implemented")
+        # Idempotent: a second close is a no-op.
+        if self._closed:
+            return
+        self._write_buffer()
+        self._inner.flush()
+        self._closed = True
+
+    def _write_buffer(mut self) raises IoError:
+        # Push the buffered bytes to the inner writer (handling short writes)
+        # and clear the buffer. Does not call inner.flush — the explicit
+        # flush()/close() own that.
+        if self._len == 0:
+            return
+        self._inner.write_all(Span(self._buf)[0 : self._len])
+        self._len = 0
 
 # API-DOCS-START
 # BufferedWriter — buffer writes to any ByteWriter with an explicit terminal

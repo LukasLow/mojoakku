@@ -1,6 +1,3 @@
-from std.os import abort
-
-
 # ReadResult — explicit read outcome: bytes written plus an EOF flag.
 @fieldwise_init
 struct ReadResult(Copyable, Deinitable, Writable):
@@ -8,7 +5,7 @@ struct ReadResult(Copyable, Deinitable, Writable):
     var eof: Bool
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write("ReadResult(count=", self.count, ", eof=", self.eof, ")")
 
 # API-DOCS-START
 # ReadResult — the explicit outcome of one read: how many bytes and whether the
