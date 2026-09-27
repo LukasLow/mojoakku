@@ -3,7 +3,7 @@ Design record for mojoakku/bit — NOT end-user documentation.
 End-user documentation lives inline in the `*.mojo` files (the `# API-DOCS`
 blocks) and in `__init__.mojo`. This file keeps the developer-facing reasoning:
 status bookkeeping, tests, rationale, reference-API comparisons, non-goals and
-open questions. It reflects the state after Phase 3 (API design).
+open questions. It reflects the state after Phase 5 (docs: per-entry test lists).
 -->
 
 # bit — Design Record
