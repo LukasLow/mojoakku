@@ -20,7 +20,7 @@ JavaScript has **no bitset/bit-array container** in the language or standard lib
 | FastBitSet.js | `fastbitset` | Daniel Lemire | speed-optimized, benchmarked against peers, 32-bit-word bitset | Apache-2.0 | <https://github.com/lemire/FastBitSet.js> |
 | TypedFastBitSet.js | `typedfastbitset` | Daniel Lemire | same design, typed arrays | Apache-2.0 | <https://github.com/lemire/TypedFastBitSet.js> |
 | BitSet.js | `bitset` | Robert Eisele | arbitrary-length + infinite complement, TypeScript, v5.3.0 | MIT | <https://github.com/rawify/BitSet.js>, <https://registry.npmjs.org/bitset> |
-| bit-buffer | `bit-buffer` | inolen | `BitView`/`BitStream`, bit-level DataView; last CI badge present | MIT | <https://github.com/inolen/bit-buffer> |
+| bit-buffer | `bit-buffer` | inolen | `BitView`/`BitStream`, bit-level DataView; npm 0.3.0 (2025-11-04), last commit 2025-10-31 | MIT | <https://github.com/inolen/bit-buffer>, <https://registry.npmjs.org/bit-buffer> |
 | @thi.ng/bitstream | `@thi.ng/bitstream` | Karsten Schmidt | "STABLE — used in production", ES6 iterator streams | Apache-2.0 | <https://www.npmjs.com/package/@thi.ng/bitstream> |
 
 (Assessment: derived from the repositories above. The ecosystem splits cleanly into *bitset containers* (FastBitSet, BitSet.js) and *bit-stream readers/writers* (bit-buffer, @thi.ng/bitstream); no library covers both.)

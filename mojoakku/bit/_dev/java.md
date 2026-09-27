@@ -56,10 +56,11 @@ it is the canonical packed, indexable bit vector.
   the RoaringBitmap authors (Lemire et al.); license Apache-2.0; ~3.9k stars;
   used by Spark, Hive, Druid, Pinot, Flink. Sources:
   <https://github.com/RoaringBitmap/RoaringBitmap>
-- Small ad-hoc readers/writers are widespread as gists/course files (e.g.
-  <https://github.com/herbix/bitstream>, CSE143 `BitInputStream`), not libraries.
-  Source: search result
-  <https://gist.github.com/camertron/927115e5a2f43f27f4eb5801d87d2964>
+- **herbix/bitstream** — a small dedicated Java bit-stream project: a bit
+  input/output stream over `InputStream`/`OutputStream`. Author: herbix; license
+  Apache-2.0; 8 stars; last pushed 2017-03-31 (low maintenance). Cited as one
+  concrete example of a standalone implementation, not as a claim of
+  ecosystem-wide prevalence. Source: <https://github.com/herbix/bitstream>
 
 ## 3. Exposed APIs
 

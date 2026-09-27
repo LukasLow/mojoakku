@@ -49,9 +49,13 @@ bits is known as a *binary*" (Erlang, <https://www.erlang.org/doc/system/data_ty
 
 **No bit-set / bitset container in stdlib.** Elixir's standard set type is
 `MapSet`, a hash-map-backed set (<https://elixir.hexdocs.pm/main/MapSet.html>) —
-it is not bit-packed. Erlang/OTP ships `sets`, `ordsets`, `gb_sets`
-(<https://www.erlang.org/doc/apps/stdlib/binary.html> lists the stdlib modules;
-the set modules are separate). No `BitSet` type exists in either stdlib.
+it is not bit-packed. Erlang/OTP ships three general set modules, `sets`,
+`ordsets` and `gb_sets` — all value-set implementations with no bit packing
+(`sets` is opaque, `ordsets` is an ordered list, `gb_sets` is a general balanced
+tree) (<https://www.erlang.org/doc/apps/stdlib/sets.html>,
+<https://www.erlang.org/doc/apps/stdlib/ordsets.html>,
+<https://www.erlang.org/doc/apps/stdlib/gb_sets.html>). No `BitSet` type exists
+in either stdlib.
 (Assessment: derived from the absence of any `BitSet`/bitset module in the
 stdlib module index, and from every bit-packed container being a Hex package in
 §2.)
@@ -468,9 +472,13 @@ The three layers are split as follows on the BEAM:
   contract of `Abit` (<https://hexdocs.pm/abit/Abit.html>).
 - **Wrap, don't rebuild, `std.bit`.** The BEAM hand-rolls popcount/reverse
   because it has no primitives (`Bitset.count/1`, `reverse_byte/2`); Mojo's
-  `std.bit` already has `pop_count`, `bit_reverse`, `byte_swap`, `rotate_bits_*`
-  — MojoAkku should consume those and add only the container, the `[hi:lo]`
-  bitfield pair and the bit-level stream.
+  `std.bit` already ships `bit_not`, `bit_reverse`, `bit_width`, `byte_swap`,
+  `count_leading_zeros`, `count_trailing_zeros`, `log2_ceil`, `log2_floor`,
+  `next_power_of_two`, `prev_power_of_two`, `pop_count`, `rotate_bits_left`,
+  `rotate_bits_right`, plus `mask.is_negative` and `mask.splat` — unstable by
+  default — so MojoAkku should consume those and add only the container, the
+  `[hi:lo]` bitfield pair and the bit-level stream. Source: `mojov1/stdlib/bit`,
+  <https://mojolang.org/docs/std/bit/>.
 
 ## Sources
 

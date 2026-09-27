@@ -25,9 +25,11 @@ Security note: since 3.11 integer↔string conversion is limited by default (`sy
 | `bitarray` | Ilan Schnell | mature, 3.11.0, 654 unit tests, wheels for all major platforms | PSF-style (see LICENSE) | <https://github.com/ilanschnell/bitarray>, <https://github.com/ilanschnell/bitarray/blob/master/LICENSE> |
 | `bitstring` | Scott Griffiths | mature, docs v4.3, `Bits`/`BitArray`/`BitStream` | MIT | <https://github.com/scott-griffiths/bitstring>, <https://github.com/scott-griffiths/bitstring/blob/master/LICENSE> |
 | `numpy.packbits`/`unpackbits` | NumPy devs | mature, in NumPy core | BSD | <https://numpy.org/doc/stable/reference/generated/numpy.packbits.html> |
-| `enum.auto` / `Flag` | CPython | stdlib since 3.6 | PSF | <https://docs.python.org/3/library/enum.html> |
 
-(Assessment: derived from the repositories/licenses above. `bitarray` and `bitstring` are the two reference container/stream designs; NumPy is the reference *packing* design.)
+Note: `enum.auto`/`enum.Flag` is **not** a community library but CPython's own
+stdlib (§1), and is therefore not listed here. (Assessment: derived from the
+repositories/licenses above. `bitarray` and `bitstring` are the two reference
+container/stream designs; NumPy is the reference *packing* design.)
 
 ## 3. Exposed APIs
 
@@ -127,7 +129,7 @@ Ordering is a per-call or per-object parameter in every case (`bitorder=`, `endi
 
 ## 12. Ideas fitting Mojo
 
-- **Wrap the `std.bit` scalar functions** rather than rebuild them: Python shows the scalar layer belongs on the integer type itself (`bit_count`, `bit_length`) — in Mojo that is `std.bit`. (`std.bit` inventory: `mojov1/stdlib/bit`.)
+- **Wrap the `std.bit` scalar functions** rather than rebuild them: Python shows the scalar layer belongs on the integer type itself (`bit_count`, `bit_length`) — in Mojo that is `std.bit`, which already ships `bit_not`, `bit_reverse`, `bit_width`, `byte_swap`, `count_leading_zeros`, `count_trailing_zeros`, `log2_ceil`, `log2_floor`, `next_power_of_two`, `prev_power_of_two`, `pop_count`, `rotate_bits_left`, `rotate_bits_right`, plus `mask.is_negative` and `mask.splat` — unstable by default. Source: `mojov1/stdlib/bit`, <https://mojolang.org/docs/std/bit/>.
 - **Explicit `bitorder` / `endian` parameter with a documented default**, as in `numpy.packbits` — matches Mojo's preference for predictable, stated conventions. Source: <https://numpy.org/doc/stable/reference/generated/numpy.packbits.html>.
 - **`search()`/set-bit iterator**: an iterator over set-bit indices is the ergonomic core of a bitset and maps well to Mojo's value/iterator model. Source: README.rst.
 - **A boundary/policy concept for out-of-range writes** (`STRICT` raise vs silent mask), expressed as `raises` in Mojo: Python's `FlagBoundary` is evidence that users want to *choose*. Source: <https://docs.python.org/3/library/enum.html#flagboundary>.

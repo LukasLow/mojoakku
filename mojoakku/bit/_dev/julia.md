@@ -47,7 +47,11 @@ the stdlib.
 | **PackedStructs.jl** (JuliaData) | `@packed` macro packing sub-byte integer fields; logical widths; `Pad{N}`; `pack`/unpack | <https://github.com/JuliaData/PackedStructs.jl> |
 | **Bits.jl** (ma-laforge) | `bit`, `bits`, `bitsize`, `low0`, `low1`, `mask`, `masked`, `scan0`, `scan1`, `tstbit`, `weight`; index convention debated (0- vs 1-based) | listed at <https://juliapackages.com/p/bits>; docstrings <https://docs.juliahub.com/Bits/nwkk8/0.2.0/autodocs/> (link 404 at time of writing) |
 | **BitPermutations.jl** | Bit-permutation networks using `bitreverse`/shifts | <https://juliapackages.com/p/bitpermutations> |
-| **novolang/bitstream-nv** | Bit-level reads/writes with an explicit LSB-first vs MSB-first constructor argument | <https://github.com/novolang/bitstream-nv> — **not Julia** (see §10/§11) |
+
+**Non-Julia cross-reference (not a Julia package).** `novolang/bitstream-nv` is
+listed here only as an ordering-API signal for §12: it is **not Julia**, but a
+separate implementation with an explicit LSB-first vs MSB-first constructor
+argument. Source: <https://github.com/novolang/bitstream-nv> — **not Julia** (see §10/§11).
 
 ## 3. Exposed APIs
 
@@ -329,10 +333,12 @@ The three layers and where Julia puts them:
 ## 12. Ideas fitting Mojo
 
 - **Match `std.bit` first, then add the container.** Mojo already has the scalar layer
-  (`pop_count`, `count_leading_zeros`, `count_trailing_zeros`, `bit_reverse`, `byte_swap`,
-  `rotate_bits_left/right`, `bit_not`, `bit_width`; see `mojov1/stdlib/bit` and
-  `mojoakku/bit/_dev/README.md`). The research signal is to *wrap, not rebuild*, those and
-  spend the design on the container + bitfield + bit I/O.
+  (`bit_not`, `bit_reverse`, `bit_width`, `byte_swap`, `count_leading_zeros`,
+  `count_trailing_zeros`, `log2_ceil`, `log2_floor`, `next_power_of_two`,
+  `prev_power_of_two`, `pop_count`, `rotate_bits_left`, `rotate_bits_right`, plus
+  `mask.is_negative` and `mask.splat`; unstable by default — source:
+  `mojov1/stdlib/bit`, <https://mojolang.org/docs/std/bit/>). The research signal is to
+  *wrap, not rebuild*, those and spend the design on the container + bitfield + bit I/O.
 - **Word-parallel set algebra on `UInt64` chunks** (`union`/`intersect`/`difference`/
   `complement` as single-word ops) is portable and fast; Julia's `_matched_map!` pattern
   shows how to handle unequal lengths/offsets. Source: `base/bitset.jl`.
@@ -389,7 +395,7 @@ Community packages:
 - PackedStructs.jl — <https://github.com/JuliaData/PackedStructs.jl>
 - Bits.jl package listing — <https://juliapackages.com/p/bits>
 - BitPermutations.jl listing — <https://juliapackages.com/p/bitpermutations>
-- bitstream-nv (non-Julia, ordering-API signal) — <https://github.com/novolang/bitstream-nv>
+- bitstream-nv (non-Julia cross-reference, not a Julia package — ordering-API signal) — <https://github.com/novolang/bitstream-nv>
 
 Discussion:
 - "I have: Vector{UInt8}. I need: BitVector" (reinterpret limits, unsafe workaround) — <https://discourse.julialang.org/t/i-have-vector-uint8-i-need-bitvector/2286>

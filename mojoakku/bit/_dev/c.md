@@ -227,15 +227,19 @@ Operation Builtins*, and the community library pages.)
 
 ## 12. Ideas fitting Mojo
 
-- **Wrap, don't rebuild, the scalars.** `std.bit` already has `pop_count`,
-  `count_leading_zeros`, `count_trailing_zeros`, `bit_reverse`, `rotate_bits_left/right`,
-  `next/prev_power_of_two`, `log2_floor/ceil` (mojov1 buch, `mojov1/stdlib/bit`).
+- **Wrap, don't rebuild, the scalars.** `std.bit` already provides `bit_not`,
+  `bit_reverse`, `bit_width`, `byte_swap`, `count_leading_zeros`,
+  `count_trailing_zeros`, `log2_ceil`, `log2_floor`, `next_power_of_two`,
+  `prev_power_of_two`, `pop_count`, `rotate_bits_left`, `rotate_bits_right`,
+  plus `mask.is_negative` and `mask.splat` (mojov1 buch, `mojov1/stdlib/bit`;
+  <https://mojolang.org/docs/std/bit/>).
   The C `<stdbit.h>` split into leading/trailing × zeros/ones × first/count is a
   good checklist for what a wrapper could add.
 - **A `BitSet` container with explicit capacity** mirrors the kernel `bitmap`:
   set/clear/toggle/test, union/intersection/difference/complement, cardinality,
   `find_first_set` / `find_next_set` (Linux `bitmap.h`; Boost names
-  `find_first`/`find_next`).
+  `find_first`/`find_next` —
+  <https://www.boost.org/doc/libs/latest/libs/dynamic_bitset/doc/html/dynamic_bitset/reference/boost/dynamic_bitset.html>).
 - **`get_bits(hi, lo)` / `set_bits(hi, lo, value)`** over an integer value is exactly
   the kernel `bitmap_read`/`bitmap_write` concept applied to a scalar
   (`include/linux/bitmap.h`).

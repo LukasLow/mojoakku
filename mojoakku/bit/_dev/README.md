@@ -100,8 +100,10 @@ claim cites a source (URL, or `repo/path:line`). Derived statements are marked
 `(Assessment: derived from <sources>)`; unsourced statements are marked `GUESS:`
 with the reason no source exists.
 
-The Mojo side is **not** a generated file: it lives in the `mojov1` buch
-(`mojov1/stdlib/bit`) and is read from there.
+The Mojo side is **not** a researcher-written file: the facts live in the
+`mojov1` buch (`mojov1/stdlib/bit`). `mojo.md` is a small pointer note that
+records what the buch answers and which parts of the question set it does not —
+those unanswered parts are the library's gap premise.
 
 ## Status
 
@@ -116,7 +118,7 @@ The Mojo side is **not** a generated file: it lives in the `mojov1` buch
 | Java | managed-JVM | `java.md` | done |
 | Elixir | functional/BEAM | `elixir.md` | done |
 | Julia | data/science | `julia.md` | done |
-| Mojo | (buch) | `mojov1/stdlib/bit` | covered by buch |
+| Mojo | (buch) | `mojo.md` → `mojov1/stdlib/bit` | covered by buch |
 
 Researchers started: **6** (one per selected group; the upper bound).
 

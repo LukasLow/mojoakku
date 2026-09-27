@@ -21,7 +21,9 @@
   bitwise and comparison operations with another `std::byte`" (cppreference,
   *std::byte*).
 - **`<stdbit.h>` (C++26)** exposes the C23 `stdc_*` macros in C++ as well
-  (cppreference, *Standard library header `<bit>`*, navigation).
+  (cppreference, *Standard library header `<stdbit.h>` (C++26)*,
+  <https://en.cppreference.com/w/cpp/header/stdbit.h>; note the unsuffixed path
+  <https://en.cppreference.com/w/cpp/header/stdbit> currently returns 404).
 - **No bit-level stream I/O in the standard library**: `istream`/`ostream` operate on
   bytes/words; bit packing is user code (Assessment: derived from cppreference
   `std::bitset` non-member operators `<<`/`>>`, which format/parse a whole bitset,
@@ -38,8 +40,10 @@
   <https://github.com/steinwurf/bitter>
 - **KredeGC/BitStream** (header-only C++): `bit_writer<T>`/`bit_reader<T>` with trait
   specializations, extension-oriented. <https://kredegc.github.io/BitStream/>
-- **Martin Weihrauch `BitStream`**, **FranX1024 `bitstream`**: further C++ bit-stream
-  libraries found in the ecosystem (GitHub search result listing).
+- **Martin Weihrauch `BitStream`** (read/write bits from/to a byte stream):
+  <https://github.com/martinweihrauch/bitstream>. **FranX1024 `bitstream`**
+  (C++ library for directly changing and reading bits):
+  <https://github.com/FranX1024/bitstream>.
 - **LLVM `BitstreamReader.h`**: production low-level bitstream reader used by
   Clang/LLVM bitcode. <https://github.com/llvm/llvm-project/blob/main/llvm/include/llvm/Bitstream/BitstreamReader.h>
 - **Michael Dipperstein `bitfile-cpp`** (LGPL): C++ wrapper using (not inheriting)
@@ -235,11 +239,13 @@ Boost.DynamicBitset reference; and the listed community libraries.*)
 
 ## 12. Ideas fitting Mojo
 
-- **Wrap `std.bit` scalars; don't rebuild them.** mojov1 already lists `pop_count`,
-  `count_leading_zeros`, `count_trailing_zeros`, `bit_reverse`, `byte_swap`,
-  `rotate_bits_left/right`, `next/prev_power_of_two`, `log2_floor/ceil`
-  (mojov1 buch, `mojov1/stdlib/bit`). The C++ `<bit>` surface adds the useful
-  complements: `countl_one`/`countr_one`, `bit_width`, `has_single_bit`, and the
+- **Wrap `std.bit` scalars; don't rebuild them.** `std.bit` already provides
+  `bit_not`, `bit_reverse`, `bit_width`, `byte_swap`, `count_leading_zeros`,
+  `count_trailing_zeros`, `log2_ceil`, `log2_floor`, `next_power_of_two`,
+  `prev_power_of_two`, `pop_count`, `rotate_bits_left`, `rotate_bits_right`,
+  plus `mask.is_negative` and `mask.splat` (mojov1 buch, `mojov1/stdlib/bit`;
+  <https://mojolang.org/docs/std/bit/>). The C++ `<bit>` surface adds the useful
+  complements: `countl_one`/`countr_one`, `has_single_bit`, and the
   defined `shl`/`shr` (cppreference, *`<bit>`*).
 - **Two access verbs, defined semantics**: mirror `operator[]` (unchecked, fast) vs
   `test()` (checked, `raises`) but with **no UB** and an explicit error type
