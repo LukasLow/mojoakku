@@ -1,5 +1,5 @@
 id: string
 name: String
-status: todo
+status: done
 depends_on: []
 summary: Text primitives: characters, bytes, slicing and comparison.
