@@ -33,7 +33,7 @@ def test_find_start_offsets_search() raises:
     # A later start skips the earlier match.
     assert_equal(find("abab", "a").value(), 0)
     assert_equal(find("abab", "a", 1).value(), 2)
-    assert_equal(find("abab", "a", 3).value(), 3)
+    assert_equal(find("abab", "b", 3).value(), 3)
 
 
 def test_find_start_below_zero_behaves_as_zero() raises:

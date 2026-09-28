@@ -1,11 +1,25 @@
-from std.os import abort
-
-
 # try_slice — checked byte-range extraction returning Optional (never raises).
 def try_slice[o: Origin[mut=False]](
     text: StringSpan[o], start: Int, end: Int
 ) -> Optional[StringSpan[o]]:
-    abort("MojoAkku: this API is not yet implemented")
+    var n = text.byte_length()
+    if start < 0 or end > n or start > end:
+        return None
+    if not _is_boundary(text, start) or not _is_boundary(text, end):
+        return None
+    var view: StringSpan[o] = text[byte=start:end]
+    return Optional(view)
+
+
+# _is_boundary — local boundary test (index 0, the end, and every non-
+# continuation byte). Kept local so `try_slice` has no cross-entry dependency.
+def _is_boundary(text: StringSpan, index: Int) -> Bool:
+    var n = text.byte_length()
+    if index < 0 or index > n:
+        return False
+    if index == n:
+        return True
+    return (text.as_bytes()[index] & 0xC0) != 0x80
 
 # API-DOCS-START
 # try_slice — checked byte-range extraction returning Optional (never raises).

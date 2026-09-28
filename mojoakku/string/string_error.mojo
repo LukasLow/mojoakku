@@ -1,5 +1,3 @@
-from std.os import abort
-
 from .string_error_kind import StringErrorKind
 
 
@@ -9,8 +7,9 @@ struct StringError(Copyable, Deinitable, Writable):
     var kind: StringErrorKind
     var position: Int
 
+    # write_to — readable kind + position, used by print(err).
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write("StringError(", self.kind, ", position=", self.position, ")")
 
 # API-DOCS-START
 # StringError — the one typed error every failing string operation declares.

@@ -1,9 +1,13 @@
-from std.os import abort
-
-
 # is_char_boundary — is a byte index a valid codepoint start (or the end)?
 def is_char_boundary(text: StringSpan, index: Int) -> Bool:
-    abort("MojoAkku: this API is not yet implemented")
+    var n = text.byte_length()
+    if index < 0 or index > n:
+        return False
+    if index == n:
+        return True
+    # A codepoint start is any byte that is not a UTF-8 continuation byte
+    # (0b10xxxxxx). This is exact for valid UTF-8, which every StringSpan is.
+    return (text.as_bytes()[index] & 0xC0) != 0x80
 
 # API-DOCS-START
 # is_char_boundary — is a byte index a valid UTF-8 codepoint start (or the end)?

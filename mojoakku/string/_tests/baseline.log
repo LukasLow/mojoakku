@@ -35,3 +35,23 @@ note: the suite holds 101 test functions across 15 files. A stub
       `abort` stops the process on its first call, so no per-test
       passed/failed count is reachable in the red phase; the file count
       (15) is the honest measure.
+
+--------
+Phase 11 correction record (factual):
+  - The red baseline above (15 failed) was captured with 4 wrong test
+    literals that contradicted the documented semantics:
+      * test_string_find.mojo:36   find("abab","a",3)   -> needle "a"->"b"
+      * test_string_rfind.mojo:26  rfind("abab","a",3)  -> needle "a"->"b"
+      * test_string_rfind.mojo:29  rfind("abab","b",3)  -> start 3->4
+      * test_string_error.mojo:96  slice("hé",1,3)      -> slice("hé",0,2)
+    These 4 literals were corrected under an explicit Phase-9 test-data
+    fix (no other assertion changed).
+  - Implemented all 16 API entries; with the corrected test data the
+    suite is green.
+
+Final green run (same command: `sh mojoakku/string/_tests/run_baseline.sh`,
+equivalent to `cd mojoakku/string && task test`):
+  baseline: 15 files, 15 passed, 0 failed
+    failures: 0 stub abort, 0 compile/import error, 0 other
+  101 test functions across 15 files, all passing.
+

@@ -23,10 +23,10 @@ def test_rfind_absent_is_none() raises:
 def test_rfind_start_lower_bound() raises:
     # start is a lower bound: matches wholly below it are ignored.
     assert_equal(rfind("abab", "a", 2).value(), 2)
-    assert_equal(rfind("abab", "a", 3).value(), 3)
+    assert_equal(rfind("abab", "b", 3).value(), 3)
     # All matches are below start -> None.
     assert_false(rfind("abab", "a", 4))
-    assert_false(rfind("abab", "b", 3))
+    assert_false(rfind("abab", "b", 4))
 
 
 def test_rfind_start_past_end_is_none() raises:

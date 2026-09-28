@@ -1,9 +1,19 @@
-from std.os import abort
-
-
 # rfind — last byte offset of a needle at or after start, as Optional.
 def rfind(text: StringSpan, needle: StringSpan, start: Int = 0) -> Optional[Int]:
-    abort("MojoAkku: this API is not yet implemented")
+    var begin = start
+    if begin < 0:
+        begin = 0
+    var n = text.byte_length()
+    if needle.byte_length() == 0:
+        # An empty needle matches at `start`, mirroring find.
+        if begin > n:
+            return None
+        return Optional(begin)
+    # std.rfind treats `start` as a lower bound and returns -1 on a miss.
+    var offset = text.rfind(needle, begin)
+    if offset == -1:
+        return None
+    return Optional(offset)
 
 # API-DOCS-START
 # rfind — the last occurrence of a needle as an Optional byte offset.

@@ -90,7 +90,7 @@ def test_string_error_surface_slice() raises:
 
     kind = StringErrorKind.INVALID_UTF8
     try:
-        _ = slice("hé", 1, 3)
+        _ = slice("hé", 0, 2)
     except e:
         kind = e.kind
     assert_equal(kind, StringErrorKind.NOT_A_BOUNDARY)

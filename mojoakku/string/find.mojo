@@ -1,9 +1,19 @@
-from std.os import abort
-
-
 # find — first byte offset of a needle, as Optional (no -1 sentinel).
 def find(text: StringSpan, needle: StringSpan, start: Int = 0) -> Optional[Int]:
-    abort("MojoAkku: this API is not yet implemented")
+    var begin = start
+    if begin < 0:
+        begin = 0
+    var n = text.byte_length()
+    if needle.byte_length() == 0:
+        # An empty needle matches at `start`; std.find ignores `start` here, so
+        # the documented start semantics are applied explicitly.
+        if begin > n:
+            return None
+        return Optional(begin)
+    var offset = text.find(needle, begin)
+    if offset == -1:
+        return None
+    return Optional(offset)
 
 # API-DOCS-START
 # find — the first occurrence of a needle as an Optional byte offset.

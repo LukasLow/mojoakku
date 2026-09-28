@@ -1,13 +1,67 @@
-from std.os import abort
+from string._internal.utf8 import (
+    codepoint_is_unicode_whitespace,
+    decode_utf8_at,
+    utf8_next_index,
+    utf8_prev_index,
+)
 
 
 # trim — strip leading/trailing Unicode whitespace, or an explicit char set.
 def trim[o: Origin[mut=False]](text: StringSpan[o]) -> StringSpan[o]:
-    abort("MojoAkku: this API is not yet implemented")
+    var bytes = text.as_bytes()
+    var start = 0
+    var end = len(bytes)
+    while start < end:
+        var decoded = decode_utf8_at(bytes, start)
+        if decoded[0] == 0 or not codepoint_is_unicode_whitespace(decoded[1]):
+            break
+        start += decoded[0]
+    while end > start:
+        var prev = utf8_prev_index(bytes, end)
+        var decoded = decode_utf8_at(bytes, prev)
+        if decoded[0] == 0 or not codepoint_is_unicode_whitespace(decoded[1]):
+            break
+        end = prev
+    return text[byte=start:end]
 
 
 def trim[o: Origin[mut=False]](text: StringSpan[o], chars: StringSpan) -> StringSpan[o]:
-    abort("MojoAkku: this API is not yet implemented")
+    var bytes = text.as_bytes()
+    var char_bytes = chars.as_bytes()
+    var start = 0
+    var end = len(bytes)
+    while start < end:
+        var width = _char_set_width(bytes, start, char_bytes)
+        if width == 0:
+            break
+        start += width
+    while end > start:
+        var prev = utf8_prev_index(bytes, end)
+        var width = _char_set_width(bytes, prev, char_bytes)
+        if width == 0 or prev + width != end:
+            break
+        end = prev
+    return text[byte=start:end]
+
+
+# _char_set_width — if the codepoint starting at `index` is a member of the
+# `chars` set, return its byte width; otherwise 0. A member is matched by its
+# exact byte sequence, so the set is compared codepoint by codepoint.
+def _char_set_width(bytes: Span[UInt8, _], index: Int, chars: Span[UInt8, _]) -> Int:
+    var decoded = decode_utf8_at(bytes, index)
+    if decoded[0] == 0:
+        return 0
+    var width = decoded[0]
+    var j = 0
+    while j < len(chars):
+        var member = decode_utf8_at(chars, j)
+        if member[0] == 0:
+            j += 1
+            continue
+        if member[0] == width and member[1] == decoded[1]:
+            return width
+        j += member[0]
+    return 0
 
 # API-DOCS-START
 # trim — remove leading and trailing whitespace, or an explicit character set.

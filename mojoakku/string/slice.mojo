@@ -1,13 +1,33 @@
-from std.os import abort
-
 from .string_error import StringError
+from .string_error_kind import StringErrorKind
 
 
 # slice — checked byte-range extraction raising StringError.
 def slice[o: Origin[mut=False]](
     text: StringSpan[o], start: Int, end: Int
 ) raises StringError -> StringSpan[o]:
-    abort("MojoAkku: this API is not yet implemented")
+    var n = text.byte_length()
+    if start < 0 or end > n:
+        raise StringError(StringErrorKind.INDEX_OUT_OF_BOUNDS, start)
+    if start > end:
+        raise StringError(StringErrorKind.BAD_RANGE, start)
+    # Both ends must be codepoint boundaries; report the offending one.
+    if not _is_boundary(text, start):
+        raise StringError(StringErrorKind.NOT_A_BOUNDARY, start)
+    if not _is_boundary(text, end):
+        raise StringError(StringErrorKind.NOT_A_BOUNDARY, end)
+    return text[byte=start:end]
+
+
+# _is_boundary — local boundary test (index 0, the end, and every non-
+# continuation byte). Kept local so `slice` has no cross-entry dependency.
+def _is_boundary(text: StringSpan, index: Int) -> Bool:
+    var n = text.byte_length()
+    if index < 0 or index > n:
+        return False
+    if index == n:
+        return True
+    return (text.as_bytes()[index] & 0xC0) != 0x80
 
 # API-DOCS-START
 # slice — checked byte-range extraction raising StringError.

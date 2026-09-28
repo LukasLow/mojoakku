@@ -1,9 +1,16 @@
-from std.os import abort
+from string._internal.utf8 import string_from_bytes
 
 
 # to_ascii_upper — deterministic ASCII-only uppercase fast path.
 def to_ascii_upper(text: StringSpan) -> String:
-    abort("MojoAkku: this API is not yet implemented")
+    var bytes = text.as_bytes()
+    var out = List[UInt8](capacity=len(bytes))
+    for b in bytes:
+        if b >= 0x61 and b <= 0x7A:   # 'a'..'z'
+            out.append(b - 0x20)
+        else:
+            out.append(b)
+    return string_from_bytes(out^)
 
 # API-DOCS-START
 # to_ascii_upper — deterministic ASCII-only uppercasing.

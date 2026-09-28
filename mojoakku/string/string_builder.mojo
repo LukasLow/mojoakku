@@ -1,6 +1,7 @@
-from std.os import abort
+from string._internal.utf8 import utf8_first_invalid
 
 from .string_error import StringError
+from .string_error_kind import StringErrorKind
 
 
 # StringBuilder — an owning incremental text buffer with an explicit flush.
@@ -8,43 +9,51 @@ struct StringBuilder(Deinitable, Writable, Writer):
     var _buf: String
 
     def __init__(out self):
-        abort("MojoAkku: this API is not yet implemented")
+        self._buf = String()
 
     def __init__(out self, capacity_bytes: Int):
-        abort("MojoAkku: this API is not yet implemented")
+        var cap = capacity_bytes
+        if cap < 0:
+            cap = 0
+        self._buf = String(capacity_bytes=cap)
 
     def append(mut self, text: StringSpan):
-        abort("MojoAkku: this API is not yet implemented")
+        self._buf += text
 
     def append_codepoint(mut self, codepoint: Codepoint):
-        abort("MojoAkku: this API is not yet implemented")
+        self._buf.append(codepoint)
 
     def append_bytes(mut self, bytes: Span[UInt8, _]) raises StringError:
-        abort("MojoAkku: this API is not yet implemented")
+        # Atomic: validate the whole span before appending anything.
+        var invalid = utf8_first_invalid(bytes)
+        if invalid != len(bytes):
+            raise StringError(StringErrorKind.INVALID_UTF8, invalid)
+        self._buf += String(unsafe_from_utf8=bytes)
 
     def reserve(mut self, capacity_bytes: Int):
-        abort("MojoAkku: this API is not yet implemented")
+        if capacity_bytes > self._buf.capacity_bytes():
+            self._buf.reserve_bytes(capacity_bytes)
 
     def clear(mut self):
-        abort("MojoAkku: this API is not yet implemented")
+        self._buf.resize(0)
 
     def byte_length(self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._buf.byte_length()
 
     def capacity(self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._buf.capacity_bytes()
 
     def to_string(self) -> String:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._buf.copy()
 
     def finish(deinit self) -> String:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._buf^
 
     def write_string(mut self, string: StringSpan):
-        abort("MojoAkku: this API is not yet implemented")
+        self._buf += string
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write(self._buf)
 
 # API-DOCS-START
 # StringBuilder — an owning incremental text buffer with an explicit flush.

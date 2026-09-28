@@ -1,9 +1,9 @@
-from std.os import abort
+from string._internal.utf8 import utf8_first_invalid
 
 
 # is_valid_utf8 — allocation-free validity predicate over raw bytes.
 def is_valid_utf8(bytes: Span[UInt8, _]) -> Bool:
-    abort("MojoAkku: this API is not yet implemented")
+    return utf8_first_invalid(bytes) == len(bytes)
 
 # API-DOCS-START
 # is_valid_utf8 — allocation-free validity predicate over raw bytes.

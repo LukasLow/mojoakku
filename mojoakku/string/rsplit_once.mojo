@@ -1,11 +1,16 @@
-from std.os import abort
-
-
 # rsplit_once — split at the last separator into an Optional (before, after) pair.
 def rsplit_once[o: Origin[mut=False]](
     text: StringSpan[o], separator: StringSpan
 ) -> Optional[Tuple[StringSpan[o], StringSpan[o]]]:
-    abort("MojoAkku: this API is not yet implemented")
+    if separator.byte_length() == 0:
+        return None
+    var index = text.rfind(separator)
+    if index == -1:
+        return None
+    var before: StringSpan[o] = text[byte=0:index]
+    var after: StringSpan[o] = text[byte=index + separator.byte_length():]
+    var pair = (before, after)
+    return Optional(pair^)
 
 # API-DOCS-START
 # rsplit_once — split at the last separator into an Optional pair of views.
