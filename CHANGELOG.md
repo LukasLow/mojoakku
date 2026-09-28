@@ -5,6 +5,12 @@ All notable changes to MojoAkku are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions stay on `0.x.y`; major is never bumped.
 
+## v0.5.0 - 2026-09-28
+
+### Added
+
+- string — new library: 16-entry text-primitive API — StringBuilder (append/append_bytes with UTF-8 validation, reserve, to_string, finish, Writer), Optional-returning find/rfind, split_once/rsplit_once, Unicode-aware trim, capitalize, ASCII to_ascii_lower/to_ascii_upper, replace_n, is_char_boundary, checked slice/try_slice, allocation-free is_valid_utf8, closed StringError surface (INDEX_OUT_OF_BOUNDS, BAD_RANGE, NOT_A_BOUNDARY, INVALID_UTF8)
+
 ## v0.4.0 - 2026-09-27
 
 ### Added
