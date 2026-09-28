@@ -3,10 +3,12 @@ Design record for mojoakku/string — NOT end-user documentation.
 End-user documentation lives inline in the `*.mojo` files (the `# API-DOCS`
 blocks) and in `__init__.mojo`. This file keeps the developer-facing reasoning:
 status bookkeeping, tests, rationale, reference-API comparisons, non-goals and
-open questions. It reflects the state of Phase 3 (API design), derived from the
+open questions. It reflects the state of Phase 5 (docs), derived from the
 approved Phase-2 research and from the checked-in probe artifact
 `_dev/std_probe.mojo` + `_dev/std_probe.log` (Mojo 1.1.0; see `## Overview`,
-"Empirical std surface").
+"Empirical std surface"). The 16 API blocks below use the same seven-field set
+in the same order: Status, Signature, Semantics, Errors, Tests, Implementation
+status, Rationale.
 -->
 
 # string — Design Record
@@ -54,7 +56,7 @@ Every API entry carries a `Status:` field with exactly one of these values:
 | `implemented` | Implemented and passing its tests. Default after Phase 12/13. |
 | `benchmarked` | Implemented, tested and measured against the performance goals. |
 
-All 16 entries in this document are `planned` at Phase 3; every entry's
+All 16 entries in this document are `planned` at Phase 5; every entry's
 `Implementation status:` is `not implemented` until Phase 11.
 
 ## Dependencies
@@ -198,7 +200,7 @@ not fit Mojo. Researched-but-unshipped **API candidates** are mirrored in
 - **Canonical-equivalence `==`.** MojoAkku rejects Swift's normalization-aware
   `==` because byte-different strings comparing equal is dangerous for protocol
   and cache keys; normalization stays a separate, explicit operation
-  (`swift.md` §11`).
+  (`swift.md` §11).
 - **A builder-less "list + join" or `io.StringIO` idiom.** MojoAkku rejects
   Python's convention-only builder and JS's total lack of one because repeated
   concatenation is documented quadratic; the library ships an explicit
@@ -368,7 +370,7 @@ supply a non-empty needle. No operation is fatal, and none aborts the process.
 ## Open Questions
 
 None block this design. Points that must be settled during Phase 7 (scaffold)
-rather than blocking Phase 4:
+rather than blocking this phase:
 
 - *`String(from_utf8=Span[UInt8])` raises the untyped built-in `Error`, not
   `StringError`.* `append_bytes` must translate it to `StringError(INVALID_UTF8)`
