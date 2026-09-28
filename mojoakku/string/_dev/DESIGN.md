@@ -4,8 +4,9 @@ End-user documentation lives inline in the `*.mojo` files (the `# API-DOCS`
 blocks) and in `__init__.mojo`. This file keeps the developer-facing reasoning:
 status bookkeeping, tests, rationale, reference-API comparisons, non-goals and
 open questions. It reflects the state of Phase 3 (API design), derived from the
-approved Phase-2 research and from an empirical probe of the installed Mojo
-1.1.0 stdlib (see `## Overview`, "Empirical std surface").
+approved Phase-2 research and from the checked-in probe artifact
+`_dev/std_probe.mojo` + `_dev/std_probe.log` (Mojo 1.1.0; see `## Overview`,
+"Empirical std surface").
 -->
 
 # string — Design Record
@@ -118,10 +119,20 @@ Cross-cutting shape:
 
 ### Empirical std surface (Mojo 1.1.0, probed)
 
-The API set below was derived from a throwaway probe of the installed toolchain
-(`mojo run` on small programs, Mojo 1.1.0/8189361e in the `smd` container). It is
-the empirical basis for "wrap/extend, not rebuild" and for the gap list. A `✓`
-means the symbol compiles and runs in 1.1.0; `✗` means it does not exist.
+The API set below is **auditable**: it is the direct reading of the probe
+artifact checked into this directory — `std_probe.mojo` (the program) and
+`std_probe.log` (its captured output, plus the per-line negative-check errors).
+Re-run it with:
+
+```
+smd mojo run mojoakku/string/_dev/std_probe.mojo
+```
+
+The probe was run in the `smd` container on **Mojo 1.1.0 (8189361e)**. Every `✓`
+row is one `print` line in `std_probe.mojo`; every `✗` row is a one-line snippet
+in the artifact's NEGATIVE CHECKS block, whose exact compiler error is in
+`std_probe.log`. This is the empirical basis for "wrap/extend, not rebuild" and
+for the gap list.
 
 | Area | Present in `std` (wrap/extend) | Absent in `std` (this library's gap) |
 | --- | --- | --- |
@@ -134,8 +145,8 @@ means the symbol compiles and runs in 1.1.0; `✗` means it does not exist.
 | Affix | `removeprefix`, `removesuffix` (return views) | `strip_prefix`/`strip_suffix` names; `has_prefix`/`has_suffix` names |
 | Indexing / slicing | `s[byte=i]`, `s[byte=a:b]`, `s[codepoint=i]`, `s[codepoint=a:b]`; `StringSpan` also `s[grapheme=a:b]`; **aborts** on an out-of-range index or a mid-codepoint byte slice | `is_char_boundary`; checked `slice`; `try_slice`; `byte_at`/`codepoint_at` helpers |
 | Views / iteration | `bytes()`, `codepoints()`, `codepoint_slices()`, grapheme iteration (`for c in s`) | — |
-| Construct / bridge | `String(from_utf8=Span[UInt8])` (raises), `String(from_utf8_lossy=…)`, `String(unsafe_from_utf8=…)`, `String(capacity_bytes=…)`, `String(ptr, len)`, variadic `String(a, b, …)`, `TString`, `format()` | allocation-free `is_valid_utf8` |
-| Builder-ish | `String()`, `+=`, `append(Codepoint)`, `reserve`/`reserve_bytes`, `resize`, `capacity()`; no `clear`, `push_back`, `pop`, `shrink_to_fit`; no `StringBuilder` type in `std` | the whole explicit builder layer |
+| Construct / bridge | `String(from_utf8=Span[UInt8])` (raises), `String(from_utf8_lossy=…)`, `String(unsafe_from_utf8=…)`, `String(capacity_bytes=…)`, `String(ptr, len)`, variadic `String(a, b, …)` (a `Writable` formatter, **not** a byte bridge), `TString`, `format()` | allocation-free `is_valid_utf8` |
+| Builder-ish | `String()`, `+=`, `append(Codepoint)`, `reserve_bytes`, `resize`, `capacity_bytes()`; no `clear`, `push_back`, `pop`, `shrink_to_fit`; no `StringBuilder` type in `std` | the whole explicit builder layer |
 
 The stdlib calls are **unstable by default** (no `@stable` marker); `String`
 itself is marked stable since 1.0.0, but member signatures are not promised. This
@@ -214,8 +225,9 @@ not fit Mojo. Researched-but-unshipped **API candidates** are mirrored in
   `Span[T: Writable & Copyable]`; a second spelling would not be learnable
   (`go.md` §3, `python.md` §3).
 - **Sentinel or silently-lenient trimming.** MojoAkku rejects Java's legacy
-  `trim()` (`<= U+0020`) and Perl's silent `\s` over-reach; `trim` uses the
-  Unicode whitespace set and an explicit char-set overload (`java.md` §11).
+  `trim()` (`<= U+0020`, kept for compatibility and fixed only in `strip()`) and
+  Python's implicit whitespace class; `trim` uses the explicit Unicode whitespace
+  set and a char-set overload (`java.md` §11, `python.md` §3).
 - **Undefined behaviour on non-UTF-8 input.** MojoAkku rejects Rust's UB-on-
   invalid-`str` and Julia's invalid-byte `String` default; `is_valid_utf8`
   reports validity and the builder raises `INVALID_UTF8` (`rust.md` §11,
@@ -240,7 +252,7 @@ right column are the reference APIs cited in the justifications below.
 | Capitalize / first-letter case | Python `str.capitalize`; Java `indent`/text blocks; Elixir `String.capitalize` | `python.md` §3; `java.md` §12; `elixir.md` §3 |
 | Counted replace | Python `str.replace(old, new, count)`; Rust `replacen`; Go `Replace(s, old, new, n)` | `python.md` §3; `rust.md` §3; `go.md` §3 |
 | Allocation-free validity predicate | Elixir `String.valid?/2`; Go `utf8.ValidString`; Rust `str::from_utf8` (checked) | `elixir.md` §3, §8; `go.md` §3, §8; `rust.md` §3 |
-| Mojo language anchors | `String`/`StringSpan`/`StaticString`; `Span[UInt8,_]`; `Optional`; `Tuple`; `Codepoint`; typed `raises`; `deinit self`; `Writer`; origin-parameterised `StringSpan[o]` | `mojov1/types/bool-and-strings`; `mojov1/stdlib/format`; `mojov1/errors/error-model`; probed on Mojo 1.1.0 |
+| Mojo language anchors | `String`/`StringSpan`/`StaticString`; `Span[UInt8,_]`; `Optional`; `Tuple`; `Codepoint`; typed `raises`; `deinit self`; `Writer`; origin-parameterised `StringSpan[o]` | `mojov1/types/bool-and-strings`; `mojov1/stdlib/format`; `mojov1/errors/error-model`; check-in probe artifact `_dev/std_probe.mojo` + `_dev/std_probe.log` (Mojo 1.1.0) |
 
 ## Public API
 
@@ -331,19 +343,22 @@ supply a non-empty needle. No operation is fatal, and none aborts the process.
 ## Ownership and Lifecycle
 
 - **`StringBuilder` is an owning value type.** It owns a `String` buffer,
-  conforms to `Deinitable` and `Writable`, and is **not** implicitly copyable
-  (`String` is likewise not implicitly copyable in 1.x). `to_string()` returns a
-  copy (the builder keeps its content); `finish(deinit self)` transfers the
-  buffer out and consumes the builder — the Go `String()`/Java `toString()` and
-  Julia `takestring!` split (`go.md` §3, `java.md` §9, `julia.md` §9).
+  conforms to `Deinitable`, `Writable` and `Writer`, and is **not** implicitly
+  copyable (`String` is likewise not implicitly copyable in 1.x). `to_string()`
+  returns a copy (the builder keeps its content); `finish(deinit self)` transfers
+  the buffer out and consumes the builder, so the call site must transfer with
+  `^` (`b^.finish()`) — the Go `String()`/Java `toString()` and Julia
+  `takestring!` split (`go.md` §3, `java.md` §9, `julia.md` §9).
 - **The caller owns every result.** An owned `String` returned by `capitalize`,
   `to_ascii_lower`, `to_ascii_upper`, `replace_n` or the builder is freshly
   allocated and owned by the caller. The library retains no reference after
   return.
 - **Views borrow.** `find` returns a plain `Int`; `trim`, `slice`, `try_slice`
   and `split_once`/`rsplit_once` return `StringSpan[o]` views whose origin is the
-  caller's input, expressed with an explicit `[o: Origin]` parameter so the
-  lifetime checker ties the result to the input (probed on Mojo 1.1.0).
+  caller's input. Every view-returning function uses the same read-only origin
+  parameter `[o: Origin[mut=False]]`, which the lifetime checker ties to the
+  input (probed on Mojo 1.1.0; the `mut=False` spelling is required by the
+  multi-view tuple form and is accepted by the single-view forms too).
 - **`StringError` is `Copyable` but not `ImplicitlyCopyable`,** so a re-raise
   must transfer with `raise e^` — the `BitError`/`IoError` convention.
   `StringErrorKind` is `Equatable, ImplicitlyCopyable, Deinitable, Writable`.
@@ -514,7 +529,7 @@ Status: planned
 Signature:
 
 ```mojo
-struct StringBuilder(Deinitable, Writable):
+struct StringBuilder(Deinitable, Writable, Writer):
     var _buf: String
 
     def __init__(out self)
@@ -534,7 +549,7 @@ struct StringBuilder(Deinitable, Writable):
     def finish(deinit self) -> String
 
     def write_string(mut self, string: StringSpan)   # Writer conformance
-    def write_to(self, mut writer: Some[Writer])
+    def write_to(self, mut writer: Some[Writer])     # Writable conformance
 ```
 
 Semantics:
@@ -556,8 +571,14 @@ Semantics:
   - `byte_length()` is the current content length in bytes; `capacity()` is the
     buffer's addressable bytes.
   - `to_string()` returns a copy and leaves the builder usable; `finish(deinit
-    self)` transfers the buffer out and consumes the builder. The `finish`
-    contract is the explicit flush the README's gap item 2 asks for.
+    self)` transfers the buffer out and consumes the builder. Because `finish`
+    takes `deinit self`, the call site must **transfer** the builder with `^`:
+    `var out = b^.finish()`, never `b.finish()` (which would try to copy a
+    non-`ImplicitlyCopyable` value and not compile). After the call the builder
+    is dead and may not be used again — this is what makes the flush mandatory.
+    The `finish` contract is the explicit flush the README's gap item 2 asks
+    for; the same `^`-transfer convention applies to `StringError` re-raises
+    (`raise e^`).
   - `Writer` conformance (`write_string`) lets `builder.write(a, b, c)` receive
     formatted output directly, the `mojov1/stdlib/format` pattern.
 - **Ownership:** the builder owns its `String`. `to_string` borrows and copies;
@@ -565,7 +586,8 @@ Semantics:
   state.
 - **Stream I/O:** EOF/EINTR/EAGAIN/close do not apply: an in-memory builder has
   no descriptor and no blocking point. It is **not** a stream adapter; wrapping
-  it in `io.Writer` is a consumer concern and a Deferred idea.
+  it as an `io.Writer` is a consumer concern and a Deferred idea
+  (`_dev/TODO.md`, origin `elixir.md` §9, §12).
 
 Errors: `append_bytes` raises `StringError` `INVALID_UTF8`; every other method is
 non-raising.
@@ -580,7 +602,8 @@ Tests:
 - `test_string_builder_reserve_capacity` — capacity grows, `byte_length` does not.
 - `test_string_builder_clear_keeps_capacity` — `clear` resets content.
 - `test_string_builder_to_string_borrows` — `to_string` leaves the builder usable.
-- `test_string_builder_finish_consumes` — `finish` returns the buffer.
+- `test_string_builder_finish_consumes` — `b^.finish()` returns the buffer and
+  consumes `b` (a plain `b.finish()` does not compile).
 - `test_string_builder_writer_conformance` — `builder.write(a, b)` formats in.
 - `test_string_builder_writable` — `print(builder)` uses `write_to`.
 
@@ -710,8 +733,8 @@ Semantics:
   when the separator is absent. Both halves are **views** into `text`, so the
   split allocates nothing — Go's `strings.Cut` returns the same three facts, and
   Rust has `split_once` (`go.md` §3, §10; `rust.md` §3).
-- **Ownership:** both returned views borrow `text`; the explicit `[o: Origin]`
-  parameter ties them to the input's origin.
+- **Ownership:** both returned views borrow `text`; the explicit
+  `[o: Origin[mut=False]]` parameter ties them to the input's origin.
 - **Stream I/O:** not applicable.
 
 Errors: none — absence is `None`.
@@ -787,8 +810,8 @@ Status: planned
 Signature:
 
 ```mojo
-def trim[o: Origin](text: StringSpan[o]) -> StringSpan[o]
-def trim[o: Origin](text: StringSpan[o], chars: StringSpan) -> StringSpan[o]
+def trim[o: Origin[mut=False]](text: StringSpan[o]) -> StringSpan[o]
+def trim[o: Origin[mut=False]](text: StringSpan[o], chars: StringSpan) -> StringSpan[o]
 ```
 
 Semantics:
@@ -1070,7 +1093,7 @@ Status: planned
 Signature:
 
 ```mojo
-def slice[o: Origin](
+def slice[o: Origin[mut=False]](
     text: StringSpan[o], start: Int, end: Int
 ) raises StringError -> StringSpan[o]
 ```
@@ -1087,8 +1110,8 @@ Semantics:
   and Julia's boundary-checked `s[i:j]` without the O(n) index arithmetic
   (`rust.md` §3, §4; `julia.md` §7, §8). It differs from `std`'s `s[byte=a:b]`
   only in that a bad range is a reportable error instead of an abort.
-- **Ownership:** the returned view borrows `text`; the explicit `[o: Origin]`
-  ties them together.
+- **Ownership:** the returned view borrows `text`; the explicit
+  `[o: Origin[mut=False]]` ties them together.
 - **Stream I/O:** not applicable.
 
 Errors: `INDEX_OUT_OF_BOUNDS`, `BAD_RANGE`, `NOT_A_BOUNDARY`; all recoverable.
@@ -1123,7 +1146,7 @@ Status: planned
 Signature:
 
 ```mojo
-def try_slice[o: Origin](
+def try_slice[o: Origin[mut=False]](
     text: StringSpan[o], start: Int, end: Int
 ) -> Optional[StringSpan[o]]
 ```
@@ -1184,7 +1207,7 @@ Semantics:
 - **Ownership:** plain `Bool`; `bytes` stays borrowed.
 - **Stream I/O:** not applicable. Incremental/streaming validity (the Elixir
   `incomplete`-vs-`invalid` distinction) is a Deferred idea, not release 1
-  (`elixir.md` §12).
+  (`_dev/TODO.md`, origin `elixir.md` §12).
 
 Errors: none — invalid input is `False`.
 

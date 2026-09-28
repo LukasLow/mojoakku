@@ -2,24 +2,9 @@
 
 API candidates the research showed are possible in Mojo but that are not
 implemented. Remove a line once it ships; an empty list is the expected end
-state. Format and rules: `.agents/workflows/LibraryLayout.md`.
-
-Live backlog after Phase 3. Two kinds of items were **removed**: those the
-library now ships (Phase-3 entries) and those the probed Mojo 1.1.0 stdlib
-already exposes under the same operation, which MojoAkku `string` deliberately
-does **not** re-wrap (a Phase-3 Non-Goal). Removed as shipped:
-`find`/`rfind`, `split_once`, `slice`/`try_slice`, `is_char_boundary`,
-`replace_n`, `trim`, `capitalize`, `to_ascii_lower`/`to_ascii_upper`, the
-`StringBuilder` layer, and the error type. Removed as std-first / not re-wrapped:
-`count_occurrences` (`count`), `starts_with`/`ends_with` (`startswith`/
-`endswith`), `fields`/`split_whitespace` (`split(None)`), `lines`
-(`splitlines`), `join` (`String.join`), `to_lower`/`to_upper` (`lower`/`upper`),
-`replace_all`/`replace_n` (`replace`, `replace_n`), `append_char`/`write_rune`
-(`append(Codepoint)`), `strip_prefix`/`strip_suffix` (`removeprefix`/
-`removesuffix`), `from_bytes`/`from_bytes_lossy` (`String(from_utf8…)`),
-`builder_grow`/`builder_reset` (`reserve`/`clear`), `finish`/`take`,
-`format_to`/`writer` (`Writer`), `index_out_of_bounds`, `boundary_error`,
-`invalid_encoding`, `not_found` (all now `StringErrorKind` / `Optional`).
+state. Format and rules: `.agents/workflows/LibraryLayout.md`. The Phase-3
+shipped entries and the stdlib-first operations deliberately not re-wrapped are
+not listed here (see `DESIGN.md`, "Empirical std surface").
 
 ## Inspect & measure
 
@@ -85,6 +70,7 @@ does **not** re-wrap (a Phase-3 Non-Goal). Removed as shipped:
 - `transcode` — convert between encodings. (origin: `elixir.md` §3, `julia.md` §3, `python.md` §3)
 - `hex_encode` / `hex_decode` — hex byte bridge. (origin: `elixir.md` §3, `js-ts.md` §3)
 - `decode_error_policy` — strict/replace/ignore failure policy. (origin: `python.md` §4, `java.md` §4, `rust.md` §3)
+- `streaming_validity` — incremental validity distinguishing `incomplete` (retry with more bytes) from `invalid` (reject). (origin: `elixir.md` §3, §12)
 
 ## Unicode level
 
@@ -100,6 +86,7 @@ does **not** re-wrap (a Phase-3 Non-Goal). Removed as shipped:
 - `shrink_to_fit` — release excess builder capacity. (origin: `go.md` §3, `rust.md` §3, `java.md` §3)
 - `join_builder` — efficient build-by-join. (origin: `python.md` §9, `java.md` §3)
 - `iodata` — deferred nested pieces, materialized once. (origin: `elixir.md` §9)
+- `builder_as_writer` — an adapter exposing a `StringBuilder` as an `io.Writer` sink. (origin: `elixir.md` §9)
 
 ## Validation & error type
 
