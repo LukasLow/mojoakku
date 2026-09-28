@@ -1,0 +1,5 @@
+# Tests for mojoakku/string live here.
+#
+# One file per concern, each a plain program with its own main(); they are run
+# with `mojo run` by the library Taskfile (`task test`). There is deliberately no
+# __init__.mojo in this directory. Test files are added in Phase 9.
