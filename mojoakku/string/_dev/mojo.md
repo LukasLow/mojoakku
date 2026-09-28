@@ -24,8 +24,14 @@ Summarised from the buch page `mojov1/types/bool-and-strings`:
   it does **not** enumerate which string operations raise.
 - **Q5 ownership semantics** — `String` owns; `StringSpan`/`StaticString` are
   non-owning views; `StringLiteral` materialises to `String` or `StringSpan`.
+- **Q6 blocking / non-blocking** — not applicable: string types are pure
+  in-memory values with no I/O, so the buch has nothing to say here and the
+  question is **answered as N/A**, not open.
 - **Q7 text model** — UTF-8; three lengths disagree; iteration yields **grapheme
   clusters** by default since 1.0; `__len__()` deprecated.
+- **Q8 bounds / invalid input** — **open**: the buch does not state the
+  out-of-range and empty-edge semantics of `String`/`StringSpan` indexing and
+  slicing, nor which operations raise. This is part of the gap premise below.
 - **Q10/Q11/Q12** — operator efficiency (`String(a, b)` variadic beats `+`
   chaining); the `StringSlice` → `StringSpan` rename; `TString` laziness.
 

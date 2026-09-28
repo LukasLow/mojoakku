@@ -20,19 +20,29 @@ Rust splits text across three std primitives — an owned `String`, a borrowed
 - The everyday surface lives on `str` and is vast: `find`, `rfind`, `split`,
   `splitn`, `rsplit`, `split_once`, `split_at`, `split_at_checked`,
   `split_inclusive`, `split_whitespace`, `lines`, `replace`, `replacen`,
-  `replace_first`, `replace_last`, `remove_matches`, `trim*`,
-  `strip_prefix`, `strip_suffix`, `starts_with`, `ends_with`, `contains`,
-  `matches`, `match_indices`, `repeat`, `to_lowercase`, `to_uppercase`,
-  `to_ascii_lowercase`, `eq_ignore_ascii_case`, `eq_ignore_case_unnormalized`,
-  `to_casefold_unnormalized`, `substr_range`, `word_to_titlecase`, `chars`,
-  `char_indices`, `bytes`, `encode_utf16`, `get`, `is_char_boundary`,
+  `trim*`, `strip_prefix`, `strip_suffix`, `starts_with`, `ends_with`,
+  `contains`, `matches`, `match_indices`, `repeat`, `to_lowercase`,
+  `to_uppercase`, `to_ascii_lowercase`, `eq_ignore_ascii_case`,
+  `eq_ignore_case_unnormalized`, `to_casefold_unnormalized`, `substr_range`,
+  `chars`, `char_indices`, `bytes`, `encode_utf16`, `get`, `is_char_boundary`,
   `floor_char_boundary`, `ceil_char_boundary`, `escape_debug` — the full
-  method index is in <https://doc.rust-lang.org/std/primitive.str.html>
+  method index is in <https://doc.rust-lang.org/std/primitive.str.html>.
+  Stability is not uniform on `str`: `word_to_titlecase` is unstable (feature
+  `titlecase`, #153892) —
+  <https://doc.rust-lang.org/unstable-book/library-features/titlecase.html>;
+  `substr_range` was feature-gated (`substr_range`, #126769) and stabilized in
+  1.98.0 — <https://github.com/rust-lang/rust/issues/126769>
 - `String` adds `new`, `with_capacity`, `from_utf8`, `from_utf8_lossy`,
   `from_utf16*`, `push`, `push_str`, `insert`, `remove`, `truncate`,
   `clear`, `reserve`, `shrink_to_fit`, `as_str`, `as_mut_str`,
   `as_mut_vec`, `into_bytes`, `into_boxed_str`, `leak`, `retain`, `pop`,
-  `split_off`, `drain` — <https://doc.rust-lang.org/std/string/struct.String.html>
+  `split_off`, `drain`, `replace_range`, plus the **nightly-only in-place**
+  mutators `replace_first`/`replace_last` (feature `string_replace_in_place`,
+  #147949) and `remove_matches` (feature `string_remove_matches`, #72826),
+  which take `&mut self` and are **not** available on `str` —
+  <https://doc.rust-lang.org/std/string/struct.String.html>,
+  <https://github.com/rust-lang/rust/issues/147949>,
+  <https://github.com/rust-lang/rust/issues/72826>
 - `core::char` / `std::char` add the scalar predicates and conversions
   (`is_alphabetic`, `is_numeric`, `to_digit`, `from_u32`,
   `REPLACEMENT_CHARACTER`) —
@@ -76,14 +86,24 @@ Rust's surface is **methods on `&str` plus a small set of `String` methods**:
   `split_inclusive`, `split_terminator`, `split_whitespace`,
   `split_ascii_whitespace`, `lines`, `lines_any` —
   <https://doc.rust-lang.org/std/primitive.str.html>
-- Replace/trim: `replace`, `replacen`, `replace_first`, `replace_last`,
-  `remove_matches`, `trim`, `trim_start`, `trim_end`, `trim_matches`,
+- Replace/trim (on `str`): `replace`, `replacen`,
+  `trim`, `trim_start`, `trim_end`, `trim_matches`,
   `trim_start_matches`, `trim_end_matches`, `trim_prefix`, `trim_suffix`,
-  `strip_prefix`, `strip_suffix` — <https://doc.rust-lang.org/std/primitive.str.html>
+  `strip_prefix`, `strip_suffix` — <https://doc.rust-lang.org/std/primitive.str.html>.
+  `replace_first`, `replace_last` and `remove_matches` are **not** `str`
+  methods: they are `String` methods taking `&mut self`, and are
+  **nightly-only** — `replace_first`/`replace_last` under feature
+  `string_replace_in_place` and `remove_matches` under feature
+  `string_remove_matches` —
+  <https://doc.rust-lang.org/std/string/struct.String.html>,
+  <https://github.com/rust-lang/rust/issues/147949>,
+  <https://github.com/rust-lang/rust/issues/72826>
 - Case: `to_uppercase`, `to_lowercase` (full Unicode), `to_ascii_uppercase`,
   `to_ascii_lowercase`, `eq_ignore_ascii_case`, `to_casefold_unnormalized`,
-  `eq_ignore_case_unnormalized`, `word_to_titlecase` —
-  <https://doc.rust-lang.org/std/primitive.str.html>
+  `eq_ignore_case_unnormalized`, and `word_to_titlecase`
+  (**unstable**, feature `titlecase`, #153892) —
+  <https://doc.rust-lang.org/std/primitive.str.html>,
+  <https://doc.rust-lang.org/unstable-book/library-features/titlecase.html>
 - Byte-level: `as_bytes`, `bytes()`, `is_char_boundary`,
   `floor_char_boundary`, `ceil_char_boundary`, `encode_utf16` —
   <https://doc.rust-lang.org/std/primitive.str.html>
@@ -303,16 +323,19 @@ documented — <https://doc.rust-lang.org/std/primitive.str.html#invariant>
 
 ## 11. Decisions NOT to copy
 
-1. **Undefined behaviour on non-UTF-8 `str`.** Mojo's stated contract
-   enforces validity at construction (`String(unsafe_from_utf8=…)` requires a
-   caller guarantee) but should not let an invalid value become UB; a checked
-   or `unsafe`-but-defined path is the safer contract for a low-vision user.
+1. **Undefined behaviour on non-UTF-8 `str`.** Mojo's contract offers
+   `String(from_utf8_lossy=…)`, which replaces invalid bytes, and
+   `String(unsafe_from_utf8=…)`, which explicitly does **not** enforce and
+   requires a caller guarantee; Mojo should not let an invalid value become
+   UB, and its checked/lossy path is the safer default for a low-vision user.
    `(Assessment: derived from <https://doc.rust-lang.org/std/primitive.str.html#invariant>
    vs. `mojov1/types/bool-and-strings`.)`
 2. **Two panicking paths for slicing.** `&s[..]` panicking while `get` returns
    `None` is idiomatic Rust but adds a choice a text-primitive library does
    not need; prefer one checked path plus a clearly named clamping helper.
-   `(Assessment.)`
+   `(Assessment: reasoning from the two documented behaviours at
+   <https://doc.rust-lang.org/std/primitive.str.html#method.get> and
+   <https://doc.rust-lang.org/std/string/struct.String.html>.)`
 3. **`char` = scalar only.** Rust's `char` is a codepoint, so `count()` over
    `chars` over-counts user-perceived characters; Mojo already defaults
    iteration to grapheme clusters and should not regress to scalar-only
@@ -321,14 +344,21 @@ documented — <https://doc.rust-lang.org/std/primitive.str.html#invariant>
 4. **No builder type.** Fusing owned+builder into one type works in Rust
    because `Deref` supplies the view, but it gives no explicit `flush`
    contract; the README asks for an explicit append/flush contract.
-   `(Assessment.)`
+   `(Assessment: derived from the mutation methods listed at
+   <https://doc.rust-lang.org/std/string/struct.String.html> and the
+   README.md gap premise, item 2.)`
 5. **`Deref`-coercion magic.** It is ergonomic but implicit; a Mojo library
    should make `String`↔`StringSpan` conversion explicit rather than
-   operator-driven. `(Assessment.)`
+   operator-driven. `(Assessment: reasoning from the `Deref`/coercion
+   behaviour at
+   <https://doc.rust-lang.org/std/string/struct.String.html#deref>.)`
 6. **std's silence on graphemes and normalization.** Leaving both to crates
    means every consumer must discover `unicode-segmentation` and
    `unicode-normalization`; the primitive library should own the grapheme
-   boundary it already counts. `(Assessment.)`
+   boundary it already counts. `(Assessment: derived from the absence of a
+   grapheme/normalization API at
+   <https://doc.rust-lang.org/std/primitive.str.html> plus the crate list in
+   §2.)`
 
 ## 12. Ideas fitting Mojo
 
@@ -385,4 +415,12 @@ documented — <https://doc.rust-lang.org/std/primitive.str.html#invariant>
   <https://docs.rs/bstr/latest/bstr/>
 - `unicode-normalization` crate: `github.com/unicode-rs/unicode-normalization`
   (not fetched this run)
+- Unstable Book, feature `titlecase` (`str::word_to_titlecase`):
+  <https://doc.rust-lang.org/unstable-book/library-features/titlecase.html>
+- Tracking issue #147949 (`string_replace_in_place`):
+  <https://github.com/rust-lang/rust/issues/147949>
+- Tracking issue #72826 (`string_remove_matches`):
+  <https://github.com/rust-lang/rust/issues/72826>
+- Tracking issue #126769 (`substr_range`, stabilized 1.98.0):
+  <https://github.com/rust-lang/rust/issues/126769>
 - Mojo facts: `mojov1/types/bool-and-strings`

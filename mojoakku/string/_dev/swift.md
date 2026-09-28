@@ -311,25 +311,34 @@ indexing. `(Assessment: derived from
    is user-friendly for UI but dangerous for protocol/security code (hash
    keys, cache lookup, signature comparison) and forces normalization work
    inside equality. Provide it as an explicitly named operation, not as `==`.
-   Swift book, Comparing Strings. `(Assessment.)`
+   Swift book, Comparing Strings. `(Assessment: reasoning from the
+   canonical-equivalence examples in the Swift book's Comparing Strings, where
+   `"\u{E9}"` == `"\u{65}\u{301}"`.)`
 3. **A retaining `Substring` that can appear to leak memory.** Mojo's
    `StringSpan` should keep the ownership story explicit rather than hiding a
    full-buffer retain behind a value type —
-   <https://developer.apple.com/documentation/swift/substring.md>. `(Assessment.)`
+   <https://developer.apple.com/documentation/swift/substring.md>.
+   `(Assessment: derived from the `Substring` storage-sharing description on
+   that page.)`
 4. **No builder type.** Mutating a `var String` is convenient but gives no
    explicit reserve/flush contract; the README asks for one.
-   `(Assessment.)`
+   `(Assessment: derived from the absence of a builder type in the Swift book
+   Strings chapter and README.md gap premise, item 2.)`
 5. **Opaque index tokens whose distance computation is O(n).** Good for
    correctness, but a Mojo text library needs explicit numeric byte and
    codepoint offsets too (`byte_length`, `count_codepoints`,
-   `count_graphemes` already exist). `(Assessment.)`
+   `count_graphemes` already exist). `(Assessment: derived from the
+   `index(_:offsetBy:)` O(n) note in the Swift book plus
+   `mojov1/types/bool-and-strings`.)`
 6. **Platform-specific NSString bridging complexity.** The lazy-bridging and
    breadcrumb machinery exists to serve Objective-C; Mojo has no such
    constraint and should not reproduce it —
-   <https://www.swift.org/blog/utf8-string/>. `(Assessment.)`
+   <https://www.swift.org/blog/utf8-string/>. `(Assessment: derived from the
+   bridging description on that page.)`
 7. **A `.utf16` view as a first-class API.** It is a legacy-interop need;
    for new UTF-8-native libraries it adds surface without value.
-   `(Assessment.)`
+   `(Assessment: derived from the UTF-16 legacy/NSString-interop role of the
+   `.utf16` view in the Swift book's Unicode Representations section.)`
 
 ## 12. Ideas fitting Mojo
 
@@ -363,7 +372,9 @@ indexing. `(Assessment: derived from
    point makes the assumption visible — <https://developer.apple.com/documentation/swift/string/init(decoding:as:).md>.
 9. **Grapheme-safe substring extraction by *character offset*, implemented as
    a traversal**, for the UI/display use case, separate from the O(1)
-   byte-slice API — Swift book, String Indices. `(Assessment.)`
+   byte-slice API — Swift book, String Indices. `(Assessment: derived from
+   the O(n) `index(_:offsetBy:)` traversal described in the Swift book's
+   String Indices.)`
 
 ## Sources
 

@@ -293,7 +293,7 @@ Consequences that are explicitly defined:
 `:unicode.characters_to_binary/3` returns `{error, Encoded, Rest}` for genuine
 invalid data but `{incomplete, Encoded, Rest}` when the chunk ends inside a
 multi-byte character — the case you must retry after reading more bytes
-([unicode.html#characters_to_list/2](https://www.erlang.org/doc/apps/stdlib/unicode.html)).
+([unicode.html#characters_to_binary/3](https://www.erlang.org/doc/apps/stdlib/unicode.html)).
 
 **Empty / zero-length edges, all documented:**
 
@@ -409,11 +409,11 @@ library one — [Kernel.html#byte_size/1](https://hexdocs.pm/elixir/Kernel.html)
    [Kernel.html#binary_slice/3](https://hexdocs.pm/elixir/Kernel.html)).
 2. **Default "length" and default "iteration" mean graphemes.** `String.length/1`
    counts grapheme clusters per UAX #29, not codepoints
-   ([String.html#length/1](https://hexdocs.pm/elixir/String.html)). This is the
-   same choice Mojo 1.x makes by default (per the run README's positioning fact)
-   and the sharpest contrast to Java (UTF-16 code units) and Python
-   (codepoints) (Assessment: derived from the run README §"Positioning fact"
-   plus the String.html source).
+   ([String.html#length/1](https://hexdocs.pm/elixir/String.html)). Mojo's
+   default *iteration* is graphemes; Mojo exposes no single default length.
+   Elixir's grapheme defaults are the sharpest contrast to Java (UTF-16 code
+   units) and Python (codepoints) (Assessment: derived from the run README
+   §"Positioning fact" plus the String.html source).
 3. **Invalid UTF-8 is tolerated, not rejected.** String functions operate on
    possibly-invalid binaries and rely on UTF-8 self-synchronization; validation
    is the caller's boundary responsibility, with `valid?/2`, `chunk/2`,

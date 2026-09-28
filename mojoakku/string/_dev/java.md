@@ -457,7 +457,8 @@ default charset, which is UTF-8 since Java 18 (JEP 400).
   `length`/`charAt`/`substring` in Java's code-unit semantics would recreate the
   surrogate-pair machinery and the "length trap" for no benefit. Use Mojo's
   explicit `byte_length` / `count_codepoints` / `count_graphemes` instead
-  (README.md). (Assessment.)
+  (README.md). `(Assessment: derived from the UTF-16 code-unit model in the
+  String Javadoc and the UTF-8 positioning fact in README.md.)`
 - **No borrowed view.** Java's lack of a `&str`-style span forces either copies
   or the contract-free `CharSequence` abstraction. Mojo already has
   `StringSpan`/`StaticString`/`StringLiteral`; keep a real view layer (README.md).

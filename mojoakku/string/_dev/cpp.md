@@ -61,10 +61,12 @@ in §9 except a builder.)
   in Boost, hence GUESS on the exact API list.)
 - **Abseil (`absl::string_view`, `absl::StrCat`, `absl::StrSplit`)** — Google's
   pre-`std::string_view` view plus append/format helpers. (GUESS: same reason.)
-- **`folly::fbstring`** — a 23-char-SSO string. Referenced from
-  <https://www.reddit.com/r/cpp/comments/o2p92m/increase_the_size_of_the_small_buffer/>
-  (community discussion) and the Folly docs path it cites
-  (`folly/docs/FBString.md`).
+- **`folly::fbstring`** — a three-tiered string whose "Small strings (<= 23
+  chars) are stored in-situ without memory allocation"; medium strings (24-255)
+  are malloc-allocated and copied eagerly, large strings (>255) are
+  malloc-allocated and copied lazily. Source (Folly's own doc, fetched this
+  run): <https://github.com/facebook/folly/blob/main/folly/docs/FBString.md>
+  (raw: <https://raw.githubusercontent.com/facebook/folly/main/folly/docs/FBString.md>).
 
 ## 3. Exposed APIs
 
@@ -559,6 +561,8 @@ C++ has **no codepoint/grapheme layer**, which Mojo already has.
 - `std::to_chars`: <https://en.cppreference.com/w/cpp/utility/to_chars>
 - `std::format`: <https://en.cppreference.com/w/cpp/utility/format/format>
 - `{fmt}`: <https://fmt.dev/latest/index.html>
+- `folly::fbstring` (three-tiered storage, <=23-char SSO):
+  <https://github.com/facebook/folly/blob/main/folly/docs/FBString.md>
 - ICU strings: <https://unicode-org.github.io/icu/userguide/strings/>
 - utf8proc: <https://github.com/JuliaStrings/utf8proc>
 - SSO (libstdc++ / 15): <https://tc-imba.github.io/posts/cpp-sso/>

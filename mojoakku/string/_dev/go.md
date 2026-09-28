@@ -170,8 +170,12 @@ type.**
 - What a "character" is: Go defines `rune` = Unicode code point, but does
   **not** promise normalization: "No guarantee is made in Go that characters
   in strings are normalized." — <https://go.dev/blog/strings>
-- Grapheme clusters are *not* a stdlib unit; segmentation lives in
-  `rivo/uniseg` (community) or `golang.org/x/text` (words/sentences).
+- Grapheme clusters are *not* a stdlib unit; segmentation is delegated to
+  third parties. `GUESS:` the `rivo/uniseg` grapheme-cluster claim carries the
+  same marker as in §2 — no fetchable authoritative page for it was retrieved
+  this run; it rests on `github.com/rivo/uniseg`, not on a cited doc page.
+  `golang.org/x/text` is sourced at <https://pkg.go.dev/golang.org/x/text>,
+  but that page does not itself document word/sentence segmentation.
 - Indexing: `s[i]` is the i'th **byte**; a `for range` over a string decodes
   runes and reports each rune's starting **byte position** —
   <https://go.dev/blog/strings>
@@ -257,19 +261,28 @@ All three layers exist in the stdlib, but the "borrowed view" is implicit
    type silently permits invalid text; every consumer must re-validate.
    Mojo guarantees valid UTF-8 at construction
    (`mojov1/types/bool-and-strings`), which is a stronger contract worth
-   keeping. `(Assessment.)`
+   keeping. `(Assessment: derived from <https://go.dev/blog/strings> vs.
+   `mojov1/types/bool-and-strings`.)`
 2. **Panic on out-of-range indexing.** A library that must be predictable for
    a low-vision user should prefer a checked/`get`-style result or a defined
    clamp over a runtime panic. `(Assessment: derived from
-   <https://go.dev/ref/spec#Index_expressions>.)`
+   <https://go.dev/ref/spec#Index_expressions> and the checked `get` in
+   <https://doc.rust-lang.org/std/primitive.str.html#method.get>.)`
 3. **`-1` sentinels.** Overloading an index result to encode "not found"
-   hides errors in arithmetic; Mojo already has `Optional`. `(Assessment.)`
+   hides errors in arithmetic; Mojo already has `Optional`.
+   `(Assessment: derived from <https://pkg.go.dev/strings#Index> and Mojo's
+   `Optional`, `mojov1/types/bool-and-strings`.)`
 4. **No grapheme unit.** Go forces users to third-party segmentation; Mojo
    1.0 already iterates grapheme clusters by default
-   (`mojov1/types/bool-and-strings`). `(Assessment.)`
+   (`mojov1/types/bool-and-strings`). `(Assessment: derived from the absence
+   of a grapheme API in <https://pkg.go.dev/unicode/utf8> and
+   `mojov1/types/bool-and-strings`; the third-party segmentation claim carries
+   the `GUESS:` marker set in §2.)`
 5. **No separate borrowed view type.** `string` conflates owner and view, so
    substring lifetime/retention is invisible; a distinct `StringSpan` is more
-   explicit. `(Assessment.)`
+   explicit. `(Assessment: derived from <https://go.dev/ref/spec#String_types>
+   — no view type in the spec — and the absence of any span type in
+   <https://pkg.go.dev/strings>.)`
 6. **No normalization guarantee.** Go documents the ambiguity and leaves it
    to `x/text`; a text-primitive library should state the normalization
    contract explicitly. — <https://go.dev/blog/strings>
