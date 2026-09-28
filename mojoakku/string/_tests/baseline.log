@@ -1,0 +1,37 @@
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_ascii_case.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/to_ascii_lower.mojo:6:10: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_builder.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/string_builder.mojo:11:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_capitalize.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/capitalize.mojo:6:10: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_error.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/string_error.mojo:13:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_error_kind.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/string_error_kind.mojo:19:14: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_find.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/find.mojo:6:10: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_is_char_boundary.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/is_char_boundary.mojo:6:10: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_is_valid_utf8.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/is_valid_utf8.mojo:6:10: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_replace_n.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/replace_n.mojo:10:10: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_rfind.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/rfind.mojo:6:10: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_rsplit_once.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/rsplit_once.mojo:8:10: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_slice.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/slice.mojo:10:10: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_split_once.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/split_once.mojo:8:10: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_trim.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/trim.mojo:6:10: MojoAkku: this API is not yet implemented
+== mojo run -I mojoakku mojoakku/string/_tests/test_string_try_slice.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: mojoakku/string/try_slice.mojo:8:10: MojoAkku: this API is not yet implemented
+--------
+baseline: 15 files, 0 passed, 15 failed
+  failures: 15 stub abort, 0 compile/import error, 0 other
+note: the suite holds 101 test functions across 15 files. A stub
+      `abort` stops the process on its first call, so no per-test
+      passed/failed count is reachable in the red phase; the file count
+      (15) is the honest measure.
