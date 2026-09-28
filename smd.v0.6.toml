@@ -1,0 +1,28 @@
+[dockerfile]
+  lines = '''
+FROM docker.io/debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl bash bzip2 unzip git && rm -rf /var/lib/apt/lists/*
+RUN sh -c "$(curl -fsSL https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+RUN curl -fsSL https://pixi.sh/install.sh | bash
+ENV PATH="/root/.pixi/bin:${PATH}"
+RUN pixi global install -c https://conda.modular.com/max/ -c conda-forge mojo
+'''
+
+[ports]
+  publish = []
+
+# Named volume (never a host bind mount). Cache pixi's package downloads so a
+# container rebuild does not re-download the whole Mojo toolchain.
+# NOTE: do NOT mount /root/.pixi — that would mask the mojo installed in the
+# image. Only the download cache lives in the volume.
+[volume]
+  volumes = ["smd_pkg_pixi:/root/.cache/rattler"]
+
+[network]
+  mode = ""
+
+[smd]
+  version = "0.6.0"
+  block_cmd = ["git commit"]
+
+# For more information see: smd --help | smd --agent | smd --changelog
