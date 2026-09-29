@@ -5,6 +5,19 @@ All notable changes to MojoAkku are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions stay on `0.x.y`; major is never bumped.
 
+## v0.6.0 - 2026-09-29
+
+### Changed
+
+- catalogue — all 244 libraries renamed to domain-prefixed flat names (`bit`→`prim_bit`, `io`→`io_core`, `base64`→`codec_base64`, `string`→`text_string`, `socket`→`net_socket`, …); every `depends_on` rewritten. New in the YAML: `mojoNeeds:` per library. The 4 shipped libraries were renamed too; their tests stay green.
+- `covered_*` namespace for std/MAX-covered libs (simd, tensor, broadcast, soa, ml, gpu); `homeless_*` for pdf/game.
+
+### Added
+
+- 74 additional planned libraries added to the catalogue (`units_*` 8, `proto_*` 9, `crypto_*` 6, `phy_*` 5, `security_*` 5, `archive_*` 5, `algo_*` 5, `math_special_*` 4, `serialize_*` 4, `chem_*` 4, `bio_*` 4, `document_*` 4, `app_*` 3, `econ_*` 3, `codec_*` 3, `fs_find`, `time_duration`) — catalogue total 244 → 318.
+- mojo.yml capability ledger (what Mojo 1.1.0 can/cannot do, sourced) + `task todo` capability gate (`mojoNeeds` must be `have`); `task todo -- --all` / `todo-all` show planned-but-blocked libs with reasons.
+- `docs/adr/0001-namespace-domains.md` + `docs/architecture/` (namespace model, domain map, rename map, new-libraries list, render research).
+
 ## v0.5.0 - 2026-09-28
 
 ### Added
