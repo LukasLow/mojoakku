@@ -1,0 +1,6 @@
+id: units_pressure
+name: Pressure
+status: todo
+depends_on: [units_core]
+mojoNeeds: [pure-mojo]
+summary: Pressure units: pascal, bar, psi, atmosphere.

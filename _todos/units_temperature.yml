@@ -1,0 +1,6 @@
+id: units_temperature
+name: Temperature
+status: todo
+depends_on: [units_core]
+mojoNeeds: [pure-mojo]
+summary: Temperature units: celsius, fahrenheit, kelvin.

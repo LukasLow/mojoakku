@@ -1,0 +1,6 @@
+id: security_ratelimit
+name: Rate Limiting
+status: todo
+depends_on: [time_clock]
+mojoNeeds: [pure-mojo]
+summary: Abuse protection and throttling.

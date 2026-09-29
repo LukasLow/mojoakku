@@ -1,0 +1,6 @@
+id: chem_periodic
+name: Periodic Table
+status: todo
+depends_on: [chem_core]
+mojoNeeds: [pure-mojo]
+summary: Elements and periodic data.

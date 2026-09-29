@@ -1,0 +1,6 @@
+id: units_energy
+name: Energy
+status: todo
+depends_on: [units_core]
+mojoNeeds: [pure-mojo]
+summary: Energy units: joule, calorie, kilowatt-hour, electronvolt.

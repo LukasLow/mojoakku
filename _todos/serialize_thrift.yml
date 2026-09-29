@@ -1,0 +1,6 @@
+id: serialize_thrift
+name: Thrift
+status: todo
+depends_on: [serialize_serialization]
+mojoNeeds: [pure-mojo]
+summary: Apache Thrift serialization.

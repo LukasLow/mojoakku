@@ -1,0 +1,6 @@
+id: archive_tar
+name: TAR
+status: todo
+depends_on: [archive_core]
+mojoNeeds: [pure-mojo]
+summary: TAR archive reading and writing.

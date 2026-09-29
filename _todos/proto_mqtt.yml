@@ -1,0 +1,6 @@
+id: proto_mqtt
+name: MQTT
+status: todo
+depends_on: [net_tcp]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Publish/subscribe messaging.

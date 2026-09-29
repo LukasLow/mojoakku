@@ -1,0 +1,6 @@
+id: units_electricity
+name: Electricity
+status: todo
+depends_on: [units_core]
+mojoNeeds: [pure-mojo]
+summary: Electrical units: ampere, volt, ohm, watt, coulomb.

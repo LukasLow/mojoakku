@@ -1,0 +1,6 @@
+id: fs_find
+name: Find
+status: todo
+depends_on: [fs_path]
+mojoNeeds: [pure-mojo, fs-full]
+summary: Search a directory tree by name, size, time or type.

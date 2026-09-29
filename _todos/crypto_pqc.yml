@@ -1,0 +1,6 @@
+id: crypto_pqc
+name: Post-Quantum
+status: todo
+depends_on: [crypto_publickey]
+mojoNeeds: [pure-mojo]
+summary: Post-quantum algorithms: ML-KEM, ML-DSA.

@@ -1,0 +1,6 @@
+id: econ_finance
+name: Finance
+status: todo
+depends_on: [econ_core]
+mojoNeeds: [pure-mojo]
+summary: Interest, present value, annuities.

@@ -1,0 +1,6 @@
+id: econ_money
+name: Money
+status: todo
+depends_on: [econ_core]
+mojoNeeds: [pure-mojo]
+summary: Currency amounts and conversion.

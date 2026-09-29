@@ -1,0 +1,6 @@
+id: units_mass
+name: Mass
+status: todo
+depends_on: [units_core]
+mojoNeeds: [pure-mojo]
+summary: Mass units: kilogram, gram, pound, ounce, tonne.

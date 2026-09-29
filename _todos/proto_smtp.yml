@@ -1,0 +1,6 @@
+id: proto_smtp
+name: SMTP
+status: todo
+depends_on: [net_tcp]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: SMTP mail sending.

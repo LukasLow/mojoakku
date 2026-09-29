@@ -1,0 +1,6 @@
+id: security_acl
+name: Access Control
+status: todo
+depends_on: [security_auth]
+mojoNeeds: [pure-mojo]
+summary: Roles and permission checks.

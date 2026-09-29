@@ -1,0 +1,6 @@
+id: archive_7z
+name: 7-Zip
+status: todo
+depends_on: [archive_core]
+mojoNeeds: [pure-mojo]
+summary: 7z archive support.

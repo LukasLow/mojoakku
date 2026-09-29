@@ -1,0 +1,6 @@
+id: archive_gzip
+name: Gzip
+status: todo
+depends_on: [archive_compression]
+mojoNeeds: [pure-mojo]
+summary: Gzip stream compression.

@@ -1,0 +1,6 @@
+id: proto_ssh
+name: SSH
+status: todo
+depends_on: [net_tcp,crypto_cipher]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: SSH transport and keys.

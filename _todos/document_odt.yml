@@ -1,0 +1,6 @@
+id: document_odt
+name: ODT
+status: todo
+depends_on: [archive_zip,markup_xml]
+mojoNeeds: [pure-mojo]
+summary: OpenDocument text format.

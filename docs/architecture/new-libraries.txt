@@ -1,0 +1,94 @@
+# NEW: id|name|depends_on|mojoNeeds|summary
+# Die im Namespace-Gespräch NEU beschlossenen Libraries (Runde 1/2 + Research).
+# Regel: <domain>_<lokal>. Anzulegen als _todos/<id>.yml mit status: todo.
+
+units_distance|Distance|units_core|[pure-mojo]|Length units: meter, kilometer, centimeter, feet, inches, mile.
+units_mass|Mass|units_core|[pure-mojo]|Mass units: kilogram, gram, pound, ounce, tonne.
+units_time|Time Units|units_core|[pure-mojo]|Time units: nanosecond, millisecond, second, minute, hour, day, year, decade.
+units_temperature|Temperature|units_core|[pure-mojo]|Temperature units: celsius, fahrenheit, kelvin.
+units_electricity|Electricity|units_core|[pure-mojo]|Electrical units: ampere, volt, ohm, watt, coulomb.
+units_energy|Energy|units_core|[pure-mojo]|Energy units: joule, calorie, kilowatt-hour, electronvolt.
+units_pressure|Pressure|units_core|[pure-mojo]|Pressure units: pascal, bar, psi, atmosphere.
+units_speed|Speed|units_core|[pure-mojo]|Speed units: meter-per-second, km/h, knot, mph.
+
+phy_mechanics|Mechanics|math_core|[pure-mojo]|Kinematics, force, energy, momentum.
+phy_relativity|Relativity|math_core|[pure-mojo]|Einstein equations, metrics, Lorentz transforms.
+phy_cosmology|Cosmology|math_core|[pure-mojo]|Redshift, Hubble parameter, comoving distance.
+phy_quantum|Quantum|math_core|[pure-mojo]|Schrodinger, states, operators.
+phy_thermo|Thermodynamics|math_core|[pure-mojo]|Heat, entropy, equations of state.
+
+chem_core|Chemistry Core|math_core|[pure-mojo]|Core chemical types and units.
+chem_molecule|Molecules|chem_core|[pure-mojo]|Molecular composition and molar mass.
+chem_reaction|Reactions|chem_core|[pure-mojo]|Stoichiometry and reaction balancing.
+chem_periodic|Periodic Table|chem_core|[pure-mojo]|Elements and periodic data.
+
+bio_core|Biology Core|math_core|[pure-mojo]|Core biological types.
+bio_sequence|Sequences|bio_core|[pure-mojo]|Nucleotide and protein sequences.
+bio_genome|Genome|bio_sequence|[pure-mojo]|Genome assembly and annotation records.
+bio_align|Alignment|bio_sequence|[pure-mojo]|Sequence alignment algorithms.
+
+econ_core|Economics Core|math_core|[pure-mojo]|Core economic types.
+econ_finance|Finance|econ_core|[pure-mojo]|Interest, present value, annuities.
+econ_money|Money|econ_core|[pure-mojo]|Currency amounts and conversion.
+
+math_special_bessel|Bessel Functions|math_core|[pure-mojo]|Bessel and related cylinder functions.
+math_special_gamma|Gamma Functions|math_core|[pure-mojo]|Gamma, beta, digamma, polygamma.
+math_special_erf|Error Functions|math_core|[pure-mojo]|erf, erfc, Fresnel integrals.
+math_special_orthogonal|Orthogonal Polynomials|math_core|[pure-mojo]|Legendre, Chebyshev, Hermite, Laguerre.
+
+app_frame|App Frame|io_core|[gui-windowing]|Base: OS window, event loop, input, platform entry, surface handle.
+app_native|App Native|app_frame,math_core|[shader-graphics, gui-windowing]|Native renderer (Dart/Flutter model) on top of the GPU layer.
+app_webview|App WebView|app_frame|[webview]|System webview shell (Tauri/Wails model); Linux to macOS to Windows to mobile.
+
+crypto_kdf|Key Derivation|math_core,crypto_digest|[pure-mojo]|KDFs: PBKDF2, HKDF, Argon2.
+crypto_kex|Key Exchange|math_core,crypto_publickey|[pure-mojo]|Key agreement: ECDH, X25519.
+crypto_aead|AEAD Ciphers|crypto_cipher,crypto_mac|[pure-mojo]|Authenticated encryption: AES-GCM, ChaCha20-Poly1305.
+crypto_sign|Signatures|crypto_publickey,crypto_digest|[pure-mojo]|Digital signatures: Ed25519, ECDSA.
+crypto_rng|Secure Random|math_random|[pure-mojo]|Cryptographically secure random number generation.
+crypto_pqc|Post-Quantum|crypto_publickey|[pure-mojo]|Post-quantum algorithms: ML-KEM, ML-DSA.
+
+security_webauth|WebAuthn|security_auth,crypto_sign|[pure-mojo]|Passkeys, FIDO2, WebAuthn ceremonies.
+security_totp|One-Time Passwords|security_auth,crypto_mac|[pure-mojo]|TOTP and HOTP one-time codes.
+security_cert|Certificates|crypto_certificate|[pure-mojo]|Issue, verify and chain X.509 certificates.
+security_acl|Access Control|security_auth|[pure-mojo]|Roles and permission checks.
+security_ratelimit|Rate Limiting|time_clock|[pure-mojo]|Abuse protection and throttling.
+
+proto_pop3|POP3|net_tcp|[pure-mojo, net-sockets]|POP3 mail retrieval.
+proto_imap|IMAP|net_tcp|[pure-mojo, net-sockets]|IMAP mail access and folders.
+proto_smtp|SMTP|net_tcp|[pure-mojo, net-sockets]|SMTP mail sending.
+proto_jmap|JMAP|web_http|[pure-mojo, net-sockets]|JSON mail access protocol.
+proto_ssh|SSH|net_tcp,crypto_cipher|[pure-mojo, net-sockets]|SSH transport and keys.
+proto_ldap|LDAP|net_tcp|[pure-mojo, net-sockets]|Directory access protocol.
+proto_mqtt|MQTT|net_tcp|[pure-mojo, net-sockets]|Publish/subscribe messaging.
+proto_ntp|NTP|net_udp,time_clock|[pure-mojo, net-sockets]|Network time synchronisation.
+proto_snmp|SNMP|net_udp|[pure-mojo, net-sockets]|Network management protocol.
+
+archive_zip|ZIP|archive_core|[pure-mojo]|ZIP archive reading and writing.
+archive_tar|TAR|archive_core|[pure-mojo]|TAR archive reading and writing.
+archive_gzip|Gzip|archive_compression|[pure-mojo]|Gzip stream compression.
+archive_zstd|Zstandard|archive_compression|[pure-mojo]|Zstandard compression.
+archive_7z|7-Zip|archive_core|[pure-mojo]|7z archive support.
+
+serialize_protobuf|Protobuf|serialize_serialization|[pure-mojo]|Protocol Buffers wire format.
+serialize_flatbuffers|FlatBuffers|serialize_binary|[pure-mojo]|FlatBuffers zero-copy format.
+serialize_msgpack|MessagePack|serialize_serialization|[pure-mojo]|MessagePack binary format.
+serialize_thrift|Thrift|serialize_serialization|[pure-mojo]|Apache Thrift serialization.
+
+codec_hex|Hex|codec_base64|[pure-mojo]|Hexadecimal encode and decode.
+codec_base32|Base32|codec_base64|[pure-mojo]|Base32 encode and decode.
+codec_base64url|Base64url|codec_base64|[pure-mojo]|URL-safe base64 variant.
+
+document_docx|DOCX|archive_zip,markup_xml|[pure-mojo]|Word document reading and writing.
+document_odt|ODT|archive_zip,markup_xml|[pure-mojo]|OpenDocument text format.
+document_epub|EPUB|archive_zip,markup_html|[pure-mojo]|EPUB ebook format.
+document_convert|Document Convert|document_docx|[pure-mojo]|Convert between document formats.
+
+algo_pathfind|Pathfinding|coll_core|[pure-mojo]|Shortest path algorithms: A*, Dijkstra, BFS, DFS.
+algo_sort|Sorting|coll_core|[pure-mojo]|Sorting algorithms.
+algo_graph|Graph Algorithms|coll_core|[pure-mojo]|Traversal, connectivity, spanning trees, flow.
+algo_complexity|Complexity|math_core|[pure-mojo]|Algorithmic complexity helpers and analysis.
+algo_search|Search Algorithms|coll_core|[pure-mojo]|Binary search, interpolation, heuristic search.
+
+fs_find|Find|fs_path|[pure-mojo, fs-full]|Search a directory tree by name, size, time or type.
+
+time_duration|Duration|time_clock|[pure-mojo]|Durations and time arithmetic.

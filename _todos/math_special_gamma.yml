@@ -1,0 +1,6 @@
+id: math_special_gamma
+name: Gamma Functions
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Gamma, beta, digamma, polygamma.

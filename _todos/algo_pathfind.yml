@@ -1,0 +1,6 @@
+id: algo_pathfind
+name: Pathfinding
+status: todo
+depends_on: [coll_core]
+mojoNeeds: [pure-mojo]
+summary: Shortest path algorithms: A*, Dijkstra, BFS, DFS.

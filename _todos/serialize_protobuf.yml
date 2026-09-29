@@ -1,0 +1,6 @@
+id: serialize_protobuf
+name: Protobuf
+status: todo
+depends_on: [serialize_serialization]
+mojoNeeds: [pure-mojo]
+summary: Protocol Buffers wire format.

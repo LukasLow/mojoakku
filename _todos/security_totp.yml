@@ -1,0 +1,6 @@
+id: security_totp
+name: One-Time Passwords
+status: todo
+depends_on: [security_auth,crypto_mac]
+mojoNeeds: [pure-mojo]
+summary: TOTP and HOTP one-time codes.

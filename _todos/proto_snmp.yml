@@ -1,0 +1,6 @@
+id: proto_snmp
+name: SNMP
+status: todo
+depends_on: [net_udp]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Network management protocol.

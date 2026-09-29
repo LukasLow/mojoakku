@@ -1,0 +1,6 @@
+id: math_special_erf
+name: Error Functions
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: erf, erfc, Fresnel integrals.

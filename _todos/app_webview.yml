@@ -1,0 +1,6 @@
+id: app_webview
+name: App WebView
+status: todo
+depends_on: [app_frame]
+mojoNeeds: [webview]
+summary: System webview shell (Tauri/Wails model); Linux to macOS to Windows to mobile.

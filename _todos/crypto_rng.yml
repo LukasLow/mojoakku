@@ -1,0 +1,6 @@
+id: crypto_rng
+name: Secure Random
+status: todo
+depends_on: [math_random]
+mojoNeeds: [pure-mojo]
+summary: Cryptographically secure random number generation.

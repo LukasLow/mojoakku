@@ -1,0 +1,6 @@
+id: crypto_kdf
+name: Key Derivation
+status: todo
+depends_on: [math_core,crypto_digest]
+mojoNeeds: [pure-mojo]
+summary: KDFs: PBKDF2, HKDF, Argon2.

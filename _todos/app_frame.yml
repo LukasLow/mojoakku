@@ -1,0 +1,6 @@
+id: app_frame
+name: App Frame
+status: todo
+depends_on: [io_core]
+mojoNeeds: [gui-windowing]
+summary: Base: OS window, event loop, input, platform entry, surface handle.
