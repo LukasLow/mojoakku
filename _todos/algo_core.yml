@@ -1,0 +1,6 @@
+id: algo_core
+name: Algorithms
+status: todo
+depends_on: [coll_core,coll_iter]
+mojoNeeds: [pure-mojo]
+summary: Sorting, searching and generic algorithms.

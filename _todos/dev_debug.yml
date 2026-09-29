@@ -1,0 +1,6 @@
+id: dev_debug
+name: Debugging
+status: todo
+depends_on: [io_core,lang_error]
+mojoNeeds: [pure-mojo]
+summary: Debug helpers and backtraces.

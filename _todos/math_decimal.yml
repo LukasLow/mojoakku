@@ -1,0 +1,6 @@
+id: math_decimal
+name: Decimal
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Decimal floating point numbers.

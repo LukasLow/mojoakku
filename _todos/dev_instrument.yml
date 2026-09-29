@@ -1,0 +1,6 @@
+id: dev_instrument
+name: Instrument
+status: todo
+depends_on: [code_codegen,dev_ffi]
+mojoNeeds: [pure-mojo]
+summary: Runtime instrumentation hooks.

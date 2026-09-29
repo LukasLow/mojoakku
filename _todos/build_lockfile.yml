@@ -1,0 +1,6 @@
+id: build_lockfile
+name: Lockfile
+status: todo
+depends_on: [fs_core,os_core]
+mojoNeeds: [pure-mojo]
+summary: Advisory file locking.

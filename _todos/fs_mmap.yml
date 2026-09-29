@@ -1,0 +1,6 @@
+id: fs_mmap
+name: Memory Map
+status: todo
+depends_on: [mem_core,fs_core]
+mojoNeeds: [pure-mojo, fs-full]
+summary: Memory mapped files.

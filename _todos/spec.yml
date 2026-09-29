@@ -1,5 +1,0 @@
-id: spec
-name: Spec
-status: todo
-depends_on: [collections,pattern]
-summary: Data shape and schema validation.

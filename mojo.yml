@@ -1,0 +1,144 @@
+# mojo.yml — what Mojo can and cannot do (capability ledger)
+#
+# Purpose: every MojoAkku library declares `mojoNeeds:` in _todos/<id>.yml —
+# a list of capability keys from this file. `task todo` lists a library as
+# "buildable" only when ALL of its mojoNeeds are `have` (and all libdeps `done`).
+# So "buildable today" is honest, not guessed.
+#
+# Every state is evidence-backed (buch `mojov1`, Mojo 1.1.0). `partial`/`missing`
+# carry a `note:` naming what is missing.
+
+mojo: 1.1.0
+verified: 2026-09-29
+source: mojov1 (buch)
+
+capabilities:
+
+  pure-mojo:
+    state: have
+    note: Pure CPU libraries, no foreign dependency (collections, math, text …).
+
+  c-ffi:
+    state: have
+    note: >-
+      Direct C calls, no layer: external_call[...] (libc & linked symbols) and
+      OwnedDLHandle (dlopen, get_function, check_symbol). Source:
+      mojov1/interop/calling-c.
+
+  ffi-callback:
+    state: have
+    note: >-
+      C callbacks work: function must be `thin` + abi("C"), no captures.
+      Source: mojov1/interop/calling-c (qsort example).
+
+  ffi-export-c-abi:
+    state: have
+    note: >-
+      @export / abi("C") — Mojo as a shared library for C hosts.
+      Source: mojov1/decorators/export, mojov1/tooling/compiler-and-flags.
+
+  cpu-parallel:
+    state: partial
+    note: >-
+      `parallelize` lives in max.algorithm (MAX), not std. Callback form,
+      synchronous. Source: mojov1/concurrency/async-and-parallelism.
+
+  threads:
+    state: partial
+    note: >-
+      Thread pool via std.runtime (initialize_runtime, parallelism_level).
+      Atomics: std.atomic (Atomic, Ordering, fence). Spin lock: std.utils.lock.
+      No documented Mutex/Condvar. Source: mojov1/concurrency/async-and-parallelism.
+
+  async:
+    state: missing
+    note: >-
+      async/await are UNSTABLE; in 1.1.0 the public task API
+      (Task/TaskGroup/Coroutine) was removed and the module made private.
+      Roadmap "First-class async" = not started. Do not build a lib on async.
+      Source: mojov1/concurrency/async-and-parallelism, mojov1/intro/stability.
+
+  gpu-compute:
+    state: partial
+    note: >-
+      Low-level primitives in max.gpu (std.gpu is private in 1.1.0 = std._gpu).
+      Needs the MAX package + DeviceContext. `Int`/`UInt` are NOT DevicePassable
+      (use Int32). WARP_SIZE is 32/64/0 — never hard-code.
+      Source: mojov1/concurrency/gpu-and-accelerators.
+
+  net-sockets:
+    state: missing
+    note: >-
+      No socket in std. Only via C-FFI (libc socket/bind/connect).
+      Source: mojov1/stdlib/overview, mojov1/interop/calling-c.
+
+  fs-full:
+    state: partial
+    note: >-
+      Basic file I/O exists; full fs semantics (mmap, watch, glob) are not
+      documented in std. Source: mojov1/stdlib/overview.
+
+  time:
+    state: have
+    note: 'std.time: monotonic clocks, performance counters. Source: mojov1/stdlib/overview.'
+
+  process:
+    state: partial
+    note: libc via FFI (fork/exec/wait) or std.process. Source: mojov1/interop/calling-c.
+
+  gui-windowing:
+    state: missing
+    note: >-
+      No window/widget in std. Only via C-FFI to SDL2/SDL3/GLFW/raylib.
+      Source: mojov1/stdlib/overview; .tmp/research_render_*.md.
+
+  webview:
+    state: missing
+    note: >-
+      No WebView in Mojo. Windows/Linux via C-FFI (WebView2/webkit2gtk);
+      Android = Java/Kotlin (JNI only); iOS = Obj-C. Source:
+      .tmp/research_render_webview.md.
+
+  jni-bridge:
+    state: missing
+    note: 'Mojo has no JNI bridge; needed for Android webview. Source: .tmp/research_render_webview.md.'
+
+  objc-bridge:
+    state: missing
+    note: >-
+      Mojo has no Obj-C bridge; JNI and the Obj-C runtime are C-ABI
+      (JNIEnv as C struct, objc_msgSend as a C function), so a Kotlin/Swift host
+      that loads a Mojo .so is the workaround. Source: .tmp/research_render_webview.md.
+
+  shader-graphics:
+    state: partial
+    note: >-
+      No GPU rendering in std/MAX (MAX = compute only). Reachable via
+      wgpu-native (MIT/Apache), SDL_gpu, or Vulkan/Metal via C-FFI.
+      Source: mojov1/concurrency/gpu-and-accelerators, .tmp/research_render_rust.md.
+
+  interpreter:
+    state: partial
+    note: >-
+      No std interpreter. Python interop exists (PythonObject) but is a different
+      goal. Source: mojov1/interop/calling-python.
+
+  python-interop:
+    state: have
+    note: >-
+      Bidirectional (PythonObject, mojo from python). Needs Python 3.10–3.14.
+      Source: mojov1/interop/calling-python, mojov1/interop/mojo-from-python.
+
+  resource-embed:
+    state: partial
+    note: >-
+      No documented resource embedding. Workaround: generate a Mojo module with
+      the content as comptime bytes (via the planned MojoAkku CLI), or ship
+      files alongside. Source: .tmp/namespace.md decision 2 (user).
+
+# ---- derivation rule ------------------------------------------------------
+# `task todo` shows a library only when:
+#   for all n in _todos/<id>.yml:mojoNeeds:  capabilities[n].state == "have"
+#   AND all libdeps are status "done".
+# "partial" -> planned with a warning (task todo --all shows it).
+# "missing" -> roadmap-only until Mojo has the capability.

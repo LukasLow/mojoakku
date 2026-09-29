@@ -1,5 +1,0 @@
-id: ini
-name: INI
-status: todo
-depends_on: [string,file]
-summary: INI configuration parsing.

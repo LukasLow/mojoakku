@@ -1,5 +1,0 @@
-id: audio
-name: Audio
-status: todo
-depends_on: [io,binary]
-summary: Audio decoding and encoding.

@@ -1,5 +1,0 @@
-id: matrix
-name: Matrix
-status: todo
-depends_on: [math]
-summary: Dense matrix and linear algebra.

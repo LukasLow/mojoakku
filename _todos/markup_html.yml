@@ -1,0 +1,6 @@
+id: markup_html
+name: HTML
+status: todo
+depends_on: [text_string]
+mojoNeeds: [pure-mojo]
+summary: HTML escaping, parsing and rendering.

@@ -1,5 +1,0 @@
-id: future
-name: Future
-status: todo
-depends_on: [thread]
-summary: Futures and promises.

@@ -1,0 +1,6 @@
+id: async_future
+name: Future
+status: todo
+depends_on: [sync_thread]
+mojoNeeds: [async]
+summary: Futures and promises.

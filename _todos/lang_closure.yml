@@ -1,0 +1,6 @@
+id: lang_closure
+name: Closure
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: First class functions.

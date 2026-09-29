@@ -1,0 +1,6 @@
+id: meta_overload
+name: Overload
+status: todo
+depends_on: [lang_trait]
+mojoNeeds: [pure-mojo]
+summary: Operator overloading for user types.

@@ -1,0 +1,6 @@
+id: text_regex
+name: Regular Expressions
+status: todo
+depends_on: [text_string]
+mojoNeeds: [pure-mojo]
+summary: Regular expression matching and capture.

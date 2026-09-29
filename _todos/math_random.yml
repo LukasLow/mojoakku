@@ -1,0 +1,6 @@
+id: math_random
+name: Random
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Random number generation.

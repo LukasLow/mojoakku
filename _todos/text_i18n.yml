@@ -1,0 +1,6 @@
+id: text_i18n
+name: Internationalization
+status: todo
+depends_on: [text_string,text_encoding]
+mojoNeeds: [pure-mojo]
+summary: Message catalogs and locale handling.

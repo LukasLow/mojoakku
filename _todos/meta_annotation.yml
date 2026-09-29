@@ -1,0 +1,6 @@
+id: meta_annotation
+name: Annotation
+status: todo
+depends_on: [meta_reflection,meta_comptime]
+mojoNeeds: [pure-mojo]
+summary: Declarative metadata on declarations.

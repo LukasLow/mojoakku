@@ -1,0 +1,6 @@
+id: web_quic
+name: QUIC
+status: todo
+depends_on: [net_udp,security_tls]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: QUIC transport.

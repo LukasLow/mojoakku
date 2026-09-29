@@ -1,0 +1,6 @@
+id: markup_markdown
+name: Markdown
+status: todo
+depends_on: [text_string,markup_html]
+mojoNeeds: [pure-mojo]
+summary: Markdown parsing and rendering.

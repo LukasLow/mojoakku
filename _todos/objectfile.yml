@@ -1,5 +1,0 @@
-id: objectfile
-name: Object File
-status: todo
-depends_on: [binary,fs]
-summary: Executable and object format parsing.

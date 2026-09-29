@@ -1,0 +1,6 @@
+id: async_scheduler
+name: Scheduler
+status: todo
+depends_on: [time_clock,sync_thread]
+mojoNeeds: [async]
+summary: Timers and periodic tasks.

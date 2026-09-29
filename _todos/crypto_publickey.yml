@@ -1,0 +1,6 @@
+id: crypto_publickey
+name: Public Key
+status: todo
+depends_on: [math_bigint,math_random]
+mojoNeeds: [pure-mojo]
+summary: Asymmetric keys and signatures.

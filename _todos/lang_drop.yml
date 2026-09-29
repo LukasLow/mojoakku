@@ -1,0 +1,6 @@
+id: lang_drop
+name: Drop
+status: todo
+depends_on: [mem_ownership]
+mojoNeeds: [pure-mojo]
+summary: Destructors and scope based cleanup.

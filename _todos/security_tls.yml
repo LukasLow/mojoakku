@@ -1,0 +1,6 @@
+id: security_tls
+name: TLS
+status: todo
+depends_on: [net_tcp,crypto_cipher,crypto_mac,crypto_certificate,crypto_publickey]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Transport layer security.

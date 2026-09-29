@@ -1,5 +1,0 @@
-id: complex
-name: Complex
-status: todo
-depends_on: [math]
-summary: Complex numbers.

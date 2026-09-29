@@ -1,0 +1,6 @@
+id: coll_core
+name: Collections
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Core containers: list, map, set and deque.

@@ -1,0 +1,6 @@
+id: async_coroutine
+name: Coroutine
+status: todo
+depends_on: [async_future]
+mojoNeeds: [async]
+summary: Coroutines and generators.

@@ -1,0 +1,6 @@
+id: fs_glob
+name: Glob
+status: todo
+depends_on: [fs_path,text_string]
+mojoNeeds: [pure-mojo, fs-full]
+summary: Pattern matching for file paths.

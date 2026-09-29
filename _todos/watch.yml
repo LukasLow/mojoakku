@@ -1,5 +1,0 @@
-id: watch
-name: File Watch
-status: todo
-depends_on: [fs,eventloop]
-summary: Filesystem change notification.

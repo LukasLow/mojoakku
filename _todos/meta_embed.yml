@@ -1,0 +1,6 @@
+id: meta_embed
+name: Embed
+status: todo
+depends_on: [dev_ffi,mem_core]
+mojoNeeds: [pure-mojo]
+summary: Embedded resources and hosted runtimes.

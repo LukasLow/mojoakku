@@ -1,0 +1,6 @@
+id: coll_transducer
+name: Transducer
+status: todo
+depends_on: [coll_core,coll_iter]
+mojoNeeds: [pure-mojo]
+summary: Composable transformation steps.

@@ -1,0 +1,6 @@
+id: os_signal
+name: Signal
+status: todo
+depends_on: [os_process,os_core]
+mojoNeeds: [pure-mojo]
+summary: Unix signal handling.

@@ -1,0 +1,6 @@
+id: proto_mail
+name: Mail
+status: todo
+depends_on: [web_mime,security_tls]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: SMTP, IMAP and POP3.

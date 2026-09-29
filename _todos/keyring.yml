@@ -1,5 +1,0 @@
-id: keyring
-name: Keyring
-status: todo
-depends_on: [cipher,fs]
-summary: Secure storage for secrets.

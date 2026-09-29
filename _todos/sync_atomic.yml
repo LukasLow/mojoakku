@@ -1,0 +1,6 @@
+id: sync_atomic
+name: Atomic
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo, threads]
+summary: Atomic values and memory ordering.

@@ -1,0 +1,6 @@
+id: format_json
+name: JSON
+status: todo
+depends_on: [text_string,coll_core]
+mojoNeeds: [pure-mojo]
+summary: JSON parsing and serialization.

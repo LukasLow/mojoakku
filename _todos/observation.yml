@@ -1,5 +1,0 @@
-id: observation
-name: Observation
-status: todo
-depends_on: [trait,pattern]
-summary: Change observation of state.

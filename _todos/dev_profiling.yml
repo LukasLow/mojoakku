@@ -1,0 +1,6 @@
+id: dev_profiling
+name: Profiling
+status: todo
+depends_on: [time_clock,io_core]
+mojoNeeds: [pure-mojo]
+summary: Performance profiling.

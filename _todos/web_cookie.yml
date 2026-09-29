@@ -1,0 +1,6 @@
+id: web_cookie
+name: Cookie
+status: todo
+depends_on: [time_datetime,web_url]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: HTTP cookie handling.

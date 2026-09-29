@@ -1,5 +1,0 @@
-id: migration
-name: Migration
-status: todo
-depends_on: [sql,config]
-summary: Schema migrations.

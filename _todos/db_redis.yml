@@ -1,0 +1,6 @@
+id: db_redis
+name: Redis
+status: todo
+depends_on: [net_tcp,text_string]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Redis client.

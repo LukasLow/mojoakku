@@ -1,0 +1,6 @@
+id: os_session
+name: Session
+status: todo
+depends_on: [web_cookie,math_random]
+mojoNeeds: [pure-mojo]
+summary: Session management.

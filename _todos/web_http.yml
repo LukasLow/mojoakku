@@ -1,0 +1,6 @@
+id: web_http
+name: HTTP
+status: todo
+depends_on: [net_tcp,security_tls,web_url,web_mime]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: HTTP client and server.

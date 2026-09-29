@@ -1,5 +1,0 @@
-id: defer
-name: Defer
-status: todo
-depends_on: [error]
-summary: Cleanup that runs on scope exit.

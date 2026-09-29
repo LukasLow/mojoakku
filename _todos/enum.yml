@@ -1,5 +1,0 @@
-id: enum
-name: Enum
-status: todo
-depends_on: [variant]
-summary: Enumerated types.

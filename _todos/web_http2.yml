@@ -1,0 +1,6 @@
+id: web_http2
+name: HTTP/2
+status: todo
+depends_on: [web_http]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: HTTP/2 framing and streams.

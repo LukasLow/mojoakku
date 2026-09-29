@@ -1,5 +1,0 @@
-id: timezone
-name: Timezone
-status: todo
-depends_on: [datetime]
-summary: Time zone database and conversion.

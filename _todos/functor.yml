@@ -1,5 +1,0 @@
-id: functor
-name: Functor
-status: todo
-depends_on: [typeclass]
-summary: Higher order type abstractions.

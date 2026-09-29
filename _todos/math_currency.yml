@@ -1,0 +1,6 @@
+id: math_currency
+name: Currency
+status: todo
+depends_on: [text_string,math_core]
+mojoNeeds: [pure-mojo]
+summary: Money values and currency formatting.

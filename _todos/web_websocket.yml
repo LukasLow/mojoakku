@@ -1,0 +1,6 @@
+id: web_websocket
+name: WebSocket
+status: todo
+depends_on: [web_http]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Full duplex HTTP upgrade.

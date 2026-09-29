@@ -1,0 +1,6 @@
+id: dev_hotload
+name: Hot Reload
+status: todo
+depends_on: [build_plugin,build_module]
+mojoNeeds: [pure-mojo]
+summary: Replace code in a running system.

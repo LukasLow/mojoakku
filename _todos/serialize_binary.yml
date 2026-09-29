@@ -1,0 +1,6 @@
+id: serialize_binary
+name: Binary
+status: todo
+depends_on: [mem_core]
+mojoNeeds: [pure-mojo]
+summary: Binary reading and writing.

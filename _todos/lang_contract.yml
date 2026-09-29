@@ -1,0 +1,6 @@
+id: lang_contract
+name: Contract
+status: todo
+depends_on: [lang_error,meta_comptime]
+mojoNeeds: [pure-mojo]
+summary: Preconditions and postconditions.

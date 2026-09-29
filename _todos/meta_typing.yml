@@ -1,0 +1,6 @@
+id: meta_typing
+name: Typing
+status: todo
+depends_on: [meta_annotation]
+mojoNeeds: [pure-mojo]
+summary: Static type annotations and protocols.

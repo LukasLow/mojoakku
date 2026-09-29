@@ -1,0 +1,6 @@
+id: math_rational
+name: Rational
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Exact rational numbers.

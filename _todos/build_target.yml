@@ -1,0 +1,6 @@
+id: build_target
+name: Target
+status: todo
+depends_on: [build_core]
+mojoNeeds: [pure-mojo]
+summary: Cross compilation targets.

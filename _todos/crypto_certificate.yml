@@ -1,0 +1,6 @@
+id: crypto_certificate
+name: Certificate
+status: todo
+depends_on: [crypto_publickey,crypto_digest,text_encoding]
+mojoNeeds: [pure-mojo]
+summary: X.509 certificate handling.

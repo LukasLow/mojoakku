@@ -1,0 +1,6 @@
+id: coll_zipper
+name: Zipper
+status: todo
+depends_on: [coll_core]
+mojoNeeds: [pure-mojo]
+summary: Functional cursor for navigating trees.

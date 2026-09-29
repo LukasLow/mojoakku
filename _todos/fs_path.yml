@@ -1,0 +1,6 @@
+id: fs_path
+name: Path
+status: todo
+depends_on: [text_string]
+mojoNeeds: [pure-mojo, fs-full]
+summary: Path parsing, joining and normalization.

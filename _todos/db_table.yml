@@ -1,0 +1,6 @@
+id: db_table
+name: Table
+status: todo
+depends_on: [text_string,coll_core]
+mojoNeeds: [pure-mojo]
+summary: Tabular data display and formatting.

@@ -1,0 +1,6 @@
+id: math_core
+name: Math
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Arithmetic, trigonometry and constants.

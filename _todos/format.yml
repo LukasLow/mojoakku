@@ -1,5 +1,0 @@
-id: format
-name: Format
-status: todo
-depends_on: [string]
-summary: String formatting and interpolation.

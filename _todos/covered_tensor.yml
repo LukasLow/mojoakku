@@ -1,0 +1,6 @@
+id: covered_tensor
+name: Tensor
+status: todo
+depends_on: [math_matrix,covered_simd]
+mojoNeeds: [pure-mojo]
+summary: N dimensional arrays and operations.

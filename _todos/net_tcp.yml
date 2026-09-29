@@ -1,0 +1,6 @@
+id: net_tcp
+name: TCP
+status: todo
+depends_on: [net_socket]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Streaming TCP connections.

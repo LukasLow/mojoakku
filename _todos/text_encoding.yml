@@ -1,0 +1,6 @@
+id: text_encoding
+name: Encoding
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Character encodings and conversion between them.

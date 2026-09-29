@@ -1,5 +1,0 @@
-id: parallel
-name: Parallel
-status: todo
-depends_on: [thread,atomic]
-summary: Data and task parallelism.

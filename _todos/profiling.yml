@@ -1,5 +1,0 @@
-id: profiling
-name: Profiling
-status: todo
-depends_on: [time,io]
-summary: Performance profiling.

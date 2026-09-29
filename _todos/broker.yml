@@ -1,5 +1,0 @@
-id: broker
-name: Broker
-status: todo
-depends_on: [queue,tcp]
-summary: Message broker clients.

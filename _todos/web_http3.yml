@@ -1,0 +1,6 @@
+id: web_http3
+name: HTTP/3
+status: todo
+depends_on: [web_quic,web_http]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: HTTP/3 over QUIC.

@@ -1,5 +1,0 @@
-id: embed
-name: Embed
-status: todo
-depends_on: [ffi,memory]
-summary: Embedded resources and hosted runtimes.

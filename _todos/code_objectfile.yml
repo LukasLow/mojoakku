@@ -1,0 +1,6 @@
+id: code_objectfile
+name: Object File
+status: todo
+depends_on: [serialize_binary,fs_core]
+mojoNeeds: [pure-mojo]
+summary: Executable and object format parsing.

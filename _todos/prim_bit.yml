@@ -1,0 +1,6 @@
+id: prim_bit
+name: Bit
+status: done
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Bit twiddling and bitsets.

@@ -1,5 +1,0 @@
-id: hash
-name: Hash
-status: todo
-depends_on: []
-summary: Non cryptographic hash functions.

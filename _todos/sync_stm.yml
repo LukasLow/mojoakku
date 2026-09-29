@@ -1,0 +1,6 @@
+id: sync_stm
+name: STM
+status: todo
+depends_on: [sync_atomic,sync_core]
+mojoNeeds: [pure-mojo, threads]
+summary: Software transactional memory.

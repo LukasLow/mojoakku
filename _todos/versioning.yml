@@ -1,5 +1,0 @@
-id: versioning
-name: Versioning
-status: todo
-depends_on: [string]
-summary: Semantic version parsing and comparison.

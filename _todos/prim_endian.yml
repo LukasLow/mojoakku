@@ -1,0 +1,6 @@
+id: prim_endian
+name: Endian
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Byte order conversion and host endianness.

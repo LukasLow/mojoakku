@@ -1,0 +1,6 @@
+id: lang_propertywrapper
+name: Property Wrapper
+status: todo
+depends_on: [meta_macro]
+mojoNeeds: [pure-mojo]
+summary: Declarative behavior on properties.

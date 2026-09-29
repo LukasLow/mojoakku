@@ -1,0 +1,6 @@
+id: db_cache
+name: Cache
+status: todo
+depends_on: [coll_core,time_clock]
+mojoNeeds: [pure-mojo]
+summary: In-memory caching with eviction policies.

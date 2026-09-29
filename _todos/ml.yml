@@ -1,5 +1,0 @@
-id: ml
-name: Machine Learning
-status: todo
-depends_on: [matrix]
-summary: Classic machine learning algorithms.

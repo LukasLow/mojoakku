@@ -1,0 +1,6 @@
+id: math_graph
+name: Graph
+status: todo
+depends_on: [coll_core]
+mojoNeeds: [pure-mojo]
+summary: Directed and undirected graph structures.

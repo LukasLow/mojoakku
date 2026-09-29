@@ -1,5 +1,0 @@
-id: nic
-name: Network Interface
-status: todo
-depends_on: [ip]
-summary: Network interface enumeration.

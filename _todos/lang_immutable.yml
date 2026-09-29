@@ -1,0 +1,6 @@
+id: lang_immutable
+name: Immutable
+status: todo
+depends_on: [coll_core,mem_ownership]
+mojoNeeds: [pure-mojo]
+summary: Persistent immutable collections.

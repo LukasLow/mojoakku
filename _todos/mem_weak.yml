@@ -1,0 +1,6 @@
+id: mem_weak
+name: Weak
+status: todo
+depends_on: [mem_refcount]
+mojoNeeds: [pure-mojo]
+summary: Weak references that do not own.

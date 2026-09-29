@@ -1,0 +1,6 @@
+id: archive_compression
+name: Compression
+status: todo
+depends_on: [mem_core,io_core]
+mojoNeeds: [pure-mojo]
+summary: Deflate, gzip, zlib and zstd.

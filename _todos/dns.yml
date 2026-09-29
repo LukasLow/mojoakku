@@ -1,5 +1,0 @@
-id: dns
-name: DNS
-status: todo
-depends_on: [udp,string]
-summary: Name resolution.

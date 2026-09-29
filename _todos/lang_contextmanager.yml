@@ -1,0 +1,6 @@
+id: lang_contextmanager
+name: Context Manager
+status: todo
+depends_on: [lang_error,lang_trait]
+mojoNeeds: [pure-mojo]
+summary: Scoped resource blocks.

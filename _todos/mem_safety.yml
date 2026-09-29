@@ -1,0 +1,6 @@
+id: mem_safety
+name: Memory Safety
+status: todo
+depends_on: [mem_core]
+mojoNeeds: [pure-mojo]
+summary: Runtime safety and bounds checking.

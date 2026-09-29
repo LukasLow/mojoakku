@@ -1,5 +1,0 @@
-id: interpreter
-name: Interpreter
-status: todo
-depends_on: [parser,ast]
-summary: Expression evaluation.

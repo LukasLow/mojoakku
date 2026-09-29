@@ -1,0 +1,6 @@
+id: sync_queue
+name: Queue
+status: todo
+depends_on: [coll_core,sync_core]
+mojoNeeds: [pure-mojo, threads]
+summary: FIFO, priority and blocking queues.

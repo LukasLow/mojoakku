@@ -1,0 +1,6 @@
+id: meta_metatable
+name: Metatable
+status: todo
+depends_on: [lang_trait,coll_core]
+mojoNeeds: [pure-mojo]
+summary: Per value behavior hooks.

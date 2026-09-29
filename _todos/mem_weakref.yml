@@ -1,0 +1,6 @@
+id: mem_weakref
+name: Weakref
+status: todo
+depends_on: [mem_core,mem_ownership]
+mojoNeeds: [pure-mojo]
+summary: Weak reference tracking.

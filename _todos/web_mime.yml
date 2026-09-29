@@ -1,0 +1,6 @@
+id: web_mime
+name: MIME
+status: todo
+depends_on: [text_string]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Media type handling.

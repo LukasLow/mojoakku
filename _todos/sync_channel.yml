@@ -1,0 +1,6 @@
+id: sync_channel
+name: Channel
+status: todo
+depends_on: [sync_core]
+mojoNeeds: [pure-mojo, threads]
+summary: Message passing channels.

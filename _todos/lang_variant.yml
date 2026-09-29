@@ -1,0 +1,6 @@
+id: lang_variant
+name: Variant
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Tagged union values.

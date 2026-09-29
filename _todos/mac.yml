@@ -1,5 +1,0 @@
-id: mac
-name: MAC
-status: todo
-depends_on: [digest,cipher]
-summary: Message authentication codes.

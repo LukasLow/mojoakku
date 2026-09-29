@@ -1,0 +1,6 @@
+id: crypto_mac
+name: MAC
+status: todo
+depends_on: [crypto_digest,crypto_cipher]
+mojoNeeds: [pure-mojo]
+summary: Message authentication codes.

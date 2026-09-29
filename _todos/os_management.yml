@@ -1,0 +1,6 @@
+id: os_management
+name: Management
+status: todo
+depends_on: [os_core,io_core]
+mojoNeeds: [pure-mojo]
+summary: Runtime management and introspection.

@@ -1,0 +1,6 @@
+id: fs_watch
+name: File Watch
+status: todo
+depends_on: [fs_core,async_eventloop]
+mojoNeeds: [pure-mojo, fs-full]
+summary: Filesystem change notification.

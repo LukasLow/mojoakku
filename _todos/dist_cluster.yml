@@ -1,0 +1,6 @@
+id: dist_cluster
+name: Cluster
+status: todo
+depends_on: [dist_actor,net_socket]
+mojoNeeds: [net-sockets, threads, pure-mojo]
+summary: Remote nodes and distribution.

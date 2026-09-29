@@ -1,0 +1,6 @@
+id: crypto_hash
+name: Hash
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Non cryptographic hash functions.

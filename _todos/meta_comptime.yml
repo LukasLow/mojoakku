@@ -1,0 +1,6 @@
+id: meta_comptime
+name: Comptime
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Compile time evaluation.

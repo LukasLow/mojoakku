@@ -1,0 +1,6 @@
+id: coll_ranges
+name: Ranges
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Lazy range and view types.

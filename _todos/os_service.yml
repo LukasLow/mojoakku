@@ -1,0 +1,6 @@
+id: os_service
+name: Daemon
+status: todo
+depends_on: [os_process,os_core]
+mojoNeeds: [pure-mojo]
+summary: Detach and run as a service.

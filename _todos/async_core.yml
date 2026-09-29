@@ -1,0 +1,6 @@
+id: async_core
+name: Async
+status: todo
+depends_on: [async_future,async_eventloop]
+mojoNeeds: [async]
+summary: Async and await.

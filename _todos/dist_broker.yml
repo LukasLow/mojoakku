@@ -1,0 +1,6 @@
+id: dist_broker
+name: Broker
+status: todo
+depends_on: [sync_queue,net_tcp]
+mojoNeeds: [net-sockets, threads, pure-mojo]
+summary: Message broker clients.

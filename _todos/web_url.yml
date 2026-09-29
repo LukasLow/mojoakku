@@ -1,0 +1,6 @@
+id: web_url
+name: URL
+status: todo
+depends_on: [text_string]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: URL parsing and joining.

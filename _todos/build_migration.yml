@@ -1,0 +1,6 @@
+id: build_migration
+name: Migration
+status: todo
+depends_on: [db_sql,format_config]
+mojoNeeds: [pure-mojo]
+summary: Schema migrations.

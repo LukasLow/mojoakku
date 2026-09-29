@@ -1,0 +1,6 @@
+id: sync_thread
+name: Thread
+status: todo
+depends_on: [sync_atomic]
+mojoNeeds: [pure-mojo, threads]
+summary: Operating system threads.

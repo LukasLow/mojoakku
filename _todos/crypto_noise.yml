@@ -1,0 +1,6 @@
+id: crypto_noise
+name: Noise
+status: todo
+depends_on: [math_core,math_random]
+mojoNeeds: [pure-mojo]
+summary: Procedural noise for content and graphics.

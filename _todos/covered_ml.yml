@@ -1,0 +1,6 @@
+id: covered_ml
+name: Machine Learning
+status: todo
+depends_on: [math_matrix]
+mojoNeeds: [pure-mojo]
+summary: Classic machine learning algorithms.

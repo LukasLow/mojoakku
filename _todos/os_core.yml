@@ -1,0 +1,6 @@
+id: os_core
+name: Operating System
+status: todo
+depends_on: [os_env,fs_path,io_core]
+mojoNeeds: [pure-mojo, fs-full]
+summary: Platform and system information.

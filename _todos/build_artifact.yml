@@ -1,0 +1,6 @@
+id: build_artifact
+name: Artifact
+status: todo
+depends_on: [archive_core,fs_core]
+mojoNeeds: [pure-mojo]
+summary: Downloadable build artifacts.

@@ -1,5 +1,0 @@
-id: uri
-name: URI
-status: todo
-depends_on: [string]
-summary: URI parsing and encoding.

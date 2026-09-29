@@ -1,0 +1,6 @@
+id: net_multicast
+name: Multicast
+status: todo
+depends_on: [net_udp]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Multicast group messaging.

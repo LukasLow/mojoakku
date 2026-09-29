@@ -1,5 +1,0 @@
-id: geo
-name: Geo
-status: todo
-depends_on: [geometry]
-summary: Geographic coordinates and distance.

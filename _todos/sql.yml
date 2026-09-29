@@ -1,5 +1,0 @@
-id: sql
-name: SQL
-status: todo
-depends_on: [string,collections]
-summary: SQL building and execution.

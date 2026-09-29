@@ -1,5 +1,0 @@
-id: os
-name: Operating System
-status: todo
-depends_on: [env,path,io]
-summary: Platform and system information.

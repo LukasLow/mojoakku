@@ -1,0 +1,6 @@
+id: io_stream
+name: Stream
+status: todo
+depends_on: [io_core,async_core]
+mojoNeeds: [pure-mojo, fs-full]
+summary: Asynchronous data streams.

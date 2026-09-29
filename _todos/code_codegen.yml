@@ -1,0 +1,6 @@
+id: code_codegen
+name: Code Generation
+status: todo
+depends_on: [code_ast,code_parser]
+mojoNeeds: [pure-mojo]
+summary: Source and bytecode generation.

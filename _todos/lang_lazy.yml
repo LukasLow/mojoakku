@@ -1,0 +1,6 @@
+id: lang_lazy
+name: Lazy
+status: todo
+depends_on: [lang_closure]
+mojoNeeds: [pure-mojo]
+summary: Deferred evaluation of values.

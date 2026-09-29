@@ -1,0 +1,6 @@
+id: format_csv
+name: CSV
+status: todo
+depends_on: [text_string,fs_file]
+mojoNeeds: [pure-mojo]
+summary: Comma separated value reading and writing.

@@ -1,0 +1,6 @@
+id: ui_input
+name: Input
+status: todo
+depends_on: [io_core,cli_terminal]
+mojoNeeds: [gui-windowing, pure-mojo]
+summary: Keyboard and input events.

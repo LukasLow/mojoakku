@@ -1,0 +1,6 @@
+id: archive_core
+name: Archive
+status: todo
+depends_on: [fs_core,archive_compression]
+mojoNeeds: [pure-mojo]
+summary: Tar and zip archives.

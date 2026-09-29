@@ -1,0 +1,6 @@
+id: stat_statistics
+name: Statistics
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Descriptive statistics and distributions.

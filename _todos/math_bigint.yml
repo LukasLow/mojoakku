@@ -1,0 +1,6 @@
+id: math_bigint
+name: Big Integer
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Arbitrary precision integers.

@@ -1,0 +1,6 @@
+id: meta_macro
+name: Macro
+status: todo
+depends_on: [meta_comptime]
+mojoNeeds: [pure-mojo]
+summary: Compile time metaprogramming.

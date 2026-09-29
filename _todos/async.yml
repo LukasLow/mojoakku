@@ -1,5 +1,0 @@
-id: async
-name: Async
-status: todo
-depends_on: [future,eventloop]
-summary: Async and await.

@@ -1,0 +1,6 @@
+id: security_auth
+name: Auth
+status: todo
+depends_on: [security_password,crypto_mac]
+mojoNeeds: [pure-mojo]
+summary: Authentication primitives.

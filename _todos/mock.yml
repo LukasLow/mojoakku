@@ -1,5 +1,0 @@
-id: mock
-name: Mock
-status: todo
-depends_on: [testing]
-summary: Test doubles and mocking.

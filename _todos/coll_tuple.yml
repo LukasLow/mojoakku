@@ -1,0 +1,6 @@
+id: coll_tuple
+name: Tuple
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Heterogeneous product types.
