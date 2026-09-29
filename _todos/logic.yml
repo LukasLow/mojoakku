@@ -1,5 +1,0 @@
-id: logic
-name: Logic
-status: todo
-depends_on: [collections]
-summary: Logic and relational programming.

@@ -1,5 +1,0 @@
-id: factor
-name: Factor
-status: todo
-depends_on: [collections]
-summary: Categorical factor values and levels.

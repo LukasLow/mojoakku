@@ -1,0 +1,6 @@
+id: mem_align
+name: Alignment
+status: todo
+depends_on: [mem_core]
+mojoNeeds: [pure-mojo]
+summary: Memory alignment control and inspection.

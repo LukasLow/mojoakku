@@ -1,0 +1,6 @@
+id: mem_refcount
+name: Reference Count
+status: todo
+depends_on: [mem_ownership,sync_atomic]
+mojoNeeds: [pure-mojo]
+summary: Shared ownership counters.

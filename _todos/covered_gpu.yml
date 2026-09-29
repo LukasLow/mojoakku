@@ -1,0 +1,6 @@
+id: covered_gpu
+name: GPU
+status: todo
+depends_on: [mem_core,covered_simd]
+mojoNeeds: [pure-mojo]
+summary: GPU compute and device management.

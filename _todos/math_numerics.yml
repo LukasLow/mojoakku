@@ -1,0 +1,6 @@
+id: math_numerics
+name: Numerics
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Numeric traits and conversions.

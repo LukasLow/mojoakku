@@ -1,0 +1,6 @@
+id: lang_error
+name: Error
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Error values and propagation.

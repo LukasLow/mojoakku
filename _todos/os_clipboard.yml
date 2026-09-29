@@ -1,0 +1,6 @@
+id: os_clipboard
+name: Clipboard
+status: todo
+depends_on: [io_core]
+mojoNeeds: [pure-mojo]
+summary: System clipboard access.

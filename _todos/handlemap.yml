@@ -1,5 +1,0 @@
-id: handlemap
-name: Handle Map
-status: todo
-depends_on: [collections,memory]
-summary: Generation indexed handle table.

@@ -1,0 +1,6 @@
+id: stat_dataframe
+name: Dataframe
+status: todo
+depends_on: [coll_core,format_csv]
+mojoNeeds: [pure-mojo]
+summary: Columnar tables for data analysis.

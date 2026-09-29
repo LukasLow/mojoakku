@@ -4,7 +4,8 @@ This folder is the **machine-readable catalogue of every library MojoAkku could
 build**. There is exactly **one file per library**, named `<id>.yml`, and all
 files sit **flat** in this directory. The flat layout is a core project
 decision: no library is nested inside another, not here and not under
-`mojoakku/`.
+`mojoakku/`. The catalogue currently holds **318** entries (4 `done`, and the
+`covered_*`/`homeless_*` marker prefixes explained in the ADR).
 
 The catalogue is pure inventory — a library may still be only an idea. Its
 `status` says whether work has started, nothing more.
@@ -16,21 +17,28 @@ the start of a line (which is why the Taskfile can parse them with `awk`):
 
 | Key          | Meaning                                                                                   | Allowed values                       |
 | ------------ | ----------------------------------------------------------------------------------------- | ------------------------------------ |
-| `id`         | Canonical library id; also the file name without `.yml`. Lowercase, one word, no nesting. | `^[a-z0-9]+$` (e.g. `tcp`, `udp`)     |
+| `id`         | Canonical library id; also the file name without `.yml`. `domain_local`, joined with `_`, no nesting. | `^[a-z0-9_]+$` (e.g. `net_udp`)       |
 | `name`       | Human-readable display name.                                                              | free text                            |
 | `status`     | Whether work has started. **Only three values.**                                          | `todo` \| `current` \| `done`        |
 | `depends_on` | Inline list of other catalogue `id`s this library needs first (conceptual graph edges).   | `[]` or `[id, id, ...]`              |
+| `mojoNeeds`  | Inline list of Mojo capability keys from `mojo.yml` the library requires.                 | `[pure-mojo]` or `[key, ...]`        |
 | `summary`    | One-sentence description of what the library provides.                                    | free text                            |
 
 Example:
 
 ```yaml
-id: udp
+id: net_udp
 name: UDP
 status: todo
-depends_on: [socket, ip]
+depends_on: [net_socket]
+mojoNeeds: [pure-mojo, net-sockets]
 summary: Datagram UDP sockets.
 ```
+
+A library is buildable only when all its `mojoNeeds` are `have` in `mojo.yml`
+and all its `depends_on` libraries are `done`. `mojoNeeds` keys are defined in
+[`../mojo.yml`](../mojo.yml); the naming rule is in
+[`../docs/adr/0001-namespace-domains.md`](../docs/adr/0001-namespace-domains.md).
 
 ### There is no `blocked` field — and no `blocked` status
 
@@ -73,7 +81,9 @@ Run these from the repository root. The Taskfile uses only `sh`, `awk`, `grep`,
 | Command             | What it prints                                                       |
 | ------------------- | -------------------------------------------------------------------- |
 | `task`              | Same as `task todo`.                                                 |
-| `task todo`         | Every library you can start building **right now**.                  |
+| `task todo`         | Every library you can start building **right now** (todo + deps done + `mojoNeeds` all `have`). |
+| `task todo -- --all`| Every dependency-clear todo library with its blocking reason (alias `task todo-all`). |
+| `task mojoHave`     | The `mojo.yml` capability keys whose state is `have`.                |
 | `task current`      | Libraries that are in progress.                                      |
 | `task all`          | Every catalogued library as `id  status  name`.                      |
 | `task count`        | How many libraries are in each status, plus the total.               |
@@ -84,32 +94,37 @@ Example output lines (ids are illustrative):
 
 ```
 $ task todo
-encoding  Encoding
-string    String
+text_encoding  Encoding
+text_string    String
 
 $ task all
-http      todo     HTTP
-socket    done     Socket
-tcp       done     TCP
-udp       todo     UDP
+net_socket  done     Socket
+net_tcp     done     TCP
+net_udp     todo     UDP
+web_http    todo     HTTP
 
 $ task count
-MojoAkku catalogue: 244 libraries
+MojoAkku catalogue: 318 libraries
 
-todo:      230
-current:   2
-done:      12
-total:     244
+todo:      314
+current:   0
+done:      4
+total:     318
 
-$ task show -- udp
-id: udp
+$ task show -- net_udp
+id: net_udp
 name: UDP
 status: todo
-depends_on: [socket, ip]
+depends_on: [net_socket]
+mojoNeeds: [pure-mojo, net-sockets]
 summary: Datagram UDP sockets.
 
 $ task waiting
-http  todo  HTTP  -> waiting for: tcp
+web_http  todo  HTTP  -> waiting for: net_tcp
+
+$ task todo -- --all
+net_ip    IP Address  -> needs net-sockets (missing)
+web_url   URL         -> needs net-sockets (missing)
 ```
 
 If no library is ready, `task todo` prints a clear "nothing is ready to build
@@ -134,4 +149,6 @@ data/science groups). Each language's standard library and known 1st-party
 libraries were checked at the concept level, not the function level. Multiple
 names for the same concept were normalized to one canonical MojoAkku `id`. New
 ids are still allowed when a concept was missed — the same naming convention
-applies: lowercase, one word, no nesting.
+applies: `domain_local`, lowercase, joined with `_`, no nesting. The domain
+prefixes are defined in
+[`../docs/adr/0001-namespace-domains.md`](../docs/adr/0001-namespace-domains.md).

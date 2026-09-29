@@ -1,0 +1,6 @@
+id: mem_layout
+name: Layout
+status: todo
+depends_on: [mem_core]
+mojoNeeds: [pure-mojo]
+summary: Control over memory layout.

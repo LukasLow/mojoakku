@@ -1,0 +1,6 @@
+id: security_jwt
+name: JWT
+status: todo
+depends_on: [format_json,crypto_mac,codec_base64]
+mojoNeeds: [pure-mojo]
+summary: JSON web tokens.

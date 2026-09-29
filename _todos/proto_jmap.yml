@@ -1,0 +1,6 @@
+id: proto_jmap
+name: JMAP
+status: todo
+depends_on: [web_http]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: JSON mail access protocol.

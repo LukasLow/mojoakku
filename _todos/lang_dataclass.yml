@@ -1,0 +1,6 @@
+id: lang_dataclass
+name: Dataclass
+status: todo
+depends_on: [meta_macro]
+mojoNeeds: [pure-mojo]
+summary: Generated record types.

@@ -1,0 +1,6 @@
+id: covered_soa
+name: Struct of Arrays
+status: todo
+depends_on: [mem_core,mem_layout]
+mojoNeeds: [pure-mojo]
+summary: SIMD friendly data layout.

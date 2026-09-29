@@ -1,0 +1,6 @@
+id: econ_core
+name: Economics Core
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Core economic types.

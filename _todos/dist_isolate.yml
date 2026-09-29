@@ -1,0 +1,6 @@
+id: dist_isolate
+name: Isolate
+status: todo
+depends_on: [sync_thread,sync_channel]
+mojoNeeds: [net-sockets, threads, pure-mojo]
+summary: Isolated concurrent workers.

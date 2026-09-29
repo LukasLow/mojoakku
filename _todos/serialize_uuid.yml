@@ -1,0 +1,6 @@
+id: serialize_uuid
+name: UUID
+status: todo
+depends_on: [math_random,text_string]
+mojoNeeds: [pure-mojo]
+summary: Unique identifier generation.

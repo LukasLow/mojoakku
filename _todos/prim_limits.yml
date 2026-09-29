@@ -1,0 +1,6 @@
+id: prim_limits
+name: Limits
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Numeric type limits and properties.

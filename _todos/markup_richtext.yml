@@ -1,0 +1,6 @@
+id: markup_richtext
+name: Rich Text
+status: todo
+depends_on: [text_string,markup_html]
+mojoNeeds: [pure-mojo]
+summary: Text carrying attributes for each range.

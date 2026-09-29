@@ -1,0 +1,6 @@
+id: meta_reflection
+name: Reflection
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Runtime type information.

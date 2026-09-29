@@ -1,0 +1,6 @@
+id: chem_reaction
+name: Reactions
+status: todo
+depends_on: [chem_core]
+mojoNeeds: [pure-mojo]
+summary: Stoichiometry and reaction balancing.

@@ -1,0 +1,6 @@
+id: media_image
+name: Image
+status: todo
+depends_on: [io_core,archive_compression]
+mojoNeeds: [pure-mojo]
+summary: Image decoding and encoding.

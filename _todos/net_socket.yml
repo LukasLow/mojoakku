@@ -1,0 +1,6 @@
+id: net_socket
+name: Socket
+status: todo
+depends_on: [io_core,net_ip]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Low level socket primitives.

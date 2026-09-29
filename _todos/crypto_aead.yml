@@ -1,0 +1,6 @@
+id: crypto_aead
+name: AEAD Ciphers
+status: todo
+depends_on: [crypto_cipher,crypto_mac]
+mojoNeeds: [pure-mojo]
+summary: Authenticated encryption: AES-GCM, ChaCha20-Poly1305.

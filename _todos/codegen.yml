@@ -1,5 +1,0 @@
-id: codegen
-name: Code Generation
-status: todo
-depends_on: [ast,parser]
-summary: Source and bytecode generation.

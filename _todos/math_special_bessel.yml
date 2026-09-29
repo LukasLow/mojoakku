@@ -1,0 +1,6 @@
+id: math_special_bessel
+name: Bessel Functions
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Bessel and related cylinder functions.

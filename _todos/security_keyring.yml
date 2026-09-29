@@ -1,0 +1,6 @@
+id: security_keyring
+name: Keyring
+status: todo
+depends_on: [crypto_cipher,fs_core]
+mojoNeeds: [pure-mojo]
+summary: Secure storage for secrets.

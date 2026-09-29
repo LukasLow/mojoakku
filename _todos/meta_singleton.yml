@@ -1,0 +1,6 @@
+id: meta_singleton
+name: Singleton
+status: todo
+depends_on: [mem_ownership]
+mojoNeeds: [pure-mojo]
+summary: Single instance construction pattern.

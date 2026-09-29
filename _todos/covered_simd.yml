@@ -1,0 +1,6 @@
+id: covered_simd
+name: SIMD
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Vectorized numeric operations.

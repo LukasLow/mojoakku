@@ -1,5 +1,0 @@
-id: binary
-name: Binary
-status: todo
-depends_on: [memory]
-summary: Binary reading and writing.

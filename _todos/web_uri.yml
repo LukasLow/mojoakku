@@ -1,0 +1,6 @@
+id: web_uri
+name: URI
+status: todo
+depends_on: [text_string]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: URI parsing and encoding.

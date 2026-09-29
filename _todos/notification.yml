@@ -1,5 +1,0 @@
-id: notification
-name: Notification
-status: todo
-depends_on: [io]
-summary: Desktop notifications.

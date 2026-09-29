@@ -1,0 +1,6 @@
+id: io_core
+name: IO
+status: done
+depends_on: []
+mojoNeeds: [pure-mojo, fs-full]
+summary: Byte and text streams.

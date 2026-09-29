@@ -1,0 +1,6 @@
+id: net_nic
+name: Network Interface
+status: todo
+depends_on: [net_ip]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Network interface enumeration.

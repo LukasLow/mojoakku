@@ -1,0 +1,6 @@
+id: proto_pop3
+name: POP3
+status: todo
+depends_on: [net_tcp]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: POP3 mail retrieval.

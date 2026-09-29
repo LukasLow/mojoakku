@@ -1,5 +1,0 @@
-id: http
-name: HTTP
-status: todo
-depends_on: [tcp,tls,url,mime]
-summary: HTTP client and server.

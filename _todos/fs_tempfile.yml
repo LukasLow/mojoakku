@@ -1,0 +1,6 @@
+id: fs_tempfile
+name: Tempfile
+status: todo
+depends_on: [fs_path,fs_core]
+mojoNeeds: [pure-mojo, fs-full]
+summary: Temporary files and directories.

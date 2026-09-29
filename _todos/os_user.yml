@@ -1,0 +1,6 @@
+id: os_user
+name: User
+status: todo
+depends_on: [os_core]
+mojoNeeds: [pure-mojo]
+summary: User and group lookup.

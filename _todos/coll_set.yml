@@ -1,0 +1,6 @@
+id: coll_set
+name: Set
+status: todo
+depends_on: [coll_core]
+mojoNeeds: [pure-mojo]
+summary: Unordered collections of unique elements.

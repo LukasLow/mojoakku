@@ -1,0 +1,6 @@
+id: covered_broadcast
+name: Broadcast
+status: todo
+depends_on: [coll_iter,covered_simd]
+mojoNeeds: [pure-mojo]
+summary: Elementwise broadcasting and fusion.

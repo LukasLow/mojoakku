@@ -1,0 +1,6 @@
+id: dev_mock
+name: Mock
+status: todo
+depends_on: [dev_testing]
+mojoNeeds: [pure-mojo]
+summary: Test doubles and mocking.

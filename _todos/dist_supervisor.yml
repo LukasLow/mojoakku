@@ -1,0 +1,6 @@
+id: dist_supervisor
+name: Supervisor
+status: todo
+depends_on: [dist_actor]
+mojoNeeds: [net-sockets, threads, pure-mojo]
+summary: Restart and monitor child actors.

@@ -1,0 +1,6 @@
+id: ui_easing
+name: Easing
+status: todo
+depends_on: [math_core]
+mojoNeeds: [gui-windowing, pure-mojo]
+summary: Interpolation and easing functions.

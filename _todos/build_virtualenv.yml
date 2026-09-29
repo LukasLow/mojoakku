@@ -1,0 +1,6 @@
+id: build_virtualenv
+name: Virtual Environment
+status: todo
+depends_on: [build_package,fs_core]
+mojoNeeds: [pure-mojo]
+summary: Isolated toolchain environments.

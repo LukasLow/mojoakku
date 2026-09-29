@@ -1,5 +1,0 @@
-id: tempfile
-name: Tempfile
-status: todo
-depends_on: [path,fs]
-summary: Temporary files and directories.

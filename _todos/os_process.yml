@@ -1,0 +1,6 @@
+id: os_process
+name: Process
+status: todo
+depends_on: [io_core,os_core]
+mojoNeeds: [pure-mojo, process]
+summary: Spawning and controlling processes.

@@ -1,0 +1,6 @@
+id: codec_base32
+name: Base32
+status: todo
+depends_on: [codec_base64]
+mojoNeeds: [pure-mojo]
+summary: Base32 encode and decode.

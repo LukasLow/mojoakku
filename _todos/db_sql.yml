@@ -1,0 +1,6 @@
+id: db_sql
+name: SQL
+status: todo
+depends_on: [text_string,coll_core]
+mojoNeeds: [pure-mojo]
+summary: SQL building and execution.

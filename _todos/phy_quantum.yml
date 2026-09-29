@@ -1,0 +1,6 @@
+id: phy_quantum
+name: Quantum
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Schrodinger, states, operators.

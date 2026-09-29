@@ -1,0 +1,6 @@
+id: lang_logic
+name: Logic
+status: todo
+depends_on: [coll_core]
+mojoNeeds: [pure-mojo]
+summary: Logic and relational programming.

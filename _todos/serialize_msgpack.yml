@@ -1,0 +1,6 @@
+id: serialize_msgpack
+name: MessagePack
+status: todo
+depends_on: [serialize_serialization]
+mojoNeeds: [pure-mojo]
+summary: MessagePack binary format.

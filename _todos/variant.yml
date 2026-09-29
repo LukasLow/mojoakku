@@ -1,5 +1,0 @@
-id: variant
-name: Variant
-status: todo
-depends_on: []
-summary: Tagged union values.

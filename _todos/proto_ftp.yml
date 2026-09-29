@@ -1,0 +1,6 @@
+id: proto_ftp
+name: FTP
+status: todo
+depends_on: [net_tcp,fs_core]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: File transfer protocol.

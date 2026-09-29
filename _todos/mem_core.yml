@@ -1,0 +1,6 @@
+id: mem_core
+name: Memory
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Raw memory, pointers and allocation.

@@ -1,0 +1,6 @@
+id: web_sse
+name: Server-Sent Events
+status: todo
+depends_on: [web_http]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Server-sent event streams.

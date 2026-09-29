@@ -1,5 +1,0 @@
-id: artifact
-name: Artifact
-status: todo
-depends_on: [archive,fs]
-summary: Downloadable build artifacts.

@@ -1,0 +1,6 @@
+id: lang_option
+name: Option
+status: todo
+depends_on: [lang_variant]
+mojoNeeds: [pure-mojo]
+summary: Optional and result values instead of null.

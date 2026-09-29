@@ -1,0 +1,6 @@
+id: units_core
+name: Units
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Physical units and measures.

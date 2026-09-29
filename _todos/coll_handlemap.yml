@@ -1,0 +1,6 @@
+id: coll_handlemap
+name: Handle Map
+status: todo
+depends_on: [coll_core,mem_core]
+mojoNeeds: [pure-mojo]
+summary: Generation indexed handle table.

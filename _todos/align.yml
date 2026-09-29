@@ -1,5 +1,0 @@
-id: align
-name: Alignment
-status: todo
-depends_on: [memory]
-summary: Memory alignment control and inspection.

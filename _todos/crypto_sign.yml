@@ -1,0 +1,6 @@
+id: crypto_sign
+name: Signatures
+status: todo
+depends_on: [crypto_publickey,crypto_digest]
+mojoNeeds: [pure-mojo]
+summary: Digital signatures: Ed25519, ECDSA.

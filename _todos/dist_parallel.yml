@@ -1,0 +1,6 @@
+id: dist_parallel
+name: Parallel
+status: todo
+depends_on: [sync_thread,sync_atomic]
+mojoNeeds: [net-sockets, threads, pure-mojo]
+summary: Data and task parallelism.

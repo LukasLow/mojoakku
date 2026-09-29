@@ -1,0 +1,6 @@
+id: sync_core
+name: Sync
+status: todo
+depends_on: [sync_atomic]
+mojoNeeds: [pure-mojo, threads]
+summary: Mutexes, locks and condition variables.

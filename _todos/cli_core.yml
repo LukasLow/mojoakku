@@ -1,0 +1,6 @@
+id: cli_core
+name: CLI
+status: todo
+depends_on: [text_string,coll_core]
+mojoNeeds: [pure-mojo, fs-full]
+summary: Command line argument parsing.

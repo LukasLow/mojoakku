@@ -1,0 +1,6 @@
+id: crypto_cipher
+name: Cipher
+status: todo
+depends_on: [mem_core,text_string]
+mojoNeeds: [pure-mojo]
+summary: Symmetric encryption.

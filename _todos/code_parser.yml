@@ -1,0 +1,6 @@
+id: code_parser
+name: Parser
+status: todo
+depends_on: [text_string,coll_core,lang_error]
+mojoNeeds: [pure-mojo]
+summary: Parser combinators and lexing.

@@ -1,0 +1,6 @@
+id: proto_rpc
+name: RPC
+status: todo
+depends_on: [serialize_serialization,net_tcp]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Remote procedure calls.

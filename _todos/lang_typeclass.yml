@@ -1,0 +1,6 @@
+id: lang_typeclass
+name: Typeclass
+status: todo
+depends_on: [lang_trait,meta_comptime]
+mojoNeeds: [pure-mojo]
+summary: Type directed overloading.

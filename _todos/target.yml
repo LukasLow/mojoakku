@@ -1,5 +1,0 @@
-id: target
-name: Target
-status: todo
-depends_on: [build]
-summary: Cross compilation targets.

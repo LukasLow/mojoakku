@@ -1,0 +1,6 @@
+id: format_spec
+name: Spec
+status: todo
+depends_on: [coll_core,lang_pattern]
+mojoNeeds: [pure-mojo]
+summary: Data shape and schema validation.

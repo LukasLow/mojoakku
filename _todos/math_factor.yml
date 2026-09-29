@@ -1,0 +1,6 @@
+id: math_factor
+name: Factor
+status: todo
+depends_on: [coll_core]
+mojoNeeds: [pure-mojo]
+summary: Categorical factor values and levels.

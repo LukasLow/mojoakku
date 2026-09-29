@@ -1,5 +1,0 @@
-id: statistics
-name: Statistics
-status: todo
-depends_on: [math]
-summary: Descriptive statistics and distributions.

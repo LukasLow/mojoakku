@@ -1,0 +1,6 @@
+id: meta_observation
+name: Observation
+status: todo
+depends_on: [lang_trait,lang_pattern]
+mojoNeeds: [pure-mojo]
+summary: Change observation of state.

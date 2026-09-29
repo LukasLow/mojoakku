@@ -1,0 +1,6 @@
+id: units_geo
+name: Geo
+status: todo
+depends_on: [math_geometry]
+mojoNeeds: [pure-mojo]
+summary: Geographic coordinates and distance.

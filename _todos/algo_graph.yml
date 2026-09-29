@@ -1,0 +1,6 @@
+id: algo_graph
+name: Graph Algorithms
+status: todo
+depends_on: [coll_core]
+mojoNeeds: [pure-mojo]
+summary: Traversal, connectivity, spanning trees, flow.

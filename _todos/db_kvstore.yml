@@ -1,0 +1,6 @@
+id: db_kvstore
+name: Key Value Store
+status: todo
+depends_on: [fs_core]
+mojoNeeds: [pure-mojo]
+summary: Embedded key value storage.

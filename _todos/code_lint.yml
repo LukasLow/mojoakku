@@ -1,0 +1,6 @@
+id: code_lint
+name: Lint
+status: todo
+depends_on: [code_parser,code_ast]
+mojoNeeds: [pure-mojo]
+summary: Static analysis and linting.

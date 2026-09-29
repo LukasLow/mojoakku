@@ -1,5 +1,0 @@
-id: lazy
-name: Lazy
-status: todo
-depends_on: [closure]
-summary: Deferred evaluation of values.

@@ -1,0 +1,6 @@
+id: security_webauth
+name: WebAuthn
+status: todo
+depends_on: [security_auth,crypto_sign]
+mojoNeeds: [pure-mojo]
+summary: Passkeys, FIDO2, WebAuthn ceremonies.

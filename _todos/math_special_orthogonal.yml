@@ -1,0 +1,6 @@
+id: math_special_orthogonal
+name: Orthogonal Polynomials
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Legendre, Chebyshev, Hermite, Laguerre.

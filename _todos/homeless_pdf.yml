@@ -1,0 +1,6 @@
+id: homeless_pdf
+name: PDF
+status: todo
+depends_on: [io_core,archive_compression]
+mojoNeeds: [pure-mojo]
+summary: PDF reading and writing.

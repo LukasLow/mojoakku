@@ -1,0 +1,6 @@
+id: fs_core
+name: Filesystem
+status: todo
+depends_on: [fs_path,io_core]
+mojoNeeds: [pure-mojo, fs-full]
+summary: Directory and file system operations.

@@ -1,5 +1,0 @@
-id: base64
-name: Base64
-status: done
-depends_on: []
-summary: Base64 and base32 encoding.

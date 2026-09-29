@@ -1,0 +1,6 @@
+id: lang_trait
+name: Trait
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Interfaces and dynamic dispatch.

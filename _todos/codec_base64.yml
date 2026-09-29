@@ -1,0 +1,6 @@
+id: codec_base64
+name: Base64
+status: done
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Base64 and base32 encoding.

@@ -19,27 +19,57 @@ repo root/
   README.md
   TODO.md
   LICENSE
+  mojo.yml            <-- capability ledger: what Mojo 1.1.0 can and cannot do
   Taskfile.yml        <-- task commands, reads the _todos/ catalogue
   _todos/             <-- flat catalogue: one YAML file per planned library
+  docs/adr/           <-- architecture decision records
   .agents/workflows/*.md
   mojoakku/
-    socket/    <-- SIBLING library
-    tcp/       <-- SIBLING library
-    udp/       <-- SIBLING library
-    http/      <-- SIBLING library
-    websocket/ <-- SIBLING library
-    json/      <-- SIBLING library
-    url/       <-- SIBLING library
-    html/      <-- SIBLING library
-    template/  <-- SIBLING library
-    markdown/  <-- SIBLING library
+    net_socket/   <-- SIBLING library
+    net_tcp/      <-- SIBLING library
+    web_http/     <-- SIBLING library
+    markup_html/  <-- SIBLING library
+    format_json/  <-- SIBLING library
     ...
 ```
 
 Every library under `mojoakku/<lib>/` is a **sibling**. Libraries are **never
-nested** inside each other. The expected libraries are `socket`, `tcp`, `udp`,
-`http`, `websocket`, `json`, `url`, `html`, `template`, `markdown` and other
-names added later; this list is illustrative, not exhaustive.
+nested** inside each other.
+
+### Library naming: the domain prefix
+
+A flat namespace of 244 siblings stays readable only with a `domain_local`
+prefix joined by `_` (never `-`, which would force backticks in imports):
+`crypto_cipher`, not `cipher`. Two segments are preferred, three the maximum;
+no filler segment (`phy_cosmology`, not `math_func_cosmology`).
+
+| Domain prefix | Meaning | Examples |
+| --- | --- | --- |
+| `text_` `markup_` `format_` `codec_` `code_` | text, documents, encodings, source code | `text_string`, `format_json` |
+| `math_` (expansive) `stat_` `algo_` `units_` | numbers and computation | `math_core`, `stat_statistics` |
+| `crypto_` `security_` | primitives and network security | `crypto_hash`, `security_tls` |
+| `net_` `proto_` `web_` | raw sockets, protocols, web/browser layers | `net_socket`, `web_http` |
+| `db_` `archive_` `serialize_` | data stores, archives, streams | `db_sql`, `serialize_binary` |
+| `os_` `fs_` `io_` `cli_` `sync_` `async_` `dist_` `time_` `build_` | system, runtime, build | `os_core`, `sync_thread` |
+| `lang_` `meta_` `coll_` `mem_` `prim_` `dev_` | language, collections, memory, tooling | `lang_trait`, `coll_core` |
+| `media_` `ui_` | media and user interface | `media_image`, `ui_gui` |
+
+`covered_<x>` marks a library already covered by std/MAX (never built, e.g.
+`covered_simd`); `homeless_<x>` marks one without a home yet (e.g.
+`homeless_pdf`). The decision record is `docs/adr/0001-namespace-domains.md`.
+
+### Capability ledger: `mojo.yml` and `mojoNeeds:`
+
+`mojo.yml` records what Mojo 1.1.0 can (`have`), partly can (`partial`) or
+cannot (`missing`) do, each entry with a source. Every `_todos/<id>.yml`
+declares `mojoNeeds:` — the capability keys it requires.
+
+`task todo` applies the **capability gate**: a library is listed only when all
+three hold — status `todo`, every `depends_on` library `done`, and every
+`mojoNeeds` key `state: have`. "Buildable today" is therefore evidence-backed,
+not guessed. `task todo -- --all` (alias `task todo-all`) drops the capability
+filter and appends a reason per library, so planned-but-blocked entries stay
+visible.
 
 ## Layout of one library
 
@@ -67,7 +97,7 @@ The canonical reference is `.agents/workflows/LibraryLayout.md`.
 - Libraries **MUST NOT** be structurally nested. The directory tree stays flat
   under `mojoakku/`.
 - A library **MAY** depend on another library as a **graph edge**, e.g.
-  `http -> tcp -> socket`.
+  `web_http -> net_tcp -> net_socket`.
 - Every dependency edge **must** be technically justified and documented in the
   depending library's inline `# API-DOCS` shared block (`__init__.mojo`).
 - Dependency edges **MUST NOT** determine directory nesting. A dependency is a

@@ -1,0 +1,6 @@
+id: build_module
+name: Module
+status: todo
+depends_on: [fs_path,fs_core]
+mojoNeeds: [pure-mojo]
+summary: Module loading and discovery.

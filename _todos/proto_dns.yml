@@ -1,0 +1,6 @@
+id: proto_dns
+name: DNS
+status: todo
+depends_on: [net_udp,text_string]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Name resolution.

@@ -1,5 +1,0 @@
-id: zon
-name: ZON
-status: todo
-depends_on: [string,collections]
-summary: Object notation configuration format.

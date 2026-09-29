@@ -1,0 +1,6 @@
+id: sync_pool
+name: Pool
+status: todo
+depends_on: [mem_allocator,mem_core]
+mojoNeeds: [pure-mojo, threads]
+summary: Reusable object and buffer pools.

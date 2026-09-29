@@ -1,0 +1,6 @@
+id: lang_tie
+name: Tie
+status: todo
+depends_on: [lang_trait]
+mojoNeeds: [pure-mojo]
+summary: Binding an ordinary variable to methods.

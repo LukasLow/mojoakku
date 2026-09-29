@@ -1,5 +1,0 @@
-id: session
-name: Session
-status: todo
-depends_on: [cookie,random]
-summary: Session management.

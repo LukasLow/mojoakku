@@ -1,0 +1,6 @@
+id: dev_sandbox
+name: Sandbox
+status: todo
+depends_on: [code_interpreter,mem_core]
+mojoNeeds: [interpreter, pure-mojo]
+summary: Restricted execution of code.

@@ -1,5 +1,0 @@
-id: endian
-name: Endian
-status: todo
-depends_on: []
-summary: Byte order conversion and host endianness.

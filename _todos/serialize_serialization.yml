@@ -1,0 +1,6 @@
+id: serialize_serialization
+name: Serialization
+status: todo
+depends_on: [serialize_binary,coll_core]
+mojoNeeds: [pure-mojo]
+summary: Encoding of structured values.

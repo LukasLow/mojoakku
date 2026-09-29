@@ -1,5 +1,0 @@
-id: sandbox
-name: Sandbox
-status: todo
-depends_on: [interpreter,memory]
-summary: Restricted execution of code.

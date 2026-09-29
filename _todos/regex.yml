@@ -1,5 +1,0 @@
-id: regex
-name: Regular Expressions
-status: todo
-depends_on: [string]
-summary: Regular expression matching and capture.

@@ -1,0 +1,6 @@
+id: text_format
+name: Format
+status: todo
+depends_on: [text_string]
+mojoNeeds: [pure-mojo]
+summary: String formatting and interpolation.

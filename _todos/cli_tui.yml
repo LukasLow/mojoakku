@@ -1,0 +1,6 @@
+id: cli_tui
+name: TUI
+status: todo
+depends_on: [cli_terminal,ui_input]
+mojoNeeds: [pure-mojo, fs-full]
+summary: Terminal user interfaces.

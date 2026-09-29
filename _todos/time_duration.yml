@@ -1,0 +1,6 @@
+id: time_duration
+name: Duration
+status: todo
+depends_on: [time_clock]
+mojoNeeds: [pure-mojo]
+summary: Durations and time arithmetic.

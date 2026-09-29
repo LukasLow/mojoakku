@@ -1,0 +1,6 @@
+id: format_config
+name: Config
+status: todo
+depends_on: [format_toml,format_yaml,format_ini,format_json]
+mojoNeeds: [pure-mojo]
+summary: Configuration loading from files.

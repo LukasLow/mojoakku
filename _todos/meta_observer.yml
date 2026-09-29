@@ -1,0 +1,6 @@
+id: meta_observer
+name: Observer
+status: todo
+depends_on: [coll_core]
+mojoNeeds: [pure-mojo]
+summary: Publish and subscribe notification.

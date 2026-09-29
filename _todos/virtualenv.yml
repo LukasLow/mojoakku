@@ -1,5 +1,0 @@
-id: virtualenv
-name: Virtual Environment
-status: todo
-depends_on: [package,fs]
-summary: Isolated toolchain environments.

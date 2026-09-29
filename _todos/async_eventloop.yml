@@ -1,0 +1,6 @@
+id: async_eventloop
+name: Event Loop
+status: todo
+depends_on: [io_core,sync_thread]
+mojoNeeds: [async]
+summary: Event loop and readiness notification.

@@ -1,0 +1,6 @@
+id: algo_sort
+name: Sorting
+status: todo
+depends_on: [coll_core]
+mojoNeeds: [pure-mojo]
+summary: Sorting algorithms.

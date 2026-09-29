@@ -1,0 +1,6 @@
+id: math_matrix
+name: Matrix
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Dense matrix and linear algebra.

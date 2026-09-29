@@ -1,0 +1,6 @@
+id: archive_zip
+name: ZIP
+status: todo
+depends_on: [archive_core]
+mojoNeeds: [pure-mojo]
+summary: ZIP archive reading and writing.

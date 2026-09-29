@@ -1,0 +1,6 @@
+id: cli_terminal
+name: Terminal
+status: todo
+depends_on: [io_core,cli_console]
+mojoNeeds: [pure-mojo, fs-full]
+summary: Terminal control and ANSI sequences.

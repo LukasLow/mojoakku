@@ -1,0 +1,6 @@
+id: build_package
+name: Package
+status: todo
+depends_on: [build_module,format_config]
+mojoNeeds: [pure-mojo]
+summary: Dependency and package management.

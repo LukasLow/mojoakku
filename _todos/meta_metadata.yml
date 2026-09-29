@@ -1,0 +1,6 @@
+id: meta_metadata
+name: Metadata
+status: todo
+depends_on: [meta_reflection]
+mojoNeeds: [pure-mojo]
+summary: Structured metadata about values.

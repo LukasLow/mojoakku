@@ -1,0 +1,6 @@
+id: algo_complexity
+name: Complexity
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Algorithmic complexity helpers and analysis.

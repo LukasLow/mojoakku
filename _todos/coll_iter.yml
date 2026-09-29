@@ -1,0 +1,6 @@
+id: coll_iter
+name: Iteration
+status: todo
+depends_on: [coll_core]
+mojoNeeds: [pure-mojo]
+summary: Iterator protocol and adapters.

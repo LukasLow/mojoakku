@@ -1,0 +1,6 @@
+id: build_core
+name: Build
+status: todo
+depends_on: [build_package,os_process]
+mojoNeeds: [pure-mojo]
+summary: Build graph and task running.

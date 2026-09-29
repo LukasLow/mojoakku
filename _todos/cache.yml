@@ -1,5 +1,0 @@
-id: cache
-name: Cache
-status: todo
-depends_on: [collections,time]
-summary: In-memory caching with eviction policies.

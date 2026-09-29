@@ -1,0 +1,6 @@
+id: build_autoload
+name: Autoload
+status: todo
+depends_on: [build_module,fs_core]
+mojoNeeds: [pure-mojo]
+summary: Automatic symbol loading.

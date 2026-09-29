@@ -1,0 +1,6 @@
+id: dist_actor
+name: Actor
+status: todo
+depends_on: [sync_channel,async_scheduler]
+mojoNeeds: [net-sockets, threads, pure-mojo]
+summary: Message driven concurrency units.

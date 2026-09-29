@@ -1,0 +1,6 @@
+id: phy_cosmology
+name: Cosmology
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Redshift, Hubble parameter, comoving distance.

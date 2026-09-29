@@ -1,0 +1,6 @@
+id: serialize_flatbuffers
+name: FlatBuffers
+status: todo
+depends_on: [serialize_binary]
+mojoNeeds: [pure-mojo]
+summary: FlatBuffers zero-copy format.

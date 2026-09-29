@@ -1,0 +1,6 @@
+id: phy_thermo
+name: Thermodynamics
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Heat, entropy, equations of state.

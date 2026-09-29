@@ -1,0 +1,6 @@
+id: text_string
+name: String
+status: done
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Text primitives: characters, bytes, slicing and comparison.

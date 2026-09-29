@@ -1,0 +1,6 @@
+id: sync_cell
+name: Cell
+status: todo
+depends_on: [mem_ownership]
+mojoNeeds: [pure-mojo, threads]
+summary: Interior mutability.

@@ -1,0 +1,6 @@
+id: bio_align
+name: Alignment
+status: todo
+depends_on: [bio_sequence]
+mojoNeeds: [pure-mojo]
+summary: Sequence alignment algorithms.

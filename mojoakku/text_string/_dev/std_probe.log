@@ -1,0 +1,134 @@
+std_probe.log — captured output of `std_probe.mojo` on the installed toolchain.
+Development artifact under `_dev/`; never shipped.
+
+Command (inside smd, from the repo root):
+    smd mojo run mojoakku/text_string/_dev/std_probe.mojo
+
+Toolchain: Mojo 1.1.0 (8189361e)
+Date of capture: 2026-09-28
+
+================================================================================
+PART 1 — POSITIVE CHECK: what std DOES expose (the `✓` rows of the DESIGN table)
+================================================================================
+
+$ mojo run mojoakku/text_string/_dev/std_probe.mojo
+PROBE toolchain=Mojo 1.1.0(8189361e)
+byte_length 5
+count_codepoints 4
+count_graphemes 4
+find_hit 6
+find_miss -1
+find_start 2
+rfind 2
+rfind_miss -1
+rfind_start 2
+count_substr 2
+startswith True
+endswith True
+startswith_start True
+in_operator True
+split_sep [a, b, c]
+split_maxsplit [a, b,c]
+split_none_ws [a, b]
+splitlines [a, b]
+split_empty_sep [, a, b, c, ]
+strip [x]
+strip_chars [a]
+lstrip [x  ]
+rstrip [  x]
+strip_nbsp_survives [ x ]
+strip_u3000_survives [　x　]
+lower abc
+upper ABC
+lower_unicode ä
+upper_unicode Ä
+replace bbb
+removeprefix bar
+removesuffix foo
+removeprefix_miss abc
+index_byte e
+index_codepoint é
+slice_byte el
+slice_codepoint el
+slice_grapheme_span el
+bytes_iter_len 5
+codepoints_iter_len 4
+codepoint_slices_iter_len 4
+grapheme_iter_len 4
+String_from_utf8 hi
+String_from_utf8_lossy �i
+String_unsafe_from_utf8 hi
+String_capacity_bytes 0
+String_ptr_len 0xffff44000440 2
+String_variadic a5
+TString v=5
+format_method 1 x
+String_mutation abc
+String_capacity_bytes_gt0 True
+String_resize abb
+String_join x,y
+String_join_writable 1,2
+PROBE done
+
+(exit 0)
+
+Reading of the output:
+  * `find`/`rfind` return an Int with the sentinel `-1` on a miss.
+  * `rfind` accepts a `start` argument.
+  * `split(None)` splits on whitespace runs; `split("")` yields the
+    [, a, b, c, ] shape; `split(sep, maxsplit)` exists.
+  * `strip()` removes ASCII whitespace only — `strip_nbsp_survives [ x ]`
+    and `strip_u3000_survives [　x　]` show NBSP and U+3000 survive.
+  * `lower`/`upper` map full Unicode (`Ä` -> `ä`).
+  * Indexing/slicing are the annotated `s[byte=…]`, `s[codepoint=…]` forms;
+    `StringSpan` additionally has `s[grapheme=…]`.
+  * Byte -> text is the `String(from_utf8=Span)`, `from_utf8_lossy`,
+    `unsafe_from_utf8` trio; `String(variadic)` is a Writable formatter.
+
+================================================================================
+PART 2 — NEGATIVE CHECK: what std does NOT expose (the `✗` rows of the table)
+================================================================================
+Each row was a separate one-line `mojo run`; the first compiler error / assert
+line is shown. All exit non-zero.
+
+$ sh _neg_runner.sh
+trim                   rc=1 :: error: 'String' value has no attribute 'trim'
+is_empty               rc=1 :: error: 'String' value has no attribute 'is_empty'
+capitalize             rc=1 :: error: 'String' value has no attribute 'capitalize'
+title                  rc=1 :: error: 'String' value has no attribute 'title'
+casefold               rc=1 :: error: 'String' value has no attribute 'casefold'
+to_lower               rc=1 :: error: 'String' value has no attribute 'to_lower'
+to_ascii_lower         rc=1 :: error: 'String' value has no attribute 'to_ascii_lower'
+reverse                rc=1 :: error: 'String' value has no attribute 'reverse'
+clear                  rc=1 :: error: 'String' value has no attribute 'clear'
+shrink_to_fit          rc=1 :: error: 'String' value has no attribute 'shrink_to_fit'
+push_back              rc=1 :: error: 'String' value has no attribute 'push_back'
+pop                    rc=1 :: error: 'String' value has no attribute 'pop'
+replace_count          rc=1 :: error: invalid call to 'replace': unexpected argument
+rsplit                 rc=1 :: error: 'String' value has no attribute 'rsplit'
+split_once             rc=1 :: error: 'String' value has no attribute 'split_once'
+partition              rc=1 :: error: 'String' value has no attribute 'partition'
+find_end               rc=1 :: error: invalid call to 'find': unexpected argument
+is_char_boundary       rc=1 :: error: 'String' value has no attribute 'is_char_boundary'
+byte_at                rc=1 :: error: 'String' value has no attribute 'byte_at'
+codepoint_at           rc=1 :: error: 'String' value has no attribute 'codepoint_at'
+strip_prefix           rc=1 :: error: 'String' value has no attribute 'strip_prefix'
+as_bytes_slice         rc=1 :: error: 'String' value has no attribute 'as_bytes_slice'
+StringBuilder          rc=1 :: error: package 'collections' does not contain 'StringBuilder'
+reversed               rc=1 :: error: no matching function in call to 'reversed'
+bare_index             rc=1 :: error: String does not support direct positional indexing like `s[i]` ...
+                               ... use one of: `s[byte=i]`, `s[codepoint=i]`, `s[grapheme=i]`.
+bare_slice             rc=1 :: error: String does not support direct positional slicing like `s[a:b]` ...
+                               ... use `s[byte=a:b]` or `s[codepoint=a:b]`.
+byte_index_oob         rc=1 :: Assert Error: index 5 is out of bounds, valid range is 0 to 1
+byte_slice_mid         rc=1 :: Assert Error: String span ends on, 2 which is not a codepoint boundary.
+negative_index         rc=1 :: error: function instantiation failed
+empty_index0           rc=1 :: Assert Error: index 0 is out of bounds, valid range is 0 to -1
+
+Additional note recorded during the probe:
+  * `String(some_list)` compiles but is the variadic Writable constructor, not a
+    byte bridge: `String([104, 105])` prints `[104, 105]` (10 bytes), not `hi`.
+    Byte input must go through a `Span` (`String(from_utf8=Span(list))`).
+  * `len(s)` is a compile error by design: "`len(String/StringSlice)` is not
+    supported because Mojo strings are UTF-8 encoded, so a single length is
+    ambiguous".

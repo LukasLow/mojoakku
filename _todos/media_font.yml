@@ -1,0 +1,6 @@
+id: media_font
+name: Font
+status: todo
+depends_on: [io_core,serialize_binary]
+mojoNeeds: [pure-mojo]
+summary: Font parsing and rendering.

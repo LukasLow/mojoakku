@@ -1,5 +1,0 @@
-id: bit
-name: Bit
-status: done
-depends_on: []
-summary: Bit twiddling and bitsets.

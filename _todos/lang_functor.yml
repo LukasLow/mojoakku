@@ -1,0 +1,6 @@
+id: lang_functor
+name: Functor
+status: todo
+depends_on: [lang_typeclass]
+mojoNeeds: [pure-mojo]
+summary: Higher order type abstractions.

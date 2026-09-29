@@ -1,0 +1,6 @@
+id: markup_xml
+name: XML
+status: todo
+depends_on: [text_string,coll_core,code_parser]
+mojoNeeds: [pure-mojo]
+summary: XML parsing and serialization.

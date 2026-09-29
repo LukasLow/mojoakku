@@ -1,0 +1,6 @@
+id: archive_zstd
+name: Zstandard
+status: todo
+depends_on: [archive_compression]
+mojoNeeds: [pure-mojo]
+summary: Zstandard compression.

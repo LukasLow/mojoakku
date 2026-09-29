@@ -1,0 +1,6 @@
+id: mem_pin
+name: Pin
+status: todo
+depends_on: [mem_ownership,mem_core]
+mojoNeeds: [pure-mojo]
+summary: Stable memory addresses.

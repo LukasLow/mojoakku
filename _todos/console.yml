@@ -1,5 +1,0 @@
-id: console
-name: Console
-status: todo
-depends_on: [io]
-summary: Standard input, output and error.

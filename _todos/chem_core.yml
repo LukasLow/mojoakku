@@ -1,0 +1,6 @@
+id: chem_core
+name: Chemistry Core
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Core chemical types and units.

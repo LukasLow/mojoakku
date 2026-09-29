@@ -1,0 +1,6 @@
+id: chem_molecule
+name: Molecules
+status: todo
+depends_on: [chem_core]
+mojoNeeds: [pure-mojo]
+summary: Molecular composition and molar mass.

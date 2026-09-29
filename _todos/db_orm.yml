@@ -1,0 +1,6 @@
+id: db_orm
+name: ORM
+status: todo
+depends_on: [db_sql]
+mojoNeeds: [pure-mojo]
+summary: Object relational mapping.

@@ -1,0 +1,6 @@
+id: lang_keypath
+name: Key Path
+status: todo
+depends_on: [meta_reflection]
+mojoNeeds: [pure-mojo]
+summary: First class property paths.

@@ -1,0 +1,6 @@
+id: dev_benchmark
+name: Benchmark
+status: todo
+depends_on: [time_clock]
+mojoNeeds: [pure-mojo]
+summary: Micro benchmarking.

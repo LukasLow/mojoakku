@@ -1,0 +1,6 @@
+id: homeless_game
+name: Game
+status: todo
+depends_on: [ui_gui,ui_input,media_audio]
+mojoNeeds: [pure-mojo]
+summary: Game loop and engine primitives.

@@ -1,0 +1,6 @@
+id: phy_mechanics
+name: Mechanics
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Kinematics, force, energy, momentum.

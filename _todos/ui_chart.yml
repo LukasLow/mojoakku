@@ -1,0 +1,6 @@
+id: ui_chart
+name: Chart
+status: todo
+depends_on: [media_image,math_core]
+mojoNeeds: [gui-windowing, pure-mojo]
+summary: Data charts and plots.

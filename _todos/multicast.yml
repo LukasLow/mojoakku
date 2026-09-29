@@ -1,5 +1,0 @@
-id: multicast
-name: Multicast
-status: todo
-depends_on: [udp]
-summary: Multicast group messaging.

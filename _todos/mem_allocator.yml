@@ -1,0 +1,6 @@
+id: mem_allocator
+name: Allocator
+status: todo
+depends_on: [mem_core]
+mojoNeeds: [pure-mojo]
+summary: Custom memory allocators.

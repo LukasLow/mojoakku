@@ -15,16 +15,32 @@ matching workflow.
 ## Library layout
 
 Libraries live directly under `mojoakku/` as siblings — never nested — and a
-dependency between libraries is a conceptual edge (`http -> tcp -> socket`),
-never a physical parent/child directory. The file list of one library —
+dependency between libraries is a conceptual edge
+(`web_http -> net_tcp -> net_socket`), never a physical parent/child directory. The file list of one library —
 including that `_tests/` has **no** `__init__.mojo` — is in
 [`AGENTS.md`](AGENTS.md#layout-of-one-library).
 
-## The catalogue (`_todos/`)
+## The catalogue (`_todos/`) and the capability ledger
 
 `_todos/` is a flat catalogue: one YAML file per planned library with its
-status (`todo | current | done`) and its dependencies. The Taskfile reads it
-and derives what can be built next.
+status (`todo | current | done`), its dependencies (`depends_on`) and the Mojo
+capabilities it needs (`mojoNeeds`). The Taskfile reads it and derives what can
+be built next.
+
+`mojoNeeds` keys are defined in [`mojo.yml`](mojo.yml), the **capability
+ledger**: what Mojo 1.1.0 can (`have`), partly can (`partial`) or cannot
+(`missing`) do, each with a source.
+
+`task todo` applies the **capability gate**: a library is buildable only when
+**all three** hold — its status is `todo`, every `depends_on` library is
+`done`, and every `mojoNeeds` key is `state: have`. `task todo -- --all` (alias
+`task todo-all`) drops the capability filter and shows every dependency-clear
+`todo` library with a one-line reason (`ready`, or `needs <capability>
+(<state>)`), so planned-but-blocked libraries stay visible.
+
+Architecture decisions live in `docs/adr/` — see
+[`docs/adr/0001-namespace-domains.md`](docs/adr/0001-namespace-domains.md) for
+the domain-prefix naming rule.
 
 ## Task commands
 
@@ -33,7 +49,9 @@ Run these from the repository root:
 | Command | What it does |
 | --- | --- |
 | `task` | Same as `task todo`: list libraries ready to build right now. |
-| `task todo` | List libraries with status `todo` whose dependencies are all `done`. |
+| `task todo` | List libraries that are ready: status `todo`, all `depends_on` `done`, all `mojoNeeds` `have`. |
+| `task todo -- --all` | Same, but show every dependency-clear `todo` library with its blocking reason (`ready` or `needs <capability> (<state>)`). Alias: `task todo-all`. |
+| `task mojoHave` | List the `mojo.yml` capability keys whose state is `have`. |
 | `task all` | List every library as `id  status  name`, sorted by id. |
 | `task count` | Count libraries per status, plus the total. |
 | `task waiting` | List libraries still waiting for a dependency, and name it. |

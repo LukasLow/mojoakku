@@ -1,0 +1,6 @@
+id: meta_dispatch
+name: Dispatch
+status: todo
+depends_on: [lang_trait]
+mojoNeeds: [pure-mojo]
+summary: Multiple dispatch.

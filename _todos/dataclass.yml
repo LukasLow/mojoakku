@@ -1,5 +1,0 @@
-id: dataclass
-name: Dataclass
-status: todo
-depends_on: [macro]
-summary: Generated record types.

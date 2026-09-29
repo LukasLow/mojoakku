@@ -1,0 +1,6 @@
+id: dev_testing
+name: Testing
+status: todo
+depends_on: [coll_core]
+mojoNeeds: [pure-mojo]
+summary: Test framework and assertions.

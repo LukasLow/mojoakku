@@ -1,0 +1,6 @@
+id: dev_ffi
+name: FFI
+status: todo
+depends_on: [mem_core]
+mojoNeeds: [ffi-callback, c-ffi, pure-mojo]
+summary: Foreign function interface.

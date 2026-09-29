@@ -1,0 +1,6 @@
+id: dev_script
+name: Scripting
+status: todo
+depends_on: [code_interpreter]
+mojoNeeds: [pure-mojo]
+summary: Script execution.

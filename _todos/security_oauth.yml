@@ -1,0 +1,6 @@
+id: security_oauth
+name: OAuth
+status: todo
+depends_on: [web_http,security_jwt]
+mojoNeeds: [pure-mojo]
+summary: OAuth authorization flows.

@@ -1,0 +1,6 @@
+id: net_udp
+name: UDP
+status: todo
+depends_on: [net_socket]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Datagram UDP sockets.

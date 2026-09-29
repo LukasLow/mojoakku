@@ -1,0 +1,6 @@
+id: codec_hex
+name: Hex
+status: todo
+depends_on: [codec_base64]
+mojoNeeds: [pure-mojo]
+summary: Hexadecimal encode and decode.

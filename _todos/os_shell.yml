@@ -1,0 +1,6 @@
+id: os_shell
+name: Shell
+status: todo
+depends_on: [os_process,text_string]
+mojoNeeds: [pure-mojo]
+summary: Shell invocation and quoting.

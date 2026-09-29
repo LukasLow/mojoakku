@@ -1,5 +1,0 @@
-id: package
-name: Package
-status: todo
-depends_on: [module,config]
-summary: Dependency and package management.

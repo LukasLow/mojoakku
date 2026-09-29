@@ -1,5 +1,0 @@
-id: textedit
-name: Text Edit
-status: todo
-depends_on: [string,collections]
-summary: Text buffer editing primitives.

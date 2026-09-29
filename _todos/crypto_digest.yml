@@ -1,0 +1,6 @@
+id: crypto_digest
+name: Crypto Hash
+status: todo
+depends_on: [crypto_hash,mem_core]
+mojoNeeds: [pure-mojo]
+summary: Cryptographic hash functions.

@@ -1,5 +1,0 @@
-id: script
-name: Scripting
-status: todo
-depends_on: [interpreter]
-summary: Script execution.

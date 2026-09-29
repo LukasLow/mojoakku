@@ -1,0 +1,6 @@
+id: math_geometry
+name: Geometry
+status: todo
+depends_on: [math_core]
+mojoNeeds: [pure-mojo]
+summary: Points, shapes and geometric operations.

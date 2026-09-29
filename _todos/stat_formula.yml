@@ -1,0 +1,6 @@
+id: stat_formula
+name: Formula
+status: todo
+depends_on: [code_parser,math_core]
+mojoNeeds: [pure-mojo]
+summary: Model formula interface.

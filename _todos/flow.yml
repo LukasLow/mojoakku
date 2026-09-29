@@ -1,5 +1,0 @@
-id: flow
-name: Flow
-status: todo
-depends_on: [async,stream]
-summary: Cold reactive value streams.

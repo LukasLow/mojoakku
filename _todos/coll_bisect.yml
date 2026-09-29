@@ -1,0 +1,6 @@
+id: coll_bisect
+name: Bisect
+status: todo
+depends_on: [coll_core]
+mojoNeeds: [pure-mojo]
+summary: Binary search and sorted insertion.

@@ -1,5 +1,0 @@
-id: stream
-name: Stream
-status: todo
-depends_on: [io,async]
-summary: Asynchronous data streams.

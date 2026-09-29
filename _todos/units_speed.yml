@@ -1,0 +1,6 @@
+id: units_speed
+name: Speed
+status: todo
+depends_on: [units_core]
+mojoNeeds: [pure-mojo]
+summary: Speed units: meter-per-second, km/h, knot, mph.

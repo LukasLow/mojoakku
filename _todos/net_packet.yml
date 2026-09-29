@@ -1,0 +1,6 @@
+id: net_packet
+name: Packet
+status: todo
+depends_on: [net_socket,net_ip]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Raw and crafted network packets.

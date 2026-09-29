@@ -1,0 +1,6 @@
+id: dev_metric
+name: Metric
+status: todo
+depends_on: [io_core,time_clock]
+mojoNeeds: [pure-mojo]
+summary: Metrics and counters.

@@ -1,0 +1,6 @@
+id: fs_file
+name: File
+status: todo
+depends_on: [fs_path,io_core]
+mojoNeeds: [pure-mojo, fs-full]
+summary: File reading and writing.

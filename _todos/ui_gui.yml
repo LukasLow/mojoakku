@@ -1,0 +1,6 @@
+id: ui_gui
+name: GUI
+status: todo
+depends_on: [io_core]
+mojoNeeds: [gui-windowing, pure-mojo]
+summary: Graphical user interfaces.

@@ -1,5 +1,0 @@
-id: comptime
-name: Comptime
-status: todo
-depends_on: []
-summary: Compile time evaluation.

@@ -1,0 +1,6 @@
+id: app_native
+name: App Native
+status: todo
+depends_on: [app_frame,math_core]
+mojoNeeds: [shader-graphics, gui-windowing]
+summary: Native renderer (Dart/Flutter model) on top of the GPU layer.

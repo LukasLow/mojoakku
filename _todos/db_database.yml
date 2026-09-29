@@ -1,0 +1,6 @@
+id: db_database
+name: Database
+status: todo
+depends_on: [io_core,db_sql]
+mojoNeeds: [pure-mojo]
+summary: Database connections and pooling.

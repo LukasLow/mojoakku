@@ -1,0 +1,6 @@
+id: build_plugin
+name: Plugin
+status: todo
+depends_on: [dev_ffi,fs_core]
+mojoNeeds: [pure-mojo]
+summary: Dynamic library loading.

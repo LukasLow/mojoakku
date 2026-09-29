@@ -1,0 +1,6 @@
+id: proto_imap
+name: IMAP
+status: todo
+depends_on: [net_tcp]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: IMAP mail access and folders.

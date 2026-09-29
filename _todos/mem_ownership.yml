@@ -1,0 +1,6 @@
+id: mem_ownership
+name: Ownership
+status: todo
+depends_on: []
+mojoNeeds: [pure-mojo]
+summary: Move, borrow and lifetime discipline.

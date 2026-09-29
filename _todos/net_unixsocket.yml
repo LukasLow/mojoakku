@@ -1,0 +1,6 @@
+id: net_unixsocket
+name: Unix Socket
+status: todo
+depends_on: [net_socket,fs_core]
+mojoNeeds: [pure-mojo, net-sockets]
+summary: Unix domain sockets.
