@@ -56,9 +56,12 @@ Medien/UI: `media_` `ui_` · `app_frame` `app_native` `app_webview`
 
 ## Quellen
 
-- `.tmp/namespace.md` (konsolidiertes Modell)
-- `.tmp/mojo.yml` (Capability-Ledger)
-- `.tmp/research_render_rust.md`, `_odin_zig.md`, `_webview.md`
+- `docs/architecture/namespace-model.md` (konsolidiertes Modell)
+- `docs/architecture/final-domains.md` (Domain → Präfix + Mitglieder)
+- `docs/architecture/rename-map.txt` (alt → neu, alle 244)
+- `mojo.yml` (Capability-Ledger)
+- `docs/architecture/research/render-rust.md`, `render-odin-zig.md`,
+  `render-webview.md`
 - Buch `mojov1`: `interop/calling-c`, `concurrency/gpu-and-accelerators`,
   `concurrency/async-and-parallelism`, `project/structure`
 - User-Freigaben 2026-09-29 (Runde 1 + 2)
