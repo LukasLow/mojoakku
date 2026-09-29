@@ -90,32 +90,32 @@ capabilities:
     state: missing
     note: >-
       No window/widget in std. Only via C-FFI to SDL2/SDL3/GLFW/raylib.
-      Source: mojov1/stdlib/overview; .tmp/research_render_*.md.
+      Source: mojov1/stdlib/overview; docs/architecture/research/.
 
   webview:
     state: missing
     note: >-
       No WebView in Mojo. Windows/Linux via C-FFI (WebView2/webkit2gtk);
       Android = Java/Kotlin (JNI only); iOS = Obj-C. Source:
-      .tmp/research_render_webview.md.
+      docs/architecture/research/render-webview.md.
 
   jni-bridge:
     state: missing
-    note: 'Mojo has no JNI bridge; needed for Android webview. Source: .tmp/research_render_webview.md.'
+    note: 'Mojo has no JNI bridge; needed for Android webview. Source: docs/architecture/research/render-webview.md.'
 
   objc-bridge:
     state: missing
     note: >-
       Mojo has no Obj-C bridge; JNI and the Obj-C runtime are C-ABI
       (JNIEnv as C struct, objc_msgSend as a C function), so a Kotlin/Swift host
-      that loads a Mojo .so is the workaround. Source: .tmp/research_render_webview.md.
+      that loads a Mojo .so is the workaround. Source: docs/architecture/research/render-webview.md.
 
   shader-graphics:
     state: partial
     note: >-
       No GPU rendering in std/MAX (MAX = compute only). Reachable via
       wgpu-native (MIT/Apache), SDL_gpu, or Vulkan/Metal via C-FFI.
-      Source: mojov1/concurrency/gpu-and-accelerators, .tmp/research_render_rust.md.
+      Source: mojov1/concurrency/gpu-and-accelerators, docs/architecture/research/render-rust.md.
 
   interpreter:
     state: partial
@@ -134,7 +134,7 @@ capabilities:
     note: >-
       No documented resource embedding. Workaround: generate a Mojo module with
       the content as comptime bytes (via the planned MojoAkku CLI), or ship
-      files alongside. Source: .tmp/namespace.md decision 2 (user).
+      files alongside. Source: docs/architecture/namespace-model.md decision 2 (user).
 
 # ---- derivation rule ------------------------------------------------------
 # `task todo` shows a library only when:

@@ -269,9 +269,21 @@ Einheiten und Dimensionsprüfung. `units_core` trägt das Typsystem, die
 > gesamte Sammlung unter `special`. Falls sie zu groß wird, kann sie später in
 > `math_special_bessel` / `math_special_gamma` / … geteilt werden.
 
-**Katalog-Wachstum:** 244 → ca. **260** (8 `units_*` + 7 `physics_*` + `math_special` + `time_duration`).
+**Katalog-Wachstum:** 244 → **318** (244 Bestand + **74 neue** Libs, angelegt).
+Die vollständige, angelegte Liste steht in `docs/architecture/new-libraries.txt`
+und unten in §7.
 
-## 7. Kosten & Ablauf (wenn freigegeben)
+## 7. Angelegte neue Libraries (74)
+
+Alle beschlossenen neuen Libs sind als `_todos/<id>.yml` angelegt (`status: todo`):
+`units_*` (8) · `phy_*` (5) · `chem_*` (4) · `bio_*` (4) · `econ_*` (3) ·
+`math_special_*` (4) · `app_*` (3) · `crypto_*` (6) · `security_*` (5) ·
+`proto_*` (9) · `archive_*` (5) · `serialize_*` (4) · `codec_*` (3) ·
+`document_*` (4) · `algo_*` (5) · `fs_find` · `time_duration`.
+
+Gesamtzahl Katalog: **318**. Davon 4 `done`, 6 `covered_*`, 2 `homeless_*`.
+
+## 8. Kosten & Ablauf (wenn freigegeben)
 
 **Pro bestehender Library mechanisch:**
 1. `_todos/<alt>.yml` → `_todos/<neu>.yml`.
@@ -289,7 +301,7 @@ Einheiten und Dimensionsprüfung. `units_core` trägt das Typsystem, die
 durchlaufen die volle Phase-1–13-Pipeline — als eigene Vorhaben, nicht Teil des
 Umbaus.
 
-## 8. Konsolidierte Entscheidungen (Runde 1 + 2 + Research)
+## 9. Konsolidierte Entscheidungen (Runde 1 + 2 + Research)
 
 Status: **alles „passt"**, nur wenige Punkte bewusst als **unsicher/Research**
 markiert. Nichts umbenannt, nichts committet.
@@ -328,8 +340,8 @@ markiert. Nichts umbenannt, nichts committet.
 
 ### 8.2 Capability-Ledger (neu)
 
-- **`mojo.yml`** — was Mojo kann/nicht kann, belegt (Stand 1.1.0). Liegt in
-  `.tmp/mojo.yml`. Beispiel: `async` = **missing**, `net-sockets` = **missing**,
+- **`mojo.yml`** — was Mojo kann/nicht kann, belegt (Stand 1.1.0). Liegt im
+  Repo-Root. Beispiel: `async` = **missing**, `net-sockets` = **missing**,
   `c-ffi`/`time`/`pure-mojo` = **have**.
 - **`mojoNeeds:`** — neues Pflichtfeld in `_todos/<id>.yml`.
 - **Ableitungsregel:** `task todo` zeigt eine Lib nur, wenn alle `mojoNeeds`

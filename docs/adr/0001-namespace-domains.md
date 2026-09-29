@@ -18,7 +18,7 @@
    `math_linear`, `math_geometry`, `math_special_*`, `math_logic`).
 5. **Der übliche Namespace ist der Themename selbst** (scipy: `special`,
    `constants`, `stats`; astropy: `cosmology`, `units`) — belegt in
-   `.tmp/research_render_*.md`.
+   `docs/architecture/research/`.
 
 ## Neue Konventionen
 
