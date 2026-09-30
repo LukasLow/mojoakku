@@ -12,3 +12,6 @@ Six language files with all12 questions; Mojo served by local buch. Three resear
 Independent reviewer checked all six reference languages, twelve questions,
 primary sources, policy distinctions and Mojo buch links. No blockers or contradictions.
 Research proposals distinguished from facts; backlog buffer/stream/length candidates complete.
+
+## Phase 3 — API design
+Two function names, four borrowed overloads, fixed raw URL encoding and tolerant whole-input decode. User session approval exception honored. Dependency rationale and all deferred candidates recorded; no code or tests.
