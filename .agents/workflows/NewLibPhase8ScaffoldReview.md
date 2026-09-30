@@ -6,11 +6,11 @@ Review the scaffold produced by `NewLibPhase7Scaffold.md` and decide whether the
 
 ## Inputs
 
-- The inline `# API-DOCS` blocks in `mojoakku/<lib>/*.mojo` and `mojoakku/<lib>/__init__.mojo` (authoritative docs; the design document is gone).
-- `mojoakku/<lib>/*.mojo` (one file per public API entry) and `mojoakku/<lib>/__init__.mojo`.
-- `mojoakku/<lib>/_internal/` (only if shared code exists).
-- `mojoakku/<lib>/_tests/` (must exist and must not contain `__init__.mojo`).
-- `mojoakku/<lib>/Taskfile.yml` (per-library test runner).
+- The inline `# API-DOCS` blocks in `akku/<lib>/*.mojo` and `akku/<lib>/__init__.mojo` (authoritative end-user docs; the design record stays in `_dev/DESIGN.md`).
+- `akku/<lib>/*.mojo` (one file per public API entry) and `akku/<lib>/__init__.mojo`.
+- `akku/<lib>/_internal/` (only if shared code exists).
+- `akku/<lib>/_tests/` (must exist and must not contain `__init__.mojo`).
+- `akku/<lib>/Taskfile.yml` (per-library test runner).
 - The scaffold report / git diff of the scaffold commit.
 
 ## Preconditions
@@ -26,14 +26,14 @@ Review the scaffold produced by `NewLibPhase7Scaffold.md` and decide whether the
 
 ## Steps
 
-1. Confirm the library directory contains exactly the agreed layout: `__init__.mojo`, one `.mojo` file per public API entry directly under `mojoakku/<lib>/` (no `api/` directory, no `API.mojo`), optional `_internal/` only if shared code exists, `_dev/` (research + persistent `DESIGN.md` + `TODO.md`), `_tests/`, `Taskfile.yml`; and that `_dev/DESIGN.md` and `_dev/TODO.md` are still present.
-2. Confirm `mojoakku/<lib>/_tests/` exists and contains no `__init__.mojo` (tests are plain files, not a package).
-3. Compile the library via the consumer-import check (`mojo run -I .. <checkfile>` importing every public name) and confirm it compiles without errors.
-4. Enumerate every public symbol documented in the inline `# API-DOCS` blocks and verify a corresponding stub exists in the API files (name, parameter list, return type) — one by one. The docs block of API `X` lives in `mojoakku/<lib>/<x>.mojo`.
+1. Confirm the library directory contains exactly the agreed layout: `__init__.mojo`, one `.mojo` file per public API entry directly under `akku/<lib>/` (no `api/` directory, no `API.mojo`), optional `_internal/` only if shared code exists, `_dev/` (research + persistent `DESIGN.md` + `TODO.md`), `_tests/`, `Taskfile.yml`; and that `_dev/DESIGN.md` and `_dev/TODO.md` are still present.
+2. Confirm `akku/<lib>/_tests/` exists and contains no `__init__.mojo` (tests are plain files, not a package).
+3. Compile the library via the consumer-import check (`mojo run -I ../.. <checkfile>` from `akku/<lib>/`, importing every public name via `from akku.<lib> import ...`) and confirm it compiles without errors.
+4. Enumerate every public symbol documented in the inline `# API-DOCS` blocks and verify a corresponding stub exists in the API files (name, parameter list, return type) — one by one. The docs block of API `X` lives in `akku/<lib>/<x>.mojo`.
 5. Verify each stub aborts with the standard "not yet implemented" message and does not return fabricated values.
 6. Confirm every API file carries its end-user `# API-DOCS` block (fields per `LibraryLayout.md`: summary, `Signature`, `What it does`, `Returns`, `Errors`, `Example`) and that `__init__.mojo` carries the shared docs block.
 7. Confirm no real implementation leaked into the API files or any stub (no working logic that would make tests pass prematurely).
-8. Confirm `_internal/` contains no nested library structure (`mojoakku/<lib>/<lib>/`), keeping the sibling rule intact. (If a private implementation file is later placed there, it is not part of the public surface.)
+8. Confirm `_internal/` contains no nested library structure (`akku/<lib>/<lib>/`), keeping the sibling rule intact. (If a private implementation file is later placed there, it is not part of the public surface.)
 9. Confirm `Taskfile.yml` exists and its `test` task actually runs the files under `_tests/`.
 10. Record findings as pass/fail per step with file:line references.
 

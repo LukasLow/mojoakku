@@ -6,10 +6,10 @@ Verify that the test suite authored in `NewLibPhase9Tests.md` genuinely encodes 
 
 ## Inputs
 
-- The inline `# API-DOCS` blocks in `mojoakku/<lib>/*.mojo` and `mojoakku/<lib>/__init__.mojo`.
-- `mojoakku/<lib>/_tests/` (all test files).
+- The inline `# API-DOCS` blocks in `akku/<lib>/*.mojo` and `akku/<lib>/__init__.mojo`.
+- `akku/<lib>/_tests/` (all test files).
 - Baseline log and the exact test command from the Tests phase.
-- Scaffold API files (`mojoakku/<lib>/*.mojo`) for signature cross-checking.
+- Scaffold API files (`akku/<lib>/*.mojo`) for signature cross-checking.
 
 ## Preconditions
 

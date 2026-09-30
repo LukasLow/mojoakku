@@ -24,7 +24,7 @@ repo root/
   _todos/             <-- flat catalogue: one YAML file per planned library
   docs/adr/           <-- architecture decision records
   .agents/workflows/*.md
-  mojoakku/
+  akku/               <-- public namespace (project/repository stays MojoAkku)
     net_socket/   <-- SIBLING library
     net_tcp/      <-- SIBLING library
     web_http/     <-- SIBLING library
@@ -33,10 +33,17 @@ repo root/
     ...
 ```
 
-Every library under `mojoakku/<lib>/` is a **sibling**. Libraries are **never
+Every library under `akku/<lib>/` is a **sibling**. Libraries are **never
 nested** inside each other.
 
 ### Library naming: the domain prefix
+
+The public import prefix is `akku`: `from akku.codec_base64 import encode`.
+Pass the repository root on the import path (`mojo run -I . <consumer>` from
+the root, or `-I ../..` from `akku/<lib>/`). Keep the flat `domain_local`
+library names; do not split them into nested packages. There is no legacy
+namespace alias. Project branding, repository URLs and toolchain workspace
+identity stay MojoAkku. See `docs/adr/0002-akku-public-namespace.md`.
 
 A flat namespace of 244 siblings stays readable only with a `domain_local`
 prefix joined by `_` (never `-`, which would force backticks in imports):
@@ -74,7 +81,7 @@ visible.
 ## Layout of one library
 
 ```
-mojoakku/<lib>/
+akku/<lib>/
   __init__.mojo      # package entry point + shared (whole-library) docs block; re-exports every public name
   <api_entry>.mojo   # ONE file per public API entry, name = API name lowercased
                      #   e.g. encode.mojo, padding_mode.mojo, base64_error.mojo
@@ -95,7 +102,7 @@ The canonical reference is `.agents/workflows/LibraryLayout.md`.
 ## Library independence rules
 
 - Libraries **MUST NOT** be structurally nested. The directory tree stays flat
-  under `mojoakku/`.
+  under `akku/`.
 - A library **MAY** depend on another library as a **graph edge**, e.g.
   `web_http -> net_tcp -> net_socket`.
 - Every dependency edge **must** be technically justified and documented in the
@@ -105,7 +112,7 @@ The canonical reference is `.agents/workflows/LibraryLayout.md`.
 
 ## Per-library backlog: `_dev/TODO.md`
 
-Every library carries a backlog at `mojoakku/<lib>/_dev/TODO.md`. It is the
+Every library carries a backlog at `akku/<lib>/_dev/TODO.md`. It is the
 home for **every API the research showed is theoretically possible in Mojo but
 which the current implementation did not ship** — deferred entry points, later
 variants, ideas surfaced in `_dev/<lang>.md` / `_dev/DESIGN.md` that were
@@ -136,8 +143,8 @@ Rules:
   block per API in that API's file) are the **single source of truth** for a library.
 - Every API decision must be **justified in the docs**.
 - The public API lives in **one file per API entry** directly under
-  `mojoakku/<lib>/`, never in a single `API.mojo`; private shared logic lives in
-  `mojoakku/<lib>/_internal/` (only if genuinely shared); every public function
+  `akku/<lib>/`, never in a single `API.mojo`; private shared logic lives in
+  `akku/<lib>/_internal/` (only if genuinely shared); every public function
   carries its seven-field docs block next to it.
 - Each library ships its own `Taskfile.yml` with a `test` task for its `_tests/`.
 - **The API design is approved by the user** before the design review runs
@@ -153,7 +160,7 @@ Rules:
   Consequence: a phase commit must be made on the library branch, and
   `git push origin main` from an agent is forbidden.
 - **CI runs one command: `task ci`.** The root `Taskfile.yml` auto-discovers
-  every `mojoakku/*/Taskfile.yml` and runs each library's `test` (and optional
+  every `akku/*/Taskfile.yml` and runs each library's `test` (and optional
   `ci`) task; no library is registered anywhere. Each library owns how it tests.
   Two GitHub workflows drive it: `pull-request-check.yml` (PR: `task ci` + require
   exactly one new `.changes/new/` file) and `main-push.yml` (main: `task ci`, then

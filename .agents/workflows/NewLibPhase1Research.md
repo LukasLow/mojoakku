@@ -14,17 +14,17 @@ Research the problem space for one new MojoAkku library across many reference la
 ## Preconditions
 - The Manager has decided that a new MojoAkku library is the next sensible step and has named `<lib>`.
 - `AGENTS.md` and `.agents/workflows/README.md` exist and this workflow is the active phase.
-- No prior `mojoakku/<lib>/_dev/` directory exists for this phase (fresh run), or it is explicitly being redone.
+- No prior `akku/<lib>/_dev/` directory exists for this phase (fresh run), or it is explicitly being redone.
 - The Manager starts NO Manager subagent; this workflow is executed by the Manager orchestrating `researcher` agents.
 
 ## Roles
 - **Manager**: owns the phase, fixes the language groups for this run, starts at most **6** `researcher` agents (one per group), collects results, enforces the source rule.
-- **researcher** (one agent per selected language group, **max 6**): answers the standardized question set for every language in its group and writes the findings **directly** into `mojoakku/<lib>/_dev/<lang>.md`, one file per language. It does not use a `docs` materialization pass.
+- **researcher** (one agent per selected language group, **max 6**): answers the standardized question set for every language in its group and writes the findings **directly** into `akku/<lib>/_dev/<lang>.md`, one file per language. It does not use a `docs` materialization pass.
 - **reviewer**: not started here; invoked by the next workflow `NewLibPhase2ResearchReview.md`.
 
 ## Steps
-1. Manager confirms the library name `<lib>` and **creates and checks out the library branch `git checkout -b <lib>-library`** (or checks out the existing `<lib>-library` if Phase 1 is resumed). Every phase of this library commits to this branch; `main` is never written directly. Manager then creates the directory `mojoakku/<lib>/_dev/` in the repository.
-2. Manager fixes the language groups for this run from the baseline roster below. The roster is a pool, not a mandate: the Manager selects the languages in which the concept `<lib>` actually exists and relevantly differs, and records the selection with a one-line reason per language in `mojoakku/<lib>/_dev/README.md`. The selection is frozen for the run.
+1. Manager confirms the library name `<lib>` and **creates and checks out the library branch `git checkout -b <lib>-library`** (or checks out the existing `<lib>-library` if Phase 1 is resumed). Every phase of this library commits to this branch; `main` is never written directly. Manager then creates the directory `akku/<lib>/_dev/` in the repository.
+2. Manager fixes the language groups for this run from the baseline roster below. The roster is a pool, not a mandate: the Manager selects the languages in which the concept `<lib>` actually exists and relevantly differs, and records the selection with a one-line reason per language in `akku/<lib>/_dev/README.md`. The selection is frozen for the run.
    - **Mojo** — always present in the list, but served by the `mojov1` buch and **not** by a `researcher`: Mojo facts are read from `mojov1` (and improved in place via `buch_update` if wrong), so **no `researcher` handles Mojo**.
    - **Mandatory languages (always selected, in every run):** C, C++, Go, Rust, JS/TS, Python — plus Mojo via the buch. These are never dropped; if a language genuinely cannot answer a domain, the Manager states why in `_dev/README.md`.
    - The remaining languages form **6 groups**. The Manager starts **at most ONE `researcher` per group, so at most 6 researchers in total** — never one per language.
@@ -50,8 +50,8 @@ Research the problem space for one new MojoAkku library across many reference la
    10. Which interesting design decisions are worth studying?
    11. Which decisions should explicitly NOT be copied into MojoAkku, and why?
    12. Which ideas fit Mojo specifically (ownership model, `raises`, `var`/`borrowed`, value semantics, compile-time features)?
-4. Manager starts at most ONE `researcher` agent per selected language group, in parallel where possible (**upper bound: 6 researchers total**), each with this prompt contract: "Research `<lib>` in the languages of your group: `<langs>`. Answer the standardized question set in the given order. Write your findings **directly** into `mojoakku/<lib>/_dev/<lang>.md`, one file per language of your group. Every factual claim needs a source (URL or file:line in a reference repo). Mark any guess explicitly as `GUESS:`."
-5. Each `researcher` writes one file per language of its group to `mojoakku/<lib>/_dev/<lang>.md`, following exactly this structure:
+4. Manager starts at most ONE `researcher` agent per selected language group, in parallel where possible (**upper bound: 6 researchers total**), each with this prompt contract: "Research `<lib>` in the languages of your group: `<langs>`. Answer the standardized question set in the given order. Write your findings **directly** into `akku/<lib>/_dev/<lang>.md`, one file per language of your group. Every factual claim needs a source (URL or file:line in a reference repo). Mark any guess explicitly as `GUESS:`."
+5. Each `researcher` writes one file per language of its group to `akku/<lib>/_dev/<lang>.md`, following exactly this structure:
    - `# <lib> research: <lang>`
    - `## 1. Standard library support`
    - `## 2. Relevant community libraries`
@@ -68,16 +68,16 @@ Research the problem space for one new MojoAkku library across many reference la
    - `## Sources`
 6. Each `researcher` marks every statement with a citation to a source (URL, RFC number, or `repo/path:line`). Where no source could be found, the statement is written as `GUESS:` and the reason no source exists is stated.
 7. Manager waits for all `researcher` agents, then verifies completeness against the frozen selection of this run from Step 2: Mojo is satisfied by the `mojov1` buch and every other selected language must have its `_dev/<lang>.md` file present and non-empty, exactly one file per selected language.
-8. Manager creates the per-library backlog `mojoakku/<lib>/_dev/TODO.md` from the research: every API candidate the research showed is **theoretically possible in Mojo** but that the run does not intend to ship goes in as one line (name — one-phrase meaning — origin `<lang>.md` §N). This is the seed of the live backlog; see `LibraryLayout.md`, "The per-library backlog". At Phase 1 the design does not exist yet, so the list is generous — later phases move items out as they ship.
+8. Manager creates the per-library backlog `akku/<lib>/_dev/TODO.md` from the research: every API candidate the research showed is **theoretically possible in Mojo** but that the run does not intend to ship goes in as one line (name — one-phrase meaning — origin `<lang>.md` §N). This is the seed of the live backlog; see `LibraryLayout.md`, "The per-library backlog". At Phase 1 the design does not exist yet, so the list is generous — later phases move items out as they ship.
 9. Manager appends a status line to `.agents/log.md` via `agentlog` naming `<lib>`, the languages covered, and the research directory.
-10. Manager commits the phase: stages `mojoakku/<lib>/_dev/` (research files, `README.md` and `TODO.md`) and commits with a message naming the phase and the covered languages (e.g. `base64 phase 1: research corpus (9 languages + README)`).
+10. Manager commits the phase: stages `akku/<lib>/_dev/` (research files, `README.md` and `TODO.md`) and commits with a message naming the phase and the covered languages (e.g. `base64 phase 1: research corpus (9 languages + README)`).
 11. Manager hands the aggregate to the next workflow, where a `reviewer` will check completeness, contradictions, missing sources, and evidence-based cross-language conclusions.
 
 ## Artifacts / Outputs
-- `mojoakku/<lib>/_dev/<lang>.md` — one file per language in the frozen selection, written directly by the `researcher` of the owning group. No `docs` materialization pass exists.
+- `akku/<lib>/_dev/<lang>.md` — one file per language in the frozen selection, written directly by the `researcher` of the owning group. No `docs` materialization pass exists.
 - Every file contains the 12 answer sections and a `Sources` section.
 - All sources are real and traceable; all unsourced statements are marked `GUESS:`.
-- `mojoakku/<lib>/_dev/TODO.md` — the seed backlog: every researched API candidate that is theoretically possible in Mojo but not in scope for this run, one line each (see `LibraryLayout.md`).
+- `akku/<lib>/_dev/TODO.md` — the seed backlog: every researched API candidate that is theoretically possible in Mojo but not in scope for this run, one line each (see `LibraryLayout.md`).
 - The Mojo side of the research is covered by the `mojov1` buch rather than by a generated `_dev/mojo.md`; if a `_dev/mojo.md` is kept, it only links to the buch pages instead of duplicating them.
 - One `.agents/log.md` entry recording the phase result.
 - One git commit for the phase containing the research directory (incl. `README.md` and `TODO.md`).

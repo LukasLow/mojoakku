@@ -430,18 +430,18 @@ tasks:
 
   # --------------------------------------------------------------------------
   # test — run the `test` task of EVERY library. Auto-discovery: it scans
-  # mojoakku/*/Taskfile.yml, so a new library is picked up the moment its
+  # akku/*/Taskfile.yml, so a new library is picked up the moment its
   # Taskfile.yml exists. No library has to be registered here. A library owns
   # how it tests (its own Taskfile `test`); this root task only dispatches.
   # Exits non-zero if any library test fails; names the failing libraries.
   # --------------------------------------------------------------------------
   test:
-    desc: 'Run the test task of every library (auto-discovered via mojoakku/*/Taskfile.yml).'
+    desc: 'Run the test task of every library (auto-discovered via akku/*/Taskfile.yml).'
     cmds:
       - |
         found=""
         failed=""
-        for d in mojoakku/*/; do
+        for d in akku/*/; do
           [ -f "${d}Taskfile.yml" ] || continue
           found="yes"
           echo "== ${d}task test"
@@ -450,7 +450,7 @@ tasks:
           fi
         done
         if [ -z "$found" ]; then
-          echo "No library Taskfiles found under mojoakku/*/ (nothing to test)."
+          echo "No library Taskfiles found under akku/*/ (nothing to test)."
           exit 0
         fi
         if [ -n "$failed" ]; then
@@ -464,7 +464,7 @@ tasks:
   # --------------------------------------------------------------------------
   # missingMojo — surface the version-stamped workaround ledger.
   #
-  # Scans mojoakku/**/*.mojo for MissingMojo comment blocks:
+  # Scans akku/**/*.mojo for MissingMojo comment blocks:
   #   # MissingMojo - v1.0.0 - Start
   #   # kind: FFI | PythonInterop | UnstableAPI | Deferred
   #   # need: <what Mojo must provide>
@@ -507,9 +507,9 @@ tasks:
         [ -n "$cur" ] || cur=0.0.0
         curN=$(printf '%s' "$cur" | awk -F. '{ printf "%d", ($1*1000+$2)*1000+$3 }')
 
-        files=$(find mojoakku -name '*.mojo' -type f 2>/dev/null | sort)
+        files=$(find akku -name '*.mojo' -type f 2>/dev/null | sort)
         if [ -z "$files" ]; then
-          echo "No Mojo sources under mojoakku/ (nothing to scan)."
+          echo "No Mojo sources under akku/ (nothing to scan)."
           exit 0
         fi
 
@@ -597,6 +597,17 @@ tasks:
         fi
 
   # --------------------------------------------------------------------------
+  # namespace:test — repository-root consumer imports and removed-name rejection.
+  # Runs separately from library tests so an incorrect discovery root cannot
+  # silently turn the migration into a green CI run with no library tests.
+  # --------------------------------------------------------------------------
+  namespace:test:
+    desc: 'Check akku consumer imports and reject the removed namespace.'
+    dir: '{{.TASKFILE_DIR}}'
+    cmds:
+      - sh .github/tests/check_namespace.sh
+
+  # --------------------------------------------------------------------------
   # ci — the single CI entry point. CI runs exactly `task ci`; everything else
   # is derived from it. It runs the full library test sweep (`task test`) and
   # then any optional per-library `ci` hook (a library may add extra checks in
@@ -607,11 +618,12 @@ tasks:
   # already exist cannot slip through silently.
   # --------------------------------------------------------------------------
   ci:
-    desc: 'CI entry point: run every library test, per-library ci hooks, and the MissingMojo gate.'
+    desc: 'CI entry point: namespace checks, every library test, per-library ci hooks, and the MissingMojo gate.'
     cmds:
+      - task: namespace:test
       - task: test
       - |
-        for d in mojoakku/*/; do
+        for d in akku/*/; do
           [ -f "${d}Taskfile.yml" ] || continue
           # optional per-library ci hook: run it only if declared.
           if task -t "${d}Taskfile.yml" --list 2>/dev/null | grep -qE '^[* ]*ci[ :]'; then

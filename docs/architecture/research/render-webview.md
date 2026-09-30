@@ -394,7 +394,7 @@ GPU surface — and no webview at all in v1.**
   (<https://wgpu.rs/>), with an existing Mojo binding to study
   (<https://github.com/Hundo1018/wgpu-mojo>).
 - Deliver: `frame_native` = window + event loop + surface + input, one file per
-  API under `mojoakku/frame_native/`, per the MojoAkku layout.
+  API under `akku/frame_native/`, per the MojoAkku layout.
 - This is bindable **today** on Linux and macOS (Apple silicon) only, because
   those are Mojo's supported targets (`mojov1/intro/supported-platforms`) and
   both SDL3 and wgpu-native/GLFW are C-callable (C-FFI page).

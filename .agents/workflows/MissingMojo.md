@@ -90,7 +90,7 @@ task missingMojo -- check # STRICT: exit 1 if any marker is stale (the CI gate)
 
 It resolves the **current** Mojo version from `mojo --version` when the binary
 is available, otherwise from the `pixi.toml` pin (`mojo = "~=1.0.0"`). It scans
-`mojoakku/**/*.mojo` for markers and prints, per stale marker: the file and line,
+`akku/**/*.mojo` for markers and prints, per stale marker: the file and line,
 the recorded version, `kind`, `need`, `optimal` and `track`, followed by a
 summary count.
 

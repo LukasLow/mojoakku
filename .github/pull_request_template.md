@@ -2,7 +2,7 @@
 
 ## What does this change?
 
-<!-- One or two sentences. Name the affected library, e.g. mojoakku/base64. -->
+<!-- One or two sentences. Name the affected library, e.g. akku/codec_base64. -->
 
 ## Checklist
 

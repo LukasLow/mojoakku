@@ -4,9 +4,9 @@
 Restructure code without changing behavior, keeping the test suite green before and after.
 
 ## Inputs
-- Target scope in `mojoakku/<lib>/` (the API files `mojoakku/<lib>/*.mojo`, `_internal/`, or tests).
-- The inline `# API-DOCS` blocks in `mojoakku/<lib>/*.mojo` and `__init__.mojo` (define the behavior that must not change).
-- Current test suite in `mojoakku/<lib>/_tests/`.
+- Target scope in `akku/<lib>/` (the API files `akku/<lib>/*.mojo`, `_internal/`, or tests).
+- The inline `# API-DOCS` blocks in `akku/<lib>/*.mojo` and `__init__.mojo` (define the behavior that must not change).
+- Current test suite in `akku/<lib>/_tests/`.
 - The motivation: readability, duplication, dead code, naming or structure.
 
 ## Preconditions
@@ -34,7 +34,7 @@ Restructure code without changing behavior, keeping the test suite green before 
 9. `manager` commits the refactoring with a message naming the restructuring goal.
 
 ## Artifacts / Outputs
-- Refactored files under `mojoakku/<lib>/`.
+- Refactored files under `akku/<lib>/`.
 - Baseline and post-refactor test output (both green) stored as evidence files.
 - Benchmark before/after comparison when performance was in scope.
 - Task-log entry naming the restructuring goal and the files touched.

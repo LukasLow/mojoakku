@@ -30,7 +30,7 @@ kleinere Sammlungen statt weniger großer — Organisation vor Kürze.
 3. **Keine Füllwörter in der Mitte** — `func`, `misc`, `general`, `utilities`
    sind verboten (`physics_cosmology` sagt mehr als `math_func_cosmology`).
 4. **Domains sind ein geschlossener Satz** (33, §4). Kein Freitext-Präfix.
-5. Das Präfix ist **Teil des Verzeichnis- und Paketnamens** → `mojoakku/crypto_tls/`.
+5. Das Präfix ist **Teil des Verzeichnis- und Paketnamens** → `akku/crypto_tls/`.
 6. Der **`name:`-Wert** in `_todos/<id>.yml` bleibt der Anzeigename (z. B. „TLS").
 7. **Kein Sammelbecken.** Eine Lib, die in keine Domain passt, ist ein Signal, eine
    neue Domain zu eröffnen — nicht, sie irgendwo unterzuschieben.
@@ -41,7 +41,7 @@ kleinere Sammlungen statt weniger großer — Organisation vor Kürze.
 |---|---|---|
 | Bindestriche? | Nein — Paketname = Verzeichnisname, ungültige Identifiererzwingen Backticks | `mojov1/project/structure` |
 | Bricht Präfix die Regeln? | Nein, verboten ist nur *strukturelle Nesting* | `AGENTS.md` |
-| Präfix kostet Tooling? | Nein — `task test`/`ci` globben `mojoakku/*/` | `Taskfile.yml:343,513` |
+| Präfix kostet Tooling? | Nein — `task test`/`ci` globben `akku/*/` | `Taskfile.yml`, Tasks `test` und `ci` |
 | Verzeichnisbaum kostet Tooling? | Ja — Discovery, `__init__`-Ebenen, Branch-Modell | `Taskfile.yml:343`, `LibraryLayout.md` |
 | User betroffen? | Nein — nichts verpackt/veröffentlicht | User-Angabe 2026-09-28 |
 
@@ -287,7 +287,7 @@ Gesamtzahl Katalog: **318**. Davon 4 `done`, 6 `covered_*`, 2 `homeless_*`.
 
 **Pro bestehender Library mechanisch:**
 1. `_todos/<alt>.yml` → `_todos/<neu>.yml`.
-2. `mojoakku/<alt>/` → `mojoakku/<neu>/` (nur bei den 4 `done`-Libs).
+2. `akku/<alt>/` → `akku/<neu>/` (nur bei den 4 `done`-Libs).
 3. `_tests/*.mojo`: die `from <alt> import …`-Zeile (1 Zeile pro Datei).
 4. Docs-Header, Branch-Name `<neu>-library`.
 
