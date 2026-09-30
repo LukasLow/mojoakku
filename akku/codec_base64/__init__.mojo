@@ -21,7 +21,7 @@ from .encoder import Encoder
 from .decoder import Decoder
 
 # API-DOCS-START
-# Purpose    — akku/codec_base64 encodes raw bytes to text and decodes encoded
+# Purpose   — akku/codec_base64 encodes raw bytes to text and decodes encoded
 #   text back to bytes for the RFC 4648 radix family: base64 (standard),
 #   base64url, base32 (standard), base32hex and base16/hex. It is a pure,
 #   in-process data transform: no files, sockets, threads or global state.

@@ -1,4 +1,4 @@
-# codec_base64url — design record
+# codec_base64url  — design record
 
 ## Purpose
 
