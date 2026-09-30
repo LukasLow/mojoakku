@@ -5,6 +5,12 @@ All notable changes to MojoAkku are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions stay on `0.x.y`; major is never bumped.
 
+## v0.7.0 - 2026-09-30
+
+### Changed
+
+- Rename the public namespace and source root from `mojoakku` to `akku`; use `from akku.<lib> import ...`, update `mojoakku/<lib>/` paths to `akku/<lib>/`, and replace source-root shortcuts such as `-I mojoakku` with the repository root (`-I .` from that root). Bare sibling imports also become `akku.<lib>`; no compatibility alias is provided. Flat `domain_local` library names, behavior and MojoAkku repository identity are unchanged; see README migration guidance.
+
 ## v0.6.0 - 2026-09-29
 
 ### Changed
