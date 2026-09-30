@@ -1,6 +1,6 @@
 # NEW: id|name|depends_on|mojoNeeds|summary
 # Die im Namespace-Gespräch NEU beschlossenen Libraries (Runde 1/2 + Research).
-# Regel: <domain>_<lokal>. Anzulegen als _todos/<id>.yml mit status: todo.
+# Regel: <domain>_<lokal>. Anzulegen als .repo/todo/<id>.yml mit status: todo.
 
 units_distance|Distance|units_core|[pure-mojo]|Length units: meter, kilometer, centimeter, feet, inches, mile.
 units_mass|Mass|units_core|[pure-mojo]|Mass units: kilogram, gram, pound, ounce, tonne.

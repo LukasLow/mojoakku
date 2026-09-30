@@ -31,7 +31,7 @@ kleinere Sammlungen statt weniger großer — Organisation vor Kürze.
    sind verboten (`physics_cosmology` sagt mehr als `math_func_cosmology`).
 4. **Domains sind ein geschlossener Satz** (33, §4). Kein Freitext-Präfix.
 5. Das Präfix ist **Teil des Verzeichnis- und Paketnamens** → `akku/crypto_tls/`.
-6. Der **`name:`-Wert** in `_todos/<id>.yml` bleibt der Anzeigename (z. B. „TLS").
+6. Der **`name:`-Wert** in `.repo/todo/<id>.yml` bleibt der Anzeigename (z. B. „TLS").
 7. **Kein Sammelbecken.** Eine Lib, die in keine Domain passt, ist ein Signal, eine
    neue Domain zu eröffnen — nicht, sie irgendwo unterzuschieben.
 
@@ -275,7 +275,7 @@ und unten in §7.
 
 ## 7. Angelegte neue Libraries (74)
 
-Alle beschlossenen neuen Libs sind als `_todos/<id>.yml` angelegt (`status: todo`):
+Alle beschlossenen neuen Libs sind als `.repo/todo/<id>.yml` angelegt (`status: todo`):
 `units_*` (8) · `phy_*` (5) · `chem_*` (4) · `bio_*` (4) · `econ_*` (3) ·
 `math_special_*` (4) · `app_*` (3) · `crypto_*` (6) · `security_*` (5) ·
 `proto_*` (9) · `archive_*` (5) · `serialize_*` (4) · `codec_*` (3) ·
@@ -286,7 +286,7 @@ Gesamtzahl Katalog: **318**. Davon 4 `done`, 6 `covered_*`, 2 `homeless_*`.
 ## 8. Kosten & Ablauf (wenn freigegeben)
 
 **Pro bestehender Library mechanisch:**
-1. `_todos/<alt>.yml` → `_todos/<neu>.yml`.
+1. `.repo/todo/<alt>.yml` → `.repo/todo/<neu>.yml`.
 2. `akku/<alt>/` → `akku/<neu>/` (nur bei den 4 `done`-Libs).
 3. `_tests/*.mojo`: die `from <alt> import …`-Zeile (1 Zeile pro Datei).
 4. Docs-Header, Branch-Name `<neu>-library`.
@@ -343,7 +343,7 @@ markiert. Nichts umbenannt, nichts committet.
 - **`mojo.yml`** — was Mojo kann/nicht kann, belegt (Stand 1.1.0). Liegt im
   Repo-Root. Beispiel: `async` = **missing**, `net-sockets` = **have**
   (libc-Socket-API via C-FFI, probe-verifiziert), `c-ffi`/`time`/`pure-mojo` = **have**.
-- **`mojoNeeds:`** — neues Pflichtfeld in `_todos/<id>.yml`.
+- **`mojoNeeds:`** — neues Pflichtfeld in `.repo/todo/<id>.yml`.
 - **Ableitungsregel:** `task todo` zeigt eine Lib nur, wenn alle `mojoNeeds`
   `have` sind **und** alle `libdeps` `done`.
 

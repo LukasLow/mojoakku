@@ -48,9 +48,9 @@ GitHub URLs, clone directory names, branding and workspace names do not change.
 Do not rename compiled `.mojoc` artifacts to migrate; rebuild them with the
 new namespace. See [ADR 0002](docs/adr/0002-akku-public-namespace.md).
 
-## The catalogue (`_todos/`) and the capability ledger
+## The catalogue (`.repo/todo/`) and the capability ledger
 
-`_todos/` is a flat catalogue: one YAML file per planned library with its
+`.repo/todo/` is a flat catalogue: one YAML file per planned library with its
 status (`todo | current | done`), its dependencies (`depends_on`) and the Mojo
 capabilities it needs (`mojoNeeds`). The Taskfile reads it and derives what can
 be built next.
@@ -85,7 +85,10 @@ Run these from the repository root:
 | `task waiting` | List libraries still waiting for a dependency, and name it. |
 | `task test` | Run the `test` task of every library (auto-discovered via `akku/*/Taskfile.yml`). |
 | `task namespace:test` | Check repository-root `akku` imports and rejection of the removed namespace. |
-| `task ci` | The single CI entry point: namespace checks, every library's tests, optional per-library `ci` hooks and the MissingMojo gate. |
+| `task ci` / `task ci::full` | Full library CI plus repository gates. |
+| `task ci::smart` | Changed libraries and transitive consumers plus repository gates. |
+| `task test::smart` / `task test::plan` | Run or preview tests since the last full-checked release tag. |
+| `task net_ip::test` / `task net_ip::compile` | Automatically dispatch to one library. |
 | `task changes:version` | Compute the next `0.x.y` version from the current tag and `.changes/`. |
 
 More commands: `task current` (libraries in progress) and
@@ -97,15 +100,25 @@ More commands: `task current` (libraries in progress) and
   lines (`NEW`, `FIX`, `SECURITY`, `PERFORMANCE`, `BREAKING`, `DEPRECATED`,
   `INTERNAL`). See `.changes/README.md`.
 - **Pull requests** run `.github/workflows/pull-request-check.yml`: it runs
-  `task ci` and requires exactly one new `.changes/new/*.md` file.
-- **Pushes to `main`** run `.github/workflows/main-push.yml`: it runs `task ci`,
+  `task ci::smart` and requires exactly one new `.changes/new/*.md` file.
+- **Pushes to `main`** run `.github/workflows/main-push.yml`: it runs `task ci::full`,
   and if `.changes/new/` is non-empty it releases — updates `CHANGELOG.md`,
   moves the files to `.changes/archive/<tag>/`, and creates the next `0.x.y` tag
   (`major` is never bumped).
-- `task ci` is the single test entry point; the root Taskfile auto-discovers
+- The root Taskfile auto-discovers
   every library, so a new library is tested the moment its
   `akku/<lib>/Taskfile.yml` exists — nothing to register.
+
+## Repository tooling
+
+Repository maintenance scripts live in `.repo/scrupts/`; the library catalogue
+lives in `.repo/todo/`. Taskfiles provide command descriptions and dispatch.
+Task currently uses no source fingerprints. If cache files are needed later,
+set `TASK_TEMP_DIR` outside the checkout to keep `.task` out of the repository.
 
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE).
+
+Test pools default to two libraries at a time (`JOBS=1` makes them serial).
+See [.repo/TESTING.md](.repo/TESTING.md) for selection rules and full fallbacks.

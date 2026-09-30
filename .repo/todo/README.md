@@ -1,4 +1,4 @@
-# `_todos/` — the MojoAkku library catalogue
+# `.repo/todo/` — the MojoAkku library catalogue
 
 This folder is the **machine-readable catalogue of every library MojoAkku could
 build**. There is exactly **one file per library**, named `<id>.yml`, and all
@@ -37,8 +37,8 @@ summary: Datagram UDP sockets.
 
 A library is buildable only when all its `mojoNeeds` are `have` in `mojo.yml`
 and all its `depends_on` libraries are `done`. `mojoNeeds` keys are defined in
-[`../mojo.yml`](../mojo.yml); the naming rule is in
-[`../docs/adr/0001-namespace-domains.md`](../docs/adr/0001-namespace-domains.md).
+[`../mojo.yml`](../../mojo.yml); the naming rule is in
+[`../docs/adr/0001-namespace-domains.md`](../../docs/adr/0001-namespace-domains.md).
 
 ### There is no `blocked` field — and no `blocked` status
 
@@ -129,7 +129,7 @@ web_http    HTTP        -> waiting for: net_tcp
 ```
 
 If no library is ready, `task todo` prints a clear "nothing is ready to build
-yet" message. If `_todos/` is still empty, every task says so instead of
+yet" message. If `.repo/todo/` is still empty, every task says so instead of
 failing.
 
 ## How work actually flows
@@ -137,7 +137,7 @@ failing.
 1. Run `task todo` to see which libraries are unblocked right now.
 2. Pick one and set `status: current` in its file while it is being built.
 3. The pipeline starts at
-   [`.agents/workflows/NewLibPhase1Research.md`](../.agents/workflows/NewLibPhase1Research.md)
+   [`.agents/workflows/NewLibPhase1Research.md`](../../.agents/workflows/NewLibPhase1Research.md)
    (research, then API design, docs, scaffold, tests, implementation, review).
 4. When the library passes review, set `status: done`. Dependents of it may now
    appear in `task todo`.
@@ -152,4 +152,4 @@ names for the same concept were normalized to one canonical MojoAkku `id`. New
 ids are still allowed when a concept was missed — the same naming convention
 applies: `domain_local`, lowercase, joined with `_`, no nesting. The domain
 prefixes are defined in
-[`../docs/adr/0001-namespace-domains.md`](../docs/adr/0001-namespace-domains.md).
+[`../docs/adr/0001-namespace-domains.md`](../../docs/adr/0001-namespace-domains.md).

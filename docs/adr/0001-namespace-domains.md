@@ -22,7 +22,7 @@
 
 ## Neue Konventionen
 
-- **`mojoNeeds:`** — Pflichtfeld in `_todos/<id>.yml`: Liste von
+- **`mojoNeeds:`** — Pflichtfeld in `.repo/todo/<id>.yml`: Liste von
   Capability-Schlüsseln aus `mojo.yml`.
 - **`mojo.yml`** — Capability-Ledger: was Mojo 1.1.0 kann (`have`), teilweise
   kann (`partial`) oder nicht kann (`missing`), je mit Quelle.

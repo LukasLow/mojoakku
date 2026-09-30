@@ -1,44 +1,7 @@
 version: '3'
 
-# silent: true on every task — the runner does not echo the shell commands.
-# Output stays clean, which matters for a low-vision user who reads the list.
 silent: true
-
-# ============================================================================
-# MojoAkku catalogue — Taskfile
-#
-# Reads the flat catalogue in _todos/ (one YAML file per library).
-# Uses only sh, awk, grep, sed and sort, so it runs in the smd container
-# (bare debian:bookworm-slim: no python3, node, jq or yq).
-#
-# Every file in _todos/ is flat YAML:
-#   id: net_udp
-#   name: UDP
-#   status: todo
-#   depends_on: [net_socket, net_ip]
-#   mojoNeeds: [pure-mojo, net-sockets]
-#   summary: Datagram UDP sockets.
-#
-# status is ONLY one of: todo | current | done.
-# "blocked" is never stored — `task todo` derives it. A library is ready to
-# build when ALL hold:
-#   1. its status is todo,
-#   2. every id in its depends_on list has status done,
-#   3. every key in its mojoNeeds list is `state: have` in mojo.yml.
-#
-# `task todo all` (equivalently `task todo -- --all`) lists every status:todo
-# library with a one-line reason instead of hiding the blocked ones.
-#
-# Usage:
-#   task            same as `task todo`
-#   task todo       list libraries you can start building right now
-#   task todo all   list every todo library with its blocking reason
-#   task current    list libraries that are in progress
-#   task all        list every library as: id  status  name
-#   task count      count libraries per status, plus the total
-#   task show -- <id>   print the catalogue file for one library
-#   task waiting    list libraries still waiting for a dependency, with names
-# ============================================================================
+method: none
 
 tasks:
 
@@ -47,592 +10,163 @@ tasks:
     cmds:
       - task: todo
 
-  # --------------------------------------------------------------------------
-  # changes:version — PREVIEW the next version from the current tag and the
-  # pending files in .changes/new/. Read-only; it changes nothing.
-  #
-  # MojoAkku stays on 0.x.y; major is NEVER bumped. A pre-1.0 break is a minor
-  # bump, same as NEW/DEPRECATED.
-  #   NEW / BREAKING / DEPRECATED present    -> minor: 0.(x+1).0
-  #   only FIX/SECURITY/PERFORMANCE/INTERNAL -> patch: 0.x.(y+1)
-  # Prints the next version (e.g. "0.2.0"), or "none" when .changes/new/ is
-  # empty. The real release does the same computation in
-  # `.github/scripts/release-prepare.sh`.
-  # --------------------------------------------------------------------------
   changes:version:
     desc: 'Preview the next 0.x.y from the current tag and pending .changes/new files.'
+    env:
+      REPO_TODO_MODE: "{{.TODO_MODE}}"
+      REPO_CLI_ARGS: "{{.CLI_ARGS}}"
     cmds:
-      - |
-        tag=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n1)
-        [ -n "$tag" ] || tag=v0.0.0
-        ver=${tag#v}
-        minor=$(printf '%s' "$ver" | cut -d. -f2)
-        patch=$(printf '%s' "$ver" | cut -d. -f3)
-        [ -n "$minor" ] || minor=0
-        [ -n "$patch" ] || patch=0
-        bump=none
-        any=""
-        for f in .changes/new/*.md; do
-          [ -f "$f" ] || continue
-          any="yes"
-          if grep -qE '^(NEW|BREAKING|DEPRECATED):' "$f"; then
-            bump=minor
-          elif [ "$bump" != "minor" ] && grep -qE '^(FIX|SECURITY|PERFORMANCE):' "$f"; then
-            bump=patch
-          fi
-        done
-        if [ -z "$any" ] || [ "$bump" = "none" ]; then
-          echo "none"
-        elif [ "$bump" = "minor" ]; then
-          echo "0.$((minor + 1)).0"
-        else
-          echo "0.${minor}.$((patch + 1))"
-        fi
-
-  # --------------------------------------------------------------------------
-  # release:prepare — fold the pending status:new files into CHANGELOG.md,
-  # archive them, and print the new version (e.g. "new=v0.2.0"). Used by the
-  # main-push workflow; safe to run locally to preview the exact changelog edit.
-  # With no pending file it prints "new=none" and changes nothing.
-  # --------------------------------------------------------------------------
+      - sh .repo/scrupts/tasks.sh changes:version
   release:prepare:
     desc: 'Apply pending .changes to CHANGELOG.md and print new=vX.Y.Z (or none).'
     cmds:
       - sh .github/scripts/release-prepare.sh
 
-  # --------------------------------------------------------------------------
-  # todo — the main command. One line per library that can be built NOW.
-  # Buildable means ALL of:
-  #   1. status is todo,
-  #   2. every id in depends_on has status done,
-  #   3. every key in mojoNeeds has `state: have` in mojo.yml.
-  # Prints "<id>  <name>".
-  #
-  # `task todo -- --all` (or the alias `task todo-all`) drops the mojoNeeds
-  # filter: it lists every dependency-clear todo library and appends a
-  # one-line reason ("ready" or "needs <capability> (<state>)"), so libraries
-  # blocked only by a missing Mojo capability stay visible.
-  # If nothing is ready it says so plainly.
-  # --------------------------------------------------------------------------
   todo:
     desc: 'List libraries ready to build now (status todo, deps done, mojoNeeds have). `task todo -- --all` adds reasons.'
+    env:
+      REPO_TODO_MODE: "{{.TODO_MODE}}"
+      REPO_CLI_ARGS: "{{.CLI_ARGS}}"
     cmds:
-      - |
-        mode="{{.TODO_MODE}}"
-        [ -n "$mode" ] || mode="{{.CLI_ARGS}}"
-        case "$mode" in
-          all|--all|reasons) mode=all ;;
-          *) mode=strict ;;
-        esac
-
-        files=""
-        for f in _todos/*.yml; do
-          [ -f "$f" ] || continue
-          files="$files $f"
-        done
-        if [ -z "$files" ]; then
-          echo "No catalogue files found yet (no _todos/*.yml)."
-          exit 0
-        fi
-        if [ ! -f mojo.yml ]; then
-          echo "error: mojo.yml (capability ledger) is missing; cannot check mojoNeeds."
-          exit 1
-        fi
-
-        # awk reads mojo.yml first (capability key -> state) and then every
-        # catalogue file. A capability key is a 2-space-indented line ending in
-        # ":"; the following "    state: <x>" line is its state. Comments and
-        # blank lines are ignored.
-        # The catalogue pass prints "<id>\t<name>[\t<reason>]": strict mode
-        # prints only fully buildable libraries; all mode prints every
-        # dependency-clear todo library with its reason.
-        out=$(awk -v mode="$mode" '
-          function trim(s) { gsub(/^[ \t]+/, "", s); gsub(/[ \t\r]+$/, "", s); return s }
-          function flush() {
-            if (id != "") {
-              order[++n] = id; name_of[id] = name; status_of[id] = status
-              deps_of[id] = deps; needs_of[id] = needs
-            }
-            id = ""; name = ""; status = ""; deps = ""; needs = ""
-          }
-          # ---- phase 1: capability ledger ----
-          FILENAME == "mojo.yml" {
-            if ($0 ~ /^  [a-z][a-z0-9-]*:[ \t]*$/) {
-              key = $0; sub(/^  /, "", key); sub(/:[ \t]*$/, "", key); cur = key; next
-            }
-            if ($0 ~ /^    state:/) {
-              line = $0; sub(/^    state:[ \t]*/, "", line); state_of[cur] = trim(line); next
-            }
-            next
-          }
-          # ---- phase 2: catalogue files ----
-          FNR == 1 { flush() }
-          /^id:/         { line = $0; sub(/^id:[ \t]*/,         "", line); id     = trim(line) }
-          /^name:/       { line = $0; sub(/^name:[ \t]*/,       "", line); name   = trim(line) }
-          /^status:/     { line = $0; sub(/^status:[ \t]*/,     "", line); status = trim(line) }
-          /^depends_on:/ { line = $0; sub(/^depends_on:[ \t]*/, "", line); deps   = trim(line) }
-          /^mojoNeeds:/  { line = $0; sub(/^mojoNeeds:[ \t]*/,  "", line); needs  = trim(line) }
-          END {
-            flush()
-            for (i = 1; i <= n; i++) {
-              id = order[i]
-              if (status_of[id] != "todo") continue
-              # condition 2: every dependency done
-              raw = deps_of[id]; gsub(/^\[/, "", raw); gsub(/\]$/, "", raw)
-              cnt = split(raw, parts, ",")
-              deps_ok = 1
-              for (j = 1; j <= cnt; j++) {
-                dep = trim(parts[j])
-                if (dep == "") continue
-                if (status_of[dep] != "done") deps_ok = 0
-              }
-              if (!deps_ok) continue
-              # condition 3: every mojoNeeds key is state have
-              raw = needs_of[id]; gsub(/^\[/, "", raw); gsub(/\]$/, "", raw)
-              cnt = split(raw, parts, ",")
-              caps_ok = 1; missing = ""
-              for (j = 1; j <= cnt; j++) {
-                need = trim(parts[j])
-                if (need == "") continue
-                st = state_of[need]
-                if (st != "have") {
-                  caps_ok = 0
-                  label = need " (" (st == "" ? "unknown" : st) ")"
-                  missing = (missing == "" ? label : missing ", " label)
-                }
-              }
-              if (mode == "all") {
-                print id "\t" name_of[id] "\t" (caps_ok ? "ready" : "needs " missing)
-              } else if (caps_ok) {
-                print id "\t" name_of[id]
-              }
-            }
-          }
-        ' mojo.yml $files | sort | awk -F'\t' '{ if ($1 == "") next; if (NF >= 3 && $3 != "") printf "%s  %s  -> %s\n", $1, $2, $3; else printf "%s  %s\n", $1, $2 }')
-        if [ "$mode" = "all" ]; then
-          if [ -z "$out" ]; then
-            echo "Nothing to show: no library is clear of its dependencies yet."
-          else
-            printf '%s\n' "$out"
-          fi
-        elif [ -z "$out" ]; then
-          echo "Nothing is ready to build yet."
-          echo "Every remaining library waits for a dependency that is not done, or a Mojo capability that is not 'have'."
-          echo "Run 'task todo -- --all' to see the dependencies-clear libraries and their blocking reason."
-        else
-          printf '%s\n' "$out"
-        fi
-
-  # --------------------------------------------------------------------------
-  # todo-all — alias for `task todo -- --all`: every status:todo library whose
-  # dependencies are done, with a one-line reason. Lets the capability-gated
-  # libraries stay visible instead of being hidden by `task todo`.
-  # --------------------------------------------------------------------------
+      - sh .repo/scrupts/tasks.sh todo
   todo-all:
     desc: 'Like `task todo`, but show every dependency-clear todo library with its blocking reason.'
     cmds:
       - task: todo
         vars: { TODO_MODE: all }
 
-  # --------------------------------------------------------------------------
-  # mojoHave — print the capability keys whose state is `have` in mojo.yml.
-  # Small read-only helper (awk only), useful to check the gate by hand.
-  # --------------------------------------------------------------------------
   mojoHave:
     desc: 'List the mojo.yml capability keys whose state is have.'
+    env:
+      REPO_TODO_MODE: "{{.TODO_MODE}}"
+      REPO_CLI_ARGS: "{{.CLI_ARGS}}"
     cmds:
-      - |
-        if [ ! -f mojo.yml ]; then
-          echo "error: mojo.yml not found."
-          exit 1
-        fi
-        awk '
-          /^  [a-z][a-z0-9-]*:[ \t]*$/ { key = $0; sub(/^  /, "", key); sub(/:[ \t]*$/, "", key); cur = key; next }
-          /^    state:/ { line = $0; sub(/^    state:[ \t]*/, "", line); gsub(/[ \t\r]+$/, "", line); if (line == "have") print cur }
-        ' mojo.yml | sort
-
-  # --------------------------------------------------------------------------
-  # current — libraries with status current (work already started).
-  # Prints "<id>  <name>".
-  # --------------------------------------------------------------------------
+      - sh .repo/scrupts/tasks.sh mojoHave
   current:
     desc: 'List libraries that are in progress (status current).'
+    env:
+      REPO_TODO_MODE: "{{.TODO_MODE}}"
+      REPO_CLI_ARGS: "{{.CLI_ARGS}}"
     cmds:
-      - |
-        files=""
-        for f in _todos/*.yml; do
-          [ -f "$f" ] || continue
-          files="$files $f"
-        done
-        if [ -z "$files" ]; then
-          echo "No catalogue files found yet (no _todos/*.yml)."
-          exit 0
-        fi
-        awk '
-          function trim(s) { gsub(/^[ \t]+/, "", s); gsub(/[ \t\r]+$/, "", s); return s }
-          function flush() {
-            if (id != "") { order[++n] = id; name_of[id] = name; status_of[id] = status }
-            id = ""; name = ""; status = ""
-          }
-          FNR == 1 { flush() }
-          /^id:/     { line = $0; sub(/^id:[ \t]*/,     "", line); id     = trim(line) }
-          /^name:/   { line = $0; sub(/^name:[ \t]*/,   "", line); name   = trim(line) }
-          /^status:/ { line = $0; sub(/^status:[ \t]*/, "", line); status = trim(line) }
-          END {
-            flush()
-            for (i = 1; i <= n; i++) if (status_of[order[i]] == "current") print order[i] "\t" name_of[order[i]]
-          }
-        ' $files | sort | awk -F'\t' 'NF > 0 { printf "%s  %s\n", $1, $2 }'
-
-  # --------------------------------------------------------------------------
-  # all — every library as "<id>  <status>  <name>", sorted by id.
-  # --------------------------------------------------------------------------
+      - sh .repo/scrupts/tasks.sh current
   all:
     desc: 'List every catalogued library as: id  status  name (sorted by id).'
+    env:
+      REPO_TODO_MODE: "{{.TODO_MODE}}"
+      REPO_CLI_ARGS: "{{.CLI_ARGS}}"
     cmds:
-      - |
-        files=""
-        for f in _todos/*.yml; do
-          [ -f "$f" ] || continue
-          files="$files $f"
-        done
-        if [ -z "$files" ]; then
-          echo "No catalogue files found yet (no _todos/*.yml)."
-          exit 0
-        fi
-        awk '
-          function trim(s) { gsub(/^[ \t]+/, "", s); gsub(/[ \t\r]+$/, "", s); return s }
-          function flush() {
-            if (id != "") print id "\t" status "\t" name
-            id = ""; name = ""; status = ""
-          }
-          FNR == 1 { flush() }
-          /^id:/     { line = $0; sub(/^id:[ \t]*/,     "", line); id     = trim(line) }
-          /^name:/   { line = $0; sub(/^name:[ \t]*/,   "", line); name   = trim(line) }
-          /^status:/ { line = $0; sub(/^status:[ \t]*/, "", line); status = trim(line) }
-          END { flush() }
-        ' $files | sort | awk -F'\t' '{ printf "%s  %s  %s\n", $1, $2, $3 }'
-
-  # --------------------------------------------------------------------------
-  # count — how many libraries are in each status, plus the total.
-  # --------------------------------------------------------------------------
+      - sh .repo/scrupts/tasks.sh all
   count:
     desc: 'Count libraries per status, plus the total.'
+    env:
+      REPO_TODO_MODE: "{{.TODO_MODE}}"
+      REPO_CLI_ARGS: "{{.CLI_ARGS}}"
     cmds:
-      - |
-        files=""
-        for f in _todos/*.yml; do
-          [ -f "$f" ] || continue
-          files="$files $f"
-        done
-        if [ -z "$files" ]; then
-          echo "No catalogue files found yet (no _todos/*.yml)."
-          exit 0
-        fi
-        awk '
-          function trim(s) { gsub(/^[ \t]+/, "", s); gsub(/[ \t\r]+$/, "", s); return s }
-          function flush() {
-            if (id != "") print status
-            id = ""; status = ""
-          }
-          FNR == 1 { flush() }
-          /^id:/     { line = $0; sub(/^id:[ \t]*/,     "", line); id     = trim(line) }
-          /^status:/ { line = $0; sub(/^status:[ \t]*/, "", line); status = trim(line) }
-          END { flush() }
-        ' $files | awk '
-          { if ($0 != "") { c[$0]++; total++ } }
-          END {
-            printf "MojoAkku catalogue: %d libraries\n\n", total
-            printf "%-10s %d\n", "todo:", c["todo"] + 0
-            printf "%-10s %d\n", "current:", c["current"] + 0
-            printf "%-10s %d\n", "done:", c["done"] + 0
-            printf "%-10s %d\n", "total:", total + 0
-          }
-        '
-
-  # --------------------------------------------------------------------------
-  # waiting — libraries that still wait for a dependency, with the names of
-  # the missing dependencies. This is the "blocked" view, computed, never
-  # stored. Output: "<id>  <status>  <name>  -> waiting for: <dep>, <dep>"
-  # --------------------------------------------------------------------------
+      - sh .repo/scrupts/tasks.sh count
   waiting:
     desc: 'List libraries waiting for a dependency and name the missing ones.'
+    env:
+      REPO_TODO_MODE: "{{.TODO_MODE}}"
+      REPO_CLI_ARGS: "{{.CLI_ARGS}}"
     cmds:
-      - |
-        files=""
-        for f in _todos/*.yml; do
-          [ -f "$f" ] || continue
-          files="$files $f"
-        done
-        if [ -z "$files" ]; then
-          echo "No catalogue files found yet (no _todos/*.yml)."
-          exit 0
-        fi
-        out=$(awk '
-          function trim(s) { gsub(/^[ \t]+/, "", s); gsub(/[ \t\r]+$/, "", s); return s }
-          function flush() {
-            if (id != "") { order[++n] = id; name_of[id] = name; status_of[id] = status; deps_of[id] = deps }
-            id = ""; name = ""; status = ""; deps = ""
-          }
-          FNR == 1 { flush() }
-          /^id:/         { line = $0; sub(/^id:[ \t]*/,         "", line); id     = trim(line) }
-          /^name:/       { line = $0; sub(/^name:[ \t]*/,       "", line); name   = trim(line) }
-          /^status:/     { line = $0; sub(/^status:[ \t]*/,     "", line); status = trim(line) }
-          /^depends_on:/ { line = $0; sub(/^depends_on:[ \t]*/, "", line); deps   = trim(line) }
-          END {
-            flush()
-            for (i = 1; i <= n; i++) {
-              id = order[i]
-              if (status_of[id] == "done") continue
-              raw = deps_of[id]
-              gsub(/^\[/, "", raw); gsub(/\]$/, "", raw)
-              cnt = split(raw, parts, ",")
-              missing = ""
-              for (j = 1; j <= cnt; j++) {
-                dep = trim(parts[j])
-                if (dep == "") continue
-                if (status_of[dep] != "done") {
-                  label = dep
-                  if (!(dep in status_of)) label = dep " (no file)"
-                  missing = (missing == "" ? label : missing ", " label)
-                }
-              }
-              if (missing != "") print id "\t" status_of[id] "\t" name_of[id] "\t" missing
-            }
-          }
-        ' $files | sort | awk -F'\t' '{ printf "%s  %s  %s  -> waiting for: %s\n", $1, $2, $3, $4 }')
-        if [ -z "$out" ]; then
-          echo "No library is waiting for a dependency."
-        else
-          printf '%s\n' "$out"
-        fi
-
-  # --------------------------------------------------------------------------
-  # show — print one catalogue file: task show -- <id>
-  # --------------------------------------------------------------------------
+      - sh .repo/scrupts/tasks.sh waiting
   show:
     desc: 'Print one catalogue file: task show -- <id>'
+    env:
+      REPO_TODO_MODE: "{{.TODO_MODE}}"
+      REPO_CLI_ARGS: "{{.CLI_ARGS}}"
     cmds:
-      - |
-        id="{{.CLI_ARGS}}"
-        if [ -z "$id" ]; then
-          echo "error: no library id given."
-          echo "usage: task show -- <id>"
-          exit 1
-        fi
-        file="_todos/${id}.yml"
-        if [ ! -f "$file" ]; then
-          echo "error: no catalogue file for id '${id}' (looked for ${file})."
-          echo "Run 'task all' to see every known id."
-          exit 1
-        fi
-        awk '{ print }' "$file"
-
-  # --------------------------------------------------------------------------
-  # test — run the `test` task of EVERY library. Auto-discovery: it scans
-  # akku/*/Taskfile.yml, so a new library is picked up the moment its
-  # Taskfile.yml exists. No library has to be registered here. A library owns
-  # how it tests (its own Taskfile `test`); this root task only dispatches.
-  # Exits non-zero if any library test fails; names the failing libraries.
-  # --------------------------------------------------------------------------
+      - sh .repo/scrupts/tasks.sh show
   test:
-    desc: 'Run the test task of every library (auto-discovered via akku/*/Taskfile.yml).'
+    desc: 'Full library test pool (alias for test::full).'
     cmds:
-      - |
-        found=""
-        failed=""
-        for d in akku/*/; do
-          [ -f "${d}Taskfile.yml" ] || continue
-          found="yes"
-          echo "== ${d}task test"
-          if ! task -t "${d}Taskfile.yml" test; then
-            failed="${failed} ${d}"
-          fi
-        done
-        if [ -z "$found" ]; then
-          echo "No library Taskfiles found under akku/*/ (nothing to test)."
-          exit 0
-        fi
-        if [ -n "$failed" ]; then
-          echo ""
-          echo "FAILED libraries:${failed}"
-          exit 1
-        fi
-        echo ""
-        echo "task test: all libraries passed."
+      - task: test::full
 
-  # --------------------------------------------------------------------------
-  # missingMojo — surface the version-stamped workaround ledger.
-  #
-  # Scans akku/**/*.mojo for MissingMojo comment blocks:
-  #   # MissingMojo - v1.0.0 - Start
-  #   # kind: FFI | PythonInterop | UnstableAPI | Deferred
-  #   # need: <what Mojo must provide>
-  #   # optimal: <the target solution>
-  #   # track: <reference>            (optional)
-  #   # MissingMojo - End
-  #
-  # The version in the Start line is the Mojo version at which the marker was
-  # LAST CONFIRMED TRUE. The task prints every marker whose stamp is OLDER than
-  # the installed Mojo version — i.e. everything that must be re-checked on the
-  # current toolchain: either upgrade the site, or re-stamp it to the installed
-  # version ("checked here, still true").
-  #
-  # Version source: `mojo --version` when the binary is available (container),
-  # otherwise the `pixi.toml` pin (`mojo = "~=1.0.0"`). Never guessed.
-  #
-  # Usage:
-  #   task missingMojo          show only markers older than the installed Mojo
-  #   task missingMojo -- all   show every marker, regardless of version
-  #
-  # See .agents/workflows/MissingMojo.md for the convention and the FFI triage
-  # rule.
-  # --------------------------------------------------------------------------
+  test::full:
+    desc: 'Test every discovered library; JOBS defaults to 2.'
+    env:
+      REPO_TEST_JOBS: '{{.JOBS | default "2"}}'
+    cmds:
+      - python3 .repo/scrupts/testing.py run test full
+
+  test::smart:
+    desc: 'Test changes since the last full-checked release tag and their users.'
+    env:
+      REPO_TEST_JOBS: '{{.JOBS | default "2"}}'
+    cmds:
+      - python3 .repo/scrupts/testing.py run test smart
+
+  test::plan:
+    desc: 'Show the smart baseline, selection and reasons without running tests.'
+    cmds:
+      - python3 .repo/scrupts/testing.py plan
+
+  '*::test':
+    desc: 'Test one library: task net_ip::test (no registration).'
+    env:
+      REPO_TEST_LIB: '{{index .MATCH 0}}'
+    cmds:
+      - python3 .repo/scrupts/testing.py single "$REPO_TEST_LIB" test
+
+  '*::compile':
+    desc: 'Compile one library: task net_ip::compile.'
+    env:
+      REPO_TEST_LIB: '{{index .MATCH 0}}'
+    cmds:
+      - python3 .repo/scrupts/testing.py single "$REPO_TEST_LIB" compile
+
+  '*::ci':
+    desc: 'Check one library: task net_ip::ci (CI task or test fallback).'
+    env:
+      REPO_TEST_LIB: '{{index .MATCH 0}}'
+    cmds:
+      - python3 .repo/scrupts/testing.py single "$REPO_TEST_LIB" ci
+
+  testing:check:
+    desc: 'Check smart selection and dispatch using isolated Git repositories.'
+    cmds:
+      - python3 .repo/scrupts/test_testing.py
   missingMojo:
     desc: 'List MissingMojo markers older than the installed Mojo (use -- all for every marker).'
+    env:
+      REPO_TODO_MODE: "{{.TODO_MODE}}"
+      REPO_CLI_ARGS: "{{.CLI_ARGS}}"
     cmds:
-      - |
-        allmode=0
-        checkmode=0
-        case "{{.CLI_ARGS}}" in
-          all) allmode=1 ;;
-          check) checkmode=1 ;;
-        esac
-
-        # --- resolve the installed Mojo version (binary first, pin second) ---
-        cur=$(mojo --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
-        if [ -z "$cur" ] && [ -f pixi.toml ]; then
-          cur=$(grep -E '^[[:space:]]*mojo[[:space:]]*=' pixi.toml | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
-        fi
-        [ -n "$cur" ] || cur=0.0.0
-        curN=$(printf '%s' "$cur" | awk -F. '{ printf "%d", ($1*1000+$2)*1000+$3 }')
-
-        files=$(find akku -name '*.mojo' -type f 2>/dev/null | sort)
-        if [ -z "$files" ]; then
-          echo "No Mojo sources under akku/ (nothing to scan)."
-          exit 0
-        fi
-
-        out=$(printf '%s\n' "$files" | while IFS= read -r f; do
-          [ -f "$f" ] || continue
-          awk -v allmode="$allmode" -v curN="$curN" '
-            function norm(v,   n, a, i, s) {
-              sub(/^v/, "", v)
-              n = split(v, a, ".")
-              s = 0
-              for (i = 1; i <= 3; i++) s = s * 1000 + (a[i] + 0)
-              return s
-            }
-            function flush() {
-              if (curfile != "") printf "@@COUNT@ %d %d\n", found, (stale + 0)
-            }
-            FNR == 1 { flush(); curfile = FILENAME; inblock = 0; found = 0 }
-            /MissingMojo/ && /- *v[0-9]/ && /Start/ {
-              inblock = 1
-              startln = FNR
-              ver = ""
-              if (match($0, /v[0-9]+(\.[0-9]+)*/)) { ver = substr($0, RSTART, RLENGTH); sub(/^v/, "", ver) }
-              kind = ""; need = ""; optimal = ""; track = ""
-              next
-            }
-            /MissingMojo/ && /End/ {
-              if (inblock) {
-                found++
-                if (allmode == 1 || norm(ver) < curN) {
-                  printf "%s:%d  v%s  kind=%s\n", FILENAME, startln, ver, kind
-                  printf "    need:    %s\n", need
-                  printf "    optimal: %s\n", optimal
-                  if (track != "") printf "    track:   %s\n", track
-                  printf "\n"
-                  stale++
-                }
-              }
-              inblock = 0
-              next
-            }
-            inblock && /^[[:space:]]*#/ {
-              line = $0
-              sub(/^[[:space:]]*#[[:space:]]*/, "", line)
-              p = index(line, ":")
-              if (p > 0) {
-                key = substr(line, 1, p - 1)
-                val = substr(line, p + 1)
-                gsub(/^[[:space:]]+/, "", key); gsub(/[[:space:]]+$/, "", key)
-                gsub(/^[[:space:]]+/, "", val); gsub(/[[:space:]]+$/, "", val)
-                if (key == "kind") kind = val
-                else if (key == "need") need = val
-                else if (key == "optimal") optimal = val
-                else if (key == "track") track = val
-              }
-            }
-            END { flush() }
-          ' "$f"
-        done)
-
-        total=$(printf '%s\n' "$out" | grep -E '^@@COUNT@ ' | awk '{s += $2} END {print s + 0}' || true)
-        stale=$(printf '%s\n' "$out" | grep -E '^@@COUNT@ ' | awk '{s += $3} END {print s + 0}' || true)
-        body=$(printf '%s\n' "$out" | grep -vE '^@@COUNT@ ' || true)
-
-        if [ "$allmode" -eq 1 ]; then
-          echo "MissingMojo: all ${total} marker(s) (installed Mojo ${cur}):"
-        elif [ "$stale" -eq 0 ]; then
-          echo "MissingMojo: clean. ${total} marker(s), none older than installed Mojo ${cur}."
-          exit 0
-        else
-          echo "MissingMojo: ${stale} of ${total} marker(s) older than installed Mojo ${cur}:"
-        fi
-        echo ""
-        printf '%s\n' "$body"
-        echo "Action: upgrade the site if the feature now exists, or re-stamp the"
-        echo "version to v${cur} if it is still missing. See .agents/workflows/MissingMojo.md."
-
-        # Strict gate: `task missingMojo -- check` fails (exit 1) when any marker
-        # is stale. This is what `task ci` runs, so CI turns red instead of
-        # silently keeping a workaround whose feature may already exist.
-        if [ "$checkmode" -eq 1 ] && [ "$stale" -ne 0 ]; then
-          echo ""
-          echo "missingMojo: FAIL — ${stale} marker(s) older than installed Mojo ${cur}."
-          echo "Upgrade each site, or re-stamp it to v${cur} if Mojo still lacks the feature."
-          exit 1
-        fi
-
-  # --------------------------------------------------------------------------
-  # namespace:test — repository-root consumer imports and removed-name rejection.
-  # Runs separately from library tests so an incorrect discovery root cannot
-  # silently turn the migration into a green CI run with no library tests.
-  # --------------------------------------------------------------------------
+      - sh .repo/scrupts/tasks.sh missingMojo
   namespace:test:
     desc: 'Check akku consumer imports and reject the removed namespace.'
     dir: '{{.TASKFILE_DIR}}'
     cmds:
       - sh .github/tests/check_namespace.sh
 
-  # --------------------------------------------------------------------------
-  # ci — the single CI entry point. CI runs exactly `task ci`; everything else
-  # is derived from it. It runs the full library test sweep (`task test`) and
-  # then any optional per-library `ci` hook (a library may add extra checks in
-  # its own Taskfile `ci` task). Repository-level checks live here too.
-  #
-  # The MissingMojo ledger check runs here as a repository-level gate: a marker
-  # older than the installed Mojo makes CI red, so a workaround whose feature may
-  # already exist cannot slip through silently.
-  # --------------------------------------------------------------------------
   ci:
-    desc: 'CI entry point: namespace checks, every library test, per-library ci hooks, and the MissingMojo gate.'
+    desc: 'Full CI (alias for ci::full); main explicitly calls ci::full.'
     cmds:
+      - task: ci::full
+
+  ci::full:
+    desc: 'All library CI suites and repository gates; required before tagging.'
+    env:
+      REPO_TEST_JOBS: '{{.JOBS | default "2"}}'
+    cmds:
+      - task: testing:check
       - task: namespace:test
-      - task: test
-      - |
-        for d in akku/*/; do
-          [ -f "${d}Taskfile.yml" ] || continue
-          # optional per-library ci hook: run it only if declared.
-          if task -t "${d}Taskfile.yml" --list 2>/dev/null | grep -qE '^[* ]*ci[ :]'; then
-            echo "== ${d}task ci"
-            task -t "${d}Taskfile.yml" ci
-          fi
-        done
-        echo ""
-        echo "== task missingMojo -- check"
-        task missingMojo -- check
-        echo ""
-        echo "task ci: done."
+      - python3 .repo/scrupts/testing.py run ci full
+      - task: missingMojo:check
+
+  ci::smart:
+    desc: 'Changed libraries and their users, with mandatory repository gates.'
+    env:
+      REPO_TEST_JOBS: '{{.JOBS | default "2"}}'
+    cmds:
+      - task: testing:check
+      - task: namespace:test
+      - python3 .repo/scrupts/testing.py run ci smart
+      - task: missingMojo:check
+
+  missingMojo:check:
+    internal: true
+    env:
+      REPO_CLI_ARGS: check
+    cmds:
+      - sh .repo/scrupts/tasks.sh missingMojo

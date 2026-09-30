@@ -90,7 +90,7 @@ Ausnahmetabelle unten. Kein Bindestrich. `depends_on` wird mit umbenannt.
 ## Neue Libs (angelegt)
 
 74 zusätzliche Libraries wurden nach dem Namespace-Gespräch beschlossen und als
-`_todos/<id>.yml` angelegt (`status: todo`). Quelle der Zeilen:
+`.repo/todo/<id>.yml` angelegt (`status: todo`). Quelle der Zeilen:
 `docs/architecture/new-libraries.txt`.
 
 - `units_` (8): units_distance units_mass units_time units_temperature units_electricity units_energy units_pressure units_speed

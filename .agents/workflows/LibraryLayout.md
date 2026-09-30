@@ -13,7 +13,7 @@ checked out for every phase. **`main` is never written directly.**
 
 - A library reaches `main` through **exactly one pull request**, opened by
   `CreatePR.md` after `NewLibPhase13FinalReview.md` returns GO.
-- The PR is merged only when CI on the PR (`pull-request-check.yml` → `task ci`,
+- The PR is merged only when CI on the PR (`pull-request-check.yml` → `task ci::smart`,
   and exactly one new `.changes/new/*.md` file) is green.
 - `main-push.yml` then auto-releases from `.changes/new/`.
 - Consequence for every phase: the phase commit must be made on the library
@@ -227,3 +227,12 @@ Rules:
 | Which APIs were researched but not shipped? | `akku/<lib>/_dev/TODO.md` |
 | Prior art / why a decision was made | `akku/<lib>/_dev/<lang>.md` and `_dev/DESIGN.md` |
 | How do I compile/test? | `akku/<lib>/Taskfile.yml` |
+
+## Automatic test dispatch
+
+Root `task <lib>::test` and `<lib>::compile` discover library Taskfiles without
+registration. `task ci::smart` selects changed libraries and transitive Mojo
+consumers since a full-checked release tag; main always runs `task ci::full`.
+An optional local `ci` task includes tests plus extra checks; aggregate CI calls
+it once, falling back to `test`. Native/Python implementations live inside their
+own library; inter-library dependencies use Mojo imports. See `.repo/TESTING.md`.

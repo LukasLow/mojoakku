@@ -1,6 +1,6 @@
 name: main-push
 
-# Runs on every push to main. It ALWAYS tests (task ci). If there is a pending
+# Runs on every push to main. It ALWAYS tests (task ci::full). If there is a pending
 # file in `.changes/new/`, it then releases: it folds the change files into
 # CHANGELOG.md, moves them to `.changes/archive/<tag>/`, commits that, and
 # creates the next 0.x.y tag — pushed atomically, with retry if main moved
@@ -37,8 +37,9 @@ jobs:
       - name: Install the toolchain
         run: pixi install
 
-      - name: Test and release (task ci)
+      - name: Full check and release
         run: |
+          set -eu
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
@@ -52,7 +53,8 @@ jobs:
               exit 1
             fi
 
-            pixi run task ci
+            checked=$(git rev-parse HEAD)
+            pixi run task ci::full
 
             if ! find .changes/new -maxdepth 1 -type f -name '*.md' | grep -q .; then
               echo "no pending change files; nothing to release"
@@ -77,6 +79,7 @@ jobs:
               exit 1
             fi
 
+            pixi run python3 .repo/scrupts/testing.py release-guard "$checked"
             git add -A
             git commit -m "release: $new [skip ci]"
             git tag "$new"

@@ -1,17 +1,7 @@
 version: '3'
 
-# Per-library Taskfile for akku/net_ip.
-#
-# Runs every test in _tests/ with `mojo run`. There is no `mojo test`: each test
-# file is a program with its own main(). The runner stops on the first failing
-# file and exits non-zero when any test fails.
-#
-# Mojo runs inside the smd container, where `mojo` is installed globally.
-# The per-library Taskfile runs from akku/net_ip/, so `-I ../..` puts the
-# repository root on the import path and a test can write
-# `from akku.net_ip import ...`.
-
 silent: true
+method: none
 
 tasks:
 
@@ -20,54 +10,16 @@ tasks:
     cmds:
       - task: test
 
-  # --------------------------------------------------------------------------
-  # test — run every _tests/*.mojo with `mojo run`, stop on the first failure.
-  # Exits 0 when _tests/ is empty or every test passes, non-zero otherwise.
-  # --------------------------------------------------------------------------
   test:
     desc: 'Run every _tests/*.mojo with mojo run; stop and fail on the first error.'
     dir: '{{.TASKFILE_DIR}}'
     cmds:
-      - |
-        set -e
-        found=""
-        for f in _tests/*.mojo; do
-          [ -f "$f" ] || continue
-          found="yes"
-          echo "== $f"
-          mojo run -I ../.. "$f"
-        done
-        if [ -z "$found" ]; then
-          echo "No tests yet in _tests/ (nothing to run)."
-        else
-          echo "All net_ip tests passed."
-        fi
-
-  # --------------------------------------------------------------------------
-  # compile — the Phase-7/9 compile gate.
-  #
-  # `mojo precompile .` cannot be used directly here: the package directory
-  # contains `_tests/`, whose files define `main()` and are rejected inside a
-  # package. The gate therefore compiles a consumer that imports the whole
-  # public surface (JIT), which type-checks every API .mojo file and the package
-  # entry point.
-  # --------------------------------------------------------------------------
+      - sh ../../.repo/scrupts/libraries.sh test
   compile:
     desc: 'Type-check the public API via a consumer import (JIT).'
     dir: '{{.TASKFILE_DIR}}'
     cmds:
-      - |
-        set -e
-        mkdir -p ../../.tmp
-        printf 'from akku.net_ip import (AddressFamily, IpParseErrorKind, IpParseError, Ipv4Address, Ipv6Address, IpAddress, parse, parse_ipv4, parse_ipv6, try_parse, is_valid, format)\n\ndef main():\n    pass\n' > ../../.tmp/net_ip_check.mojo
-        mojo run -I ../.. ../../.tmp/net_ip_check.mojo
-        echo "net_ip public API compiles."
-
-  # --------------------------------------------------------------------------
-  # ci — the per-library CI hook the root `task ci` dispatches to. It runs the
-  # compile gate in addition to the test sweep, so a public-API signature break
-  # fails CI even if every behavioural test still passes.
-  # --------------------------------------------------------------------------
+      - sh ../../.repo/scrupts/libraries.sh compile
   ci:
     desc: 'Per-library CI hook: compile gate plus the test suite.'
     cmds:

@@ -1,6 +1,6 @@
 # mojo.yml — what Mojo can and cannot do (capability ledger)
 #
-# Purpose: every MojoAkku library declares `mojoNeeds:` in _todos/<id>.yml —
+# Purpose: every MojoAkku library declares `mojoNeeds:` in .repo/todo/<id>.yml —
 # a list of capability keys from this file. `task todo` lists a library as
 # "buildable" only when ALL of its mojoNeeds are `have` (and all libdeps `done`).
 # So "buildable today" is honest, not guessed.
@@ -141,7 +141,7 @@ capabilities:
 
 # ---- derivation rule ------------------------------------------------------
 # `task todo` shows a library only when:
-#   for all n in _todos/<id>.yml:mojoNeeds:  capabilities[n].state == "have"
+#   for all n in .repo/todo/<id>.yml:mojoNeeds:  capabilities[n].state == "have"
 #   AND all libdeps are status "done".
 # "partial" -> planned with a warning (task todo --all shows it).
 # "missing" -> roadmap-only until Mojo has the capability.

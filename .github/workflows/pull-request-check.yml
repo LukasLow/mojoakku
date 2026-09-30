@@ -28,7 +28,9 @@ jobs:
         run: pixi install
 
       - name: Test
-        run: pixi run task ci
+        env:
+          REPO_BASE_REF: origin/${{ github.base_ref }}
+        run: pixi run task ci::smart
 
       - name: Validate the change file
         run: |

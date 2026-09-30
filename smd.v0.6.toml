@@ -6,6 +6,8 @@ RUN sh -c "$(curl -fsSL https://taskfile.dev/install.sh)" -- -d -b /usr/local/bi
 RUN curl -fsSL https://pixi.sh/install.sh | bash
 ENV PATH="/root/.pixi/bin:${PATH}"
 RUN pixi global install -c https://conda.modular.com/max/ -c conda-forge mojo
+# Reuse the Python runtime already installed with Mojo for repository commands.
+RUN ln -s /root/.pixi/envs/mojo/bin/python3 /usr/local/bin/python3
 '''
 
 [ports]

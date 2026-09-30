@@ -20,8 +20,9 @@ repo root/
   TODO.md
   LICENSE
   mojo.yml            <-- capability ledger: what Mojo 1.1.0 can and cannot do
-  Taskfile.yml        <-- task commands, reads the _todos/ catalogue
-  _todos/             <-- flat catalogue: one YAML file per planned library
+  Taskfile.yml        <-- task commands, reads the .repo/todo/ catalogue
+  .repo/todo/        <-- flat catalogue: one YAML file per planned library
+  .repo/scrupts/     <-- maintenance scripts dispatched by Taskfiles
   docs/adr/           <-- architecture decision records
   .agents/workflows/*.md
   akku/               <-- public namespace (project/repository stays MojoAkku)
@@ -68,7 +69,7 @@ no filler segment (`phy_cosmology`, not `math_func_cosmology`).
 ### Capability ledger: `mojo.yml` and `mojoNeeds:`
 
 `mojo.yml` records what Mojo 1.1.0 can (`have`), partly can (`partial`) or
-cannot (`missing`) do, each entry with a source. Every `_todos/<id>.yml`
+cannot (`missing`) do, each entry with a source. Every `.repo/todo/<id>.yml`
 declares `mojoNeeds:` — the capability keys it requires.
 
 `task todo` applies the **capability gate**: a library is listed only when all
@@ -159,12 +160,14 @@ Rules:
   PR is green. `main-push.yml` then auto-releases from `.changes/new/`.
   Consequence: a phase commit must be made on the library branch, and
   `git push origin main` from an agent is forbidden.
-- **CI runs one command: `task ci`.** The root `Taskfile.yml` auto-discovers
-  every `akku/*/Taskfile.yml` and runs each library's `test` (and optional
-  `ci`) task; no library is registered anywhere. Each library owns how it tests.
-  Two GitHub workflows drive it: `pull-request-check.yml` (PR: `task ci` + require
-  exactly one new `.changes/new/` file) and `main-push.yml` (main: `task ci`, then
-  release when `.changes/new/` is non-empty).
+- **CI uses `task ci::smart` for PRs and `task ci::full` for every main push.**
+  The root Taskfile discovers every `akku/*/Taskfile.yml`; no registration.
+  A library's optional `ci` task includes its tests and extra checks; otherwise
+  CI invokes `test`. Never run both hooks redundantly. Namespace, runner and
+  MissingMojo checks remain mandatory. Release tags follow successful full CI.
+  Smart selection scans Mojo imports and differences since that tag; native
+  and Python code belongs to its library. See `.repo/TESTING.md`.
+  PRs still require exactly one new `.changes/new/` file.
 - **`.changes/` drives the changelog and the tag.** `.changes/new/` holds pending
   change files (`<date>-<slug>.md`, category lines `NEW`, `FIX`, `SECURITY`,
   `PERFORMANCE`, `BREAKING`, `DEPRECATED`, `INTERNAL`, `DOCS`); CI moves released
@@ -231,8 +234,8 @@ The process lives in `.agents/workflows/`. Start at the index:
 ## Toolchain and CI
 
 - **Mojo runs in the smd container** (global `mojo`, version pinned by
-  `pixi.toml` via smd.toml). Use `smd` for commands; never bare `bash`.
-- **CI** (`.github/workflows/`) runs `task ci` on push and PR; on `main` it also
+  `pixi.toml` via smd.v0.6.toml). Use `smd` for commands; never bare `bash`.
+- **CI** (`.github/workflows/`) runs `task ci::full` on main and `task ci::smart` on PR; on `main` it also
   auto-releases when `.changes/new/` is non-empty (`main-push.yml`).
 - **Changes** are recorded in `.changes/` and drive the version tag; see
   `.changes/README.md`.
