@@ -49,7 +49,7 @@ Base64Error is the existing `akku.codec_base64.Base64Error` type, not a new faca
 
 ## Error Surface
 
-Encoding raises no recoverable data error. Decoding propagates the sibling Base64Error unchanged: INVALID_SYMBOL for non-alphabet bytes, INVALID_LENGTH for an impossible remainder, INVALID_PADDING for excessive, misplaced or inconsistent padding. Its `position` is a zero-based index in the original input. Failure produces no result List. The caller can correct input and retry; the facade holds no state. Recoverable allocation errors are not exposed by these delegated APIs.
+Encoding raises no recoverable data error. Decoding propagates the sibling Base64Error unchanged: INVALID_SYMBOL for non-alphabet bytes, INVALID_LENGTH for an impossible remainder, INVALID_PADDING for excessive, misplaced or inconsistent padding. Its `position` is a zero-based index in the original input: the offending byte for INVALID_SYMBOL, the first symbol of the impossible remainder for INVALID_LENGTH, and the first symbol of the offending final quantum for INVALID_PADDING. Examples: `decode("Zm!v")` gives INVALID_SYMBOL at 2; `decode("Zm9vZ")` gives INVALID_LENGTH at 4; `decode("Zm9vZg=")` gives INVALID_PADDING at 4. Failure produces no result List. The caller can correct input and retry; the facade holds no state. Recoverable allocation errors are not exposed by these delegated APIs.
 
 ## Conventions
 
@@ -77,7 +77,7 @@ Semantics: Borrow all input bytes read-only and encode the complete value with B
 
 Errors: none — no recoverable data errors for any input.
 
-Tests: empty input; RFC text vectors; URL-specific binary symbols; both overloads; all byte values; borrowed inputs and independent output.
+Tests: `test_encode_empty`, `test_encode_rfc_vectors`, `test_encode_url_symbols`, `test_encode_binary_all_values`, `test_encode_borrows_inputs`, `test_encode_result_is_independent` in `test_codec_base64url_encode.mojo`. These exercise both overloads and every success/ownership concern.
 
 Implementation status: not implemented
 
@@ -95,9 +95,9 @@ def decode(input: Span[UInt8, _]) raises Base64Error -> List[UInt8]
 
 Semantics: Borrow complete input read-only, decode B64_URL under TOLERANT/REJECT, return newly owned binary bytes. Empty input returns empty List. Padded/unpadded final quanta are accepted; present padding must have the exact count, appear only at the end, and have no symbol following it. Non-zero unused trailing bits are accepted. Reject `+`, `/`, all whitespace and every other non-alphabet byte. A single-symbol remainder is impossible. Do not interpret result as Unicode. No result is produced on failure; no I/O or stream lifecycle.
 
-Errors: propagate sibling Base64Error unchanged with INVALID_SYMBOL, INVALID_LENGTH or INVALID_PADDING and original zero-based position. All are recoverable input errors; correct input and call again.
+Errors: propagate sibling Base64Error unchanged with INVALID_SYMBOL (offending byte index), INVALID_LENGTH (first symbol of impossible remainder) or INVALID_PADDING (first symbol of offending final quantum). Positions are zero-based in the original input; no characters are silently skipped. All are recoverable input errors; correct input and call again. No List is returned on failure. Non-zero unused trailing bits do not raise an error under this fixed tolerant policy.
 
-Tests: empty input; padded/unpadded vectors; URL-specific binary symbols; both overloads; borrowed inputs and independent result; non-zero trailing bits; standard alphabet rejection; whitespace rejection; all three error kinds and positions; atomic failure.
+Tests: `test_decode_empty`, `test_decode_padded_and_unpadded`, `test_decode_url_symbols`, `test_decode_binary_all_values`, `test_decode_borrows_inputs`, `test_decode_result_is_independent` in `test_codec_base64url_decode.mojo`; `test_decode_nonzero_trailing_bits`, `test_decode_rejects_standard_alphabet`, `test_decode_rejects_whitespace`, `test_decode_rejects_invalid_symbols`, `test_decode_rejects_impossible_remainder`, `test_decode_rejects_bad_padding`, `test_decode_failure_has_no_result` in `test_codec_base64url_policy.mojo`. Both overloads, all three typed error kinds and their original-input positions are covered.
 
 Implementation status: not implemented
 

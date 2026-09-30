@@ -19,3 +19,6 @@ Two function names, four borrowed overloads, fixed raw URL encoding and tolerant
 ## Phase 4 — design review: APPROVED
 Independent review: complete byte/empty/error/ownership contracts; policies agree with sibling and local buch. Two APIs only, all deferrals recorded.
 Dependency review: public codec_base64 reuse avoids a duplicate engine; same repository Apache-2.0 license; no new native/external packages or transitive sibling dependency; no reference code copied. Accepted internal graph edge, flat layout.
+
+## Phase 5 — complete design docs
+Seven-field blocks in fixed order; exact error-position semantics and named concern-to-test mapping; planned/not implemented. No code or tests.
