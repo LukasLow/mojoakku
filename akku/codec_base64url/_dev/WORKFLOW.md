@@ -22,3 +22,6 @@ Dependency review: public codec_base64 reuse avoids a duplicate engine; same rep
 
 ## Phase 5 — complete design docs
 Seven-field blocks in fixed order; exact error-position semantics and named concern-to-test mapping; planned/not implemented. No code or tests.
+
+## Phase 6 — docs review: APPROVED
+Independent reviewer compared Phase3/5: API sets and signatures unchanged; two blocks with seven fields in identical order; statuses correct, precise offset examples match engine, dependencies/backlog complete. No blockers.
