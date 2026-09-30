@@ -5,6 +5,20 @@ All notable changes to MojoAkku are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions stay on `0.x.y`; major is never bumped.
 
+## v0.8.0 - 2026-09-30
+
+### Added
+
+- net_ip — first IP-address library: IPv4 and IPv6 addresses as value types. One family-tagged `IpAddress` over two concrete structs (`Ipv4Address` on UInt32, `Ipv6Address` on UInt128); strict numeric parsing (`parse`/`parse_ipv4`/`parse_ipv6` plus non-throwing `try_parse`/`is_valid`) with a typed `IpParseError` carrying a kind and byte position; RFC-named classification predicates (unspecified, loopback, private, link-local, multicast, broadcast, IPv4-mapped); explicit mapped handling (`is_ipv4_mapped`, `to_ipv4_mapped`, `to_ipv4`, `unmap`); `format` with RFC 5952 canonical IPv6 output; and `next`/`prev` returning Optional at the range ends. No socket and no FFI: pure value library, leaf dependency.
+
+### Fixed
+
+- mojo.yml — `net-sockets` capability corrected from `missing` to `have` (libc socket API reachable via std.ffi `external_call`; probe-verified on 1.1.0). Unblocks the `net_`/`proto_`/`web_` chain once the socket core lands.
+
+### Changed
+
+- docs/architecture — namespace model no longer presents `net-sockets` as missing; catalogue README example updated.
+
 ## v0.7.0 - 2026-09-30
 
 ### Changed
