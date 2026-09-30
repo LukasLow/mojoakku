@@ -44,3 +44,9 @@ Independent reviewer confirms corrected typed List example matches buch; all sig
 
 ## Phase 9 — behavioral tests and failing baseline
 19 authored cases in three concern programs; fixed independent Python Base64url oracle for all 256 octets. Aggregate `smd -t task codec_base64url::test` exits 201 on first abort stub; each program separately compiles and aborts (3/3 program failures), zero completed passed cases. Unexecuted cases are not counted as individually observed failures. Full commands/logs and concern map: TESTS.md and raw_red*.log. Tests frozen after next review.
+
+### Phase 5/7 rework after Phase 10 NEEDS_WORK
+Two post-padding test positions were wrong. Public sibling probe confirmed
+`Zg===`, `Zg==Zg`, `Zg== ` and `Zg==+` all give INVALID_PADDING at 4.
+Refined design and inline error-position docs to specify terminal-padding precedence.
+No signature or policy change; all bodies remain abort stubs.

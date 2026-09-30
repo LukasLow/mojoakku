@@ -28,7 +28,9 @@ def decode(input: Span[UInt8, _]) raises _Base64Error -> List[UInt8]:
 #   Raises akku.codec_base64.Base64Error unchanged. All are recoverable input
 #   errors; correct input and retry. Its kind and original zero-based position:
 #   INVALID_SYMBOL — offending byte; INVALID_LENGTH — first symbol of impossible
-#   remainder; INVALID_PADDING — first symbol of offending final quantum.
+#   remainder; INVALID_PADDING — first symbol of offending final quantum, or
+#   the first following byte after a completed padded quantum. This terminal
+#   padding check takes precedence over symbol validation ("Zg== " errors at 4).
 # Example:
 #   from akku.codec_base64url import decode
 #   decode("Zg")    # -> [102]
