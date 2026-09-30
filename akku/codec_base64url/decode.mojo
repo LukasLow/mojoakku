@@ -1,13 +1,18 @@
-from std.os import abort
-from akku.codec_base64 import Base64Error as _Base64Error
+from akku.codec_base64 import (
+    decode as _decode,
+    Alphabet as _Alphabet,
+    PaddingMode as _PaddingMode,
+    Whitespace as _Whitespace,
+    Base64Error as _Base64Error,
+)
 
 
 def decode(input: StringSpan) raises _Base64Error -> List[UInt8]:
-    abort("MojoAkku: this API is not yet implemented")
+    return _decode[_Alphabet.B64_URL, _PaddingMode.TOLERANT, _Whitespace.REJECT](input)
 
 
 def decode(input: Span[UInt8, _]) raises _Base64Error -> List[UInt8]:
-    abort("MojoAkku: this API is not yet implemented")
+    return _decode[_Alphabet.B64_URL, _PaddingMode.TOLERANT, _Whitespace.REJECT](input)
 
 # API-DOCS-START
 # decode — decode borrowed Base64url text to independently owned bytes.

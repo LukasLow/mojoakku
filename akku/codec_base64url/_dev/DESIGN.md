@@ -65,7 +65,7 @@ None. The user explicitly waived the Phase 3 API presentation/approval gate for 
 
 ## encode
 
-Status: tested
+Status: implemented
 
 Signature:
 ```mojo
@@ -79,13 +79,13 @@ Errors: none — no recoverable data errors for any input.
 
 Tests: `test_encode_empty`, `test_encode_rfc_vectors`, `test_encode_url_symbols`, `test_encode_binary_all_values`, `test_encode_borrows_inputs`, `test_encode_result_is_independent` in `test_codec_base64url_encode.mojo`. These exercise both overloads and every success/ownership concern.
 
-Implementation status: scaffold stub; not implemented
+Implementation status: implemented; public sibling delegation, frozen tests green
 
 Rationale: MojoAkku uses `encode` because the sibling, cppcodec and Rust share this simple operation name (cpp.md §3, rust.md §3). MojoAkku uses fixed unpadded output because Node and Go expose this explicit raw URL convention (js_ts.md §10, go.md §3). MojoAkku uses owned String output and borrowed input because they match the sibling and avoid C buffer capacity contracts (cpp.md §5, c.md §11).
 
 ## decode
 
-Status: tested
+Status: implemented
 
 Signature:
 ```mojo
@@ -99,6 +99,6 @@ Errors: propagate sibling Base64Error unchanged with INVALID_SYMBOL (offending b
 
 Tests: `test_decode_empty`, `test_decode_padded_and_unpadded`, `test_decode_url_symbols`, `test_decode_binary_all_values`, `test_decode_borrows_inputs`, `test_decode_result_is_independent` in `test_codec_base64url_decode.mojo`; `test_decode_nonzero_trailing_bits`, `test_decode_rejects_standard_alphabet`, `test_decode_rejects_whitespace`, `test_decode_rejects_invalid_symbols`, `test_decode_rejects_impossible_remainder`, `test_decode_rejects_bad_padding`, `test_decode_failure_has_no_result` in `test_codec_base64url_policy.mojo`. Both overloads, all three typed error kinds and their original-input positions are covered.
 
-Implementation status: scaffold stub; not implemented
+Implementation status: implemented; public sibling delegation, frozen tests green
 
 Rationale: MojoAkku uses `decode` because cppcodec, Rust and the sibling use that operation name (cpp.md §3, rust.md §3). MojoAkku uses TOLERANT to support its unpadded encoder and correctly padded external input without a second engine (cpp.md §10). MojoAkku states trailing-bit tolerance explicitly because raw syntax and canonicality are distinct (go.md §10, rust.md §10). MojoAkku uses typed sibling errors because explicit `raises Base64Error` preserves structured fields without a wrapper hierarchy (python.md §12, js_ts.md §12; local buch raising-and-propagation.md).

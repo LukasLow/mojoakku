@@ -21,3 +21,9 @@ The fixed binary oracle was generated once using Python stdlib `base64.urlsafe_b
 ## Phase 10 review rework
 
 A public sibling probe established terminal-padding precedence: `Zg===`, `Zg==Zg`, `Zg== ` and `Zg==+` all raise INVALID_PADDING at 4. Refined the inline/design contract and corrected these expectations before tests freeze. Added precomposed/decomposed UTF-8 oracles within an existing named encode case. Repeated the exact aggregate and all three independent commands: unchanged abort stubs, aggregate exit 201, each program exit 1, 19 authored cases, 3/3 aborted programs. Raw logs above contain this repeated baseline.
+
+## Phase 11 implementation evidence
+
+Before implementation, `smd -t task codec_base64url::test` again exited 201 at the decode abort stub; `raw_red_before_implementation.log` preserves it. The encode-only increment passed all 6 encode cases (`smd -t mojo run -I . akku/codec_base64url/_tests/test_codec_base64url_encode.mojo`, exit 0, `raw_green_encode.log`).
+
+Final command: `smd -t task codec_base64url::ci` (container root `task codec_base64url::ci`), exit 0. `raw_green.log` contains successful public consumer compilation followed by all three test programs: 6 decode + 6 encode + 7 policy = 19 passed, 0 failed, 0 skipped. Tests are unchanged from frozen Phase 10 commit `7cb6882`; `git diff 7cb6882 -- akku/codec_base64url/_tests` is empty. Only four wrapper bodies delegate to public sibling operations; no internal engine or new error type.

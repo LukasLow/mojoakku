@@ -67,3 +67,11 @@ Corrected post-padding fields and both-overload vectors; UTF-8 non-normalization
 fixtures verified. All19 authored cases have doc basis; allfouroverloads,
 independent oracle, borrowing/owned output, alltyped errors, atomic retry and
 N/A I/O cases covered; no vacuous assertions. Tests frozen at commit 7cb6882.
+
+## Phase 11 — implementation: 19 passed, 0 failed, 0 skipped
+Reproduced red exit201 first. Encode increment: 6/6 pass. Four final wrappers
+call only public codec_base64 operations with private aliases and fixed policies.
+`smd -t task codec_base64url::ci`: exit0, consumer compile and all19 cases pass.
+Evidence raw_green.log; raw_green_encode.log records the first increment.
+`git diff 7cb6882 -- akku/codec_base64url/_tests` empty: no test tampering.
+Design statuses implemented; deferred candidates unchanged.

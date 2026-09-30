@@ -1,12 +1,16 @@
-from std.os import abort
+from akku.codec_base64 import (
+    encode as _encode,
+    Alphabet as _Alphabet,
+    Padding as _Padding,
+)
 
 
 def encode(input: StringSpan) -> String:
-    abort("MojoAkku: this API is not yet implemented")
+    return _encode[_Alphabet.B64_URL, _Padding.OMITTED](input)
 
 
 def encode(input: Span[UInt8, _]) -> String:
-    abort("MojoAkku: this API is not yet implemented")
+    return _encode[_Alphabet.B64_URL, _Padding.OMITTED](input)
 
 # API-DOCS-START
 # encode — encode borrowed bytes as owned unpadded Base64url text.

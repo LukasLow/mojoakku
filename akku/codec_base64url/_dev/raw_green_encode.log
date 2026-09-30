@@ -1,0 +1,14 @@
+/workspace/akku/codec_base64url/_tests/test_codec_base64url_encode.mojo:53:12: warning: assignment to 'text' was never used; assign to '_' instead?
+    text = "x"
+           ^
+
+Running 6 tests for /workspace/akku/codec_base64url/_tests/test_codec_base64url_encode.mojo 
+    PASS [ 0.001 ] test_encode_empty
+    PASS [ 0.001 ] test_encode_rfc_vectors
+    PASS [ 0.002 ] test_encode_url_symbols
+    PASS [ 0.010 ] test_encode_binary_all_values
+    PASS [ 0.001 ] test_encode_borrows_inputs
+    PASS [ 0.001 ] test_encode_result_is_independent
+--------
+Summary [ 0.015 ] 6 tests run: 6 passed , 0 failed , 0 skipped 
+
