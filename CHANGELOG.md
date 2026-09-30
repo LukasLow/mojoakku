@@ -5,6 +5,17 @@ All notable changes to MojoAkku are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions stay on `0.x.y`; major is never bumped.
 
+## v0.9.0 - 2026-09-30
+
+### Changed
+
+- repository — move the library catalogue to .repo/todo and extract Taskfile shell bodies into .repo/scrupts, preserving existing commands.
+- testing — discover library commands automatically, select changed libraries and transitive Mojo consumers since a full-checked release tag, run bounded test pools, and keep main CI full with guarded release metadata.
+
+### Added
+
+- codec_base64url — add borrowed byte/text encode and decode convenience functions using the existing codec_base64 public API, with unpadded URL-safe output and explicit tolerant decoding.
+
 ## v0.8.0 - 2026-09-30
 
 ### Added
