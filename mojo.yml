@@ -67,10 +67,13 @@ capabilities:
       Source: mojov1/concurrency/gpu-and-accelerators.
 
   net-sockets:
-    state: missing
+    state: have
     note: >-
-      No socket in std. Only via C-FFI (libc socket/bind/connect).
-      Source: mojov1/stdlib/overview, mojov1/interop/calling-c.
+      There is no socket type in std, but the full libc socket API is reachable
+      from pure Mojo through std.ffi `external_call`: socket, setsockopt,
+      bind, listen, connect, accept, send, recv, close. Probe-verified on 1.1.0
+      (a loopback TCP round trip completes). Requires the `c-ffi` capability,
+      which is `have`. Source: mojov1/interop/calling-c, mojov1/stdlib/overview.
 
   fs-full:
     state: partial

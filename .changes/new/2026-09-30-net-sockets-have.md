@@ -1,0 +1,2 @@
+FIX: mojo.yml — `net-sockets` capability corrected from `missing` to `have`. There is no socket type in std, but the full libc socket API (socket, bind, listen, connect, accept, send, recv, close) is reachable from pure Mojo via std.ffi `external_call`; probe-verified on 1.1.0 with a loopback TCP round trip. Unblocks `net_ip`, `web_url`, `web_uri`, `web_mime` immediately and the whole `net_`/`proto_`/`web_` chain once the socket core lands.
+DOCS: docs/architecture — namespace model no longer presents `net-sockets` as missing; catalogue README example updated.
