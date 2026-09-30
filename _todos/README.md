@@ -123,8 +123,9 @@ $ task waiting
 web_http  todo  HTTP  -> waiting for: net_tcp
 
 $ task todo -- --all
-net_ip    IP Address  -> needs net-sockets (missing)
-web_url   URL         -> needs net-sockets (missing)
+async_core  Async       -> needs async (missing)
+sync_atomic  Atomic      -> needs threads (partial)
+web_http    HTTP        -> waiting for: net_tcp
 ```
 
 If no library is ready, `task todo` prints a clear "nothing is ready to build

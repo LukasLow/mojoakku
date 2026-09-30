@@ -341,8 +341,8 @@ markiert. Nichts umbenannt, nichts committet.
 ### 8.2 Capability-Ledger (neu)
 
 - **`mojo.yml`** — was Mojo kann/nicht kann, belegt (Stand 1.1.0). Liegt im
-  Repo-Root. Beispiel: `async` = **missing**, `net-sockets` = **missing**,
-  `c-ffi`/`time`/`pure-mojo` = **have**.
+  Repo-Root. Beispiel: `async` = **missing**, `net-sockets` = **have**
+  (libc-Socket-API via C-FFI, probe-verifiziert), `c-ffi`/`time`/`pure-mojo` = **have**.
 - **`mojoNeeds:`** — neues Pflichtfeld in `_todos/<id>.yml`.
 - **Ableitungsregel:** `task todo` zeigt eine Lib nur, wenn alle `mojoNeeds`
   `have` sind **und** alle `libdeps` `done`.
