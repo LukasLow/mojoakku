@@ -15,3 +15,7 @@ Research proposals distinguished from facts; backlog buffer/stream/length candid
 
 ## Phase 3 — API design
 Two function names, four borrowed overloads, fixed raw URL encoding and tolerant whole-input decode. User session approval exception honored. Dependency rationale and all deferred candidates recorded; no code or tests.
+
+## Phase 4 — design review: APPROVED
+Independent review: complete byte/empty/error/ownership contracts; policies agree with sibling and local buch. Two APIs only, all deferrals recorded.
+Dependency review: public codec_base64 reuse avoids a duplicate engine; same repository Apache-2.0 license; no new native/external packages or transitive sibling dependency; no reference code copied. Accepted internal graph edge, flat layout.
