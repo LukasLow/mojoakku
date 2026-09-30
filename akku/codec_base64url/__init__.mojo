@@ -7,6 +7,7 @@ from .decode import decode
 #   Both accept borrowed StringSpan or Span[UInt8, _]. No I/O or stream state.
 # Dependencies — akku.codec_base64 supplies its public radix engine, alphabet,
 #   padding policies and typed errors; this package specializes those operations.
+#   Reuses the tested engine rather than duplicating encoding and validation.
 # Public API — encode: bytes to unpadded URL-safe text; decode: URL-safe text to bytes.
 # Error Surface — decode raises akku.codec_base64.Base64Error unchanged, with
 #   ErrorKind.INVALID_SYMBOL, INVALID_LENGTH or INVALID_PADDING and a zero-based

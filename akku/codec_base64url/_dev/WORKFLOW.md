@@ -28,3 +28,6 @@ Independent reviewer compared Phase3/5: API sets and signatures unchanged; two b
 
 ## Phase 7 — scaffold
 Four exact abort stubs across two API files; inline docs at bottom, only encode/decode root exports. Private error alias has unchanged sibling type identity. Taskfile compile/test/ci discovered automatically; empty _tests has no init. `smd -t task codec_base64url::compile`: exit 0, public API compiles. No implementation.
+
+### Phase 7 rework after Phase 8 NO_GO
+Independent compile succeeded, but inline dependency rationale missing. Added explicit public-engine reuse rationale; no implementation/tests. Returned to scaffold review.
