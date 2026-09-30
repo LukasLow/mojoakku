@@ -6,7 +6,7 @@
 # '::ffff:a.b.c.d' form for IPv4-mapped addresses; parse/format round trips.
 
 from std.testing import assert_equal, TestSuite
-from akku.net_ip import format, parse, Ipv4Address, Ipv6Address
+from akku.net_ip import format, parse
 
 
 def test_format_ipv4() raises:

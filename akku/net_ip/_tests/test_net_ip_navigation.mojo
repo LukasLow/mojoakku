@@ -6,7 +6,7 @@
 # never panic); the total order IPv4-before-IPv6 then numeric; equality.
 
 from std.testing import assert_equal, assert_true, assert_false, TestSuite
-from akku.net_ip import parse, Ipv4Address, Ipv6Address, IpAddress
+from akku.net_ip import parse, Ipv4Address, Ipv6Address
 
 
 def test_ipv4_next_prev() raises:

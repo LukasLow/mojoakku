@@ -6,7 +6,7 @@
 # a failure never yields a value.
 
 from std.testing import assert_equal, assert_true, assert_false, TestSuite
-from akku.net_ip import parse, parse_ipv4, IpParseErrorKind, IpAddress
+from akku.net_ip import parse, parse_ipv4, IpParseErrorKind
 
 
 def test_parse_ipv4_valid() raises:

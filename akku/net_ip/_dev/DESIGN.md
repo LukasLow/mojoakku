@@ -259,9 +259,11 @@ Each block: **Status**, **Signature**, **Semantics**, **Errors**, **Tests**,
 ### `Ipv4Address` / `Ipv6Address` / `IpAddress`
 
 - **Status:** shipped.
-- **Signature:** `struct Ipv4Address(Copyable, Movable)` wrapping `UInt32`;
-  `struct Ipv6Address(Copyable, Movable)` wrapping `UInt128`;
-  `struct IpAddress(Copyable, Movable)` with `family: AddressFamily` + carrier.
+- **Signature:** `struct Ipv4Address(Copyable, Movable, Deinitable, Equatable,
+  Writable)` wrapping `UInt32`; `struct Ipv6Address(Copyable, Movable,
+  Deinitable, Equatable, Writable)` wrapping `UInt128`; `struct IpAddress(Copyable,
+  Movable, Deinitable, Equatable, Writable)` with a private `_family:
+  AddressFamily` + carrier and a read-only `family()` accessor.
 - **Semantics:** immutable value types; equality is structural; ordering is
   total (IPv4 before IPv6).
 - **Errors:** none (construction from integers is total).

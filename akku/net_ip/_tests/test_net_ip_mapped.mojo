@@ -6,7 +6,7 @@
 # a no-op on a plain IPv4 address; nothing converts implicitly.
 
 from std.testing import assert_equal, assert_true, assert_false, TestSuite
-from akku.net_ip import parse, Ipv6Address, Ipv4Address
+from akku.net_ip import parse, Ipv6Address
 
 
 def test_to_ipv4_mapped_present() raises:

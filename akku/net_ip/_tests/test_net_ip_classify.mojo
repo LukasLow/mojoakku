@@ -6,7 +6,7 @@
 # predicate set is closed and each name is RFC-precise.
 
 from std.testing import assert_true, assert_false, TestSuite
-from akku.net_ip import parse, Ipv4Address, Ipv6Address
+from akku.net_ip import parse, Ipv4Address
 
 
 def test_ipv4_unspecified() raises:
