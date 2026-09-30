@@ -58,9 +58,11 @@ def test_decode_rejects_impossible_remainder() raises:
 
 def test_decode_rejects_bad_padding() raises:
     expect_error("Zg=", ErrorKind.INVALID_PADDING, 0)
-    expect_error("Zg===", ErrorKind.INVALID_PADDING, 0)
+    expect_error("Zg===", ErrorKind.INVALID_PADDING, 4)
     expect_error("Z=g=", ErrorKind.INVALID_PADDING, 0)
-    expect_error("Zg==Zg", ErrorKind.INVALID_PADDING, 0)
+    expect_error("Zg==Zg", ErrorKind.INVALID_PADDING, 4)
+    expect_error("Zg== ", ErrorKind.INVALID_PADDING, 4)
+    expect_error("Zg==+", ErrorKind.INVALID_PADDING, 4)
     expect_error("Zm9vZg=", ErrorKind.INVALID_PADDING, 4)
 
 def test_decode_failure_has_no_result() raises:

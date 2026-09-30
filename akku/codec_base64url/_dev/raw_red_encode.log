@@ -1,12 +1,12 @@
-/workspace/akku/codec_base64url/_tests/test_codec_base64url_encode.mojo:50:12: warning: assignment to 'text' was never used; assign to '_' instead?
+/workspace/akku/codec_base64url/_tests/test_codec_base64url_encode.mojo:53:12: warning: assignment to 'text' was never used; assign to '_' instead?
     text = "x"
            ^
 ABORT: ./akku/codec_base64url/encode.mojo:5:10: MojoAkku: this API is not yet implemented
-#0 0x0000ffff84555580 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105580)
-#1 0x0000ffff84552c40 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x102c40)
-#2 0x0000ffff84555fe4 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105fe4)
-#3 0x0000ffff877da8c0 (linux-vdso.so.1+0x8c0)
-#4 0x0000ffff4400fffc
+#0 0x0000ffffb0115580 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105580)
+#1 0x0000ffffb0112c40 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x102c40)
+#2 0x0000ffffb0115fe4 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105fe4)
+#3 0x0000ffffb3bb28c0 (linux-vdso.so.1+0x8c0)
+#4 0x0000ffff76a0fff0
 /root/.pixi/envs/mojo/bin/mojo: error: execution crashed
 To get a symbolicated stack trace, compile your program using `mojo build` with debug info enabled (e.g., `-debug-level=line-tables`) and execute it separately.
 Error: exit status 1

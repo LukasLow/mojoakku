@@ -19,6 +19,9 @@ def test_encode_rfc_vectors() raises:
     assert_equal(encode("foob"), "Zm9vYg")
     assert_equal(encode("fooba"), "Zm9vYmE")
     assert_equal(encode("foobar"), "Zm9vYmFy")
+    # Python stdlib oracle: UTF-8 bytes are distinct; no normalization.
+    assert_equal(encode("é"), "w6k")
+    assert_equal(encode("é"), "ZcyB")
 
 def test_encode_url_symbols() raises:
     var data = bytes_of([251, 255])

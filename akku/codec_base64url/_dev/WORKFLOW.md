@@ -50,3 +50,13 @@ Two post-padding test positions were wrong. Public sibling probe confirmed
 `Zg===`, `Zg==Zg`, `Zg== ` and `Zg==+` all give INVALID_PADDING at 4.
 Refined design and inline error-position docs to specify terminal-padding precedence.
 No signature or policy change; all bodies remain abort stubs.
+
+### Phase 6/8 re-review — APPROVED / GO
+Independent reviewer rechecked precise terminal-padding error precedence;
+all examples agree with sibling probe. Docs/design consistent, fixed policies and
+abort-only scaffold unchanged.
+
+### Phase 9 rework — red baseline reproduced
+Corrected two wrong offsets; added trailing whitespace/standard-symbol cases,
+and fixed independent UTF-8/non-normalization vectors. Still 19 authored cases;
+aggregate exits 201 and 3/3 programs abort independently. No implementation.
