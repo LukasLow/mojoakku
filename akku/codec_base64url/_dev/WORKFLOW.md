@@ -75,3 +75,11 @@ call only public codec_base64 operations with private aliases and fixed policies
 Evidence raw_green.log; raw_green_encode.log records the first increment.
 `git diff 7cb6882 -- akku/codec_base64url/_tests` empty: no test tampering.
 Design statuses implemented; deferred candidates unchanged.
+
+## Phase 12 — implementation review: APPROVED
+Independent compile/CI reproduces19 passed,0failed,0skipped; testdiff7cb6882 empty.
+Five-axis review: public-only delegation, fixedpolicies, typederroridentity,
+ownedresults/borrowing, flatlayout and explicit tolerantvalidation are correct.
+No Critical/Required findings. Two compiler unused-value warnings arise from
+intentionally reassigned ownership-test inputs; frozen tests unchanged.
+Clarified evidence wording:7cb6882 is the reviewed test baseline, not the Phase10 log commit.
