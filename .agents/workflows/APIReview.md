@@ -5,10 +5,10 @@ Check a proposed or landed public API change for consistency with the inline `# 
 
 ## Inputs
 - The API change: before/after signatures, types, error behavior.
-- `mojoakku/<lib>/*.mojo` (agreed public surface) and `mojoakku/<lib>/__init__.mojo` (exports).
-- The inline `# API-DOCS` blocks in `mojoakku/<lib>/*.mojo` and `__init__.mojo` (single source of truth).
+- `akku/<lib>/*.mojo` (agreed public surface) and `akku/<lib>/__init__.mojo` (exports).
+- The inline `# API-DOCS` blocks in `akku/<lib>/*.mojo` and `__init__.mojo` (single source of truth).
 - Call sites in dependent sibling libraries.
-- Existing tests in `mojoakku/<lib>/_tests/`.
+- Existing tests in `akku/<lib>/_tests/`.
 
 ## Preconditions
 - The API is either proposed (design time) or already landed (post-implementation review); the state is stated explicitly.
@@ -37,7 +37,7 @@ Check a proposed or landed public API change for consistency with the inline `# 
 
 ## Artifacts / Outputs
 - API review report: verdict, undocumented items, naming findings, compatibility findings, required changes.
-- Updated API files `mojoakku/<lib>/*.mojo`, `__init__.mojo` and the inline `# API-DOCS` blocks when corrections were required.
+- Updated API files `akku/<lib>/*.mojo`, `__init__.mojo` and the inline `# API-DOCS` blocks when corrections were required.
 - Migration note for any accepted breaking change.
 - Task-log entry referencing the report.
 - One git commit carrying the accepted API change.

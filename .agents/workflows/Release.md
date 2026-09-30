@@ -37,7 +37,7 @@ Prepare and cut a release: decide the version, write the changelog, verify docs 
    (NEW → Added, FIX → Fixed, SECURITY → Security, PERFORMANCE → Changed,
    DEPRECATED → Deprecated, BREAKING → Changed/Breaking, INTERNAL → Changed)
    into the `CHANGELOG.md` section under the computed version, each referencing
-   the affected `mojoakku/<lib>/`.
+   the affected `akku/<lib>/`.
 5. `docs` performs the docs check: the inline `# API-DOCS` blocks, API and README
    references agree with the shipped code; broken or stale links are fixed.
 6. `coder` runs the full test suite (`task ci`) for every included library and

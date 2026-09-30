@@ -1,7 +1,7 @@
 [dockerfile]
   lines = '''
 FROM docker.io/debian:bookworm-slim
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl bash bzip2 unzip git && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl bash bzip2 unzip git ripgrep && rm -rf /var/lib/apt/lists/*
 RUN sh -c "$(curl -fsSL https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
 RUN curl -fsSL https://pixi.sh/install.sh | bash
 ENV PATH="/root/.pixi/bin:${PATH}"

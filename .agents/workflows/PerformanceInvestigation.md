@@ -5,7 +5,7 @@ Measure before and after with benchmarks, isolate the bottleneck, and never opti
 
 ## Inputs
 - Performance complaint or requirement with a concrete metric (latency, throughput, memory).
-- Target scope in `mojoakku/<lib>/`.
+- Target scope in `akku/<lib>/`.
 - Existing benchmarks or a defined workload/reproduction.
 - Baseline measurement of the current code.
 

@@ -29,7 +29,7 @@ NewLibPhase1Research -> NewLibPhase2ResearchReview -> NewLibPhase3Design
 | `NewLibPhase4DesignReview.md` | Review the API design against the research and the process rules. |
 | `NewLibPhase5Docs.md` | Complete `_dev/DESIGN.md` (shared sections + one block per API entry); rationale and status live here, not in the end-user docs. |
 | `NewLibPhase6DocsReview.md` | Review the design document for accuracy, completeness and justification. |
-| `NewLibPhase7Scaffold.md` | Scaffold `mojoakku/<lib>/` and materialise the design into inline end-user `# API-DOCS` blocks: `__init__.mojo` (shared docs + re-exports), one file per API entry, optional `_internal/`, `_dev/`, `_tests/`, `Taskfile.yml`. |
+| `NewLibPhase7Scaffold.md` | Scaffold `akku/<lib>/` and materialise the design into inline end-user `# API-DOCS` blocks: `__init__.mojo` (shared docs + re-exports), one file per API entry, optional `_internal/`, `_dev/`, `_tests/`, `Taskfile.yml`. |
 | `NewLibPhase8ScaffoldReview.md` | Review the scaffold against the agreed layout (`.agents/workflows/LibraryLayout.md`). |
 | `NewLibPhase9Tests.md` | Write tests before any implementation exists. |
 | `NewLibPhase10TestsReview.md` | Review the tests for coverage and correctness of intent. |

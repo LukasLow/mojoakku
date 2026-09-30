@@ -5,9 +5,9 @@ Justify every new library dependency by checking license, maintenance status, si
 
 ## Inputs
 - Proposed dependency: name, version, origin (crate/package/repo), and the reason it is needed.
-- Depending library under `mojoakku/<lib>/` and its inline `# API-DOCS` blocks.
+- Depending library under `akku/<lib>/` and its inline `# API-DOCS` blocks.
 - Dependency graph: libraries may depend on another MojoAkku library as a graph edge (e.g. `http -> tcp -> socket`), never as directory nesting.
-- Existing `mojoakku/<lib>/_internal/` code that could implement the need instead.
+- Existing `akku/<lib>/_internal/` code that could implement the need instead.
 
 ## Preconditions
 - A concrete need is documented that cannot reasonably be met by the standard library or by an existing sibling library.

@@ -10,9 +10,9 @@ records deferred work that no library owns.
 
 ## 1. Test infrastructure and tests
 
-- **Status:** DONE. Each library ships `mojoakku/<lib>/Taskfile.yml` with a
+- **Status:** DONE. Each library ships `akku/<lib>/Taskfile.yml` with a
   `test` task (runs every `_tests/*.mojo` with `mojo run`). The root Taskfile's
-  `task test` auto-discovers `mojoakku/*/Taskfile.yml` and dispatches to each
+  `task test` auto-discovers `akku/*/Taskfile.yml` and dispatches to each
   library's `test`; `task ci` adds optional per-library `ci` hooks. First
   library (base64) has 132 passing tests.
 

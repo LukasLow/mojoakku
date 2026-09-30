@@ -14,11 +14,39 @@ matching workflow.
 
 ## Library layout
 
-Libraries live directly under `mojoakku/` as siblings — never nested — and a
+Libraries live directly under `akku/` as siblings — never nested — and a
 dependency between libraries is a conceptual edge
 (`web_http -> net_tcp -> net_socket`), never a physical parent/child directory. The file list of one library —
 including that `_tests/` has **no** `__init__.mojo` — is in
 [`AGENTS.md`](AGENTS.md#layout-of-one-library).
+
+## Imports and migration
+
+The public namespace is **`akku`**; the project and repository remain
+**MojoAkku**. Library names keep their flat `domain_local` spelling:
+
+```mojo
+from akku.codec_base64 import encode
+from akku.io_core import Cursor
+from akku.prim_bit import get_bits
+from akku.text_string import to_ascii_lower
+
+def main():
+    print(encode("foobar"))  # Zm9vYmFy
+```
+
+Run a consumer from the repository root with `mojo run -I . consumer.mojo`.
+From another directory, pass the MojoAkku repository root as `-I <repo-root>`.
+
+**Breaking migration:** replace `from mojoakku.<lib> import ...` with
+`from akku.<lib> import ...` and source paths `mojoakku/<lib>/` with
+`akku/<lib>/`. If you previously used a bare sibling import such as
+`from codec_base64 import encode` with `-I mojoakku`, use the namespaced
+import above and `-I .` instead (or `-I ../..` from `akku/<lib>/`). Update
+scripts, editor search paths and CI paths too. There is no compatibility alias.
+GitHub URLs, clone directory names, branding and workspace names do not change.
+Do not rename compiled `.mojoc` artifacts to migrate; rebuild them with the
+new namespace. See [ADR 0002](docs/adr/0002-akku-public-namespace.md).
 
 ## The catalogue (`_todos/`) and the capability ledger
 
@@ -55,8 +83,9 @@ Run these from the repository root:
 | `task all` | List every library as `id  status  name`, sorted by id. |
 | `task count` | Count libraries per status, plus the total. |
 | `task waiting` | List libraries still waiting for a dependency, and name it. |
-| `task test` | Run the `test` task of every library (auto-discovered via `mojoakku/*/Taskfile.yml`). |
-| `task ci` | The single CI entry point: every library's tests plus optional per-library `ci` hooks. |
+| `task test` | Run the `test` task of every library (auto-discovered via `akku/*/Taskfile.yml`). |
+| `task namespace:test` | Check repository-root `akku` imports and rejection of the removed namespace. |
+| `task ci` | The single CI entry point: namespace checks, every library's tests, optional per-library `ci` hooks and the MissingMojo gate. |
 | `task changes:version` | Compute the next `0.x.y` version from the current tag and `.changes/`. |
 
 More commands: `task current` (libraries in progress) and
@@ -75,7 +104,7 @@ More commands: `task current` (libraries in progress) and
   (`major` is never bumped).
 - `task ci` is the single test entry point; the root Taskfile auto-discovers
   every library, so a new library is tested the moment its
-  `mojoakku/<lib>/Taskfile.yml` exists — nothing to register.
+  `akku/<lib>/Taskfile.yml` exists — nothing to register.
 
 ## License
 

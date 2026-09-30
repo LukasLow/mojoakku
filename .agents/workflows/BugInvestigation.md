@@ -5,13 +5,13 @@ Determine and evidence the root cause of a defect WITHOUT changing code, and del
 
 ## Inputs
 - Bug report or anomaly: observed vs. expected behavior, environment, reproduction steps.
-- Affected sibling library under `mojoakku/<lib>/`.
+- Affected sibling library under `akku/<lib>/`.
 - Logs, traces, benchmark output or failing test output.
-- The inline `# API-DOCS` blocks in `mojoakku/<lib>/*.mojo` and `__init__.mojo` (intended behavior).
+- The inline `# API-DOCS` blocks in `akku/<lib>/*.mojo` and `__init__.mojo` (intended behavior).
 
 ## Preconditions
 - The defect is reproducible, or enough evidence exists to reason about it.
-- Scope is read-only: no source, test or documentation file under `mojoakku/` may be modified.
+- Scope is read-only: no source, test or documentation file under `akku/` may be modified.
 - The investigation question is stated as a falsifiable hypothesis, not as "fix X".
 
 ## Roles
@@ -28,7 +28,7 @@ Determine and evidence the root cause of a defect WITHOUT changing code, and del
 4. `debug` forms explicit hypotheses and eliminates them one by one against the captured evidence.
 5. `debug` isolates the root cause and states its confidence, the affected scope, and the blast radius.
 6. `debug` writes a recommendation: the smallest fix, alternative fixes, risks and verification criteria — but no code change.
-7. `reviewer` verifies that every conclusion is supported by a linked piece of evidence and that no file under `mojoakku/` was modified.
+7. `reviewer` verifies that every conclusion is supported by a linked piece of evidence and that no file under `akku/` was modified.
 
 ## Artifacts / Outputs
 - Investigation report at `.agents/investigations/<task-id>-<slug>.md` containing: question, evidence (`file:line`), hypotheses, proven root cause, confidence, blast radius, recommendation, verification criteria.
@@ -36,6 +36,6 @@ Determine and evidence the root cause of a defect WITHOUT changing code, and del
 - Task-log entry linking the report.
 
 ## Review Gate
-`reviewer` verifies: (a) no source, test or docs file under `mojoakku/` was changed, (b) each conclusion maps to concrete evidence, (c) the recommendation is actionable and testable. Unsourced conclusions or any code change => reject.
+`reviewer` verifies: (a) no source, test or docs file under `akku/` was changed, (b) each conclusion maps to concrete evidence, (c) the recommendation is actionable and testable. Unsourced conclusions or any code change => reject.
 
 ## Handoff: BugFix.md when a fix is recommended; Refactor.md or NewLibPhase3Design.md if the cause is structural and requires a design change; otherwise close the task.

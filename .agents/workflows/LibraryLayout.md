@@ -22,7 +22,7 @@ checked out for every phase. **`main` is never written directly.**
 ## Directory layout
 
 ```
-mojoakku/<lib>/
+akku/<lib>/
   __init__.mojo        # package entry point + shared (whole-library) end-user docs
   <api_entry>.mojo     # ONE file per public API entry (see below)
   ...
@@ -40,9 +40,10 @@ mojoakku/<lib>/
 
 Rules:
 
-- **Flat, sibling libraries.** `mojoakku/<lib>/` is a flat sibling under
-  `mojoakku/`. Libraries are never nested.
-- **One file per public API entry, directly under `mojoakku/<lib>/`.** There is
+- **Flat, sibling libraries.** `akku/<lib>/` is a flat sibling under
+  `akku/`. Libraries are never nested. Imports use `akku.<lib>` with the
+  repository root on the search path (`-I .` from root; `-I ../..` here).
+- **One file per public API entry, directly under `akku/<lib>/`.** There is
   **no `api/` directory** and **no `API.mojo`** aggregator file. The entry name is
   the API name, lowercased: e.g. `encode.mojo`, `encode_into.mojo`,
   `decoded_len.mojo`, `padding_mode.mojo`, `base64_error.mojo`.
@@ -148,7 +149,7 @@ the design record lives in `_dev/DESIGN.md` and git history.
 ## The design record (lives in `_dev/DESIGN.md`)
 
 Phases 3-6 (Design → Docs Review) operate before the code tree exists. They
-produce ONE design document, `mojoakku/<lib>/_dev/DESIGN.md`. This is the
+produce ONE design document, `akku/<lib>/_dev/DESIGN.md`. This is the
 **design record**, and it is where all the developer-facing reasoning belongs —
 the "noise" that must stay out of the end-user docs:
 
@@ -174,12 +175,12 @@ the tree (a projection, not a move):
 The design record in `_dev/DESIGN.md` keeps the full reasoning (status, tests,
 rationale, non-goals, references, open questions); the inline end-user blocks
 keep only what a user needs. From Phase 8 onward the authoritative end-user docs
-are the inline blocks in `mojoakku/<lib>/*.mojo` and `__init__.mojo`; the
-authoritative design reasoning is `mojoakku/<lib>/_dev/DESIGN.md`.
+are the inline blocks in `akku/<lib>/*.mojo` and `__init__.mojo`; the
+authoritative design reasoning is `akku/<lib>/_dev/DESIGN.md`.
 
 ## The per-library backlog (lives in `_dev/TODO.md`)
 
-`mojoakku/<lib>/_dev/TODO.md` is the **live backlog** of every API the research
+`akku/<lib>/_dev/TODO.md` is the **live backlog** of every API the research
 showed is theoretically possible in Mojo but which the current implementation
 did **not** ship. It captures deferred entry points, later variants, and ideas
 from `_dev/<lang>.md` / `_dev/DESIGN.md` that were consciously left out. It is
@@ -219,10 +220,10 @@ Rules:
 
 | Question | Look at |
 | --- | --- |
-| How do I use the library? | the API docs blocks in `mojoakku/<lib>/*.mojo` and `__init__.mojo` |
-| What is API `X` for? | `mojoakku/<lib>/<x>.mojo` docs block |
+| How do I use the library? | the API docs blocks in `akku/<lib>/*.mojo` and `__init__.mojo` |
+| What is API `X` for? | `akku/<lib>/<x>.mojo` docs block |
 | The full ordered public API | `# Public API` in `__init__.mojo` docs block |
-| Why was X designed this way? | `mojoakku/<lib>/_dev/DESIGN.md` |
-| Which APIs were researched but not shipped? | `mojoakku/<lib>/_dev/TODO.md` |
-| Prior art / why a decision was made | `mojoakku/<lib>/_dev/<lang>.md` and `_dev/DESIGN.md` |
-| How do I compile/test? | `mojoakku/<lib>/Taskfile.yml` |
+| Why was X designed this way? | `akku/<lib>/_dev/DESIGN.md` |
+| Which APIs were researched but not shipped? | `akku/<lib>/_dev/TODO.md` |
+| Prior art / why a decision was made | `akku/<lib>/_dev/<lang>.md` and `_dev/DESIGN.md` |
+| How do I compile/test? | `akku/<lib>/Taskfile.yml` |

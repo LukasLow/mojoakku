@@ -4,11 +4,11 @@
 Review a sibling library or change for security weaknesses in input validation, memory/ownership safety, TLS, secrets and unsafe/interop boundaries.
 
 ## Inputs
-- Scope: the library or change under `mojoakku/<lib>/`.
-- The inline `# API-DOCS` blocks and the API files `mojoakku/<lib>/*.mojo` for the intended trust boundaries.
-- Any `unsafe`/FFI/interop code in `mojoakku/<lib>/*.mojo` or `mojoakku/<lib>/_internal/`.
+- Scope: the library or change under `akku/<lib>/`.
+- The inline `# API-DOCS` blocks and the API files `akku/<lib>/*.mojo` for the intended trust boundaries.
+- Any `unsafe`/FFI/interop code in `akku/<lib>/*.mojo` or `akku/<lib>/_internal/`.
 - TLS, socket and HTTP configuration if in scope.
-- Threat-relevant tests in `mojoakku/<lib>/_tests/`.
+- Threat-relevant tests in `akku/<lib>/_tests/`.
 
 ## Preconditions
 - The scope compiles and its test suite is runnable.

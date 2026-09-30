@@ -4,7 +4,7 @@ This folder is the **machine-readable catalogue of every library MojoAkku could
 build**. There is exactly **one file per library**, named `<id>.yml`, and all
 files sit **flat** in this directory. The flat layout is a core project
 decision: no library is nested inside another, not here and not under
-`mojoakku/`. The catalogue currently holds **318** entries (4 `done`, and the
+`akku/`. The catalogue currently holds **318** entries (4 `done`, and the
 `covered_*`/`homeless_*` marker prefixes explained in the ADR).
 
 The catalogue is pure inventory — a library may still be only an idea. Its
@@ -69,7 +69,7 @@ the way `http` depends on `tcp`, but it never lives in that library's folder.
 
 > **Rule: no library inside a library.**
 
-A flat namespace (all libraries siblings under `mojoakku/`) plus this explicit
+A flat namespace (all libraries siblings under `akku/`) plus this explicit
 graph keeps the overview readable — which matters most for a low-vision user.
 Use a name prefix for collisions (e.g. `crypto_hash`) instead of nesting.
 
