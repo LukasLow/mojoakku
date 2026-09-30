@@ -83,3 +83,11 @@ ownedresults/borrowing, flatlayout and explicit tolerantvalidation are correct.
 No Critical/Required findings. Two compiler unused-value warnings arise from
 intentionally reassigned ownership-test inputs; frozen tests unchanged.
 Clarified evidence wording:7cb6882 is the reviewed test baseline, not the Phase10 log commit.
+
+## Phase 13 — final review: GO
+Independent `smd -t task codec_base64url::ci` exit0: consumer import compiles,
+19passed0failed0skipped. API/docs/implementation/test contracts agree; frozen
+baseline diff empty; flat public-only justified dependency and layout complete.
+No Critical/Required findings. Demand-driven follow-ups (library maintainers)
+match the six TODO candidates exactly; neither shipped API remains listed.
+Catalogue flipped done only after this GO. Ready for root CI and CreatePR.
