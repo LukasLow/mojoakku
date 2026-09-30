@@ -91,3 +91,10 @@ baseline diff empty; flat public-only justified dependency and layout complete.
 No Critical/Required findings. Demand-driven follow-ups (library maintainers)
 match the six TODO candidates exactly; neither shipped API remains listed.
 Catalogue flipped done only after this GO. Ready for root CI and CreatePR.
+
+## CreatePR — local release gate
+`smd -t task ci::full` exit0 across all six libraries, 40 runner regressions,
+namespace and MissingMojo gates. `task changes:version` reports0.9.0 from NEW.
+Actual import graph: codec_base64url depends on codec_base64; other five libraries
+are leaves. Exactly one new change file; no root dispatch registration or extra
+runtime dependency metadata. Scope frozen for PR and automated full-check release.
