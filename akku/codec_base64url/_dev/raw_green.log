@@ -1,0 +1,47 @@
+== codec_base64url::ci
+codec_base64url public API compiles.
+== _tests/test_codec_base64url_decode.mojo
+/workspace/akku/codec_base64url/_tests/test_codec_base64url_decode.mojo:53:12: warning: assignment to 'text' was never used; assign to '_' instead?
+    text = "eA"
+           ^
+
+Running 6 tests for /workspace/akku/codec_base64url/_tests/test_codec_base64url_decode.mojo 
+    PASS [ 0.001 ] test_decode_empty
+    PASS [ 0.008 ] test_decode_padded_and_unpadded
+    PASS [ 0.001 ] test_decode_url_symbols
+    PASS [ 0.011 ] test_decode_binary_all_values
+    PASS [ 0.001 ] test_decode_borrows_inputs
+    PASS [ 0.001 ] test_decode_result_is_independent
+--------
+Summary [ 0.020 ] 6 tests run: 6 passed , 0 failed , 0 skipped 
+
+== _tests/test_codec_base64url_encode.mojo
+/workspace/akku/codec_base64url/_tests/test_codec_base64url_encode.mojo:53:12: warning: assignment to 'text' was never used; assign to '_' instead?
+    text = "x"
+           ^
+
+Running 6 tests for /workspace/akku/codec_base64url/_tests/test_codec_base64url_encode.mojo 
+    PASS [ 0.001 ] test_encode_empty
+    PASS [ 0.001 ] test_encode_rfc_vectors
+    PASS [ 0.001 ] test_encode_url_symbols
+    PASS [ 0.013 ] test_encode_binary_all_values
+    PASS [ 0.001 ] test_encode_borrows_inputs
+    PASS [ 0.001 ] test_encode_result_is_independent
+--------
+Summary [ 0.018 ] 6 tests run: 6 passed , 0 failed , 0 skipped 
+
+== _tests/test_codec_base64url_policy.mojo
+
+Running 7 tests for /workspace/akku/codec_base64url/_tests/test_codec_base64url_policy.mojo 
+    PASS [ 0.003 ] test_decode_nonzero_trailing_bits
+    PASS [ 0.001 ] test_decode_rejects_standard_alphabet
+    PASS [ 0.001 ] test_decode_rejects_whitespace
+    PASS [ 0.001 ] test_decode_rejects_invalid_symbols
+    PASS [ 0.001 ] test_decode_rejects_impossible_remainder
+    PASS [ 0.001 ] test_decode_rejects_bad_padding
+    PASS [ 0.001 ] test_decode_failure_has_no_result
+--------
+Summary [ 0.004 ] 7 tests run: 7 passed , 0 failed , 0 skipped 
+
+All codec_base64url tests passed.
+PASS codec_base64url

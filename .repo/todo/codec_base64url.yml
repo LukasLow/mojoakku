@@ -1,6 +1,6 @@
 id: codec_base64url
 name: Base64url
-status: todo
+status: done
 depends_on: [codec_base64]
 mojoNeeds: [pure-mojo]
 summary: URL-safe base64 variant.
