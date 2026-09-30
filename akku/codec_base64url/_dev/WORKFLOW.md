@@ -38,3 +38,9 @@ Dependency inline rationale rechecked and approved. All four abort stubs, signat
 ## Phase 7 documentation rework during Phase 9 preparation
 
 Corrected encode inline example to typed list literal `var bytes: List[UInt8] = [251, 255]`. Compiler rejects variadic `List[UInt8](251, 255)` initialization on Mojo 1.1.0. No signature or semantic change; source remains an abort stub.
+
+### Phase 8 — example re-review: GO
+Independent reviewer confirms corrected typed List example matches buch; all signatures, semantics and stubs unchanged.
+
+## Phase 9 — behavioral tests and failing baseline
+19 authored cases in three concern programs; fixed independent Python Base64url oracle for all 256 octets. Aggregate `smd -t task codec_base64url::test` exits 201 on first abort stub; each program separately compiles and aborts (3/3 program failures), zero completed passed cases. Unexecuted cases are not counted as individually observed failures. Full commands/logs and concern map: TESTS.md and raw_red*.log. Tests frozen after next review.

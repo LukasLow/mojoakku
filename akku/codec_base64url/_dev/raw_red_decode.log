@@ -1,0 +1,12 @@
+/workspace/akku/codec_base64url/_tests/test_codec_base64url_decode.mojo:53:12: warning: assignment to 'text' was never used; assign to '_' instead?
+    text = "eA"
+           ^
+ABORT: ./akku/codec_base64url/decode.mojo:6:10: MojoAkku: this API is not yet implemented
+#0 0x0000ffff94685580 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105580)
+#1 0x0000ffff94682c40 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x102c40)
+#2 0x0000ffff94685fe4 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105fe4)
+#3 0x0000ffff989248c0 (linux-vdso.so.1+0x8c0)
+#4 0x0000ffff5c00fefc
+/root/.pixi/envs/mojo/bin/mojo: error: execution crashed
+To get a symbolicated stack trace, compile your program using `mojo build` with debug info enabled (e.g., `-debug-level=line-tables`) and execute it separately.
+Error: exit status 1

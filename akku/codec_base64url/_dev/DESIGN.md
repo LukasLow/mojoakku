@@ -65,7 +65,7 @@ None. The user explicitly waived the Phase 3 API presentation/approval gate for 
 
 ## encode
 
-Status: scaffolded
+Status: tested
 
 Signature:
 ```mojo
@@ -85,7 +85,7 @@ Rationale: MojoAkku uses `encode` because the sibling, cppcodec and Rust share t
 
 ## decode
 
-Status: scaffolded
+Status: tested
 
 Signature:
 ```mojo
