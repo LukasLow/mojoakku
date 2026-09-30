@@ -1,6 +1,5 @@
 from .ip_address import IpAddress
 from .parse import parse
-from .ip_parse_error import IpParseError
 
 
 # try_parse — non-throwing parse: Some(address) or None.
@@ -20,8 +19,8 @@ def try_parse(text: StringSpan) -> Optional[IpAddress]:
 #   is a valid numeric literal, None otherwise. Use it when a malformed address
 #   is expected input rather than an exceptional case.
 # Returns:
-#   Some(IpAddress), or None when parsing fails. Allocates only for the returned
-#   value.
+#   Some(IpAddress), or None when parsing fails. No result string is allocated;
+#   parsing may allocate small temporaries.
 # Errors:
 #   none — every failure is reported as None.
 # Example:

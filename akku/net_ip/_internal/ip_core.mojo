@@ -200,10 +200,12 @@ def parse_ipv6(b: Span[UInt8, _]) raises IpParseError -> UInt128:
         second_start = comp + 2
 
     # Parse the head segment [0, first_end) — skipped if empty.
+    # A dotted-quad is only valid as the very last group of the whole address,
+    # so it is allowed here only when there is no '::' following.
     if first_end > 0:
         var parts = List[Int]()  # boundaries
         _collect(b, 0, first_end, parts)
-        _fill_groups(b, parts, groups)
+        _fill_groups(b, parts, groups, comp == -1)
 
     if comp != -1:
         # Parse the tail segment [second_start, n) — skipped if empty.
@@ -211,7 +213,7 @@ def parse_ipv6(b: Span[UInt8, _]) raises IpParseError -> UInt128:
         if second_start < n:
             var parts2 = List[Int]()
             _collect(b, second_start, n, parts2)
-            _fill_groups(b, parts2, tail)
+            _fill_groups(b, parts2, tail, True)
         if len(groups) + len(tail) > 7:
             raise IpParseError(IpParseErrorKind.TOO_MANY_GROUPS, n - 1)
         # Build the 8 groups with zeros inserted at the hole.
@@ -251,7 +253,7 @@ def _collect(b: Span[UInt8, _], start: Int, end: Int, mut bounds: List[Int]):
 
 
 def _fill_groups(
-    b: Span[UInt8, _], bounds: List[Int], mut out: List[UInt16]
+    b: Span[UInt8, _], bounds: List[Int], mut out: List[UInt16], allow_v4_tail: Bool
 ) raises IpParseError:
     var count = len(bounds) // 2
     for k in range(count):
@@ -259,8 +261,11 @@ def _fill_groups(
         var e = bounds[2 * k + 1]
         if s == e:
             raise IpParseError(IpParseErrorKind.BAD_GROUP_SEPARATOR, s)
-        # An embedded IPv4 tail is the last group and contains a '.'.
-        if k == count - 1 and _has_dot(b, s, e):
+        var is_last = k == count - 1
+        if _has_dot(b, s, e):
+            # A dotted-quad is only legal as the final group of the address.
+            if not (is_last and allow_v4_tail):
+                raise IpParseError(IpParseErrorKind.BAD_GROUP_SEPARATOR, s)
             var v4 = parse_ipv4(b[s:e])
             out.append(UInt16((v4 >> 16) & UInt32(0xFFFF)))
             out.append(UInt16(v4 & UInt32(0xFFFF)))

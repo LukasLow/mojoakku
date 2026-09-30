@@ -18,14 +18,13 @@ state. Format and rules: `.agents/workflows/LibraryLayout.md`.
 - `is_site_local` (v6), `is_v4_compatible` (v6) — the remaining RFC 4291/4193 categories. (origin: `java.md` §9, `cpp.md` §9)
 - `is_global` convenience predicate — complement-style "not private" helper. (origin: `python.md` §3, `julia.md` §3)
 
-## Deferred arithmetic / conversion additions
+## Deferred conversion additions
 
-- `next` / `prev` with a defined end-of-range result. (origin: `go.md` §3, `python.md` §3)
-- `to_bits` / `from_bits` and `octets` / `from_octets` symmetric conversions. (origin: `rust.md` §3, `go.md` §3)
-- `to_ipv4` / `to_ipv4_mapped` split or unified mapped conversion (design choice to settle in Phase 3). (origin: `rust.md` §3, `go.md` §3)
-- `format_into` / `parse` buffer-writing overloads for allocation-free call sites. (origin: `c.md` §3; `akku.codec_base64` `encode_into`)
+- `to_bits` / `from_bits` — explicit integer round trip under those names (UInt32/UInt128 accessors already ship as to_u32/to_u128). (origin: `rust.md` §3, `go.md` §3)
+- `format_into` — write the textual form into a caller buffer instead of returning a String. (origin: `c.md` §3; `akku.codec_base64` `encode_into`)
 
 ## Deferred I/O and interop
 
 - `Reader`/`Writer` integration — parse from an `akku.io_core.Reader` or format into a `ByteWriter` without an intermediate string. (origin: `c.md` §3; `akku.io_core` byte layer)
 - `hash` support — a stable hash for use as a map key. (origin: `go.md` §5, `python.md` §5)
+- `zone id` (`%eth0`) parsing — scope ids on link-local addresses (rejected for now). (origin: `go.md` §3, RFC 4007)

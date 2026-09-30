@@ -28,13 +28,25 @@ def test_parse_ipv6_compressed_forms() raises:
 def test_parse_ipv6_family_is_ipv6() raises:
     var a = parse("2001:db8::1")
     assert_true(a.is_ipv6())
-    assert_equal(String(a.family), "IPV6")
+    assert_equal(String(a.family()), "IPV6")
 
 
 def test_parse_ipv6_embedded_ipv4_tail() raises:
     assert_equal(String(parse_ipv6("::ffff:127.0.0.1")), "::ffff:127.0.0.1")
     assert_equal(String(parse_ipv6("::ffff:192.168.1.1")), "::ffff:192.168.1.1")
     assert_equal(String(parse_ipv6("64:ff9b::1.2.3.4")), "64:ff9b::102:304")
+
+
+def test_parse_ipv6_embedded_ipv4_only_at_the_end() raises:
+    # RFC 4291 §2.2: a dotted-quad may only be the final group. A dotted-quad
+    # in the head segment (before a later '::' or group) is rejected.
+    var caught = False
+    try:
+        _ = parse_ipv6("1.2.3.4::")
+    except e:
+        caught = True
+        assert_equal(e.kind, IpParseErrorKind.BAD_GROUP_SEPARATOR)
+    assert_true(caught)
 
 
 def test_parse_ipv6_too_few_groups() raises:

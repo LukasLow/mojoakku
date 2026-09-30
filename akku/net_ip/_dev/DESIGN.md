@@ -147,15 +147,15 @@ Release 1 ships the following entries. Status: **shipped** unless noted.
 - `Ipv6Address.to_u128(self) -> UInt128`
 - `Ipv6Address.octets(self) -> Array[UInt8, 16]`
 - `Ipv6Address.segments(self) -> Array[UInt16, 8]`
-- `IpAddress.family(self) -> AddressFamily`
+- `IpAddress.family() -> AddressFamily`
 
 ### Parsing and formatting
 
-- `parse(text: String) raises IpParseError -> IpAddress`
-- `parse_ipv4(text: String) raises IpParseError -> Ipv4Address`
-- `parse_ipv6(text: String) raises IpParseError -> Ipv6Address`
-- `try_parse(text: String) -> Optional[IpAddress]`
-- `is_valid(text: String) -> Bool`
+- `parse(text: StringSpan) raises IpParseError -> IpAddress`
+- `parse_ipv4(text: StringSpan) raises IpParseError -> Ipv4Address`
+- `parse_ipv6(text: StringSpan) raises IpParseError -> Ipv6Address`
+- `try_parse(text: StringSpan) -> Optional[IpAddress]`
+- `is_valid(text: StringSpan) -> Bool`
 - `format(address: IpAddress) -> String`
 - `format_into(address: IpAddress, mut out: ByteWriter) -> None` *(deferred in
   release 1 if it would force the `io_core` edge; see `TODO.md`)*
@@ -266,7 +266,7 @@ Each block: **Status**, **Signature**, **Semantics**, **Errors**, **Tests**,
   total (IPv4 before IPv6).
 - **Errors:** none (construction from integers is total).
 - **Tests:** equality, ordering across families, copy/move.
-- **Implementation status:** not implemented (design phase).
+- **Implementation status:** implemented and tested.
 - **Rationale:** `MojoAkku uses a value struct because Go's `netip.Addr` exists
   precisely to replace a slice alias with a comparable value type (`go.md` §10),
   and value semantics is Mojo's default (`mojov1/memory/value-semantics`).`
@@ -274,14 +274,14 @@ Each block: **Status**, **Signature**, **Semantics**, **Errors**, **Tests**,
 ### `parse` / `parse_ipv4` / `parse_ipv6` / `try_parse` / `is_valid`
 
 - **Status:** shipped.
-- **Signature:** `parse(text: String) raises IpParseError -> IpAddress`;
-  `try_parse(text: String) -> Optional[IpAddress]`; `is_valid(text: String) -> Bool`.
+- **Signature:** `parse(text: StringSpan) raises IpParseError -> IpAddress`;
+  `try_parse(text: StringSpan) -> Optional[IpAddress]`; `is_valid(text: StringSpan) -> Bool`.
 - **Semantics:** strict RFC-correct parsing, numeric literals only, no DNS and
   no zone (`%`) suffixes in release 1. `try_parse` and `is_valid` never raise.
 - **Errors:** `IpParseError` kinds as listed above.
 - **Tests:** valid v4/v6, compressed v6, mapped v6, every error kind, boundary
   octets/segments, empty input, trailing junk.
-- **Implementation status:** not implemented (design phase).
+- **Implementation status:** implemented and tested.
 - **Rationale:** `MojoAkku uses a raising `parse` plus a non-raising
   `try_parse`/`is_valid` because Python and Julia both expose the pair
   (`python.md` §3, `julia.md` §10), and `akku.codec_base64` already ships the
@@ -296,7 +296,7 @@ Each block: **Status**, **Signature**, **Semantics**, **Errors**, **Tests**,
 - **Errors:** none.
 - **Tests:** RFC 5952 cases (longest-run compression, tie-break left-most, no
   compression for a single zero group), round-trip `parse(format(a)) == a`.
-- **Implementation status:** not implemented (design phase).
+- **Implementation status:** implemented and tested.
 - **Rationale:** `MojoAkku uses RFC 5952 output because Julia's `string(::IPv6)`
   and Go's `Addr.String` both emit the compressed form (`julia.md` §3,
   `go.md` §3); Rust follows the RFC too.`
@@ -310,7 +310,7 @@ Each block: **Status**, **Signature**, **Semantics**, **Errors**, **Tests**,
 - **Errors:** `from_bytes` raises `IpParseError` (`too_few_groups`/
   `too_many_groups` semantics) for a wrong-length slice.
 - **Tests:** integer round trips, byte round trips, wrong-length slices.
-- **Implementation status:** not implemented (design phase).
+- **Implementation status:** implemented and tested.
 - **Rationale:** `MojoAkku uses explicit `to_u32`/`to_u128` and
   `octets`/`segments` because Boost.Asio's `to_uint`/`from_uint` and Rust's
   `to_bits`/`octets` make the integer and byte views explicit rather than
@@ -324,7 +324,7 @@ Each block: **Status**, **Signature**, **Semantics**, **Errors**, **Tests**,
 - **Semantics:** each backed by its RFC; no vague catch-all predicate.
 - **Errors:** none.
 - **Tests:** one RFC example per predicate, per family, plus negatives.
-- **Implementation status:** not implemented (design phase).
+- **Implementation status:** implemented and tested.
 - **Rationale:** `MojoAkku uses a closed, RFC-named predicate set because
   Elixir's `:inet` provides none (`elixir.md` §9) and Java's set is
   host-oriented (`java.md` §9); Python/Julia/Rust show the useful names
@@ -340,7 +340,7 @@ Each block: **Status**, **Signature**, **Semantics**, **Errors**, **Tests**,
 - **Errors:** none (absence is `Optional`).
 - **Tests:** mapped v6 → v4, non-mapped → `None`, `unmap` no-op on plain v4,
   `::ffff:127.0.0.1` round trip.
-- **Implementation status:** not implemented (design phase).
+- **Implementation status:** implemented and tested.
 - **Rationale:** `MojoAkku makes mapped handling explicit because Go's
   `Is4In6`/`Unmap` and Rust's `to_ipv4_mapped` both do (`go.md` §3,
   `rust.md` §3); Python's silent rejection hides the wire form (`python.md` §7).`
@@ -353,7 +353,7 @@ Each block: **Status**, **Signature**, **Semantics**, **Errors**, **Tests**,
   ends (never wrap, never panic).
 - **Errors:** none.
 - **Tests:** normal step, both range ends → `None`.
-- **Implementation status:** not implemented (design phase).
+- **Implementation status:** implemented and tested.
 - **Rationale:** `MojoAkku uses `Optional` instead of Go's invalid-zero-`Addr`
   or a wrapping integer because Go's `Next` returns an invalid address at the
   top of the range (`go.md` §8) and Python raises `AddressValueError`

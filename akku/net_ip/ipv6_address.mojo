@@ -128,7 +128,7 @@ struct Ipv6Address(Copyable, Movable, Deinitable, Equatable, Writable):
 # API-DOCS-START
 # Ipv6Address — an IPv6 address value.
 # Signature:
-#   struct Ipv6Address(Copyable, Deinitable, Equatable, Writable):
+#   struct Ipv6Address(Copyable, Movable, Deinitable, Equatable, Writable):
 #       var _b: UInt128
 #       @staticmethod def from_segments(s0..s7: UInt16) -> Self
 #       @staticmethod def from_u128(value: UInt128) -> Self

@@ -25,7 +25,7 @@ def test_parse_ipv4_family_is_ipv4() raises:
     var a = parse("1.2.3.4")
     assert_true(a.is_ipv4())
     assert_false(a.is_ipv6())
-    assert_equal(String(a.family), "IPV4")
+    assert_equal(String(a.family()), "IPV4")
 
 
 def test_parse_ipv4_out_of_range() raises:

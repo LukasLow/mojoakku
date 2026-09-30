@@ -97,7 +97,7 @@ struct Ipv4Address(Copyable, Movable, Deinitable, Equatable, Writable):
 # API-DOCS-START
 # Ipv4Address — an IPv4 address value.
 # Signature:
-#   struct Ipv4Address(Copyable, Deinitable, Equatable, Writable):
+#   struct Ipv4Address(Copyable, Movable, Deinitable, Equatable, Writable):
 #       var _b: UInt32
 #       @staticmethod def from_octets(a, b, c, d: UInt8) -> Self
 #       @staticmethod def from_u32(value: UInt32) -> Self

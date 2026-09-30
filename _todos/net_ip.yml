@@ -1,6 +1,6 @@
 id: net_ip
 name: IP Address
-status: current
+status: done
 depends_on: []
-mojoNeeds: [pure-mojo, net-sockets]
+mojoNeeds: [pure-mojo]
 summary: IPv4 and IPv6 addresses.

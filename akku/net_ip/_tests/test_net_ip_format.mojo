@@ -24,17 +24,19 @@ def test_format_ipv6_lowercase_no_leading_zeros() raises:
 
 
 def test_format_ipv6_longest_run_wins() raises:
-    # The three-zero run in the middle is the longest, so it is compressed.
+    # Two runs of two zeros; the left one is longer-or-equal and is compressed.
     assert_equal(format(parse("2001:db8:0:0:1:0:0:1")), "2001:db8::1:0:0:1")
 
 
-def test_format_ipv6_leftmost_tie() raises:
-    # Two runs of length one: neither is compressed (a single zero is kept).
+def test_format_ipv6_leftmost_of_equal_runs() raises:
+    # Two runs of three zeros: the leftmost wins, so the second stays explicit.
     assert_equal(format(parse("0:0:0:1:0:0:0:1")), "::1:0:0:0:1")
 
 
 def test_format_ipv6_single_zero_not_compressed() raises:
-    assert_equal(format(parse("2001:0:0:1:0:0:1:1")), "2001::1:0:0:1:1")
+    # RFC 5952 §4.2.2: a run of just one zero group MUST NOT be compressed.
+    assert_equal(format(parse("2001:db8:0:1:1:1:1:1")), "2001:db8:0:1:1:1:1:1")
+    assert_equal(format(parse("2001:db8:1:1:1:1:1:0")), "2001:db8:1:1:1:1:1:0")
 
 
 def test_format_ipv6_special_cases() raises:

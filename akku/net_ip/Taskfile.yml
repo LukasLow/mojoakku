@@ -62,3 +62,14 @@ tasks:
         printf 'from akku.net_ip import (AddressFamily, IpParseErrorKind, IpParseError, Ipv4Address, Ipv6Address, IpAddress, parse, parse_ipv4, parse_ipv6, try_parse, is_valid, format)\n\ndef main():\n    pass\n' > ../../.tmp/net_ip_check.mojo
         mojo run -I ../.. ../../.tmp/net_ip_check.mojo
         echo "net_ip public API compiles."
+
+  # --------------------------------------------------------------------------
+  # ci — the per-library CI hook the root `task ci` dispatches to. It runs the
+  # compile gate in addition to the test sweep, so a public-API signature break
+  # fails CI even if every behavioural test still passes.
+  # --------------------------------------------------------------------------
+  ci:
+    desc: 'Per-library CI hook: compile gate plus the test suite.'
+    cmds:
+      - task: compile
+      - task: test
