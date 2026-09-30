@@ -26,6 +26,6 @@ def encode(input: Span[UInt8, _]) -> String:
 #   from akku.codec_base64url import encode
 #   encode("f")       # -> "Zg"
 #   encode("foobar")  # -> "Zm9vYmFy"
-#   var bytes = List[UInt8](251, 255)
+#   var bytes: List[UInt8] = [251, 255]
 #   encode(Span(bytes)) # -> "-_8"
 # API-DOCS-END

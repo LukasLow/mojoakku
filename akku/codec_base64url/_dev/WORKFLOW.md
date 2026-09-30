@@ -34,3 +34,7 @@ Independent compile succeeded, but inline dependency rationale missing. Added ex
 
 ## Phase 8 — scaffold review: GO
 Dependency inline rationale rechecked and approved. All four abort stubs, signatures/type identity, two root exports, doc fields/layout/Taskfile and independent compile pass. No implementation leaked.
+
+## Phase 7 documentation rework during Phase 9 preparation
+
+Corrected encode inline example to typed list literal `var bytes: List[UInt8] = [251, 255]`. Compiler rejects variadic `List[UInt8](251, 255)` initialization on Mojo 1.1.0. No signature or semantic change; source remains an abort stub.
