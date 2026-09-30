@@ -60,3 +60,10 @@ abort-only scaffold unchanged.
 Corrected two wrong offsets; added trailing whitespace/standard-symbol cases,
 and fixed independent UTF-8/non-normalization vectors. Still 19 authored cases;
 aggregate exits 201 and 3/3 programs abort independently. No implementation.
+
+## Phase 10 — tests review: APPROVED / GO
+Independent review and aggregate re-run confirm exit201 at first scaffold abort.
+Corrected post-padding fields and both-overload vectors; UTF-8 non-normalization
+fixtures verified. All19 authored cases have doc basis; allfouroverloads,
+independent oracle, borrowing/owned output, alltyped errors, atomic retry and
+N/A I/O cases covered; no vacuous assertions. Tests frozen at commit 7cb6882.
