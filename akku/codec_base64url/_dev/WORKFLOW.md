@@ -31,3 +31,6 @@ Four exact abort stubs across two API files; inline docs at bottom, only encode/
 
 ### Phase 7 rework after Phase 8 NO_GO
 Independent compile succeeded, but inline dependency rationale missing. Added explicit public-engine reuse rationale; no implementation/tests. Returned to scaffold review.
+
+## Phase 8 — scaffold review: GO
+Dependency inline rationale rechecked and approved. All four abort stubs, signatures/type identity, two root exports, doc fields/layout/Taskfile and independent compile pass. No implementation leaked.
