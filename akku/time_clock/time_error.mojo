@@ -1,5 +1,3 @@
-from std.os import abort
-
 from .time_error_kind import TimeErrorKind
 
 
@@ -10,7 +8,7 @@ struct TimeError(Copyable, Deinitable, Writable):
     var detail: String
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write("TimeError(", self.kind, ", ", self.detail, ")")
 
 # API-DOCS-START
 # TimeError — the one typed error every fallible time operation declares.

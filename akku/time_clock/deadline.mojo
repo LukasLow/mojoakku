@@ -1,7 +1,7 @@
-from std.os import abort
-
-from .duration import Duration
-from .time_error import TimeError
+from akku.time_clock._internal.time_math import checked_add, checked_sub
+from akku.time_clock.clock import Clock
+from akku.time_clock.duration import Duration
+from akku.time_clock.time_error import TimeError
 
 
 # Deadline — an opaque monotonic instant; only differences are meaningful.
@@ -10,43 +10,52 @@ struct Deadline(Copyable, ImplicitlyCopyable, Deinitable, Equatable, Writable):
 
     @doc_hidden
     def __init__(out self, t: Int):
-        abort("MojoAkku: this API is not yet implemented")
+        self._t = t
 
     def __add__(self, rhs: Duration) raises TimeError -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        return Self(checked_add(self._t, rhs.as_nanos(), "Deadline.__add__"))
 
     def __sub__(self, rhs: Duration) raises TimeError -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        return Self(checked_sub(self._t, rhs.as_nanos(), "Deadline.__sub__"))
 
     def __sub__(self, rhs: Self) raises TimeError -> Duration:
-        abort("MojoAkku: this API is not yet implemented")
+        return Duration.from_nanos(checked_sub(self._t, rhs._t, "Deadline.__sub__"))
 
     def __lt__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._t < other._t
 
     def __le__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._t <= other._t
 
     def __gt__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._t > other._t
 
     def __ge__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._t >= other._t
 
     def compare(self, other: Self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        if self._t < other._t:
+            return -1
+        if self._t > other._t:
+            return 1
+        return 0
 
     def is_expired(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        # Clock.now() >= self, with NO addition: overflow-safe.
+        return Clock.now()._t >= self._t
 
     def remaining(self) raises TimeError -> Duration:
-        abort("MojoAkku: this API is not yet implemented")
+        return Duration.from_nanos(
+            checked_sub(self._t, Clock.now()._t, "Deadline.remaining")
+        )
 
     def elapsed(self) raises TimeError -> Duration:
-        abort("MojoAkku: this API is not yet implemented")
+        return Duration.from_nanos(
+            checked_sub(Clock.now()._t, self._t, "Deadline.elapsed")
+        )
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write("Deadline(", self._t, ")")
 
 # API-DOCS-START
 # Deadline — a point on the monotonic timeline; its absolute value is meaningless.

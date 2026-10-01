@@ -3,9 +3,9 @@ Design record for akku/time_clock — NOT end-user documentation.
 End-user documentation lives inline in the `*.mojo` files (the `# API-DOCS`
 blocks) and in `__init__.mojo`. This file keeps the developer-facing reasoning:
 status bookkeeping, tests, rationale, reference-API comparisons, non-goals and
-open questions. It reflects the state after Phase 5 (docs: complete shared
-sections and per-entry blocks); no code exists yet, so every entry is `planned` /
-`not implemented`.
+open questions. It reflects the state after Phase 11 (implementation): all 5
+entries are `implemented` / `implemented`, with 41 tests green and the public
+API compiling. It was `planned` / `not implemented` from Phase 3 through Phase 10.
 -->
 
 # time_clock — Design Record
@@ -50,13 +50,13 @@ Every API entry carries a `Status:` field with exactly one of these values:
 | `implemented` | Implemented and passing its tests. Default after Phase 12/13. |
 | `benchmarked` | Implemented, tested and measured against the performance goals. |
 
-All 5 entries in this document are `planned`, and every entry's
-`Implementation status:` is `not implemented`. These two fields are reconciled
-explicitly for Phase 5: `Status` uses `planned` (designed and documented, no code
-exists yet), while `Implementation status` uses the literal value
-`not implemented` that `NewLibPhase5Docs.md` requires in this phase (nothing is
-built yet) — they do not conflict. The entries become `scaffolded` at Phase 7,
-`tested` at Phase 10 and `implemented` at Phase 12.
+All 5 entries in this document are `implemented`, and every entry's
+`Implementation status:` is `implemented`. These two fields are reconciled
+explicitly: `Status` becomes `implemented` only once the implementation passes
+its tests (Phase 11), while before that it was `planned` and
+`Implementation status` used the literal value `not implemented` that
+`NewLibPhase5Docs.md` required. The entries were `scaffolded` at Phase 7, `tested`
+at Phase 10 and `implemented` at Phase 12.
 
 ## Dependencies
 
@@ -462,8 +462,9 @@ sibling MojoAkku library copying the pattern should keep.
   test-function names.** Present for every entry.
 - **Rationale is a `MojoAkku uses X because Y` statement** naming the reference
   API and its research section.
-- **Status and implementation status are honest.** All entries are `planned` /
-  `not implemented` at Phase 5 (see `## Status legend` for the field reconciliation).
+- **Status and implementation status are honest.** All entries were `planned` /
+  `not implemented` from Phase 3 through Phase 10 and are `implemented` /
+  `implemented` from Phase 11 (see `## Status legend` for the field reconciliation).
 - **Time is monotonic-only and integer-nanosecond.** No wall clock, no float.
 - **Terminology is shared.** Span, instant, monotonic clock, expiry and overflow
   are defined once in `## Semantics ## Terminology`.
@@ -569,7 +570,7 @@ no calendar/date concept in this library.
 
 ### `Duration`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -702,7 +703,7 @@ Tests:
   - `test_duration_divided_by_zero_raises` — divisor `0` → `DIVISION_BY_ZERO`.
   - `test_duration_divided_by_neg_one_min_raises` — `MIN / -1` → `OVERFLOW`.
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a **signed integer-nanosecond span** because Go's
 `type Duration int64` (`go.md` §3) and Java's "directed duration" that "may be
@@ -733,7 +734,7 @@ this repository already taught a low-vision user the `kind`+`detail` shape in
 
 ### `Deadline`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -838,7 +839,7 @@ Tests:
   - `test_deadline_value_semantics` — `conforms_to(Deadline, Copyable/ImplicitlyCopyable/Equatable)`.
   - `test_deadline_write_to_canonical` — `print` shows the canonical form.
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses an **opaque instant over one `Int`** because Rust's
 `Instant` is "opaque and useful only with `Duration`" with no raw accessor
@@ -861,7 +862,7 @@ time due to numerical overflow" and push the guard onto the caller (`java.md`
 
 ### `Clock`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -912,7 +913,7 @@ Tests:
     non-decrease and a coarse clock may not tick during short work.
   - `test_clock_now_difference_is_duration` — `now() - now()` is a `Duration`.
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a **single static `Clock.now()`** because C++
 `steady_clock` exposes only `now()` and `cpp.md` §12 recommends one concrete
@@ -931,7 +932,7 @@ non-blocking read and would reintroduce Python's two-parallel-clock confusion
 
 ### `TimeErrorKind`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -989,7 +990,7 @@ Tests:
   - `test_error_kind_writable` — `write_to` prints `OVERFLOW` and
     `DIVISION_BY_ZERO`, never the number.
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a **closed `UInt8`-tagged discriminant** because this
 repository already taught a low-vision user one error shape in `io_core`
@@ -1006,7 +1007,7 @@ additive when a need is proven.
 
 ### `TimeError`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1056,7 +1057,7 @@ Tests:
   - `test_error_not_implicitly_copyable` — a re-raise must transfer with `raise e^`.
   - `test_error_reraise_transfer` — a caught error re-raises with `^`.
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a struct with **`kind` + `detail`** because Rust funnels
 fallible arithmetic through one error shape and carries context

@@ -1,6 +1,3 @@
-from std.os import abort
-
-
 # TimeErrorKind — compile-time discriminant for TimeError.
 struct TimeErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     var _id: UInt8
@@ -12,14 +9,19 @@ struct TimeErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     # Explicit override of Equatable's field-wise default: compares the
     # discriminant `_id` only.
     def __eq__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._id == other._id
 
     comptime OVERFLOW         = TimeErrorKind(0)   # a result does not fit the Int carrier
     comptime DIVISION_BY_ZERO = TimeErrorKind(1)   # a divisor of zero was requested
 
     # write_to — symbolic name, not the numeric _id.
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        # Symbolic names, not the numeric _id. An if/elif chain is used because
+        # the `comptime NAME[...]` runtime-index form does not compile.
+        if self._id == 0:
+            writer.write("OVERFLOW")
+        else:
+            writer.write("DIVISION_BY_ZERO")
 
 # API-DOCS-START
 # TimeErrorKind — the machine-testable reason a time operation failed.

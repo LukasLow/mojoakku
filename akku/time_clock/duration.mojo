@@ -1,6 +1,5 @@
-from std.os import abort
-
-from .time_error import TimeError
+from akku.time_clock._internal.time_math import checked_add, checked_div, checked_mul, checked_sub
+from akku.time_clock.time_error import TimeError
 
 
 # Duration — a signed integer-nanosecond span with arithmetic and a total order.
@@ -9,82 +8,90 @@ struct Duration(Copyable, ImplicitlyCopyable, Deinitable, Equatable, Writable):
 
     @doc_hidden
     def __init__(out self, nanos: Int):
-        abort("MojoAkku: this API is not yet implemented")
+        self._nanos = nanos
 
     comptime ZERO = Duration(0)
 
     @staticmethod
     def from_nanos(n: Int) -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        return Self(n)
 
     @staticmethod
     def from_micros(n: Int) raises TimeError -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        return Self(checked_mul(n, 1_000, "Duration.from_micros"))
 
     @staticmethod
     def from_millis(n: Int) raises TimeError -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        return Self(checked_mul(n, 1_000_000, "Duration.from_millis"))
 
     @staticmethod
     def from_seconds(n: Int) raises TimeError -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        return Self(checked_mul(n, 1_000_000_000, "Duration.from_seconds"))
 
     def as_nanos(self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._nanos
 
     def as_micros(self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        # Truncates toward zero (Mojo `/` on Int), never floors.
+        return self._nanos / 1_000
 
     def as_millis(self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._nanos / 1_000_000
 
     def as_seconds(self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._nanos / 1_000_000_000
 
     def is_zero(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._nanos == 0
 
     def is_positive(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._nanos > 0
 
     def is_negative(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._nanos < 0
 
     def abs(self) raises TimeError -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        if self._nanos < 0:
+            # Negation is checked: abs(MIN) needs 2^63, which is not representable.
+            return -self
+        return Self(self._nanos)
 
     def __add__(self, rhs: Self) raises TimeError -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        return Self(checked_add(self._nanos, rhs._nanos, "Duration.__add__"))
 
     def __sub__(self, rhs: Self) raises TimeError -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        return Self(checked_sub(self._nanos, rhs._nanos, "Duration.__sub__"))
 
     def __neg__(self) raises TimeError -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        return Self(checked_sub(0, self._nanos, "Duration.__neg__"))
 
     def scaled(self, factor: Int) raises TimeError -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        return Self(checked_mul(self._nanos, factor, "Duration.scaled"))
 
     def divided_by(self, divisor: Int) raises TimeError -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        return Self(checked_div(self._nanos, divisor, "Duration.divided_by"))
 
     def __lt__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._nanos < other._nanos
 
     def __le__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._nanos <= other._nanos
 
     def __gt__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._nanos > other._nanos
 
     def __ge__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._nanos >= other._nanos
 
     def compare(self, other: Self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        if self._nanos < other._nanos:
+            return -1
+        if self._nanos > other._nanos:
+            return 1
+        return 0
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write("Duration(", self._nanos, "ns)")
 
 # API-DOCS-START
 # Duration — a signed span of time, stored as an integer number of nanoseconds.

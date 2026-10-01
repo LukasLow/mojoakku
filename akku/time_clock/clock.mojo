@@ -1,4 +1,4 @@
-from std.os import abort
+from std.time import monotonic
 
 from .deadline import Deadline
 
@@ -7,7 +7,7 @@ from .deadline import Deadline
 struct Clock:
     @staticmethod
     def now() -> Deadline:
-        abort("MojoAkku: this API is not yet implemented")
+        return Deadline(monotonic())
 
 # API-DOCS-START
 # Clock — the one place to read the monotonic clock.

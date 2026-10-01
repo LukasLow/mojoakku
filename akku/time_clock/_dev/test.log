@@ -1,0 +1,87 @@
+time_clock Phase 11 — final passing test log
+============================================
+
+Worktree: /Users/lukas/home/repos/mojoakku/.worktrees/time_clock-library
+Branch:   time_clock-library
+Mojo:     1.1.0
+
+Exact command (from the worktree root):
+  smd '{ cd .worktrees/time_clock-library && task time_clock::test }'
+  (the per-library Taskfile runs: sh ../../.repo/scrupts/libraries.sh test)
+
+----- raw output -----
+== time_clock::test
+== _tests/test_time_clock.mojo
+
+Running 4 tests for /workspace/.worktrees/time_clock-library/akku/time_clock/_tests/test_time_clock.mojo 
+    PASS [ 0.001 ] test_clock_now_is_deadline
+    PASS [ 0.001 ] test_clock_now_non_decreasing
+    PASS [ 0.001 ] test_clock_now_non_decreasing_across_work
+    PASS [ 0.001 ] test_clock_now_difference_is_duration
+--------
+Summary [ 0.001 ] 4 tests run: 4 passed , 0 failed , 0 skipped 
+
+== _tests/test_time_deadline.mojo
+
+Running 10 tests for /workspace/.worktrees/time_clock-library/akku/time_clock/_tests/test_time_deadline.mojo 
+    PASS [ 0.001 ] test_deadline_add_and_sub_duration
+    PASS [ 0.001 ] test_deadline_sub_deadline_is_signed
+    PASS [ 0.001 ] test_deadline_compare_and_operators
+    PASS [ 0.001 ] test_deadline_is_expired_past_and_future
+    PASS [ 0.001 ] test_deadline_remaining_positive_then_negative
+    PASS [ 0.001 ] test_deadline_elapsed_negative_then_positive
+    PASS [ 0.001 ] test_deadline_no_raw_accessor
+    PASS [ 0.001 ] test_deadline_add_overflow_raises
+    PASS [ 0.001 ] test_deadline_write_to_canonical
+    PASS [ 0.001 ] test_deadline_value_semantics
+--------
+Summary [ 0.001 ] 10 tests run: 10 passed , 0 failed , 0 skipped 
+
+== _tests/test_time_duration.mojo
+
+Running 10 tests for /workspace/.worktrees/time_clock-library/akku/time_clock/_tests/test_time_duration.mojo 
+    PASS [ 0.001 ] test_duration_from_units_and_accessors
+    PASS [ 0.001 ] test_duration_as_truncates_toward_zero
+    PASS [ 0.001 ] test_duration_sign_predicates
+    PASS [ 0.001 ] test_duration_abs
+    PASS [ 0.001 ] test_duration_add_sub_negate
+    PASS [ 0.001 ] test_duration_scaled_and_divided_by
+    PASS [ 0.001 ] test_duration_compare_and_operators
+    PASS [ 0.001 ] test_duration_zero_constant
+    PASS [ 0.001 ] test_duration_write_to_canonical
+    PASS [ 0.001 ] test_duration_value_semantics
+--------
+Summary [ 0.001 ] 10 tests run: 10 passed , 0 failed , 0 skipped 
+
+== _tests/test_time_duration_overflow.mojo
+
+Running 8 tests for /workspace/.worktrees/time_clock-library/akku/time_clock/_tests/test_time_duration_overflow.mojo 
+    PASS [ 0.001 ] test_duration_add_overflow_raises
+    PASS [ 0.001 ] test_duration_sub_overflow_raises
+    PASS [ 0.001 ] test_duration_neg_overflow_raises
+    PASS [ 0.001 ] test_duration_scaled_overflow_raises
+    PASS [ 0.001 ] test_duration_from_millis_overflow_raises
+    PASS [ 0.001 ] test_duration_abs_of_min_raises
+    PASS [ 0.001 ] test_duration_divided_by_zero_raises
+    PASS [ 0.001 ] test_duration_divided_by_neg_one_min_raises
+--------
+Summary [ 0.001 ] 8 tests run: 8 passed , 0 failed , 0 skipped 
+
+== _tests/test_time_error.mojo
+
+Running 9 tests for /workspace/.worktrees/time_clock-library/akku/time_clock/_tests/test_time_error.mojo 
+    PASS [ 0.001 ] test_error_kind_distinct_and_eq
+    PASS [ 0.001 ] test_error_kind_writable
+    PASS [ 0.001 ] test_error_kind_conformance
+    PASS [ 0.001 ] test_error_fields_kind_detail
+    PASS [ 0.001 ] test_error_writable
+    PASS [ 0.001 ] test_error_copyable_and_deinitable
+    PASS [ 0.001 ] test_error_not_implicitly_copyable
+    PASS [ 0.001 ] test_error_reraise_transfer
+    PASS [ 0.001 ] test_error_kind_from_real_failure
+--------
+Summary [ 0.001 ] 9 tests run: 9 passed , 0 failed , 0 skipped 
+
+All time_clock tests passed.
+PASS time_clock
+----- end raw output (exit=0) -----
