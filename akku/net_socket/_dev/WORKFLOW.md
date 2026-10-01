@@ -127,3 +127,18 @@ Frozen test diff f609d1e through e133ebb is empty. ETIMEDOUT mapping verified
 statically against Linux 110 / Darwin 60; runtime induction remains unproven.
 Native macOS ABI probes are evidence, not Mojo macOS runtime certification.
 SecurityReview APPROVED; final cross-artifact review is now permitted.
+
+## Phase 13 — final review GO
+
+Independent final reviewer audited through 1e3ee38 and reran
+`smd -t '{task -t akku/net_socket/Taskfile.yml test}'`: exit 0,
+30 passed, 0 failed, 0 skipped across five programs. Endpoint, connection,
+transfer, ownership and native behavior agree across docs/API/tests/code.
+Exactly two public entries, compliant flat layout, public io_core/net_ip edges
+and their inline justification confirmed. Tests remain identical to f609d1e.
+Documentation-only reworks synchronized test evidence and preserved two omitted
+research candidates; backlog now has 17 unshipped candidates with origins.
+No blockers. P2 followups: maintainers obtain native Mojo macOS runtime evidence
+and deterministic real ETIMEDOUT coverage when practical. P3 deferred APIs are
+owned by future implementation owners in TODO.md; optional ABI log consolidation
+is documentation maintenance. Catalogue may now be marked done.
