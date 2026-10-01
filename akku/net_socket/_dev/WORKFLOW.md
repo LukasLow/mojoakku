@@ -142,3 +142,20 @@ No blockers. P2 followups: maintainers obtain native Mojo macOS runtime evidence
 and deterministic real ETIMEDOUT coverage when practical. P3 deferred APIs are
 owned by future implementation owners in TODO.md; optional ABI log consolidation
 is documentation maintenance. Catalogue may now be marked done.
+
+## Post-release BugFix — portable native failed-connect fixture
+
+Two-platform CI PR14 run36815005873 reproduced a test assumption defect on
+macOS ARM64: a bound non-listening TCP port timed out after 75 seconds, returning
+TIMED_OUT correctly while the fixture expected OTHER. Linux passed. Production
+code is unchanged. Independent native probes of TCP127.0.0.1:0 returned Linux
+ECONNREFUSED111 and Darwin EADDRNOTAVAIL49 immediately (under1ms). Port zero cannot
+name a listening TCP endpoint. The fixture now uses that endpoint to exercise
+a native failure with the same strict OTHER/op connect/closed-owner/idempotent
+close assertions. This explicitly replaces one reviewed test fixture after the
+initial released implementation; no assertions are relaxed or skipped.
+Raw failing CI: https://github.com/LukasLow/mojoakku/actions/runs/36815005873.
+Independent reviewer APPROVED the limited fixture repair: native boundary is
+reached, both native errno values map to OTHER, assertions remain intact, no
+production changes. `smd -t '{task net_socket::ci}'` passed30/failed0/skipped0
+after the repair on Linux. The full macOS/Linux PR matrix must pass before merge.

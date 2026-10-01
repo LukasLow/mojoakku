@@ -6,10 +6,12 @@ unchanged. Start pragmatically; deferred enhancements belong in root TODO.md.
 
 ## CI policy
 
-- Pull requests run `task ci::smart`.
-- Every main push runs `task ci::full`, regardless of the diff or any prior run.
+- Pull requests run `task ci::smart` on Linux x86-64 and macOS ARM64.
+- Every main push runs `task ci::full` on both platforms, regardless of the diff or any prior run.
 - A release tag is created only after full CI succeeds. A failed check cannot
-  create a tag. Release retries must rerun full CI on the new main revision.
+  create a tag. A release job depends on the entire successful platform matrix.
+  It releases only its checked revision; if main advanced, the newer push must
+  pass its own two-platform run. A rejected atomic push fails without tagging remote.
 - The release commit may change only release metadata (CHANGELOG.md and
   .changes); it must not silently change code or test inputs after full CI.
 - The release tag is the reusable baseline. A successful PR or local run does
@@ -108,7 +110,12 @@ run on every OS. PR smart checks reuse that premise only under the reproducible
 CI toolchain/platform configuration. Toolchain/configuration changes since the
 tag select full. Local runs with an unmatched platform or toolchain must use
 full checks rather than claiming tag-backed green evidence. No OS-version status
-file is introduced.
+file is introduced. New annotated release tags carry `Full CI: linux-64 osx-arm64`;
+older Linux-only tags conservatively select full on both platforms. The matching
+platform entry in the tagged lockfile must agree with the installed Mojo version.
+CI pins runner labels `ubuntu-24.04` (x86-64) and `macos-15` (ARM64), verifies
+actual OS/architecture, and installs the locked toolchain. macOS supplies GNU
+`timeout` from coreutils for the existing bounded test tasks.
 
 Keep namespace and MissingMojo checks mandatory in both CI modes. A repository
 check failure makes the full invocation fail. Selected library failures propagate

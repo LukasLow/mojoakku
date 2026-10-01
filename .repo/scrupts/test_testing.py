@@ -15,6 +15,42 @@ sys.dont_write_bytecode = True
 import testing
 
 
+class EnvironmentTests(unittest.TestCase):
+    def issue(self, system="Linux", machine="x86_64", certificate=True,
+              compiler="1.1.0", lock_target=None):
+        target = lock_target or ("osx-arm64" if system == "Darwin" else "linux-64")
+        annotation = b"Full CI: linux-64 osx-arm64\n" if certificate else b"release: v0.10.0 [skip ci]\n"
+        lock = f"https://example.invalid/{target}/mojo-1.1.0-release.conda".encode()
+        with patch.object(testing.platform, "system", return_value=system), \
+             patch.object(testing.platform, "machine", return_value=machine), \
+             patch.object(testing, "git", side_effect=lambda root, command, *args: annotation if command == "for-each-ref" else lock), \
+             patch.object(testing.subprocess, "run", return_value=subprocess.CompletedProcess(
+                 [], 0, stdout=f"Mojo {compiler}", stderr="")):
+            return testing.environment_issue(Path("."), "v0.11.0")
+
+    def test_certified_linux_x86_64_matches(self):
+        self.assertIsNone(self.issue())
+
+    def test_certified_macos_arm64_matches(self):
+        self.assertIsNone(self.issue("Darwin", "arm64"))
+
+    def test_old_linux_only_tag_cannot_certify_either_platform(self):
+        for system, machine in (("Linux", "x86_64"), ("Darwin", "arm64")):
+            with self.subTest(system=system):
+                issue = self.issue(system, machine, certificate=False)
+                self.assertIsNotNone(issue)
+                self.assertIn("predates", issue)
+
+    def test_unchecked_architectures_fall_back(self):
+        for system, machine in (("Linux", "aarch64"), ("Darwin", "x86_64")):
+            with self.subTest(system=system):
+                self.assertIn("not this platform", self.issue(system, machine))
+
+    def test_compiler_must_match_platform_lock(self):
+        self.assertIn("locked compiler", self.issue(compiler="1.2.0"))
+        self.assertIn("locked compiler", self.issue("Darwin", "arm64", lock_target="linux-64"))
+
+
 class RepositoryTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()

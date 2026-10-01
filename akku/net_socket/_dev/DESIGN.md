@@ -264,7 +264,7 @@ Tests: Loopback IPv4/IPv6 bind/listen/connect/accept; dynamic-port/local-address
 roundtrip; scope representation; binary/partial I/O and untouched buffer suffix;
 Reader/ByteWriter helper interoperability; empty transfer behavior; peer EOF;
 shutdown_write idempotence and response reads; closed operations; invalid backlog
-and family mismatch; refused-connect invalidation; move/destructor fd ownership;
+and family mismatch; failed-native-connect invalidation; move/destructor fd ownership;
 accepted independence; native close-on-exec flags and SIGPIPE subprocess safety;
 controlled EINTR with an isolated alarm/signal fixture. Timeout/nonblocking paths
 are excluded APIs and their configured-path tests are N/A, not reported as skips.
@@ -275,7 +275,7 @@ Planned concern-to-test names:
 - connection: `test_loopback_ipv4`, `test_loopback_ipv6`,
   `test_local_address_ipv4`, `test_local_address_ipv6`,
   `test_family_mismatch_retains_owner`, `test_listen_invalid_backlog`,
-  `test_connect_refused_closes`, `test_accepted_independent`.
+  `test_native_connect_error_closes`, `test_accepted_independent`.
 - transfers: `test_binary_short_read`, `test_short_write_count`,
   `test_read_suffix_untouched`, `test_empty_read_rejected`,
   `test_empty_write`, `test_peer_eof_repeated`, `test_flush_open`.

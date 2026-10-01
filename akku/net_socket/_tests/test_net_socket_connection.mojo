@@ -98,12 +98,11 @@ def test_listen_invalid_backlog_retains_owner() raises:
     socket.close()
 
 
-def test_connect_refused_closes() raises:
-    # A bound non-listening socket reserves the port; no outside host or race
-    # selecting an already-closed ephemeral port is involved.
-    var reserve = Socket(AddressFamily.IPV4)
-    reserve.bind(SocketAddress(loopback4(), 0))
-    var target = reserve.local_address()
+def test_native_connect_error_closes() raises:
+    # TCP destination port zero cannot name a listener. Linux refuses it and
+    # Darwin rejects the destination; both are immediate native OTHER failures.
+    # A bound non-listening TCP port can instead stall until timeout on Darwin.
+    var target = SocketAddress(loopback4(), 0)
     var client = Socket(AddressFamily.IPV4)
     var caught = False
     try:
@@ -115,7 +114,6 @@ def test_connect_refused_closes() raises:
     assert_true(caught)
     assert_true(client.is_closed())
     client.close()
-    reserve.close()
 
 
 def test_native_bind_error_retains_owner() raises:
