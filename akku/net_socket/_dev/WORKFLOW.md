@@ -42,3 +42,9 @@ macOS ABI/close/SIGPIPE verification remains an implementation acceptance gate.
 Coder verified seven ordered fields for both public entries and expanded exact
 inherited helper signatures, operation/error names and named planned tests.
 No implementation or tests created; approved semantics unchanged.
+
+## Phase 6 — documentation review APPROVED
+
+Independent reviewer verified two entries, seven ordered fields, exact approved
+semantics, justified siblings, planned real interruption/security/lifecycle tests,
+and no implementation claims or signature drift. No required findings.
