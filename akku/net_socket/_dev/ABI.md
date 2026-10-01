@@ -29,7 +29,7 @@ The supported Darwin kernel close path calls fp_close_and_unlock; fdrelse runs b
 
 ## Limits
 
-These native probes establish current macOS C ABI and option behavior. They do not certify a Mojo macOS binary. The Mojo suite runs in the Linux smd container and GitHub Linux CI. Linux direct syscall paths still require integration evidence before release.
+These native probes establish current macOS C ABI and option behavior. They do not certify a Mojo macOS binary. The Mojo suite runs in the Linux smd container and GitHub Linux CI. Linux direct syscall paths passed the 30-case Mojo integration suite; see implementation.log. GitHub CI evidence is recorded when the PR runs.
 
 ## Linux ctypes/libc probe
 

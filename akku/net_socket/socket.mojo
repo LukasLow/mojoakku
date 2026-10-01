@@ -20,7 +20,15 @@ from .socket_address import SocketAddress as _SocketAddress
 # optimal: replace the private libc boundary with stable native Mojo socket APIs
 # track: https://mojolang.org/docs/std/
 # MissingMojo - End
-# sockaddr_in/in6 layouts measured independently; see _dev/ABI.md.
+# Private FFI safety invariants; measured layouts are recorded in _dev/ABI.md.
+# Address storage is 128 bytes, UInt32-aligned (4 bytes), sufficient for the
+# 16/28-byte sockaddr structs used here. Fixed address offsets are below 28;
+# decoding validates the returned family and required length before address reads.
+# Spans, options and socklen pointers remain valid for each synchronous libc call;
+# libc does not retain them. recv/send use exactly the borrowed span's byte length.
+# The errno TLS pointer is read immediately after failure and is never retained.
+# Each adopted descriptor already passed configuration and has exactly one owner;
+# deinit-move transfers that owner, and explicit close invalidates before release.
 comptime _AF6 = _c_int(30 if _Target.is_macos() else 10)
 comptime _V6ONLY = _c_int(27 if _Target.is_macos() else 26)
 comptime _EAGAIN = _c_int(35 if _Target.is_macos() else 11)
