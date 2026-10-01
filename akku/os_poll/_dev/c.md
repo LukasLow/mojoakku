@@ -203,8 +203,7 @@ timeout and the number of events otherwise. `errno` "is significant only when
 the return value of the call indicated an error" and must be saved immediately,
 because any intervening call may clobber it. Sources:
 <https://pubs.opengroup.org/onlinepubs/9699919799/functions/poll.html>,
-<https://man7.org/linux/man-pages/man3/errno.3.html> (via
-`akku/io_core/_dev/c.md` §4 which cites the same page).
+<https://man7.org/linux/man-pages/man3/errno.3.html>.
 
 ## 5. Ownership semantics
 
@@ -264,7 +263,7 @@ The readiness API is **entirely caller-owned with no hidden allocation**:
   callback will be called". Sources: <https://libevent.org/doc/event_8h.html>,
   <https://docs.libuv.org/en/v1.x/poll.html>.
 
-## 7. Kernel primitives / portable abstraction
+## 7. Kernel primitives and portability
 
 Four families, historically layered:
 
@@ -346,7 +345,7 @@ Facts worth recording:
   <https://linux.die.net/man/7/signal>.
 - **Atomic wait+signal** is the whole point of `pselect`/`ppoll`/`epoll_pwait`:
   they let the caller block a signal, test a flag and wait without the
-  lost-wakeup race; the pre-`pselect` workaround is the **self-pipe trick".
+  lost-wakeup race; the pre-pselect workaround is the **self-pipe trick**.
   Sources: <https://linux.die.net/man/2/select>,
   <https://linux.die.net/man/2/ppoll>,
   <https://linux.die.net/man/2/epoll_wait>.

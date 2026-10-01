@@ -180,7 +180,7 @@ Key difference from C: C++ *standardised* the errno value into a typed, copyable
   jthread calls `request_stop()` and `join()`." Source:
   <https://en.cppreference.com/w/cpp/thread/stop_token>.
 
-## 7. Kernel primitives / portable abstraction
+## 7. Kernel primitives and portability
 
 - Asio is the canonical C++ **portable abstraction**: it implements the proactor
   over epoll/kqueue/select (POSIX) and IOCP (Windows), with a documented
@@ -216,7 +216,7 @@ C++ **fixes the unit/sentinel problem** of C:
   `timeout_duration` due to scheduling or resource contention delays." Source:
   <https://en.cppreference.com/w/cpp/thread/future/wait_for>.
 
-## 9. Bounded vs unbounded waits, EINTR and cancellation
+## 9. Bounded vs unbounded waits, EINTR and overflow
 
 - **Bounded** is the default mental model: `wait_for`/`wait_until`.
   **Unbounded** is the plain `wait()` (no duration). Sources:

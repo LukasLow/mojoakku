@@ -161,7 +161,7 @@ itself are surfaced as event bits (`POLLERR`/`POLLHUP`/`POLLNVAL`,
   edge. `selectors.EpollSelector` does not set `EPOLLET`, so it is level-triggered.
   Source: <https://docs.python.org/3/library/select.html>
 
-## 8. Timeouts and cancellation
+## 8. Timeouts
 
 - Units are inconsistent across primitives:
   - `select.select`: seconds (float).
@@ -184,7 +184,7 @@ itself are surfaced as event bits (`POLLERR`/`POLLHUP`/`POLLNVAL`,
   is closing the selector or the fd and letting `select` return with an fd marked
   ready (or, for Kqueue, unregistering).
 
-## 9. Bounded vs unbounded waits, EINTR, overflow
+## 9. Bounded vs unbounded waits, EINTR and overflow
 
 - Unbounded wait is signalled differently per API: `None` (select/selectors),
   negative or omitted (poll/devpoll), `None` (epoll/kqueue). `0` means a

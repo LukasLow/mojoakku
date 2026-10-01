@@ -79,12 +79,12 @@ Scope: **synchronous file-descriptor readiness with a bounded timeout** — `sel
 - **Overflow handling:** the Linux netpoll caps the wait: `delay > 0` maps to `waitms = int32(delay / 1e6)`, but `delay >= 1e15` is clamped to `waitms = 1e9` ms "~11.5 days" (`src/runtime/netpoll_epoll.go`). Deadline arithmetic also saturates: `if d <= 0 { d = 1<<63 - 1 }` (`src/runtime/netpoll.go`).
 - Note the rounding caveat, which Go inherits from the kernel: `poll` will "round up to the system clock granularity, and kernel scheduling delays mean that the blocking interval may overrun by a small amount." (POSIX/`poll(2)`; the same wording appears in nix/rustix docs).
 
-## 9. Bounded vs unbounded waits, EINTR
+## 9. Bounded vs unbounded waits, EINTR and overflow
 
 - Unbounded: negative timeout (`Poll`) / `nil` timeout (`ppoll`, `select`). Bounded: `>= 0`.
 - **EINTR:** `unix.Poll`/`Ppoll` do **not** retry; the syscall returns `-1, EINTR` and the caller must loop if desired (they are thin syscall wrappers, `unix/syscall_linux.go`).
 - The **runtime netpoller retries EINTR** on the indefinite path: `if errno != _EINTR { … throw }`; `if waitms > 0 { return … }` (recompute remaining time), else `goto retry` (`src/runtime/netpoll_epoll.go`). So the async path is EINTR-robust, the synchronous wrapper is not.
-- Timeout-unit overflow: `Poll`'s `timeout int` is multiplied by `1e6` into `Timespec`; on 32-bit `int` a huge millisecond value would overflow before conversion. The runtime explicitly guards against this by saturating to `1e9` ms; `unix.Poll` itself does not (GUESS: no explicit guard seen in `unix/syscall_linux.go`'s `Poll`; reason: the wrapper is a one-liner and the platform's `ppoll` would be handed the converted value).
+- Timeout-unit overflow: `Poll` converts with `NsecToTimespec(int64(timeout) * 1e6)`; the `int64(timeout)` widening means the multiplication happens in `int64`, so a 32-bit `int` timeout cannot overflow at this conversion step — the bound is the `int64` product itself (overflow only above ~9.2e12 ms, ≈292 years) and the `Timespec` handed to the platform's `ppoll`. `unix.Poll` performs no explicit guard (`unix/syscall_linux.go`). The runtime netpoller separately caps its own wait at `1e9` ms (`src/runtime/netpoll_epoll.go`).
 
 ## 10. Interesting design decisions
 

@@ -74,8 +74,9 @@ synchronous surfaces.
 - **Node.js `net.Socket` synchronous-ish surface**: `socket.fd`? Not documented as
   public on modern Node; the documented class exposes `socket.readyState`,
   `socket.connecting`, `socket.pause()/resume()`, events. `net.BoundSocket`
-  (new) exposes `boundSocket.fd()` and `close()`. Full async API surface:
-  <https://nodejs.org/api/net.html>
+  (new) exposes `boundSocket.fd()` and `close()`.
+  Source: <https://nodejs.org/api/net.html#class-netboundsocket>. Full async
+  API surface: <https://nodejs.org/api/net.html>
 - **`epoll` addon** API: `new Epoll(callback)` with callback
   `(err, fd, events)`; `add(fd, events)`, `remove(fd)`, `modify(fd, events)`,
   `close()`; constants `Epoll.EPOLLIN/OUT/RDHUP/PRI/ERR/HUP/ET/ONESHOT`.
@@ -156,7 +157,7 @@ synchronous surfaces.
 - libuv picks the best mechanism: **epoll** (Linux), **kqueue** (macOS/BSD),
   **event ports** (SunOS), **IOCP** (Windows) — an explicitly portable abstraction.
   Sources: <https://docs.libuv.org/en/v1.x/design.html>,
-  <https://docs.libuv.org/ (front page: "Full-featured event loop backed by epoll, kqueue, IOCP, event ports").
+  <https://docs.libuv.org/en/v1.x/>.
 - `uv_poll_t` maps to the platform poller; on Windows **only sockets** can be
   polled; on Unix any fd accepted by `poll(2)`. `UV_DISCONNECT` unsupported on AIX.
   Source: <https://docs.libuv.org/en/v1.x/poll.html>
@@ -167,7 +168,7 @@ synchronous surfaces.
   execution model consistent across Unix systems and Windows."
   Source: <https://docs.libuv.org/en/v1.x/design.html>
 
-## 8. Timeouts and cancellation
+## 8. Timeouts
 
 - libuv timers are **milliseconds** (`uint64_t timeout`, `uint64_t repeat`).
   Source: <https://docs.libuv.org/en/v1.x/timer.html>
@@ -188,7 +189,7 @@ synchronous surfaces.
 - Poll-handle cancellation is `uv_poll_stop()`; it is immediate and cancels even a
   pending callback. Source: <https://docs.libuv.org/en/v1.x/poll.html>
 
-## 9. Bounded vs unbounded waits, EINTR, overflow
+## 9. Bounded vs unbounded waits, EINTR and overflow
 
 - **Unbounded** at libuv/Node level is either "omit the timer" or an infinite
   poll; Node's poll phase blocks when there is nothing else to do, bounded by a

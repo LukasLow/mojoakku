@@ -84,7 +84,7 @@ Scope: **synchronous file-descriptor readiness with a bounded timeout** — `sel
 - mio's `Poll::poll` takes `Option<Duration>`; "A timeout of `Duration::ZERO` is not affected by this rounding", whereas a nonzero timeout "will be rounded up to the system clock granularity (usually 1ms)". On timeout mio currently returns `Ok(())` with no events, but "we're not guaranteeing this behaviour as this depends on the OS" (https://docs.rs/mio/latest/mio/struct.Poll.html).
 - `polling::Poller::wait` takes `Option<Duration>`; `wait_deadline` takes an absolute `Instant` — the deadline form avoids recomputing remaining time across a loop and is the cleaner abstraction for cancellation/elapsed handling (https://docs.rs/polling/latest/polling/struct.Poller.html).
 
-## 9. Bounded vs unbounded waits, EINTR
+## 9. Bounded vs unbounded waits, EINTR and overflow
 
 - Unbounded: `PollTimeout::NONE` / `None` timeout. Bounded: any `Duration`/`Timespec`. Zero = non-blocking probe.
 - **EINTR:** mio explicitly documents "This returns any errors without attempting to retry, previous versions of Mio would automatically retry the poll call if it was interrupted (if `EINTR` was returned)." — the retry was deliberately removed (https://docs.rs/mio/latest/mio/struct.Poll.html). `nix::poll`/`ppoll` are thin wrappers and likewise return the `Errno` to the caller.
