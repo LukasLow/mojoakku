@@ -94,5 +94,17 @@ def test_closed_slot_reports_invalid_bit() raises:
     _ = close_fd(kept)
 
 
+def test_peer_close_reports_hangup() raises:
+    var pair = make_pair()
+    assert_equal(close_fd(pair[1]), 0)
+    var fds = List[PollFd]()
+    fds.append(PollFd(pair[0], PollEvents.READ))
+    var span = MutSpan(fds)
+    var count = wait_many(span, PollTimeout(500))
+    assert_equal(count, 1)
+    assert_true(fds[0].revents.has_hangup())
+    _ = close_fd(pair[0])
+
+
 def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()

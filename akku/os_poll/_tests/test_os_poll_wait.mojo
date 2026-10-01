@@ -87,5 +87,15 @@ def test_closed_descriptor_reports_invalid_bit() raises:
     _ = close_fd(kept)
 
 
+def test_peer_close_reports_hangup() raises:
+    # Closing the only write end makes the read end report HANGUP (POLLHUP),
+    # which poll(2) sets unconditionally even though we only asked for READ.
+    var pair = make_pair()
+    assert_equal(close_fd(pair[1]), 0)
+    var ready = wait(pair[0], PollEvents.READ, PollTimeout(500))
+    assert_true(ready.has_hangup())
+    _ = close_fd(pair[0])
+
+
 def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()
