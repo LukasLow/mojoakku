@@ -30,3 +30,9 @@ requested. Scope IDs included, flowinfo deferred, empty Reader buffers rejected,
 connect failure consumes owner, close never retried, SIGPIPE/CLOEXEC policies
 explicit. Native platform ABI must be verified before support claims.
 Buch structs.md move signature corrected from its exact documented Movable trait.
+
+## Phase 4 — design review APPROVED
+
+Independent reviewer approved complete semantics, existing trait compatibility,
+sole ownership, public sibling dependencies and accurate live backlog. Native
+macOS ABI/close/SIGPIPE verification remains an implementation acceptance gate.
