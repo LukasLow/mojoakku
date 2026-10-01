@@ -3,8 +3,9 @@ Design record for akku/time_clock — NOT end-user documentation.
 End-user documentation lives inline in the `*.mojo` files (the `# API-DOCS`
 blocks) and in `__init__.mojo`. This file keeps the developer-facing reasoning:
 status bookkeeping, tests, rationale, reference-API comparisons, non-goals and
-open questions. It reflects the state after Phase 3 (API design); no code exists
-yet, so every entry is `planned` / `not implemented`.
+open questions. It reflects the state after Phase 5 (docs: complete shared
+sections and per-entry blocks); no code exists yet, so every entry is `planned` /
+`not implemented`.
 -->
 
 # time_clock — Design Record
