@@ -1,0 +1,11 @@
+== _tests/test_net_socket_address.mojo
+ABORT: /workspace/akku/net_socket/socket_address.mojo:13:14: MojoAkku: this API is not yet implemented
+#0 0x0000ffff90315580 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105580)
+#1 0x0000ffff90312c40 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x102c40)
+#2 0x0000ffff90315fe4 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105fe4)
+#3 0x0000ffff92d8e8c0 (linux-vdso.so.1+0x8c0)
+#4 0x0000ffff4c00fc30
+/root/.pixi/envs/mojo/bin/mojo: error: execution crashed
+To get a symbolicated stack trace, compile your program using `mojo build` with debug info enabled (e.g., `-debug-level=line-tables`) and execute it separately.
+task: Failed to run task "test": exit status 1
+Error: exit status 201

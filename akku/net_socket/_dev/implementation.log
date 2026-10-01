@@ -1,0 +1,69 @@
+Command: smd -t '{task net_socket::ci && task missingMojo -- check}'
+Exit: 0
+Total: 30 passed, 0 failed, 0 skipped across 5 programs.
+
+== net_socket::ci
+net_socket public API compiles.
+== _tests/test_net_socket_address.mojo
+
+Running 3 tests for /workspace/akku/net_socket/_tests/test_net_socket_address.mojo 
+    PASS [ 0.001 ] test_address_ipv4_values
+    PASS [ 0.003 ] test_address_ipv6_values
+    PASS [ 0.001 ] test_address_ipv4_scope_rejected
+--------
+Summary [ 0.004 ] 3 tests run: 3 passed , 0 failed , 0 skipped 
+
+== _tests/test_net_socket_connection.mojo
+
+Running 7 tests for /workspace/akku/net_socket/_tests/test_net_socket_connection.mojo 
+    PASS [ 0.166 ] test_loopback_ipv4_local_address_and_accepted_independence
+    PASS [ 0.084 ] test_loopback_ipv6_local_address_and_accepted_independence
+    PASS [ 0.029 ] test_wildcard_dynamic_bind
+    PASS [ 0.004 ] test_family_mismatch_retains_owner
+    PASS [ 0.024 ] test_listen_invalid_backlog_retains_owner
+    PASS [ 0.028 ] test_connect_refused_closes
+    PASS [ 0.012 ] test_native_bind_error_retains_owner
+--------
+Summary [ 0.350 ] 7 tests run: 7 passed , 0 failed , 0 skipped 
+
+== _tests/test_net_socket_native.mojo
+
+Running 7 tests for /workspace/akku/net_socket/_tests/test_net_socket_native.mojo 
+    PASS [ 3.450 ] test_cloexec_created_and_accepted
+    PASS [ 1.135 ] test_ipv6_only_configuration
+    PASS [ 1.198 ] test_sigpipe_safe_with_default_process_signal_policy
+    PASS [ 1.103 ] test_native_ebadf_maps_closed_and_failed_close_invalidates
+    PASS [ 1.256 ] test_native_would_block_preserves_buffer_and_owner
+    PASS [ 1002.666 ] test_interrupted_accept_surfaces_real_eintr_and_retains_owner
+    PASS [ 1005.104 ] test_interrupted_read_preserves_buffer_and_connection
+--------
+Summary [ 2015.916 ] 7 tests run: 7 passed , 0 failed , 0 skipped 
+
+== _tests/test_net_socket_ownership.mojo
+
+Running 5 tests for /workspace/akku/net_socket/_tests/test_net_socket_ownership.mojo 
+    PASS [ 1.029 ] test_creation_close_idempotence_and_native_release
+    PASS [ 1.010 ] test_invalid_family_rejected_without_descriptor
+    PASS [ 1.513 ] test_move_preserves_single_native_owner
+    PASS [ 2.071 ] test_destructor_releases_native_descriptor
+    PASS [ 0.030 ] test_closed_direct_operations_and_validation_priority
+--------
+Summary [ 5.655 ] 5 tests run: 5 passed , 0 failed , 0 skipped 
+
+== _tests/test_net_socket_transfer.mojo
+
+Running 8 tests for /workspace/akku/net_socket/_tests/test_net_socket_transfer.mojo 
+    PASS [ 0.120 ] test_binary_short_read_and_untouched_suffix
+    PASS [ 0.034 ] test_write_returned_prefix_and_borrowed_subspan
+    PASS [ 0.002 ] test_empty_direct_transfers_and_flush
+    PASS [ 0.033 ] test_write_all_read_exact_and_repeatable_eof
+    PASS [ 0.040 ] test_read_exact_unexpected_eof_preserves_prefix
+    PASS [ 0.028 ] test_read_to_end_owned_binary_result
+    PASS [ 0.001 ] test_empty_helpers_keep_existing_contract_on_closed_owner
+    PASS [ 0.019 ] test_write_shutdown_idempotence_eof_and_response_read
+--------
+Summary [ 0.281 ] 8 tests run: 8 passed , 0 failed , 0 skipped 
+
+All net_socket tests passed.
+PASS net_socket
+MissingMojo: clean. 2 marker(s), none older than installed Mojo 1.1.0.
