@@ -112,3 +112,18 @@ Tests are unchanged from f609d1e. Immediate errno capture, descriptor invalidati
 before close, platform SIGPIPE suppression and CLOEXEC are implemented.
 ABI.md records independent Linux/macOS native probes; macOS Mojo runtime and
 actual ETIMEDOUT induction remain unverified. Ready for independent Phase 12.
+
+## Phase 12 — implementation and security review APPROVED
+
+Fresh independent reviewer examined fce26b3 and documentation-only e133ebb
+against correctness, readability, architecture, security and performance.
+Creation/accept cleanup, sole ownership and deinit-move, failed connect/close
+invalidation, bounded synchronous FFI, endian/layout handling, closed priority,
+CLOEXEC and per-platform SIGPIPE match the contract. No blockers remain.
+Required private FFI safety invariants were added in the Phase 11 rework.
+Independent `smd -t '{task -t akku/net_socket/Taskfile.yml ci}'` exited 0:
+API compile passed; 30 passed, 0 failed, 0 skipped across five programs.
+Frozen test diff f609d1e through e133ebb is empty. ETIMEDOUT mapping verified
+statically against Linux 110 / Darwin 60; runtime induction remains unproven.
+Native macOS ABI probes are evidence, not Mojo macOS runtime certification.
+SecurityReview APPROVED; final cross-artifact review is now permitted.
