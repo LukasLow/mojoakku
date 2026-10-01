@@ -80,5 +80,5 @@ selected group), Mojo linked to the `mojov1` buch. The review happens in
 
 ## Later phases
 
-- Phase 9 baseline: `baseline-tests.log` (8 test files, 36 tests, 8/8 failing —
+- Phase 9 baseline: `baseline-tests.log` (8 test files, 40 tests, 8/8 failing —
   the intended red state against the not-yet-implemented stubs).
