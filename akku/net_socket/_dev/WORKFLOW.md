@@ -77,3 +77,9 @@ Phase 9 compile revealed std.os.abort had not been explicitly imported: the
 consumer import did not instantiate method bodies. Added that import to both API
 files without changing any body, signature or contract. Tests are paused until
 an independent scaffold re-check. No implementation is allowed yet.
+
+### Phase 8 — instantiated scaffold recheck APPROVED
+
+Independent reviewer executed the address test program: compiler succeeded and
+runtime reached the exact not-yet-implemented abort, exit 1. All twenty bodies
+remain abort-only; no implementation leaked. Tests may resume.
