@@ -10,7 +10,7 @@ no private `Socket` fields or private sibling modules are imported.
 | Concern | Program | Authored tests | Contract assertions |
 | --- | --- | ---: | --- |
 | Endpoint values | `test_net_socket_address.mojo` | 3 | IPv4/IPv6 accessors, independent copies, port 0/65535, equality including scope and port, brackets/numeric scope, IPv4 scope OTHER/op address |
-| Connections | `test_net_socket_connection.mojo` | 7 | Both real loopbacks, local endpoint family/IP/assigned port, accepted lifetime independent of listener, wildcard bind, mismatch/backlog validation retains ownership (including successful positive backlog 1 << 40), native bind failure retains ownership, refused native connect consumes owner |
+| Connections | `test_net_socket_connection.mojo` | 7 | Both real loopbacks, local endpoint family/IP/assigned port, accepted lifetime independent of listener, wildcard bind, mismatch/backlog validation retains ownership (including successful positive backlog 1 << 40), native bind failure retains ownership, native failed connect consumes owner |
 | Transfers | `test_net_socket_transfer.mojo` | 8 | Binary prefixes, short read without assuming TCP packets, untouched suffix/outside borrowed subspan, write accepted prefix, empty direct read/write, flush, read_exact/read_to_end/write_all, EOF repeatability, UNEXPECTED_EOF consumed prefix, empty closed helper contract, half-close idempotence and receiving replies |
 | Ownership | `test_net_socket_ownership.mojo` | 5 | Creation and exactly released descriptor, idempotent close, forged family rejected without fd, move preserves sole owner, destructor native release, every direct closed operation including invalid/empty argument precedence and op labels |
 | Native contracts | `test_net_socket_native.mojo` | 7 | Created/accepted FD_CLOEXEC, kernel IPv6-only flag, actual SIGPIPE-safe created and accepted socket writes with process default policy, real EBADF→CLOSED and failed close invalidation, real EAGAIN→WOULD_BLOCK with unchanged buffer/recovery, real signal-interrupted accept/read without hidden retry and usable owner |
@@ -19,8 +19,10 @@ Total: **30 authored test functions in 5 standalone programs**. No `_tests/__ini
 FD snapshots use libc fcntl over descriptors 0–4095 and require exactly one new
 observable descriptor. They never read a library field. Fixtures do not perform
 parallel opens while comparing snapshots, and do not reallocate an externally
-closed descriptor before calling public close. The bound non-listening socket in
-refused-connect tests reserves its port throughout the attempt.
+closed descriptor before calling public close. The failed-connect test targets loopback TCP port zero, which cannot name a
+listener. Native Linux rejects it with ECONNREFUSED; native Darwin rejects it
+with EADDRNOTAVAIL. Both exercise OTHER/op connect and consumed ownership without
+waiting for platform-specific TCP retransmission timeouts.
 
 The native nonblocking fixture changes only an independently observed kernel fd's
 flags, induces an actual empty receive EAGAIN, then restores blocking flags and
@@ -40,7 +42,9 @@ verifies byte transfer recovery. It does not assert a public nonblocking API.
 - Public nonblocking/deadline/cancellation configuration: **N/A**, deliberately
   deferred APIs recorded in TODO.md, not skipped tests. The outer test-process
   watchdog is harness protection, not a socket timeout API.
-- ETIMEDOUT mapping: no deterministic native timeout is induced. Blocking API has
+- ETIMEDOUT mapping: the first macOS CI observed TIMED_OUT after 75 seconds
+  from the original non-listening-port fixture. No bounded deterministic timeout
+  case is retained in the regular suite. Blocking API has
   no deadline configuration; mapping constants must receive implementation review.
   No external host, firewall manipulation or fake timeout shim is introduced.
 - Positive short writes are permitted: test verifies actual returned prefix/count
