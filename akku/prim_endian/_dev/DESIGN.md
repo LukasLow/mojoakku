@@ -84,7 +84,7 @@ layers**, each independently usable:
 Cross-cutting shape:
 
 - **One typed error** (`EndianError`) with a small, **closed** `EndianErrorKind`
-  discriminant (`BAD_LENGTH`, `RANGE`, `OTHER`) — no OS errno, no sentinel, no
+  discriminant (`BAD_LENGTH`, `OTHER`) — no OS errno, no sentinel, no
   panic-as-error.
 - **One order value** (`EndianOrder`) reused by every conversion and buffer call.
 - **Explicit order**, never global and never hidden; `NATIVE` is the only
@@ -113,9 +113,8 @@ and justifies each pick below.
 - **G2 — One predictable convention set** a low-vision user can memorise once:
   `LITTLE`/`BIG`/`NATIVE`; order always explicit; one byte-layout contract per
   order; `snake_case` functions and `CamelCase` types.
-- **G3 — No magic values.** A bad input length is a typed `BAD_LENGTH` error; a
-  byte width the swap primitive cannot handle is `RANGE`; there are no error
-  sentinels and no `-1`-style returns.
+- **G3 — No magic values.** A bad input length is a typed `BAD_LENGTH` error;
+  there are no error sentinels and no `-1`-style returns.
 - **G4 — Value semantics and no hidden global state.** Everything is a value
   type; order is a parameter, never a package-global switch.
 - **G5 — Implementable in pure Mojo**, no Python/FFI dependency, deterministic
@@ -154,8 +153,8 @@ API candidates are mirrored in `_dev/TODO.md` and referenced below.
   constrained to integral `DType`s at compile time; float carriers are backlog
   (`_dev/TODO.md`).
 - **Runtime `conditional_reverse` with runtime branch in hot loops** —
-  `cpp.md` §11. Order is a value and the target check is compile-time where
-  possible; `NATIVE` resolves at compile time.
+  `cpp.md` §11. Order is a runtime value in release 1 but `NATIVE` resolves at
+  compile time; a `comptime`-order specialization is backlog (`_dev/TODO.md`).
 - **Compiler-intrinsic fallback macros leaking build config** — `cpp.md` §11.
   `std.bit.byte_swap` is the portable primitive.
 - **Go's reflection-based `Read`/`Write(any)` serializer** — `go.md` §11. That
@@ -215,6 +214,10 @@ API candidates are mirrored in `_dev/TODO.md` and referenced below.
   raises `BAD_LENGTH`.
 - **Signedness that affects only matching / order-independent modifier lists**
   — `elixir.md` §11. The API carries one order and one signed carrier type.
+- **Non-power-of-two carrier widths (e.g. 24-bit)** — `java.md` §11. Java/Netty
+  hand-roll a 3-byte `swapMedium` because no integer type covers it; the generic
+  `Scalar[dtype]` API only sees fixed power-of-two widths, so a 24-bit carrier is
+  backlog (`_dev/TODO.md`).
 
 ## Reference APIs
 
@@ -243,13 +246,12 @@ stubs them, in this order (one file per entry).
 1. `EndianOrder` — the order of a conversion: `LITTLE`, `BIG`, and the
    compile-time alias `NATIVE` (resolved to the host order).
 2. `EndianErrorKind` — closed discriminant for `EndianError`: `BAD_LENGTH`,
-   `RANGE`, `OTHER`.
+   `OTHER`.
 3. `EndianError` — the one typed error: `kind: EndianErrorKind`, `op: String`,
    `detail: String`.
 4. `host_order()` — the host's order, resolved at compile time; returns `LITTLE`
    or `BIG` (never a third value).
-5. `swap_bytes` — reverse an integer's byte order (even byte width; wraps
-   `std.bit.byte_swap`).
+5. `swap_bytes` — reverse an integer's byte order (wraps `std.bit.byte_swap`).
 6. `to_order` — reinterpret an integer from the host order into a named order
    (no-op or swap).
 7. `from_order` — the inverse of `to_order` (interpret a value that is in a named
@@ -261,7 +263,7 @@ stubs them, in this order (one file per entry).
 
 ## Error Surface
 
-One error type, `EndianError`, with a closed three-value `EndianErrorKind`.
+One error type, `EndianError`, with a closed two-value `EndianErrorKind`.
 Which API raises what:
 
 | API | Raises | Kinds |
@@ -270,17 +272,16 @@ Which API raises what:
 | `EndianErrorKind` | none | — |
 | `EndianError` (construction) | none | — |
 | `host_order` | none | — |
-| `swap_bytes` | `EndianError` | `RANGE` (the carrier's byte width is odd — a 1-byte integer cannot be byte-swapped) |
+| `swap_bytes` | none | — |
 | `to_order` | none | — |
 | `from_order` | none | — |
 | `to_bytes_into` | `EndianError` | `BAD_LENGTH` (`dst.len` does not equal the carrier's byte width) |
 | `from_bytes` | `EndianError` | `BAD_LENGTH` (`src.len` does not equal the carrier's byte width) |
 
-Recoverability: every `EndianError` is a recoverable **data** error — the caller
-can pass a correctly sized buffer, or (for `RANGE`) choose the high-level
-`to_order`/`from_order`, which are total. No operation is fatal and none aborts.
-`OTHER` is reserved for any other condition and carries its context in the
-opaque `detail` string; no release-1 operation raises it.
+Recoverability: the only `EndianError` is a recoverable **data** error — the
+caller passes a correctly sized buffer (`BAD_LENGTH`). No operation is fatal and
+none aborts. `OTHER` is reserved for any other condition and carries its context
+in the opaque `detail` string; no release-1 operation raises it.
 
 ## Conventions
 
@@ -313,6 +314,9 @@ opaque `detail` string; no release-1 operation raises it.
   to `Copyable, Deinitable, Writable`.
 - **`EndianError` is `Copyable` but not `ImplicitlyCopyable`**, so a re-raise
   must transfer with `raise e^` — the `prim_bit`/`io_core` convention.
+- **EOF / EINTR / EAGAIN / close are not applicable.** There is no stream, no
+  blocking call, no interruption point and no owned handle in this library; every
+  operation is a pure in-memory computation over a value or a span.
 - **The caller owns every buffer.** `to_bytes_into` borrows a `MutSpan[UInt8]`
   and writes into it; `from_bytes` borrows a `Span[UInt8]` and never copies or
   retains it. Both check the span length against the carrier's byte width before
@@ -324,9 +328,15 @@ opaque `detail` string; no release-1 operation raises it.
 
 ## Open Questions
 
-None block this design. Two points are deliberately settled and recorded so a
+None block this design. Three points are deliberately settled and recorded so a
 later phase does not reopen them:
 
+- *Is `dtype.is_integral()` usable as a `where`-clause constraint?* → Yes.
+  Probe-verified on Mojo 1.1.0 (it evaluates true for `uint8`/`uint16`, false for
+  `float32`), and the buch documents `DType` predicates generally
+  (`mojov1/stdlib/builtin`, `mojov1/concurrency/vectorization-and-simd`). The
+  `where dtype.is_integral()` bound in the signatures is therefore valid. The
+  buch page for `DType`'s method list is thin; a future buch update may add it.
 - *How is host order reported?* → `host_order() -> EndianOrder`, resolved at
   compile time over `std.sys.is_little_endian()` / `is_big_endian()`
   (`mojov1/stdlib/sys`). There is no runtime query and no third "mixed" value;
@@ -424,8 +434,7 @@ struct EndianErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     def __eq__(self, other: Self) -> Bool
 
     comptime BAD_LENGTH = EndianErrorKind(0)
-    comptime RANGE      = EndianErrorKind(1)
-    comptime OTHER      = EndianErrorKind(2)
+    comptime OTHER      = EndianErrorKind(1)
 
     def write_to(self, mut writer: Some[Writer])
 ```
@@ -433,7 +442,7 @@ struct EndianErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
 Semantics:
 
 - **Parameters / preconditions:** read from `EndianError.kind`; never passed by a
-  caller to a conversion. The type is **opaque**: the three `comptime` members
+  caller to a conversion. The type is **opaque**: the two `comptime` members
   are the complete public set; `_id` and its `@doc_hidden` initializer are
   implementation details (Mojo has no access control,
   `mojov1/decorators/doc-hidden`). `__eq__` is an intentional override
@@ -442,10 +451,13 @@ Semantics:
   - `BAD_LENGTH` — a buffer's length did not equal the carrier's byte width
     (the fixed-size-array guarantee Rust gets from `[u8; N]` is replaced by a
     checked error because Mojo spans are runtime-sized; `rust.md` §4, `go.md` §4).
-  - `RANGE` — a width is outside what the operation can address; here only
-    `swap_bytes` on an odd byte width (a 1-byte integer), the analogue of
-    `prim_bit`'s `RANGE` for an unaddressable span (`java.md` §4).
   - `OTHER` — any other condition; the opaque `EndianError.detail` holds it.
+    Reserved in release 1: no release-1 operation raises it.
+- **Why no `RANGE`:** an earlier draft reserved a `RANGE` kind for an odd byte
+  width. It is unreachable: `std.bit.byte_swap` accepts a 1-byte carrier and
+  returns it unchanged (probe-verified on 1.1.0, `<https://mojolang.org/docs/std/bit/bit/>`),
+  so no width is out of range. The kind was removed rather than carried as dead
+  surface.
 - **`write_to`** prints the symbolic name, never the number.
 
 Errors:
@@ -454,8 +466,7 @@ none — it is a discriminant, not an operation.
 
 Tests:
 
-- `test_error_kind_distinct_ids` — each of the three `comptime` members has a
-  distinct `_id`.
+- `test_error_kind_distinct_ids` — each `comptime` member has a distinct `_id`.
 - `test_error_kind_eq` — `==` compares `_id` only.
 - `test_error_kind_writable` — `write_to` prints the symbolic name, never the
   number.
@@ -466,10 +477,13 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses a closed three-value EndianErrorKind because Rust's ErrorKind
+`MojoAkku uses a closed two-value EndianErrorKind because Rust's ErrorKind
 shows a small closed set is enough (rust.md §4) and prim_bit already taught the
 low-vision user one kind+op+detail shape (akku/prim_bit/_dev/DESIGN.md); a
-numeric errno or a sentinel value is rejected.`
+numeric errno or a sentinel value is rejected. The set is deliberately as small
+as the reachable failures: only BAD_LENGTH can occur in release 1, so a
+hypothetical odd-width failure kind was dropped once byte_swap was probe-verified
+to accept a 1-byte carrier.`
 
 ---
 
@@ -494,12 +508,11 @@ Semantics:
 - **Parameters / preconditions:** constructed by the library on failure; read
   in an `except` block (or `try`/`except`) after a buffer call. Fields:
   `kind` (see `EndianErrorKind`), `op` (a short operation name, e.g.
-  `"to_bytes_into"`, `"from_bytes"`, `"swap_bytes"`), and `detail` (opaque
+  `"to_bytes_into"`, `"from_bytes"`), and `detail` (opaque
   human-readable context; must not be parsed). The `op` list is illustrative,
   not a closed enum.
-- **Return / meaning:** raised, never returned. Every condition is recoverable:
-  pass a correctly sized buffer (`BAD_LENGTH`) or use the total
-  `to_order`/`from_order` when no swap is possible (`RANGE`).
+- **Return / meaning:** raised, never returned. Recoverable by passing a
+  correctly sized buffer (`BAD_LENGTH`); no other failure exists in release 1.
 - **`write_to`** prints a readable `EndianError(<kind>, op=..., detail=...)`
   message. Because `EndianError` is `Copyable` but not `ImplicitlyCopyable`, a
   re-raise transfers with `raise e^`.
@@ -585,37 +598,37 @@ Status: planned
 Signature:
 
 ```mojo
-def swap_bytes[dtype: DType](x: Scalar[dtype]) raises EndianError -> Scalar[dtype]
+def swap_bytes[dtype: DType](x: Scalar[dtype]) -> Scalar[dtype]
     where dtype.is_integral()
 ```
 
 Semantics:
 
 - **Parameters / preconditions:** `x` is an integral `Scalar[dtype]` carrier
-  (signed or unsigned). The carrier's byte width is `size_of[Scalar[dtype]]()`;
-  it must be **even** (2, 4, 8, 16, … bytes), because `std.bit.byte_swap`
-  byte-swaps "an integer with an even number of bytes" (`mojov1/stdlib/bit`). A
-  1-byte carrier (e.g. `UInt8`, `Int8`) has an odd width and raises `RANGE`.
+  (signed or unsigned). The carrier's byte width is `size_of[Scalar[dtype]]()`.
+  There is no precondition failure: `std.bit.byte_swap` accepts the integral
+  widths Mojo's fixed `DType`s cover, and a 1-byte carrier reverses to itself
+  (probe-verified on 1.1.0; `mojov1/stdlib/bit`).
 - **Return / meaning:** a new value of the same type with its byte order
   reversed — bit-for-bit byte reversal, not an order conversion. It is the
   small, testable core the order conversions are defined on (`rust.md` §10:
   `swap_bytes` is the conceptual base operation).
-- **1-byte values:** already order-independent. `swap_bytes` surfaces the
-  primitive's even-width contract as `RANGE`; the high-level
-  `to_order`/`from_order` are total and treat a 1-byte carrier as a no-op.
+- **1-byte values:** already order-independent; `swap_bytes` returns them
+  unchanged. The high-level `to_order`/`from_order` likewise treat a 1-byte
+  carrier as a no-op.
 - **Not a direction.** `swap_bytes` has no order argument; it always reverses.
   Direction is expressed by `to_order`/`from_order` (`cpp.md` §10).
 
 Errors:
 
-- `RANGE` — the carrier's byte width is odd (a 1-byte integer).
+none — total for every integral carrier.
 
 Tests:
 
 - `test_swap_bytes_reverses_u16` / `_u32` / `_u64` — known bit patterns.
 - `test_swap_bytes_involution` — `swap_bytes(swap_bytes(x)) == x`.
 - `test_swap_bytes_signed_carrier` — `Int16`/`Int32` reverse the same bits.
-- `test_swap_bytes_one_byte_raises_range` — `UInt8`/`Int8` raise `RANGE`.
+- `test_swap_bytes_one_byte_identity` — `UInt8`/`Int8` return unchanged.
 - `test_swap_bytes_explicit_dtype_parameter` — the `[dtype]` parameter form.
 
 Implementation status:
@@ -628,9 +641,9 @@ Rationale:
 (rust.md §3), C bswap_32 (c.md §1), C++ std::byteswap (cpp.md §3), Go
 bits.ReverseBytes32 (go.md §3), Java Integer.reverseBytes (java.md §3) and Zig
 @byteSwap (rust.md cross-ref) all expose a bare reversal, and Mojo already ships
-it as std.bit.byte_swap (mojov1/stdlib/bit); primitive requires an even byte
-count, so MojoAkku surfaces an odd width as RANGE instead of silently accepting
-it. MojoAkku does not copy the Node/Java width-in-the-name explosion
+it as std.bit.byte_swap (mojov1/stdlib/bit); primitive accepts the widths Mojo's
+fixed DTypes cover (a 1-byte carrier reverses to itself, probe-verified), so
+MojoAkku wraps it directly. MojoAkku does not copy the Node/Java width-in-the-name explosion
 (readUInt16BE/readUInt16LE, swap16/swap32/swap64) because one generic function
 over Scalar[dtype] covers every width (js-ts.md §11).`
 
@@ -656,11 +669,10 @@ Semantics:
 - **Return / meaning:** `x` reinterpreted into `order`.
   - If `order == host_order()` (including `NATIVE`), it is a **no-op** and `x`
     is returned unchanged.
-  - Otherwise the bytes are swapped, i.e. the result equals
-    `swap_bytes(x)` for an even-width carrier.
+  - Otherwise the bytes are swapped, i.e. the result equals `swap_bytes(x)`.
   - A 1-byte carrier is a no-op for every order (there is only one byte).
-    This is why `to_order` itself never raises even though `swap_bytes` does
-    (`cpp.md` §12: only the buffer read's length can fail).
+    `to_order` never raises; only the buffer layer can (`cpp.md` §12: only the
+    buffer read's length can fail).
 - **Semantics are Rust's `to_be`/`to_le`** (`rust.md` §3): "converts self to big
   endian from the target's endianness; on big endian this is a no-op, on little
   endian the bytes are swapped". `to_order(x, EndianOrder.BIG)` is the
@@ -672,8 +684,9 @@ Semantics:
 
 Errors:
 
-none — the conversion is total for every integral carrier. A matching target is
-a compile-time-known no-op where the order is a `comptime` value.
+none — the conversion is total for every integral carrier. The order is a runtime
+value in release 1; a compile-time no-op specialization (passing the order as a
+`comptime` parameter) is backlog (`_dev/TODO.md`).
 
 Tests:
 

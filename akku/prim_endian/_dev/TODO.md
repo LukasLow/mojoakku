@@ -21,6 +21,11 @@ end state.
 - `comptime`-order specialization — instantiate the conversion per order
   instead of passing a runtime `EndianOrder` value. (origin: `cpp.md` §12,
   `elixir.md` §12)
+- A 24-bit / non-power-of-two width carrier — Java/Netty hand-roll a 3-byte
+  swap (`swapMedium`) that no fixed `DType` covers. (origin: `java.md` §11)
+- `to_bytes` value-returning form — the direction-symmetric twin of
+  `from_bytes` that allocates and returns the bytes. (origin: `go.md` §3,
+  `rust.md` §3)
 
 ## Buffer / byte-array layer
 
