@@ -1,2 +1,2 @@
-INTERNAL: catalogue — net_socket depends on io_core, net_ip, time_clock and os_poll.
-INTERNAL: CI — two-platform (Linux x86-64, macOS ARM64) full checks gate releases; smart tests reuse only tags certified on both platforms.
+FIX: CI — check Linux x86-64 and macOS ARM64 before releasing; smart tests reuse only tags certified on both platforms.
+FIX: net_socket tests — use a deterministic invalid TCP endpoint to verify failed-connect ownership on Linux and macOS.
