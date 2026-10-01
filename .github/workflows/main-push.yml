@@ -1,14 +1,7 @@
 name: main-push
 
-# Runs on every push to main. It ALWAYS tests (task ci::full). If there is a pending
-# file in `.changes/new/`, it then releases: it folds the change files into
-# CHANGELOG.md, moves them to `.changes/archive/<tag>/`, commits that, and
-# creates the next 0.x.y tag — pushed atomically, with retry if main moved
-# meanwhile. With nothing in `.changes/new/` it stops after the tests. Major is
-# never bumped (the release script rejects a non-zero major).
-#
-# The workflow is structured after dreego-stack/dreego's main-push.
-
+# Every main revision is fully checked on both supported CI platforms.
+# Only the same checked revision may be released; a newer push has its own run.
 on:
   push:
     branches: [main]
@@ -18,11 +11,55 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  test-and-release:
-    runs-on: ubuntu-latest
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            system: Linux
+            arch: x86_64
+          - runner: macos-15
+            system: Darwin
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Verify platform
+        run: |
+          test "$(uname -s)" = "${{ matrix.system }}"
+          test "$(uname -m)" = "${{ matrix.arch }}"
+          uname -sm
+
+      - name: Provide timeout on macOS
+        if: runner.os == 'macOS'
+        run: |
+          brew install coreutils
+          echo "$(brew --prefix coreutils)/libexec/gnubin" >> "$GITHUB_PATH"
+
+      - name: Install pixi
+        uses: prefix-dev/setup-pixi@v0.10.2
+        with:
+          pixi-version: latest
+          run-install: false
+
+      - name: Install the toolchain
+        run: pixi install --locked
+
+      - name: Full check
+        run: pixi run --locked task ci::full
+
+  release:
+    needs: check
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v5
         with:
@@ -35,63 +72,49 @@ jobs:
           run-install: false
 
       - name: Install the toolchain
-        run: pixi install
+        run: pixi install --locked
 
-      - name: Full check and release
+      - name: Release the checked revision
         run: |
           set -eu
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          checked=$(git rev-parse HEAD)
+          git fetch origin main --tags
+          if [ "$(git rev-parse origin/main)" != "$checked" ]; then
+            echo "main advanced; its own two-platform run must release it"
+            exit 0
+          fi
 
-          for attempt in $(seq 1 5); do
-            git fetch origin main --tags
-            git checkout -B release-work origin/main
+          latest=$(git for-each-ref --format='%(refname:short)' --sort=-version:refname 'refs/tags/v[0-9]*.[0-9]*.[0-9]*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)
+          if [ -n "$latest" ] && ! git merge-base --is-ancestor "$latest" HEAD; then
+            echo "error: latest published tag $latest is not an ancestor of main" >&2
+            exit 1
+          fi
 
-            latest=$(git for-each-ref --format='%(refname:short)' --sort=-version:refname 'refs/tags/v[0-9]*.[0-9]*.[0-9]*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)
-            if [ -n "$latest" ] && ! git merge-base --is-ancestor "$latest" HEAD; then
-              echo "error: latest published tag $latest is not an ancestor of main" >&2
-              exit 1
-            fi
+          out=$(sh .github/scripts/release-prepare.sh)
+          echo "$out"
+          new=$(printf '%s\n' "$out" | grep '^new=' | cut -d= -f2)
+          if [ "$new" = "none" ]; then
+            echo "no releasable pending changes"
+            exit 0
+          fi
+          if [ -z "$new" ]; then
+            echo "error: release-prepare.sh did not report a version" >&2
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/$new" >/dev/null 2>&1; then
+            echo "error: release tag already exists: $new" >&2
+            exit 1
+          fi
 
-            checked=$(git rev-parse HEAD)
-            pixi run task ci::full
-
-            if ! find .changes/new -maxdepth 1 -type f -name '*.md' | grep -q .; then
-              echo "no pending change files; nothing to release"
-              exit 0
-            fi
-
-            out=$(sh .github/scripts/release-prepare.sh)
-            echo "$out"
-            new=$(printf '%s\n' "$out" | grep '^new=' | cut -d= -f2)
-
-            if [ "$new" = "none" ]; then
-              echo "no pending change files; keeping them pending"
-              exit 0
-            fi
-            if [ -z "$new" ]; then
-              echo "error: release-prepare.sh did not report a version" >&2
-              exit 1
-            fi
-
-            if git ls-remote --exit-code --tags origin "refs/tags/$new" >/dev/null 2>&1; then
-              echo "error: release tag already exists: $new" >&2
-              exit 1
-            fi
-
-            pixi run python3 .repo/scrupts/testing.py release-guard "$checked"
-            git add -A
-            git commit -m "release: $new [skip ci]"
-            git tag "$new"
-
-            if git push --atomic origin HEAD:main "$new"; then
-              echo "released $new"
-              exit 0
-            fi
-
-            git tag -d "$new"
-            echo "main advanced during release attempt $attempt; retrying"
-          done
-
-          echo "release failed after five concurrent-update retries" >&2
-          exit 1
+          pixi run --locked python3 .repo/scrupts/testing.py release-guard "$checked"
+          git add -A
+          git commit -m "release: $new [skip ci]"
+          git tag -a "$new" -m "Full CI: linux-64 osx-arm64"
+          if git push --atomic origin HEAD:main "$new"; then
+            echo "released $new after Linux x86-64 and macOS ARM64 full checks"
+          else
+            echo "error: release push rejected; never substitute an unchecked revision" >&2
+            exit 1
+          fi

@@ -316,12 +316,19 @@ def dependency_graph(sources, libraries):
 
 
 def environment_issue(root, tag):
-    # Current main CI runs Ubuntu x86-64. A Linux tag does not certify macOS/ARM.
-    if platform.system() != "Linux" or platform.machine() not in {"x86_64", "AMD64"}:
-        return "release tags certify Linux x86-64 CI, not this platform"
+    target = {
+        ("Linux", "x86_64"): "linux-64",
+        ("Linux", "AMD64"): "linux-64",
+        ("Darwin", "arm64"): "osx-arm64",
+    }.get((platform.system(), platform.machine()))
+    if target is None:
+        return "release tags certify Linux x86-64 and macOS ARM64, not this platform"
     try:
+        certificate = git(root, "for-each-ref", "--format=%(contents)", f"refs/tags/{tag}").decode()
+        if "Full CI: linux-64 osx-arm64" not in certificate.splitlines():
+            return "release tag predates two-platform full CI certification"
         lock = git(root, "show", f"{tag}:pixi.lock").decode()
-        versions = set(re.findall(r"/linux-64/mojo-([0-9]+\.[0-9]+\.[0-9]+)-", lock))
+        versions = set(re.findall(r"/" + re.escape(target) + r"/mojo-([0-9]+\.[0-9]+\.[0-9]+)-", lock))
         version = subprocess.run(["mojo", "--version"], capture_output=True, text=True, check=True)
         actual = re.search(r"[0-9]+\.[0-9]+\.[0-9]+", version.stdout + version.stderr)
         if len(versions) != 1 or actual is None or actual.group() not in versions:

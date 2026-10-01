@@ -58,12 +58,14 @@ the current tag plus the categories of the pending files in `new/`:
 
 Triggered by a push to `main` (`.github/workflows/main-push.yml`):
 
-1. `task ci` runs (nothing is released unless the suite is green).
+1. `task ci::full` runs on Linux x86-64 and macOS ARM64; both must pass.
 2. `sh .github/scripts/release-prepare.sh` computes the next `0.x.y`, prepends
    the changelog section, and **moves** the released files from `new/` into
    `.changes/archive/<version>/`.
-3. The workflow commits the changelog and the moves, tags `v<version>` and
-   pushes both atomically (with retry if `main` moved meanwhile).
+3. The workflow commits the changelog and the moves, creates an annotated
+   `v<version>` tag with `Full CI: linux-64 osx-arm64`, and pushes both atomically.
+   Only the checked revision is eligible; newer main revisions require their
+   own two-platform run. A rejected push fails without publishing the tag.
 
 With nothing in `new/`, nothing is released — the push only runs the tests.
 
@@ -85,8 +87,8 @@ So pending files accumulate into the next release — nothing is lost, and no ta
 is ever created twice:
 
 - `concurrency: main-push` (`cancel-in-progress: false`) serialises the runs.
-- The release is committed and pushed **atomically** (`git push --atomic`), with
-  a 5× retry if `main` advanced meanwhile.
+- The release is committed and pushed **atomically** (`git push --atomic`).
+  If `main` advanced, its own two-platform run handles the pending release.
 - The workflow refuses to release if the latest tag is not an ancestor of `main`.
 
 This is the standard changesets-style behaviour (all pending changes fold into
