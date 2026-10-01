@@ -51,8 +51,12 @@ Every API entry carries a `Status:` field with exactly one of these values:
 | `benchmarked` | Implemented, tested and measured against the performance goals. |
 
 All 5 entries in this document are `planned`, and every entry's
-`Implementation status:` is `not implemented`, at Phase 3. They become
-`scaffolded` at Phase 7, `tested` at Phase 10 and `implemented` at Phase 12.
+`Implementation status:` is `not implemented`. These two fields are reconciled
+explicitly for Phase 5: `Status` uses `planned` (designed and documented, no code
+exists yet), while `Implementation status` uses the literal value
+`not implemented` that `NewLibPhase5Docs.md` requires in this phase (nothing is
+built yet) — they do not conflict. The entries become `scaffolded` at Phase 7,
+`tested` at Phase 10 and `implemented` at Phase 12.
 
 ## Dependencies
 
@@ -459,7 +463,7 @@ sibling MojoAkku library copying the pattern should keep.
 - **Rationale is a `MojoAkku uses X because Y` statement** naming the reference
   API and its research section.
 - **Status and implementation status are honest.** All entries are `planned` /
-  `not implemented` at Phase 3.
+  `not implemented` at Phase 5 (see `## Status legend` for the field reconciliation).
 - **Time is monotonic-only and integer-nanosecond.** No wall clock, no float.
 - **Terminology is shared.** Span, instant, monotonic clock, expiry and overflow
   are defined once in `## Semantics ## Terminology`.
