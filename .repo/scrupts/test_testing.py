@@ -97,6 +97,15 @@ class RepositoryTests(unittest.TestCase):
         self.write(".repo/todo/net_ip.yml", "summary: catalogue only\n")
         self.assertEqual(self.plan().selected, {})
 
+    def test_markdown_anywhere_is_excluded_but_other_library_files_are_relevant(self):
+        for path in ("akku/net_ip/README.md", "akku/net_ip/_tests/notes.md", "new-guide.md"):
+            self.write(path, "documentation only\n")
+        self.assertEqual(self.plan().selected, {})
+        self.write("akku/net_ip/_internal/native.c", "int changed = 1;\n")
+        self.assertEqual(set(self.plan().selected), {"net_ip", "net_socket", "web_http"})
+        self.write("akku/codec_base64/_tests/input.bin", "fixture\n")
+        self.assertEqual(set(self.plan().selected), set(testing.discover(self.root)))
+
     def test_new_library_is_discovered_without_a_registration(self):
         self.library("crypto_new")
         self.assertEqual(set(self.plan().selected), {"crypto_new"})
