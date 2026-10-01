@@ -20,7 +20,7 @@ end state.
 ## Clock / instant extras
 
 - `clock_resolution` — report the clock's expected resolution. (origin: `python.md` §10)
-- `now_wall` — a separate wall/system clock alongside the monotonic one. (origin: `c.md` §10, `rust.md` §10)
+- `now_wall` — a separate wall/system clock alongside the monotonic one. (origin: `c.md` §1, `rust.md` §10)
 - `measure_time` — helper returning a duration measured around a block. (origin: `kotlin.md` §10)
 - `test_clock` / injectable time source — deterministic time for tests. (origin: `kotlin.md` §10)
 

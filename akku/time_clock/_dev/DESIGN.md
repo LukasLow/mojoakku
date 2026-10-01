@@ -391,7 +391,7 @@ Which API can raise:
 | `Duration.from_micros` / `from_millis` / `from_seconds` | yes | `OVERFLOW` (the unit scaling does not fit the `Int` carrier) |
 | `Duration.from_nanos` | no | — (total) |
 | `Duration.__add__` / `__sub__` / `__neg__` / `scaled` | yes | `OVERFLOW` |
-| `Duration.divided_by` | yes | `DIVISION_BY_ZERO` (`divisor == 0`) |
+| `Duration.divided_by` | yes | `DIVISION_BY_ZERO` (`divisor == 0`); `OVERFLOW` (`MIN / -1`, the quotient 2^63 does not fit `Int`) |
 | `Duration.abs` | yes | `OVERFLOW` (only for the one most-negative span) |
 | `Duration.as_*`, `is_*`, `__eq__`, `__lt__`/`__le__`/`__gt__`/`__ge__`, `compare` | no | — (total) |
 | `Deadline.__add__` / `__sub__(Duration)` | yes | `OVERFLOW` |
@@ -585,7 +585,6 @@ struct Duration(Copyable, ImplicitlyCopyable, Deinitable, Equatable, Writable):
     def scaled(self, factor: Int) raises TimeError -> Self
     def divided_by(self, divisor: Int) raises TimeError -> Self
 
-    def __eq__(self, other: Self) -> Bool
     def __lt__(self, other: Self) -> Bool
     def __le__(self, other: Self) -> Bool
     def __gt__(self, other: Self) -> Bool
@@ -639,6 +638,11 @@ Semantics:
   - `__add__`/`__sub__`/`__neg__`/`scaled` check the `Int` result and raise
     `TimeError(OVERFLOW, ...)` instead of wrapping (`go.md` §11).
   - `divided_by(0)` raises `TimeError(DIVISION_BY_ZERO, ...)`; no `Inf`/`NaN`.
+  - `divided_by(-1)` of the most-negative span raises `TimeError(OVERFLOW, ...)`:
+    the true quotient 2^63 has no `Int` representation, so it is checked exactly
+    like the additive cases rather than silently wrapping to `MIN` (the two
+    distinct failure modes of `divided_by` are therefore `DIVISION_BY_ZERO` and
+    `OVERFLOW`).
   - `abs()` of the most-negative span raises `OVERFLOW` (see above).
   - `from_nanos` cannot overflow; the unit constructors can and raise.
   - A zero span is valid and common (`Duration.ZERO`); `is_zero` is the test.
@@ -647,10 +651,11 @@ Semantics:
   The expiry analogue lives on `Deadline` (see `## Error Surface`).
 
 Errors: `raises TimeError` — `OVERFLOW` from `from_micros`/`from_millis`/
-`from_seconds`/`__add__`/`__sub__`/`__neg__`/`scaled`/`abs`, and
-`DIVISION_BY_ZERO` from `divided_by`. All are recoverable data errors: the caller
-retries with smaller operands, a different unit, or a non-zero divisor. No
-condition is fatal.
+`from_seconds`/`__add__`/`__sub__`/`__neg__`/`scaled`/`abs` and from
+`divided_by` for `MIN / -1`, and `DIVISION_BY_ZERO` from `divided_by(0)`. All are
+recoverable data errors: the caller retries with smaller operands, a different
+unit, a non-zero divisor, or a divisor other than `-1` for the overflowing case.
+No condition is fatal.
 
 Tests:
 
@@ -673,6 +678,7 @@ Tests:
   - `test_duration_from_millis_overflow_raises` — unit scaling → `OVERFLOW`.
   - `test_duration_abs_of_min_raises` — `abs(MIN)` → `OVERFLOW`.
   - `test_duration_divided_by_zero_raises` — divisor `0` → `DIVISION_BY_ZERO`.
+  - `test_duration_divided_by_neg_one_min_raises` — `MIN / -1` → `OVERFLOW`.
 
 Implementation status: not implemented
 
@@ -684,7 +690,8 @@ negative" (`java.md` §10) show signed spans are the natural model for
 `Int`, not Java's seconds+nanos pair, because the two-field encoding of a
 negative (`-1 ns` stored as `-1 s + 999,999,999 ns`) is subtly hard to read
 (`java.md` §11). `__add__`/`__sub__`/`__neg__`/`scaled` **raise** `OVERFLOW` and
-`divided_by` raises `DIVISION_BY_ZERO` because Go wraps silently under
+`divided_by` raises `DIVISION_BY_ZERO` for divisor `0` and `OVERFLOW` for
+`MIN / -1` because Go wraps silently under
 two's-complement rules (`go.md` §11), C has no arithmetic on the value at all
 (`c.md` §11), C++ signed overflow is UB (`cpp.md` §11) and Rust's operator forms
 panic (`rust.md` §11); a typed `raises` makes the failure visible in the
@@ -719,7 +726,6 @@ struct Deadline(Copyable, ImplicitlyCopyable, Deinitable, Equatable, Writable):
     def __sub__(self, rhs: Duration) raises TimeError -> Self
     def __sub__(self, rhs: Self) raises TimeError -> Duration
 
-    def __eq__(self, other: Self) -> Bool
     def __lt__(self, other: Self) -> Bool
     def __le__(self, other: Self) -> Bool
     def __gt__(self, other: Self) -> Bool
@@ -904,6 +910,8 @@ struct TimeErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     @doc_hidden
     def __init__(out self, id: UInt8)
 
+    # Explicit override of Equatable's field-wise default: compares the
+    # discriminant `_id` only (see Semantics).
     def __eq__(self, other: Self) -> Bool
 
     comptime OVERFLOW         = TimeErrorKind(0)
@@ -932,6 +940,10 @@ Semantics:
   The two values are the **complete** set of ways any release-1 operation can
   fail. A future parse/format or wall-clock layer can add members additively.
 - **Ownership.** Value type; `comptime` constants copied into the error value.
+- **Overflow / edge behaviour.** Not applicable: a `TimeErrorKind` is a
+  two-valued discriminant holding a `UInt8`, so constructing one and comparing
+  two of them cannot overflow, wrap or fail. The overflow *condition* it labels
+  lives in the arithmetic that raises `TimeError`, never in the kind itself.
 - **Stream I/O.** Not applicable.
 
 Errors: none — it is a discriminant, not an operation.
