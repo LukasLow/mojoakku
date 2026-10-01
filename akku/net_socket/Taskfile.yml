@@ -11,7 +11,7 @@ tasks:
     desc: 'Run each test program, stopping on the first failure.'
     dir: '{{.TASKFILE_DIR}}'
     cmds:
-      - sh ../../.repo/scrupts/libraries.sh test
+      - timeout 180 sh ../../.repo/scrupts/libraries.sh test
   compile:
     desc: 'Compile the public API through a consumer import.'
     dir: '{{.TASKFILE_DIR}}'

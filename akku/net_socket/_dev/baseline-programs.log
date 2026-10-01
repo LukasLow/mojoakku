@@ -1,0 +1,50 @@
+== akku/net_socket/_tests/test_net_socket_address.mojo
+ABORT: ./akku/net_socket/socket_address.mojo:13:14: MojoAkku: this API is not yet implemented
+#0 0x0000ffffbc405580 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105580)
+#1 0x0000ffffbc402c40 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x102c40)
+#2 0x0000ffffbc405fe4 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105fe4)
+#3 0x0000ffffbf68f8c0 (linux-vdso.so.1+0x8c0)
+#4 0x0000ffff7800fc30
+/root/.pixi/envs/mojo/bin/mojo: error: execution crashed
+To get a symbolicated stack trace, compile your program using `mojo build` with debug info enabled (e.g., `-debug-level=line-tables`) and execute it separately.
+PROGRAM_EXIT=1
+== akku/net_socket/_tests/test_net_socket_connection.mojo
+ABORT: ./akku/net_socket/socket.mojo:16:14: MojoAkku: this API is not yet implemented
+#0 0x0000ffff902d5580 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105580)
+#1 0x0000ffff902d2c40 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x102c40)
+#2 0x0000ffff902d5fe4 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105fe4)
+#3 0x0000ffff9253b8c0 (linux-vdso.so.1+0x8c0)
+#4 0x0000ffff5000fd40
+/root/.pixi/envs/mojo/bin/mojo: error: execution crashed
+To get a symbolicated stack trace, compile your program using `mojo build` with debug info enabled (e.g., `-debug-level=line-tables`) and execute it separately.
+PROGRAM_EXIT=1
+== akku/net_socket/_tests/test_net_socket_native.mojo
+ABORT: ./akku/net_socket/socket.mojo:16:14: MojoAkku: this API is not yet implemented
+#0 0x0000ffffa06a5580 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105580)
+#1 0x0000ffffa06a2c40 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x102c40)
+#2 0x0000ffffa06a5fe4 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105fe4)
+#3 0x0000ffffa59768c0 (linux-vdso.so.1+0x8c0)
+#4 0x0000ffff640020b0
+/root/.pixi/envs/mojo/bin/mojo: error: execution crashed
+To get a symbolicated stack trace, compile your program using `mojo build` with debug info enabled (e.g., `-debug-level=line-tables`) and execute it separately.
+PROGRAM_EXIT=1
+== akku/net_socket/_tests/test_net_socket_ownership.mojo
+ABORT: ./akku/net_socket/socket.mojo:16:14: MojoAkku: this API is not yet implemented
+#0 0x0000ffff9c385580 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105580)
+#1 0x0000ffff9c382c40 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x102c40)
+#2 0x0000ffff9c385fe4 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105fe4)
+#3 0x0000ffff9dddb8c0 (linux-vdso.so.1+0x8c0)
+#4 0x0000ffff5c0020b0
+/root/.pixi/envs/mojo/bin/mojo: error: execution crashed
+To get a symbolicated stack trace, compile your program using `mojo build` with debug info enabled (e.g., `-debug-level=line-tables`) and execute it separately.
+PROGRAM_EXIT=1
+== akku/net_socket/_tests/test_net_socket_transfer.mojo
+ABORT: ./akku/net_socket/socket.mojo:16:14: MojoAkku: this API is not yet implemented
+#0 0x0000ffff8c735580 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105580)
+#1 0x0000ffff8c732c40 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x102c40)
+#2 0x0000ffff8c735fe4 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105fe4)
+#3 0x0000ffff973758c0 (linux-vdso.so.1+0x8c0)
+#4 0x0000ffff5000fd80
+/root/.pixi/envs/mojo/bin/mojo: error: execution crashed
+To get a symbolicated stack trace, compile your program using `mojo build` with debug info enabled (e.g., `-debug-level=line-tables`) and execute it separately.
+PROGRAM_EXIT=1

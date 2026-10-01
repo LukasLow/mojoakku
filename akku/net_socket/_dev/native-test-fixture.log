@@ -1,0 +1,3 @@
+Linux aarch64
+Mojo 1.1.0 (8189361e)
+Native signal fixture: real EINTR and unchanged buffer observed; WOULD_BLOCK errno11 observed; SIGPIPE default actually terminates independent child.

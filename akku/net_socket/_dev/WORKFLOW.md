@@ -83,3 +83,12 @@ an independent scaffold re-check. No implementation is allowed yet.
 Independent reviewer executed the address test program: compiler succeeded and
 runtime reached the exact not-yet-implemented abort, exit 1. All twenty bodies
 remain abort-only; no implementation leaked. Tests may resume.
+
+## Phase 9 — tests and observed red baseline
+
+Thirty authored behavioral functions in five programs, bounded test dispatch.
+Each program compiles then aborts at an unimplemented constructor (5 observed
+program failures, not 30 individually executed case failures); aggregate stops
+at the first abort. Raw logs and concern/edge-case matrix in TESTS.md.
+Independent native signal fixture proves real EINTR/EAGAIN and default SIGPIPE
+behavior on Linux aarch64, Mojo 1.1.0. No production implementation added.
