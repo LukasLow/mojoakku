@@ -6,7 +6,7 @@ feature** (Erlang bit syntax, exposed unchanged in Elixir through
 `Kernel.SpecialForms.<<>>/1`) plus a handful of `:binary` (stdlib) and
 `:erlang` (erts) BIFs.
 
-# 1. Standard library support
+## 1. Standard library support
 
 - Endianness is handled by the **bit syntax**, not a library module. A binary
   segment has the general form `Value:Size/TypeSpecifierList`; the endianness
@@ -32,7 +32,7 @@ feature** (Erlang bit syntax, exposed unchanged in Elixir through
   `:erlang.term_to_binary/1` / `:erlang.binary_to_term/1`, and the bit-syntax
   `<<>>` special form.
 
-# 2. Relevant community libraries
+## 2. Relevant community libraries
 
 - There is effectively **no community library for generic endianness**, because
   the language feature plus `:binary` already cover it. A Hex package search for
@@ -41,7 +41,7 @@ feature** (Erlang bit syntax, exposed unchanged in Elixir through
   Source: https://hex.pm/packages?search=endian&sort=downloads.
 - Domain-specific libraries implement endianness handling internally when they
   read fixed binary formats. Example: `elixir-nx/safetensors` handles tensor
-  endianness in `Safetensors.Shared`. Source: https://deepwiki.com/elixir-nx/safetensors/3.2-binary-processing-and-endianness (secondary; derived from the safetensors repo).
+  endianness in `Safetensors.Shared`. Source: https://deepwiki.com/elixir-nx/safetensors/3.2-binary-processing-and-endianness (secondary source, derived from the safetensors repo — not authoritative).
 - `:crypto` and `:ssl` handle wire formats internally in big-endian order but do
   not expose a byte-order API. `(Assessment: derived from the OTP external term
   format and stdlib docs, §3 below.)`
@@ -49,7 +49,7 @@ feature** (Erlang bit syntax, exposed unchanged in Elixir through
   the reason is that the built-in bit syntax is sufficient, so there is no gap
   for a library. No authoritative negative-source exists.
 
-# 3. Exposed APIs
+## 3. Exposed APIs
 
 Bit-syntax endian modifiers (language-level; identical in Erlang and Elixir):
 
@@ -91,7 +91,7 @@ Bit-syntax endian modifiers (language-level; identical in Erlang and Elixir):
 - Elixir's `Bitwise` module is bit-twiddling only (`band`, `bor`, `bxor`, `bsl`,
   `bsr`, shifts/ops) and has no endian function. Source: https://hexdocs.pm/elixir/Bitwise.html.
 
-# 4. Error representation
+## 4. Error representation
 
 - `:binary` functions raise a `badarg` exception (Erlang error exception) on bad
   input. `encode_unsigned/2` documents: "If `Unsigned` is not a non-negative
@@ -112,7 +112,7 @@ Bit-syntax endian modifiers (language-level; identical in Erlang and Elixir):
   is used at higher-level library boundaries, not by these primitives.
   `(Assessment: derived from the absence of such returns in the `:binary` docs.)`
 
-# 5. Ownership semantics (adapted: value-returning vs. in-place; ownership of input/output)
+## 5. Ownership semantics (adapted: value-returning vs. in-place; ownership of input/output)
 
 - All conversion here is **value-returning and immutable**. Erlang terms are
   immutable; a function cannot mutate its argument. `decode_unsigned/2` returns a
@@ -133,7 +133,7 @@ Bit-syntax endian modifiers (language-level; identical in Erlang and Elixir):
   concern that a slice-based Mojo buffer API must also consider.
   `(Assessment: derived from the `referenced_byte_size`/`copy` docs.)`
 
-# 6. Blocking / non-blocking
+## 6. Blocking / non-blocking
 
 - **Not applicable.** Byte-order conversion and bit-syntax matching are pure,
   synchronous, CPU-bound operations with no I/O, no locks and no waiting.
@@ -145,7 +145,7 @@ Bit-syntax endian modifiers (language-level; identical in Erlang and Elixir):
   the Erlang process/scheduler model; no endian-specific concurrency text
   exists.)`
 
-# 7. IPv4 / IPv6 (adapted: which byte orders are represented, single abstraction)
+## 7. IPv4 / IPv6 (adapted: which byte orders are represented, single abstraction)
 
 - The syntax represents **all three** orders in one abstraction: `big`, `little`,
   `native` (default `big`). A single segment's `TypeSpecifierList` selects among
@@ -164,7 +164,7 @@ Bit-syntax endian modifiers (language-level; identical in Erlang and Elixir):
 - The `:binary` functions cover only **two** of the three (`big | little`) — they
   have no `native` option. Source: https://www.erlang.org/doc/apps/stdlib/binary.html. So the abstraction is *not* fully uniform: syntax has three orders, the `:binary` helpers have two.
 
-# 8. Timeouts
+## 8. Timeouts
 
 - **Not applicable.** There is no blocking operation, therefore no timeout,
   deadline or cancellation surface for endian conversion. Source: none, and none
@@ -175,7 +175,7 @@ Bit-syntax endian modifiers (language-level; identical in Erlang and Elixir):
   but no endian API accepts or reports a cancellation handle. `(Assessment:
   derived from the BEAM process model.)`
 
-# 9. TLS (adapted: how host native endianness is detected and reported)
+## 9. TLS (adapted: how host native endianness is detected and reported)
 
 - **Runtime query:** `erlang:system_info(endian)` returns `big` or `little`.
   Implementation chooses by a compile-time macro of the runtime build:
@@ -197,7 +197,7 @@ Bit-syntax endian modifiers (language-level; identical in Erlang and Elixir):
   `erlang` docs page + the erl_bif_info.c implementation.)` The `native`
   modifier, by contrast, is fully documented.
 
-# 10. Interesting design decisions
+## 10. Interesting design decisions
 
 1. **Endianness is syntax, not a function.** It is a per-segment modifier applied
    uniformly to construction and matching, rather than a `to_be`/`to_le` function
@@ -222,7 +222,7 @@ Bit-syntax endian modifiers (language-level; identical in Erlang and Elixir):
    `unsigned-big-integer-size(32)` and `integer-big-unsigned-32` mean the same.
    Source: https://hexdocs.pm/elixir/Kernel.SpecialForms.html.
 
-# 11. Decisions NOT to copy
+## 11. Decisions NOT to copy
 
 1. **Hyphen-separated modifier soup.** `X:4/little-signed-integer-unit:8` packs
    order, signedness, type and unit into one token stream; for a low-vision user
@@ -247,7 +247,7 @@ Bit-syntax endian modifiers (language-level; identical in Erlang and Elixir):
    API should be uniform across the orders it claims to support. Source:
    https://www.erlang.org/doc/apps/stdlib/binary.html.
 
-# 12. Ideas fitting Mojo
+## 12. Ideas fitting Mojo
 
 - **Endian as a compile-time value parameter.** Model the order as a value enum
   (`Endian.BIG`, `Endian.LITTLE`, `Endian.NATIVE`) passed as a `comptime`
@@ -277,14 +277,15 @@ Bit-syntax endian modifiers (language-level; identical in Erlang and Elixir):
   better than a runtime query. Source (Mojo): buch `mojov1` page
   `concurrency/vectorization-and-simd` ("Portability: ask the target, do not
   guess"). `(Assessment: derived from that page plus §9.)`
-- **Byteswap as a first-class operation.** `mojov1` has **no** page documenting a
-  `byteswap`/endian builtin (searched the buch; no hit), so an explicit
-  `byteswap` API (scalar + SIMD) is a genuine gap a Mojo library can fill. For
-  SIMD, a lane-wise swap can be expressed with existing bitwise/shift operators
-  or inline MLIR. `GUESS:` whether Mojo exposes a native byteswap intrinsic —
-  no buch page and no official source could be found.
+- **Byteswap already ships; the library adds the named-order API.** `mojov1`
+  documents `std.bit.byte_swap` ("Byte-swaps an integer with an even number of
+  bytes", scalar and SIMD) at `mojov1/stdlib/bit`, plus the compile-time host
+  predicates `std.sys.is_little_endian()` / `is_big_endian()` at
+  `mojov1/stdlib/sys`. The genuine gap is the *abstraction over the order*
+  (big / little / native) and a buffer byte-array form, not the raw swap. Source
+  (buch): `mojov1/stdlib/bit`, `mojov1/stdlib/sys`.
 
-# Sources
+## Sources
 
 - Erlang bit syntax (Segments, Defaults, Endianness, construction/matching):
   https://www.erlang.org/doc/system/bit_syntax.html

@@ -32,10 +32,10 @@
   basis; building the conversions is left to the user or Boost (cppreference,
   *std::endian* *See also*, which points only to `byteswap` and to the C
   documentation).
-- **C++23/26 gains the C headers:** C23 `<stdbit.h>` is exposed in C++ as
-  `<stdbit.h>`/`<stdbit.h>` header page listed under C++26 (cppreference,
-  *Standard library header `<stdbit.h>` (C++26)*). It carries the C23 endian
-  macros, not new C++ functions (cppreference, C23 `<stdbit.h>`).
+- **C++26 gains the C header:** C23 `<stdbit.h>` is exposed in C++26 **under the
+  same name** `<stdbit.h>` (a C-compatibility header; cppreference, *Standard
+  library header `<stdbit.h>` (C++26)*). It carries the C23 endian macros, not
+  new C++ functions (cppreference, C23 `<stdbit.h>`).
 - `std::byteswap` deliberately does **not** touch byte order semantics: it is a
   pure reversal, so it is useful "for processing data of different endianness"
   (cppreference, *std::byteswap*, Notes).

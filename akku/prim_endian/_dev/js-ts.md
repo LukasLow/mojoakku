@@ -263,10 +263,12 @@ cited reference.)
   runtime queries (`os.endianness()`, the `Int16Array` trick) support this.
   Sources: <https://nodejs.org/api/os.html#osendianness>,
   <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView#endianness>.
-- **Mojo-side gap to close:** the `mojov1` buch has no endianness/byteswap page as
-  of this run (`buch_search "byte order"` / `"byteswap"` → no hits); the nearest
-  primitive is `unsafe`'s `bitcast`/`pack_bits`. (Assessment: derived from the
-  buch searches run in this session; `buch mojov1/stdlib/memory`.)
+- **Mojo-side primitives already exist; the library adds the ordering layer.**
+  The `mojov1` buch documents `std.bit.byte_swap` ("Byte-swaps an integer with an
+  even number of bytes") at `mojov1/stdlib/bit`, and the host-order predicates
+  `std.sys.is_little_endian()` / `is_big_endian()` at `mojov1/stdlib/sys`. JS/TS'
+  gap is not the swap but the explicit per-access order flag, which maps to a
+  named-order API on top. Source (buch): `mojov1/stdlib/bit`, `mojov1/stdlib/sys`.
 
 ## Sources
 

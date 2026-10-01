@@ -263,7 +263,10 @@ Adapted Q9: how host native endianness is detected and reported.
 ## Sources
 
 - Go `encoding/binary` package documentation — https://pkg.go.dev/encoding/binary
-- Go `encoding/binary` source (v1.23.0) —
+- Go `encoding/binary` source — the `binary.go:NN` line references and the
+  `cs.opensource.google/go/go/+/go1.27.1` links point at the current development
+  tip (go1.27.1); the GitHub `blob/go1.23.0` links below are the tagged release
+  used for the file-level citations. Both describe the same API surface:
   https://github.com/golang/go/blob/go1.23.0/src/encoding/binary/binary.go
   (also `cs.opensource.google/go/go/+/go1.27.1:src/encoding/binary/binary.go`)
 - Go `encoding/binary` native-endian implementations (v1.23.0) —

@@ -116,9 +116,9 @@ Netty `ByteBuf` (community, for comparison)
 
 Byte-order conversion in Java is **exception-free** in the normal case:
 
-- `Short/Integer/Long.reverseBytes` "does not throw an exception at the time of
-  reversing the order of bytes" (GeeksforGeeks, `https://www.geeksforgeeks.org/java/integer-reversebytes-method-in-java/`;
-  the JDK javadoc declares no `throws` — JDK 21 `Integer`, `Short.java`).
+- `Short/Integer/Long.reverseBytes` does not declare any `throws` clause; it is
+  total for its fixed-width input and cannot fail on a valid argument (JDK
+  javadoc, JDK 21 `Integer`, `Short.java`).
 - Buffers report misuse through unchecked runtime exceptions rather than error
   codes: `BufferUnderflowException`/`BufferOverflowException` on relative
   get/put past the limit, `IndexOutOfBoundsException` on bad absolute index,
@@ -201,7 +201,7 @@ one abstraction covers all of them.
 - "Network byte order" has **no separate constant**; it is big-endian. The JDK's
   own `Uses` pages state "`ByteOrder.BIG_ENDIAN` indicates network byte order and
   `ByteOrder.LITTLE_ENDIAN` indicates the reverse order"
-  (`https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/nio/class-use/ByteOrder.html`).
+  (`https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/class-use/ByteOrder.html`).
 - "Native" is not a third value; `nativeOrder()` resolves at runtime to one of the
   two constants (`ByteOrder.java:71`).
 - A single abstraction therefore covers big, little and native: `ByteOrder` plus
@@ -283,9 +283,10 @@ Endian adaptation (was: TLS): how host native endianness is detected and reporte
 - **`duplicate()`/`slice()` reset the order to `BIG_ENDIAN`.** This is called out
   by third-party libraries as "error-prone": "`ByteBuffer.slice()` returns a
   buffer that is always BIG_ENDIAN"
-  (`https://docs.stardog.com/javadoc/snarl/com/complexible/common/nio/ByteBuffers.html`;
-  Javamex: "the byte order of a buffer is not preserved when you make a duplicate
-  or slice" — `https://www.javamex.com/tutorials/io/nio_byte_order.shtml`).
+  (`https://docs.stardog.com/javadoc/snarl/com/complexible/common/nio/ByteBuffers.html`,
+  secondary source; the same reset is stated by Netty's own `SwappedByteBuf`
+  wrapper, a primary source; Javamex, secondary:
+  `https://www.javamex.com/tutorials/io/nio_byte_order.shtml`).
 - **Unsigned widths are emulated.** Netty exposes `getUnsignedShortLE`/
   `getUnsignedIntLE`, and `EndianUtils` adds `readSwappedUnsignedShort`/
   `readSwappedUnsignedInteger`, because Java lacks unsigned integral types and
@@ -301,10 +302,10 @@ Endian adaptation (was: TLS): how host native endianness is detected and reporte
 
 - **Do not carry byte order as hidden mutable state on a buffer.** The
   `ByteBuffer.order()` model forces every consumer to remember a hidden field;
-  Netty deprecated exactly this (`https://netty.io/4.2/api/io/netty/buffer/ByteBuf.html`)
-  and the `slice()`/`duplicate()` reset to `BIG_ENDIAN` is a documented footgun
-  (`https://www.javamex.com/tutorials/io/nio_byte_order.shtml`). An explicit
-  order argument/parameter is easier to reason about.
+  Netty deprecated exactly this (`https://netty.io/4.2/api/io/netty/buffer/ByteBuf.html`,
+  primary) and the `slice()`/`duplicate()` reset to `BIG_ENDIAN` is a documented
+  footgun (`https://www.javamex.com/tutorials/io/nio_byte_order.shtml`,
+  secondary). An explicit order argument/parameter is easier to reason about.
 - **Do not silently reset order on sub-views.** Returning `BIG_ENDIAN` from
   `slice()`/`duplicate()` is surprising and was flagged as "error-prone" by
   third parties (`https://docs.stardog.com/javadoc/snarl/com/complexible/common/nio/ByteBuffers.html`).
@@ -377,8 +378,8 @@ the `mojov1` buch, not inferred from Java.
   https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/ByteOrder.html
 - `ByteBuffer` JDK 21:
   https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/ByteBuffer.html
-- `Uses of Class java.nio.ByteOrder` JDK 24:
-  https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/nio/class-use/ByteOrder.html
+- `Uses of Class java.nio.ByteOrder` JDK 21:
+  https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/class-use/ByteOrder.html
 - OpenJDK `Short.java` (master):
   https://raw.githubusercontent.com/openjdk/jdk/master/src/java.base/share/classes/java/lang/Short.java
 - `Short` JDK 21:
@@ -407,9 +408,7 @@ the `mojov1` buch, not inferred from Java.
   https://raw.githubusercontent.com/netty/netty/4.2/buffer/src/main/java/io/netty/buffer/SwappedByteBuf.java
 - Netty endianness discussion (Stack Overflow):
   https://stackoverflow.com/questions/19850269/setting-bytebuf-endianness-in-netty4
-- Javamex, "How to set the byte order of a NIO buffer":
+- Javamex, "How to set the byte order of a NIO buffer" (secondary source):
   https://www.javamex.com/tutorials/io/nio_byte_order.shtml
-- Stardog `ByteBuffers` (slice-order gotcha):
+- Stardog `ByteBuffers` (slice-order gotcha; secondary source):
   https://docs.stardog.com/javadoc/snarl/com/complexible/common/nio/ByteBuffers.html
-- GeeksforGeeks, `Integer.reverseBytes` (no exception thrown):
-  https://www.geeksforgeeks.org/java/integer-reversebytes-method-in-java/

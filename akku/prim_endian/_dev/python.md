@@ -267,11 +267,12 @@ stringly-typed runtime query, not a boolean or enum.
   `array.array`, not on `bytes`. A Mojo function over `MutSpan[Byte]` with a
   1/2/4/8-byte element width would generalize it. Python precedent:
   <https://docs.python.org/3/library/array.html#array.array.byteswap>.
-- **Mojo-side gap to close:** as of this run the `mojov1` buch has **no page for
-  endianness/byteswap** (`buch_search "byte order"`, `"byteswap"` → no hits); the
-  closest existing primitive is `unsafe`'s `bitcast`/`pack_bits`
-  (`buch mojov1/stdlib/memory`). (Assessment: derived from the buch searches run
-  in this session.) A future Mojo pass should add an endian page.
+- **Mojo-side primitives already exist; the library adds the ordering layer.**
+  The `mojov1` buch documents `std.bit.byte_swap` ("Byte-swaps an integer with an
+  even number of bytes") at `mojov1/stdlib/bit`, and the host-order predicates
+  `std.sys.is_little_endian()` / `is_big_endian()` at `mojov1/stdlib/sys`. Python's
+  gap is therefore not the swap but the *named-order* API on top. Source (buch):
+  `mojov1/stdlib/bit`, `mojov1/stdlib/sys`.
 
 ## Sources
 
@@ -288,7 +289,8 @@ stringly-typed runtime query, not a boolean or enum.
 - NumPy project: <https://numpy.org/>
 - `bitstring`: <https://github.com/scott-griffiths/bitstring>
 - `construct`: <https://github.com/construct/construct>
-- RFC 1700 (referenced by the `struct` docs for `!`):
+- RFC 1700 (network order = big-endian; the `struct` docs describe `!` as
+  "network (= big-endian) order"):
   <https://datatracker.ietf.org/doc/html/rfc1700>
 - Mojo buch (local, read-only lookups in this session):
   `mojov1/stdlib/memory`, `mojov1/keywords/comptime`, `mojov1/errors/error-model`

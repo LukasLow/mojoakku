@@ -264,8 +264,8 @@ and reported (compile-time constant, runtime query, or not at all).*
 ## 12. Ideas fitting Mojo
 
 - **Mojo already ships the low-level primitives; wrap, don't rebuild them.**
-  `std.bit.byte_swap` byte-swaps "a SIMD vector of integer values with an even
-  number of bytes" (mojov1 buch, `mojov1/stdlib/bit`;
+  `std.bit.byte_swap` byte-swaps an integer (scalar or SIMD) with an even number
+  of bytes (mojov1 buch, `mojov1/stdlib/bit`;
   <https://mojolang.org/docs/std/bit/bit/byte_swap/>), and
   `std.sys.info` exposes compile-time `is_little_endian()` / `is_big_endian()`
   (mojov1 buch, `mojov1/stdlib/sys`;
