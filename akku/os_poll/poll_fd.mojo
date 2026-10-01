@@ -1,3 +1,5 @@
+from std.os import abort
+
 from .poll_events import PollEvents
 
 

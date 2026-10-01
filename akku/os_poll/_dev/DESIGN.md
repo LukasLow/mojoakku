@@ -211,7 +211,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 - **Status:** planned
 - **Signature:**
   ```
-  struct PollEvents(Copyable, Deinitable, Equatable, Writable):
+  struct PollEvents(ImplicitlyCopyable, Deinitable, Equatable, Writable):
       var _bits: UInt16
       @doc_hidden def __init__(out self, bits: UInt16)
       comptime NONE     = PollEvents(0x0000)
@@ -257,7 +257,9 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
   for one concept (`java.md` §3). The constants are `comptime` values, matching
   `IoErrorKind` in `io_core` and the research's `comptime`-bitflags idea
   (`go.md` §12). `POLLRDHUP` is not shipped because Linux has it and macOS does
-  not (`c.md` §3); it is deferred to `_dev/TODO.md`.
+  not (`c.md` §3); it is deferred to `_dev/TODO.md`. The pure bitmask is
+  `ImplicitlyCopyable` for ergonomics, matching `io_core.SeekFrom` and the
+  project's other small value types.
 
 ## API entry: PollErrorKind
 
@@ -324,7 +326,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 - **Status:** planned
 - **Signature:**
   ```
-  struct PollTimeout(Copyable, Deinitable, Equatable, Writable):
+  struct PollTimeout(ImplicitlyCopyable, Deinitable, Equatable, Writable):
       var millis: Int
       comptime MAX_MILLIS = 2_147_483_647
       comptime ZERO = PollTimeout(0)
@@ -354,7 +356,9 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
   The `MAX_MILLIS` bound follows nix's `PollTimeout` newtype and rustix's
   `INVAL`-on-oversized behaviour (`rust.md` §10): overflow is surfaced, not
   silently truncated as in Java (`java.md` §9). The absence of an infinite form
-  is the deliberate bounded-wait rule.
+  is the deliberate bounded-wait rule. This pure value type is
+  `ImplicitlyCopyable` for ergonomics, matching `io_core.SeekFrom` and the
+  project's other small value types.
 
 ## API entry: PollFd
 

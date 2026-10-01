@@ -1,8 +1,9 @@
+from std.os import abort
 from std.ffi import c_short as _c_short
 
 
 # PollEvents — the portable fd-readiness bitmask, used as interest and as result.
-struct PollEvents(Copyable, Deinitable, Equatable, Writable):
+struct PollEvents(ImplicitlyCopyable, Deinitable, Equatable, Writable):
     var _bits: UInt16
 
     @doc_hidden
@@ -60,7 +61,7 @@ struct PollEvents(Copyable, Deinitable, Equatable, Writable):
 # API-DOCS-START
 # PollEvents — the portable fd-readiness bitmask, used as interest and as result.
 # Signature:
-#   struct PollEvents(Copyable, Deinitable, Equatable, Writable):
+#   struct PollEvents(ImplicitlyCopyable, Deinitable, Equatable, Writable):
 #       var _bits: UInt16
 #       @doc_hidden
 #       def __init__(out self, bits: UInt16)

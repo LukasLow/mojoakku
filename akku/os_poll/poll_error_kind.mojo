@@ -1,3 +1,6 @@
+from std.os import abort
+
+
 # PollErrorKind — the closed reason a readiness wait failed.
 struct PollErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     var _id: UInt8

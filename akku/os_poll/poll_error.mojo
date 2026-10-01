@@ -1,3 +1,5 @@
+from std.os import abort
+
 from .poll_error_kind import PollErrorKind
 
 

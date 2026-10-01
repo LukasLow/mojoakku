@@ -1,3 +1,5 @@
+from std.os import abort
+
 from .poll_events import PollEvents
 from .poll_timeout import PollTimeout
 from .poll_error import PollError

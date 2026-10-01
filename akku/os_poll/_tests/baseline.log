@@ -1,0 +1,21 @@
+== mojo run -I . akku/os_poll/_tests/test_os_poll_bounded.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/os_poll/wait.mojo:10:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/os_poll/_tests/test_os_poll_events.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/os_poll/poll_events.mojo:26:14: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/os_poll/_tests/test_os_poll_fd.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/os_poll/poll_events.mojo:23:14: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/os_poll/_tests/test_os_poll_timeout.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/os_poll/poll_timeout.mojo:23:14: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/os_poll/_tests/test_os_poll_wait.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/os_poll/wait.mojo:10:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/os_poll/_tests/test_os_poll_wait_many.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/os_poll/wait_many.mojo:10:10: MojoAkku: this API is not yet implemented
+--------
+baseline: 6 files, 0 passed, 6 failed
+  failures: 6 stub abort, 0 compile/import error, 0 other
+note: the suite holds 24 test functions across 6 files. A stub
+      `abort` stops the process on its first call, so no per-test
+      passed/failed count is reachable in the red phase; the file count
+      (6) is the honest measure.
+note: the red phase expects stub aborts only — a compile/import error or a
+      PASS means the test (or the scaffold) must be fixed before review.

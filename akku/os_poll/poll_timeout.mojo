@@ -1,5 +1,8 @@
+from std.os import abort
+
+
 # PollTimeout — a bounded wait, in milliseconds. There is no infinite form.
-struct PollTimeout(Copyable, Deinitable, Equatable, Writable):
+struct PollTimeout(ImplicitlyCopyable, Deinitable, Equatable, Writable):
     var millis: Int
 
     comptime MAX_MILLIS = 2_147_483_647
@@ -25,7 +28,7 @@ struct PollTimeout(Copyable, Deinitable, Equatable, Writable):
 # API-DOCS-START
 # PollTimeout — a bounded wait, in milliseconds. There is no infinite form.
 # Signature:
-#   struct PollTimeout(Copyable, Deinitable, Equatable, Writable):
+#   struct PollTimeout(ImplicitlyCopyable, Deinitable, Equatable, Writable):
 #       var millis: Int
 #       comptime MAX_MILLIS = 2_147_483_647
 #       comptime ZERO = PollTimeout(0)
