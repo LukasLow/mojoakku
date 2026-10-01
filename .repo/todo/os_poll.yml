@@ -1,0 +1,6 @@
+id: os_poll
+name: Readiness
+status: current
+depends_on: []
+mojoNeeds: [pure-mojo, c-ffi]
+summary: Synchronous file-descriptor readiness (poll) with bounded waits.

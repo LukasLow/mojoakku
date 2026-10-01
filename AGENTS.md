@@ -32,10 +32,18 @@ repo root/
     markup_html/  <-- SIBLING library
     format_json/  <-- SIBLING library
     ...
+  akku_later/         <-- DEFERRED code, outside the test pool (not a library)
+    net_socket/   <-- parked implementation; see its _dev/TODO.md handoff
 ```
 
 Every library under `akku/<lib>/` is a **sibling**. Libraries are **never
 nested** inside each other.
+
+`akku_later/<lib>/` parks a **deferred** implementation so it stops running in
+`task test`/`ci` (only `akku/*` is discovered) while its rebuild waits for
+dependencies. It is **not** a second `akku/`: nothing imports from it, and the
+live catalogue entry (`.repo/todo/<lib>.yml`) stays the source of truth. See
+`.repo/todo/README.md`.
 
 ### Library naming: the domain prefix
 

@@ -4,7 +4,7 @@ This folder is the **machine-readable catalogue of every library MojoAkku could
 build**. There is exactly **one file per library**, named `<id>.yml`, and all
 files sit **flat** in this directory. The flat layout is a core project
 decision: no library is nested inside another, not here and not under
-`akku/`. The catalogue currently holds **318** entries (4 `done`, and the
+`akku/`. The catalogue currently holds **319** entries (6 `done`, and the
 `covered_*`/`homeless_*` marker prefixes explained in the ADR).
 
 The catalogue is pure inventory — a library may still be only an idea. Its
@@ -57,7 +57,12 @@ todo ──▶ current ──▶ done
 
 - **todo** — catalogued, not finished. Some `todo` libraries are ready to build
   now; the rest wait for a dependency (see `task todo` / `task waiting`).
-- **current** — work is actively running for this library.
+- **current** — the library belongs to the **one active work strand**, i.e. it is
+  being built now or is the immediate next step of that strand. A strand may span
+  several libraries that depend on each other (build the foundations first, then
+  the library that needs them) — all of them are `current` while the strand is
+  open. `current` means "in this active strand", not "a file is being edited right
+  now". Finish the strand before opening another.
 - **done** — API, docs, scaffold, tests and implementation exist and passed
   review.
 
@@ -68,6 +73,18 @@ dependency**, never physical nesting: a library may depend on another library
 the way `http` depends on `tcp`, but it never lives in that library's folder.
 
 > **Rule: no library inside a library.**
+
+### `akku_later/` — deferred code, not a library
+
+A **deferred** implementation (one that shipped but is being rebuilt and must not
+run in the test pool meanwhile) is parked under `akku_later/<lib>/` at the repo
+root. It is **outside** `akku/`, so discovery, `task test`/`ci` and the smart
+selector ignore it — the suite stays green. The live catalogue entry stays the
+single source of truth: its `status` is `todo` again and its `depends_on` lists
+the dependencies the rebuild must wait for. The parked folder keeps its `_dev/`
+record; its `_dev/TODO.md` carries the handoff (what the code does, why it was
+deferred, what to watch when bringing it back). `akku_later/` is never a second
+`akku/`: nothing may import from it.
 
 A flat namespace (all libraries siblings under `akku/`) plus this explicit
 graph keeps the overview readable — which matters most for a low-vision user.
@@ -98,18 +115,18 @@ text_encoding  Encoding
 text_string    String
 
 $ task all
-net_socket  done     Socket
-net_tcp     done     TCP
+net_socket  todo     Socket
+net_tcp     todo     TCP
 net_udp     todo     UDP
 web_http    todo     HTTP
 
 $ task count
-MojoAkku catalogue: 318 libraries
+MojoAkku catalogue: 319 libraries
 
-todo:      314
-current:   0
-done:      4
-total:     318
+todo:      311
+current:   2
+done:      6
+total:     319
 
 $ task show -- net_udp
 id: net_udp
