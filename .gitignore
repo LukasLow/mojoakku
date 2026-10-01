@@ -1,5 +1,8 @@
 .tmp/
 
+# Agent git worktrees (parallel branches) — never commit checkouts.
+.worktrees/
+
 # Kilo Code agent worktrees and local state (never commit editor/agent tooling).
 .kilo/
 **/.kilo/

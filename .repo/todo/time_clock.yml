@@ -1,6 +1,6 @@
 id: time_clock
 name: Time
-status: todo
+status: done
 depends_on: []
 mojoNeeds: [pure-mojo]
 summary: Clocks, durations and instants.

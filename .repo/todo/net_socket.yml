@@ -1,6 +1,6 @@
 id: net_socket
 name: Socket
 status: done
-depends_on: [io_core,net_ip]
+depends_on: [io_core, net_ip, time_clock, os_poll]
 mojoNeeds: [pure-mojo, net-sockets]
-summary: Low level socket primitives.
+summary: Low level socket primitives with bounded waits.

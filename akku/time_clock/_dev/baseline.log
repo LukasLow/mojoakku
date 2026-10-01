@@ -1,0 +1,46 @@
+time_clock Phase 9 (post-Phase-10-review) — failing baseline
+==========================================================
+
+Worktree: /Users/lukas/home/repos/mojoakku/.worktrees/time_clock-library
+Branch:   time_clock-library
+Date:     2026-10-01
+
+Exact command run (from the worktree root):
+  smd '{ cd .worktrees/time_clock-library && task time_clock::test }'
+  (the per-library Taskfile runs: sh ../../.repo/scrupts/libraries.sh test)
+
+Test-file count: 5
+  akku/time_clock/_tests/test_time_clock.mojo
+  akku/time_clock/_tests/test_time_deadline.mojo
+  akku/time_clock/_tests/test_time_duration.mojo
+  akku/time_clock/_tests/test_time_duration_overflow.mojo
+  akku/time_clock/_tests/test_time_error.mojo
+
+Runner semantics: libraries.sh test runs each _tests/*.mojo with `mojo run`
+and stops at the first non-zero exit. The stubs call abort(), so the baseline
+is "fails at the first file"; the remaining files are not reached by the runner,
+but each was run directly and each aborts in its first stub call (all 5 fail).
+
+----- raw output: task time_clock::test -----
+== time_clock::test
+== _tests/test_time_clock.mojo
+ABORT: /workspace/.worktrees/time_clock-library/akku/time_clock/clock.mojo:10:14: MojoAkku: this API is not yet implemented
+#0 0x0000ffff80415580 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105580)
+#1 0x0000ffff80412c40 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x102c40)
+#2 0x0000ffff80415fe4 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105fe4)
+#3 0x0000ffff82e988c0 (linux-vdso.so.1+0x8c0)
+#4 0x0000ffff4000fc3c
+/root/.pixi/envs/mojo/bin/mojo: error: execution crashed
+To get a symbolicated stack trace, compile your program using `mojo build` with debug info enabled (e.g., `-debug-level=line-tables`) and execute it separately.
+task: Failed to run task "test": exit status 1
+FAIL time_clock
+FAILED: time_clock
+task: Failed to run task "time_clock::test": exit status 1
+----- end raw output (exit=201) -----
+
+Per-file direct runs (`mojo run -I . <file>`, first line each):
+  akku/time_clock/_tests/test_time_clock.mojo: ABORT: /workspace/.worktrees/time_clock-library/akku/time_clock/clock.mojo:10:14: MojoAkku: this API is not yet implemented
+  akku/time_clock/_tests/test_time_deadline.mojo: ABORT: ./akku/time_clock/clock.mojo:10:14: MojoAkku: this API is not yet implemented
+  akku/time_clock/_tests/test_time_duration.mojo: ABORT: <unknown location in parameter context>:0:0: MojoAkku: this API is not yet implemented
+  akku/time_clock/_tests/test_time_duration_overflow.mojo: ABORT: ./akku/time_clock/duration.mojo:18:14: MojoAkku: this API is not yet implemented
+  akku/time_clock/_tests/test_time_error.mojo: ABORT: ./akku/time_clock/time_error_kind.mojo:15:14: MojoAkku: this API is not yet implemented

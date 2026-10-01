@@ -159,3 +159,28 @@ Independent reviewer APPROVED the limited fixture repair: native boundary is
 reached, both native errno values map to OTHER, assertions remain intact, no
 production changes. `smd -t '{task net_socket::ci}'` passed30/failed0/skipped0
 after the repair on Linux. The full macOS/Linux PR matrix must pass before merge.
+
+## Rewrite — bounded waits on the time and readiness siblings
+
+The blocking implementation was deferred to `akku_later/net_socket` when a flaky
+macOS CI run (SIGPIPE/EPIPE depending on OS packet timing) and the need for an
+external GNU `timeout` watchdog showed the blocking model was the root problem.
+`time_clock` (Duration/Deadline/Clock) and `os_poll` (bounded poll) were built
+first as siblings and marked done; the catalogue then listed net_socket with
+`depends_on: [io_core, net_ip, time_clock, os_poll]`.
+
+The rewrite moved the code back to `akku/net_socket` and rebuilt the socket as
+**non-blocking internally with absolute deadlines** (Go net.Conn style):
+
+- creation/accept set O_NONBLOCK (Linux atomically via SOCK_NONBLOCK/accept4);
+- `read`/`write`/`accept`/`connect` retry through `os_poll.wait` under the
+  read/write deadline; EAGAIN/EWOULDBLOCK and EINTR are absorbed;
+- a reached deadline raises `IoError(TIMED_OUT, op)` and keeps the owner usable;
+- deadline API: `set_read_deadline`, `set_write_deadline`, `set_deadline`,
+  `clear_deadline`, `has_read_deadline`, `has_write_deadline`;
+- the Taskfile no longer wraps the runner in `timeout 180`.
+
+Result: **30 passed, 0 failed, 0 skipped** on Linux aarch64, with no external
+watchdog and no OS-timing-dependent test. No third-party native library is linked,
+so a consumer needs only `mojo build` — no linker flags, no bundled archive.
+
