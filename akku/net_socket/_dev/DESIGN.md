@@ -10,7 +10,7 @@ macOS support claim can be released. No Python runtime or external C library.
 ## Status legend
 
 planned → scaffolded → tested → implemented; benchmarked is optional.
-The design and docs phases record planned API only; no implementation exists.
+API declarations and end-user docs are scaffolded; no implementation exists.
 
 ## Dependencies
 
@@ -129,7 +129,7 @@ silently shipping assumed ABI support.
 
 ## SocketAddress
 
-Status: planned
+Status: scaffolded
 
 Signature:
 ```mojo
@@ -176,7 +176,7 @@ and accessor copies because callers should not bypass the scope invariant.
 
 ## Socket
 
-Status: planned
+Status: scaffolded
 
 Signature:
 ```mojo

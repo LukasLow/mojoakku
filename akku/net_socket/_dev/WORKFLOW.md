@@ -48,3 +48,11 @@ No implementation or tests created; approved semantics unchanged.
 Independent reviewer verified two entries, seven ordered fields, exact approved
 semantics, justified siblings, planned real interruption/security/lifecycle tests,
 and no implementation claims or signature drift. No required findings.
+
+## Phase 7 — compile-ready scaffold
+
+Two public API files and exactly two root exports; private aliases keep imports
+out of the public root. All twenty own method bodies are the exact abort stub.
+Taskfile derives the shared library runner with method:none; no registration or
+shared helper change. Consumer import: `smd -t '{task net_socket::compile}'`
+passed, raw output in scaffold.log. No implementation or tests yet.

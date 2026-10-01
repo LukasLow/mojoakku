@@ -1,0 +1,5 @@
+Command: smd -t '{task net_socket::compile}'
+Exit: 0
+== net_socket::compile
+net_socket public API compiles.
+PASS net_socket

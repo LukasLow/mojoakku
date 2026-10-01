@@ -1,0 +1,24 @@
+version: '3'
+silent: true
+method: none
+
+tasks:
+  default:
+    desc: 'Run the net_socket test suite.'
+    cmds:
+      - task: test
+  test:
+    desc: 'Run each test program, stopping on the first failure.'
+    dir: '{{.TASKFILE_DIR}}'
+    cmds:
+      - sh ../../.repo/scrupts/libraries.sh test
+  compile:
+    desc: 'Compile the public API through a consumer import.'
+    dir: '{{.TASKFILE_DIR}}'
+    cmds:
+      - sh ../../.repo/scrupts/libraries.sh compile
+  ci:
+    desc: 'Compile and test the library once.'
+    cmds:
+      - task: compile
+      - task: test
