@@ -95,7 +95,9 @@ Each library owns its native and Python code, including vendored code under
 
 Changes inside a library, including tests and fixtures, select its suite.
 Changes to shared runner scripts, root Taskfile, toolchain/lockfiles, CI setup or
-shared test infrastructure select all libraries. Pure developer notes in _dev,
+shared test infrastructure select all libraries. Markdown files (`.md`) anywhere are explicitly excluded as documentation; this
+is a blacklist, not a source-extension whitelist. Other library files remain
+relevant, including native/Python code and fixtures. Pure developer notes in _dev,
 release metadata and catalogue descriptions do not on their own select suites.
 Unclassified changes are conservative full-check triggers.
 
