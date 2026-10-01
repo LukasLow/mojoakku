@@ -1,6 +1,6 @@
 id: net_socket
 name: Socket
-status: todo
+status: current
 depends_on: [io_core, net_ip, time_clock, os_poll]
 mojoNeeds: [pure-mojo, net-sockets]
-summary: Low level socket primitives. Deferred: current code lives in akku_later/net_socket and waits for time_clock and os_poll, then is rebuilt timeout-bounded (see akku_later/net_socket/_dev/TODO.md).
+summary: Low level socket primitives. Rebuild pending: the old blocking code is parked in akku_later/net_socket; rebuild it timeout-bounded on time_clock and os_poll (see akku_later/net_socket/_dev/TODO.md).
