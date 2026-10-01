@@ -162,8 +162,9 @@ Tests:
 - `test_local_address_ipv4` / `test_local_address_ipv6`: native local endpoint
   preserves family, IP and assigned nonzero bind(port=0) port.
 
-These are planned assertions, not claims that tests already exist. The same
-SocketAddress contract applies when a value is returned by local_address.
+These assertions are covered by the reviewed address and connection tests;
+TESTS.md records the executed programs. The same SocketAddress contract applies
+when a value is returned by local_address.
 
 Implementation status: implemented
 
