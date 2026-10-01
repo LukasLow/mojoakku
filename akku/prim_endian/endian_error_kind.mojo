@@ -1,3 +1,6 @@
+from std.os import abort
+
+
 # EndianErrorKind — closed discriminant for EndianError.
 struct EndianErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     var _id: UInt8

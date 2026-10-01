@@ -1,0 +1,82 @@
+prim_endian Phase 9 — behavioral test suite + failing baseline
+==============================================================
+
+Branch:  prim_endian-library
+Date:    2026-10-01
+Files:   akku/prim_endian/_tests/test_prim_endian_*.mojo (one concern per file)
+
+Exact commands
+--------------
+Run from the repo root (or `cd akku/prim_endian && task test`, which does the
+same):
+
+  smd '{ cd akku/prim_endian && task test }'
+  # Taskfile.yml:13-17 -> `sh ../../.repo/scrupts/libraries.sh test`
+  # libraries.sh:15-20  -> for each _tests/*.mojo: `mojo run -I <root> <file>`
+
+Direct per-file equivalent (used below to see every file, because the runner
+stops at the first failure):
+  cd akku/prim_endian && for f in _tests/*.mojo; do mojo run -I ../.. "$f"; done
+
+Test inventory
+--------------
+Test-file count: 8    Test-function total: 36
+  _tests/test_prim_endian_endian_order.mojo        (4 tests)
+  _tests/test_prim_endian_endian_error_kind.mojo   (3 tests)
+  _tests/test_prim_endian_endian_error.mojo        (4 tests)
+  _tests/test_prim_endian_host_order.mojo          (2 tests)
+  _tests/test_prim_endian_swap_bytes.mojo          (6 tests)
+  _tests/test_prim_endian_to_order.mojo            (5 tests)
+  _tests/test_prim_endian_from_order.mojo          (5 tests)
+  _tests/test_prim_endian_to_bytes_from_bytes.mojo (7 tests)
+
+Baseline result (intended red state)
+------------------------------------
+Files run:     8
+Files passing: 0
+Files failing: 8 / 8 — each fails with a stub `abort`, the intended red state.
+
+Raw output — per-file run (each line is the abort of that file)
+--------------------------------------------------------------
+== _tests/test_prim_endian_endian_error.mojo
+ABORT: ./akku/prim_endian/endian_error.mojo:14:14: MojoAkku: this API is not yet implemented
+== _tests/test_prim_endian_endian_error_kind.mojo
+ABORT: ./akku/prim_endian/endian_error_kind.mojo:19:14: MojoAkku: this API is not yet implemented
+== _tests/test_prim_endian_endian_order.mojo
+ABORT: ./akku/prim_endian/host_order.mojo:8:10: MojoAkku: this API is not yet implemented
+== _tests/test_prim_endian_from_order.mojo
+ABORT: ../../akku/prim_endian/host_order.mojo:8:10: MojoAkku: this API is not yet implemented
+== _tests/test_prim_endian_host_order.mojo
+ABORT: ./akku/prim_endian/host_order.mojo:8:10: MojoAkku: this API is not yet implemented
+== _tests/test_prim_endian_swap_bytes.mojo
+ABORT: ../../akku/prim_endian/swap_bytes.mojo:6:10: MojoAkku: this API is not yet implemented
+== _tests/test_prim_endian_to_bytes_from_bytes.mojo
+ABORT: ../../akku/prim_endian/to_bytes_into.mojo:9:10: MojoAkku: this API is not yet implemented
+== _tests/test_prim_endian_to_order.mojo
+ABORT: ../../akku/prim_endian/host_order.mojo:8:10: MojoAkku: this API is not yet implemented
+
+`cd akku/prim_endian && task test` stops at the first file
+---------------------------------------------------------
+The per-library runner (`libraries.sh test`) stops at the first non-zero exit,
+so `task test` reports only the first file:
+
+  == _tests/test_prim_endian_endian_error.mojo
+  ABORT: ./akku/prim_endian/endian_error.mojo:14:14: MojoAkku: this API is not yet implemented
+  task: Failed to run task "test": exit status 1
+
+Note on the scaffold fix
+------------------------
+The first baseline run failed with a parse error: the stubs called `abort(...)`
+without `from std.os import abort`. `task compile` missed it because it emits
+`from akku.prim_endian import *` and Mojo resolves `import *` lazily. The
+scaffold was corrected (Phase-7 rework, recorded in the Phase-8 commit) by
+adding `from std.os import abort` to all 9 API files; the red state above is the
+result. This is exactly the defect net_socket fixed in
+"phase 7 rework: import abort for instantiated stubs" (commit e8378aa).
+
+Interpretation
+--------------
+- 8 test files, 36 test functions, 8 files failing, 0 passing — the intended
+  red baseline: the tests fail because the stubs abort, not for any other reason.
+- No test assertion was executed; no test logic is yet disproven. The tests are
+  expected to go green in Phase 11 (implementation).

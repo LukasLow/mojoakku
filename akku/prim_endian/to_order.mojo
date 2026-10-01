@@ -1,3 +1,5 @@
+from std.os import abort
+
 from .endian_order import EndianOrder
 
 

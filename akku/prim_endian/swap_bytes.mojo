@@ -1,3 +1,6 @@
+from std.os import abort
+
+
 # swap_bytes — reverse an integral value's byte order.
 def swap_bytes[dtype: DType](x: Scalar[dtype]) -> Scalar[dtype] where dtype.is_integral():
     abort("MojoAkku: this API is not yet implemented")
