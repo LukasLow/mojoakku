@@ -1,58 +1,278 @@
-from std.os import abort
-from akku.net_ip import AddressFamily as _AddressFamily
+from std.ffi import (
+    external_call as _external_call, c_int as _c_int, c_uint as _c_uint,
+    c_size_t as _c_size_t, c_ssize_t as _c_ssize_t,
+)
+from std.sys import CompilationTarget as _Target
+from akku.net_ip import (
+    AddressFamily as _AddressFamily, IpAddress as _IpAddress,
+    Ipv4Address as _Ipv4Address, Ipv6Address as _Ipv6Address,
+)
 from akku.io_core import (
     Reader as _Reader, ByteWriter as _ByteWriter,
-    ReadResult as _ReadResult, IoError as _IoError,
+    ReadResult as _ReadResult, IoError as _IoError, IoErrorKind as _IoErrorKind,
 )
 from .socket_address import SocketAddress as _SocketAddress
 
 
+# MissingMojo - v1.1.0 - Start
+# kind: FFI
+# need: stable native Mojo owned POSIX sockets and numeric endpoint operations
+# optimal: replace the private libc boundary with stable native Mojo socket APIs
+# track: https://mojolang.org/docs/std/
+# MissingMojo - End
+# sockaddr_in/in6 layouts measured independently; see _dev/ABI.md.
+comptime _AF6 = _c_int(30 if _Target.is_macos() else 10)
+comptime _V6ONLY = _c_int(27 if _Target.is_macos() else 26)
+comptime _EAGAIN = _c_int(35 if _Target.is_macos() else 11)
+comptime _ETIMEDOUT = _c_int(60 if _Target.is_macos() else 110)
+
+
+def _errno() -> _c_int:
+    comptime if _Target.is_macos():
+        return _external_call["__error", Pointer[_c_int, MutUntrackedOrigin]]()[]
+    else:
+        return _external_call["__errno_location", Pointer[_c_int, MutUntrackedOrigin]]()[]
+
+
+def _native_error(code: _c_int, op: String) -> _IoError:
+    var kind = _IoErrorKind.OTHER
+    if code == 4:
+        kind = _IoErrorKind.INTERRUPTED
+    elif code == _EAGAIN:
+        kind = _IoErrorKind.WOULD_BLOCK
+    elif code == _ETIMEDOUT:
+        kind = _IoErrorKind.TIMED_OUT
+    elif code == 9:
+        kind = _IoErrorKind.CLOSED
+    return _IoError(kind, op, String("native errno ", code))
+
+
+def _configure_handle(fd: _c_int, op: String) raises _IoError:
+    # Linux flags are atomic at socket/accept4; Darwin supplies the other policy.
+    comptime if _Target.is_macos():
+        var flags = _external_call["fcntl", _c_int, num_fixed_args=2](fd, _c_int(1))
+        if flags < 0:
+            var code = _errno()
+            raise _native_error(code, op)
+        if _external_call["fcntl", _c_int, num_fixed_args=2](fd, _c_int(2), flags | _c_int(1)) < 0:
+            var code = _errno()
+            raise _native_error(code, op)
+        var enabled = _c_int(1)
+        if _external_call["setsockopt", _c_int](fd, _c_int(65535), _c_int(4130), Pointer(to=enabled).unsafe_bitcast[NoneType](), _c_uint(4)) < 0:
+            var code = _errno()
+            raise _native_error(code, op)
+
+
+def _pack(address: _SocketAddress) -> Array[UInt32, 32]:
+    var storage = Array[UInt32, 32](fill=0)
+    var bytes = storage.unsafe_ptr().unsafe_bitcast[UInt8]()
+    var ip = address.address()
+    var size = 16 if ip.is_ipv4() else 28
+    var family = _c_int(2) if ip.is_ipv4() else _AF6
+    comptime if _Target.is_macos():
+        bytes[unsafe_offset=0] = UInt8(size)
+        bytes[unsafe_offset=1] = UInt8(family)
+    else:
+        storage.unsafe_ptr().unsafe_bitcast[UInt16]()[] = UInt16(family)
+    bytes[unsafe_offset=2] = UInt8(address.port() >> 8)
+    bytes[unsafe_offset=3] = UInt8(address.port() & 255)
+    if ip.is_ipv4():
+        var octets = ip.to_ipv4().value().octets()
+        for i in range(4):
+            bytes[unsafe_offset=4+i] = octets[i]
+    else:
+        var octets = ip.to_ipv6().value().octets()
+        for i in range(16):
+            bytes[unsafe_offset=8+i] = octets[i]
+        storage[6] = address.scope_id()
+    return storage^
+
+
+def _unpack(storage: Array[UInt32, 32], length: _c_uint) raises _IoError -> _SocketAddress:
+    if length < 2 or length > 128:
+        raise _IoError(_IoErrorKind.OTHER, "local_address", "invalid native address length")
+    var bytes = storage.unsafe_ptr().unsafe_bitcast[UInt8]()
+    var family: _c_int
+    comptime if _Target.is_macos():
+        family = _c_int(bytes[unsafe_offset=1])
+    else:
+        family = _c_int(storage.unsafe_ptr().unsafe_bitcast[UInt16]()[])
+    var port = (UInt16(bytes[unsafe_offset=2]) << 8) | UInt16(bytes[unsafe_offset=3])
+    if family == 2 and length >= 16:
+        var ip = _Ipv4Address.from_octets(bytes[unsafe_offset=4], bytes[unsafe_offset=5], bytes[unsafe_offset=6], bytes[unsafe_offset=7])
+        return _SocketAddress(_IpAddress.from_ipv4(ip), port)
+    if family == _AF6 and length >= 28:
+        var value = UInt128(0)
+        for i in range(16):
+            value = (value << 8) | UInt128(bytes[unsafe_offset=8+i])
+        return _SocketAddress(_IpAddress.from_ipv6(_Ipv6Address.from_u128(value)), port, storage[6])
+    raise _IoError(_IoErrorKind.OTHER, "local_address", "unsupported native address family or length")
+
+
 struct Socket(Movable, Deinitable, _Reader, _ByteWriter):
-    var _fd: Int32
+    var _fd: _c_int
     var _family: _AddressFamily
     var _write_shutdown: Bool
 
     def __init__(out self, family: _AddressFamily) raises _IoError:
-        abort("MojoAkku: this API is not yet implemented")
+        self._fd = -1
+        self._family = family
+        self._write_shutdown = False
+        if family != _AddressFamily.IPV4 and family != _AddressFamily.IPV6:
+            raise _IoError(_IoErrorKind.OTHER, "socket", "invalid address family")
+        comptime if not _Target.is_linux() and not _Target.is_macos():
+            raise _IoError(_IoErrorKind.OTHER, "socket", "unsupported target")
+        var domain = _c_int(2) if family == _AddressFamily.IPV4 else _AF6
+        var flags = _c_int(1)
+        comptime if _Target.is_linux():
+            flags |= _c_int(524288)
+        self._fd = _external_call["socket", _c_int](domain, flags, _c_int(0))
+        if self._fd < 0:
+            var code = _errno()
+            raise _native_error(code, "socket")
+        try:
+            _configure_handle(self._fd, "socket")
+            if family == _AddressFamily.IPV6:
+                var enabled = _c_int(1)
+                if _external_call["setsockopt", _c_int](self._fd, _c_int(41), _V6ONLY, Pointer(to=enabled).unsafe_bitcast[NoneType](), _c_uint(4)) < 0:
+                    var code = _errno()
+                    raise _native_error(code, "socket")
+        except error:
+            var fd = self._fd
+            self._fd = -1
+            _ = _external_call["close", _c_int](fd)
+            raise error^
+
+    @doc_hidden
+    def __init__(out self, *, _accepted_fd: _c_int, _family: _AddressFamily):
+        self._fd = _accepted_fd
+        self._family = _family
+        self._write_shutdown = False
 
     def __init__(out self, *, deinit move: Self):
-        abort("MojoAkku: this API is not yet implemented")
+        self._fd = move._fd
+        self._family = move._family
+        self._write_shutdown = move._write_shutdown
 
     def __deinit__(deinit self):
-        abort("MojoAkku: this API is not yet implemented")
+        if self._fd >= 0:
+            _ = _external_call["close", _c_int](self._fd)
+
+    def _check_open(self, op: String) raises _IoError:
+        if self._fd < 0:
+            raise _IoError(_IoErrorKind.CLOSED, op, "socket is closed")
+
+    def _check_family(self, address: _SocketAddress, op: String) raises _IoError:
+        if address.address().family() != self._family:
+            raise _IoError(_IoErrorKind.OTHER, op, "address family mismatch")
 
     def bind(mut self, address: _SocketAddress) raises _IoError:
-        abort("MojoAkku: this API is not yet implemented")
+        self._check_open("bind")
+        self._check_family(address, "bind")
+        var storage = _pack(address)
+        var length = _c_uint(16 if self._family == _AddressFamily.IPV4 else 28)
+        if _external_call["bind", _c_int](self._fd, storage.unsafe_ptr().unsafe_bitcast[NoneType](), length) < 0:
+            var code = _errno()
+            raise _native_error(code, "bind")
 
     def listen(mut self, backlog: Int = 128) raises _IoError:
-        abort("MojoAkku: this API is not yet implemented")
+        self._check_open("listen")
+        if backlog <= 0:
+            raise _IoError(_IoErrorKind.OTHER, "listen", "backlog must be positive")
+        var capped = min(backlog, 2147483647)
+        if _external_call["listen", _c_int](self._fd, _c_int(capped)) < 0:
+            var code = _errno()
+            raise _native_error(code, "listen")
 
     def connect(mut self, address: _SocketAddress) raises _IoError:
-        abort("MojoAkku: this API is not yet implemented")
+        self._check_open("connect")
+        self._check_family(address, "connect")
+        var storage = _pack(address)
+        var length = _c_uint(16 if self._family == _AddressFamily.IPV4 else 28)
+        if _external_call["connect", _c_int](self._fd, storage.unsafe_ptr().unsafe_bitcast[NoneType](), length) < 0:
+            var code = _errno()
+            var fd = self._fd
+            self._fd = -1
+            _ = _external_call["close", _c_int](fd)
+            raise _native_error(code, "connect")
 
     def accept(mut self) raises _IoError -> Socket:
-        abort("MojoAkku: this API is not yet implemented")
+        self._check_open("accept")
+        var storage = Array[UInt32, 32](fill=0)
+        var length = _c_uint(128)
+        var fd: _c_int
+        comptime if _Target.is_linux():
+            fd = _external_call["accept4", _c_int](self._fd, storage.unsafe_ptr().unsafe_bitcast[NoneType](), Pointer(to=length), _c_int(524288))
+        else:
+            fd = _external_call["accept", _c_int](self._fd, storage.unsafe_ptr().unsafe_bitcast[NoneType](), Pointer(to=length))
+        if fd < 0:
+            var code = _errno()
+            raise _native_error(code, "accept")
+        # Accepted IPv6 sockets already inherit V6ONLY; do not set it after bind.
+        try:
+            _configure_handle(fd, "accept")
+        except error:
+            _ = _external_call["close", _c_int](fd)
+            raise error^
+        return Socket(_accepted_fd=fd, _family=self._family)
 
     def local_address(mut self) raises _IoError -> _SocketAddress:
-        abort("MojoAkku: this API is not yet implemented")
+        self._check_open("local_address")
+        var storage = Array[UInt32, 32](fill=0)
+        var length = _c_uint(128)
+        if _external_call["getsockname", _c_int](self._fd, storage.unsafe_ptr().unsafe_bitcast[NoneType](), Pointer(to=length)) < 0:
+            var code = _errno()
+            raise _native_error(code, "local_address")
+        return _unpack(storage, length)
 
     def read(mut self, buf: MutSpan[UInt8, _]) raises _IoError -> _ReadResult:
-        abort("MojoAkku: this API is not yet implemented")
+        self._check_open("read")
+        if len(buf) == 0:
+            raise _IoError(_IoErrorKind.OTHER, "read", "empty destination")
+        var count = _external_call["recv", _c_ssize_t](self._fd, buf.unsafe_ptr().unsafe_bitcast[NoneType](), _c_size_t(len(buf)), _c_int(0))
+        if count < 0:
+            var code = _errno()
+            raise _native_error(code, "read")
+        return _ReadResult(Int(count), count == 0)
 
     def write(mut self, data: Span[UInt8, _]) raises _IoError -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        self._check_open("write")
+        if self._write_shutdown:
+            raise _IoError(_IoErrorKind.CLOSED, "write", "socket writes are shut down")
+        if len(data) == 0:
+            return 0
+        var flags = _c_int(16384) if _Target.is_linux() else _c_int(0)
+        var count = _external_call["send", _c_ssize_t](self._fd, data.unsafe_ptr().unsafe_bitcast[NoneType](), _c_size_t(len(data)), flags)
+        if count < 0:
+            var code = _errno()
+            raise _native_error(code, "write")
+        if count == 0:
+            raise _IoError(_IoErrorKind.OTHER, "write", "write made no progress")
+        return Int(count)
 
     def shutdown_write(mut self) raises _IoError:
-        abort("MojoAkku: this API is not yet implemented")
+        self._check_open("shutdown_write")
+        if self._write_shutdown:
+            return
+        if _external_call["shutdown", _c_int](self._fd, _c_int(1)) < 0:
+            var code = _errno()
+            raise _native_error(code, "shutdown_write")
+        self._write_shutdown = True
 
     def close(mut self) raises _IoError:
-        abort("MojoAkku: this API is not yet implemented")
+        if self._fd < 0:
+            return
+        var fd = self._fd
+        self._fd = -1
+        if _external_call["close", _c_int](fd) < 0:
+            var code = _errno()
+            raise _native_error(code, "close")
 
     def is_closed(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._fd < 0
 
     def flush(mut self) raises _IoError:
-        abort("MojoAkku: this API is not yet implemented")
+        self._check_open("flush")
 
 # API-DOCS-START
 # Socket — one owner of a blocking numeric-IP stream socket.

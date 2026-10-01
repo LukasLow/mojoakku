@@ -102,3 +102,13 @@ EOF, actual EINTR/EAGAIN, accepted/client SIGPIPE, CLOEXEC, IPv6-only, ownership
 closed precedence and invalid inputs are non-tautological. No private imports.
 Real ETIMEDOUT induction remains unproven; Phase 12 must inspect the exact mapping
 and target constants. No tests changed. Implementation is now permitted.
+
+## Phase 11 — implementation green
+
+Implemented SocketAddress and owned blocking Socket against the frozen tests.
+Final library CI passed all 30 cases in five programs: zero failed or skipped;
+MissingMojo check passed. Exact commands and raw output: implementation.log.
+Tests are unchanged from f609d1e. Immediate errno capture, descriptor invalidation
+before close, platform SIGPIPE suppression and CLOEXEC are implemented.
+ABI.md records independent Linux/macOS native probes; macOS Mojo runtime and
+actual ETIMEDOUT induction remain unverified. Ready for independent Phase 12.

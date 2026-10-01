@@ -10,7 +10,7 @@ macOS support claim can be released. No Python runtime or external C library.
 ## Status legend
 
 planned → scaffolded → tested → implemented; benchmarked is optional.
-API declarations and end-user docs are scaffolded; no implementation exists.
+Both entries are implemented against the reviewed frozen test baseline.
 
 ## Dependencies
 
@@ -129,7 +129,7 @@ silently shipping assumed ABI support.
 
 ## SocketAddress
 
-Status: scaffolded
+Status: implemented
 
 Signature:
 ```mojo
@@ -165,7 +165,7 @@ Tests:
 These are planned assertions, not claims that tests already exist. The same
 SocketAddress contract applies when a value is returned by local_address.
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses SocketAddress because Rust SocketAddr and Python address
 tuples separate numeric endpoints from handles (`rust.md` §7, `python.md` §7).
@@ -176,7 +176,7 @@ and accessor copies because callers should not bypass the scope invariant.
 
 ## Socket
 
-Status: scaffolded
+Status: implemented
 
 Signature:
 ```mojo
@@ -295,7 +295,7 @@ Descriptor ownership/security tests use independent OS observations or a native
 peer fixture, without importing the library's private implementation. Names may
 be refined before the reviewed test baseline; semantics remain frozen.
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a movable Socket because Rust OwnedFd and C++ RAII
 explicitly model single ownership (`rust.md` §5, `cpp.md` §5). MojoAkku uses
