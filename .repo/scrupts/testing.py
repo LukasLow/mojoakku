@@ -117,7 +117,8 @@ def developer_note(path):
 
 def documentation(path):
     return (
-        path in {"README.md", "AGENTS.md", "TODO.md", "CHANGELOG.md", "LICENSE", ".repo/TESTING.md"}
+        path.endswith(".md")
+        or path in {"LICENSE"}
         or path.startswith(("docs/", ".changes/", ".repo/todo/"))
         or (path.startswith(".agents/") and path.endswith(".md"))
     )
