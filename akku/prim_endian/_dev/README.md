@@ -77,3 +77,8 @@ with the reason no source exists.
 Phase 1 is complete: 8 language files written directly by 5 researchers (one per
 selected group), Mojo linked to the `mojov1` buch. The review happens in
 `.agents/workflows/NewLibPhase2ResearchReview.md`.
+
+## Later phases
+
+- Phase 9 baseline: `baseline-tests.log` (8 test files, 36 tests, 8/8 failing —
+  the intended red state against the not-yet-implemented stubs).

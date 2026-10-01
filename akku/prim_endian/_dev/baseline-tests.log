@@ -2,7 +2,7 @@ prim_endian Phase 9 — behavioral test suite + failing baseline
 ==============================================================
 
 Branch:  prim_endian-library
-Date:    2026-10-01
+Date:    2026-10-01 (refreshed after Phase-10 review findings)
 Files:   akku/prim_endian/_tests/test_prim_endian_*.mojo (one concern per file)
 
 Exact commands
@@ -20,7 +20,7 @@ stops at the first failure):
 
 Test inventory
 --------------
-Test-file count: 8    Test-function total: 36
+Test-file count: 8    Test-function total: 40
   _tests/test_prim_endian_endian_order.mojo        (4 tests)
   _tests/test_prim_endian_endian_error_kind.mojo   (3 tests)
   _tests/test_prim_endian_endian_error.mojo        (4 tests)
@@ -28,7 +28,7 @@ Test-file count: 8    Test-function total: 36
   _tests/test_prim_endian_swap_bytes.mojo          (6 tests)
   _tests/test_prim_endian_to_order.mojo            (5 tests)
   _tests/test_prim_endian_from_order.mojo          (5 tests)
-  _tests/test_prim_endian_to_bytes_from_bytes.mojo (7 tests)
+  _tests/test_prim_endian_to_bytes_from_bytes.mojo (11 tests)
 
 Baseline result (intended red state)
 ------------------------------------
@@ -36,8 +36,8 @@ Files run:     8
 Files passing: 0
 Files failing: 8 / 8 — each fails with a stub `abort`, the intended red state.
 
-Raw output — per-file run (each line is the abort of that file)
---------------------------------------------------------------
+Raw output — exact reproduction (each line is that file's abort)
+----------------------------------------------------------------
 == _tests/test_prim_endian_endian_error.mojo
 ABORT: ./akku/prim_endian/endian_error.mojo:14:14: MojoAkku: this API is not yet implemented
 == _tests/test_prim_endian_endian_error_kind.mojo
@@ -54,6 +54,15 @@ ABORT: ../../akku/prim_endian/swap_bytes.mojo:6:10: MojoAkku: this API is not ye
 ABORT: ../../akku/prim_endian/to_bytes_into.mojo:9:10: MojoAkku: this API is not yet implemented
 == _tests/test_prim_endian_to_order.mojo
 ABORT: ../../akku/prim_endian/host_order.mojo:8:10: MojoAkku: this API is not yet implemented
+
+Note on the reported line numbers
+---------------------------------
+Mojo reports the abort location as `endian_error_kind.mojo:19:14` while the
+`abort(...)` statement is on source line 20. The `:19` is the source span the
+runtime prints (the statement's start), not the physical `abort` line; the log
+records the raw runtime output verbatim. This is why the numbers here may differ
+from a naive `grep -n abort` (source line 20). No inconsistency — the log is the
+captured command output.
 
 `cd akku/prim_endian && task test` stops at the first file
 ---------------------------------------------------------
@@ -76,7 +85,9 @@ result. This is exactly the defect net_socket fixed in
 
 Interpretation
 --------------
-- 8 test files, 36 test functions, 8 files failing, 0 passing — the intended
+- 8 test files, 40 test functions, 8 files failing, 0 passing — the intended
   red baseline: the tests fail because the stubs abort, not for any other reason.
+- Coverage now includes the NATIVE buffer mode, an over-long `dst`, and the
+  2/4/8-byte round-trips, per the Phase-10 review findings.
 - No test assertion was executed; no test logic is yet disproven. The tests are
   expected to go green in Phase 11 (implementation).

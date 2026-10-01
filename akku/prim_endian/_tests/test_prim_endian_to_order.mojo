@@ -10,13 +10,13 @@ from std.testing import assert_equal, assert_true, assert_false, TestSuite
 from akku.prim_endian import EndianOrder, host_order, swap_bytes, to_order, from_order
 
 
-def test_to_order_big_on_little_host_swaps() raises:
-    # On a little-endian host, BIG is the opposite order and swaps the bytes.
-    if host_order() == EndianOrder.LITTLE:
-        assert_equal(to_order(UInt16(0x0102), EndianOrder.BIG), UInt16(0x0201))
-        assert_equal(
-            to_order(UInt32(0x01020304), EndianOrder.BIG), UInt32(0x04030201)
-        )
+def test_to_order_swaps_only_off_host() raises:
+    # Host-independent: converting to the non-host order swaps the bytes;
+    # converting to the host order is the identity. No host is assumed.
+    var host = host_order()
+    var non_host = EndianOrder.BIG if host == EndianOrder.LITTLE else EndianOrder.LITTLE
+    assert_equal(to_order(UInt32(0x01020304), non_host), UInt32(0x04030201))
+    assert_equal(to_order(UInt32(0x01020304), host), UInt32(0x01020304))
 
 
 def test_to_order_matches_host_order_rule() raises:

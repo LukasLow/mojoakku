@@ -12,6 +12,7 @@ from akku.prim_endian import (
     EndianOrder,
     EndianError,
     EndianErrorKind,
+    host_order,
     to_bytes_into,
     from_bytes,
 )
@@ -98,6 +99,62 @@ def test_from_bytes_empty_span_raises_bad_length() raises:
         kind = e.kind
     assert_true(caught)
     assert_equal(kind, EndianErrorKind.BAD_LENGTH)
+
+
+def test_to_bytes_into_too_long_raises_bad_length() raises:
+    # dst longer than the carrier's width is also BAD_LENGTH (exact length
+    # required, not a minimum), and the buffer is left untouched.
+    var dst: List[UInt8] = [0xAA, 0xAA, 0xAA, 0xAA]
+    var kind = EndianErrorKind.OTHER
+    try:
+        to_bytes_into(UInt16(0x0102), MutSpan(dst), EndianOrder.BIG)
+    except e:
+        kind = e.kind
+    assert_equal(kind, EndianErrorKind.BAD_LENGTH)
+    assert_equal(dst[0], UInt8(0xAA))
+
+
+def test_to_bytes_into_native_matches_host_layout() raises:
+    # NATIVE is the host order; its byte layout equals writing the host order.
+    var value: UInt32 = 0x01020304
+    var host = host_order()
+    var native_dst: List[UInt8] = [0, 0, 0, 0]
+    var host_dst: List[UInt8] = [0, 0, 0, 0]
+    to_bytes_into(value, MutSpan(native_dst), EndianOrder.NATIVE)
+    to_bytes_into(value, MutSpan(host_dst), host)
+    for i in range(4):
+        assert_equal(native_dst[i], host_dst[i])
+    assert_equal(
+        from_bytes[DType.uint32](Span(native_dst), EndianOrder.NATIVE), value
+    )
+
+
+def test_from_bytes_native_matches_host_layout() raises:
+    # Reading with NATIVE reads the host layout: for a host-order byte list it
+    # returns the value unchanged.
+    var value: UInt32 = 0xDEADBEEF
+    var host = host_order()
+    var bytes: List[UInt8] = [0, 0, 0, 0]
+    to_bytes_into(value, MutSpan(bytes), host)
+    assert_equal(from_bytes[DType.uint32](Span(bytes), EndianOrder.NATIVE), value)
+
+
+def test_bytes_per_width() raises:
+    # Round-trip for 2-, 4- and 8-byte carriers in both explicit orders.
+    for order in [EndianOrder.LITTLE, EndianOrder.BIG]:
+        var d2: List[UInt8] = [0, 0]
+        to_bytes_into(UInt16(0x0102), MutSpan(d2), order)
+        assert_equal(from_bytes[DType.uint16](Span(d2), order), UInt16(0x0102))
+
+        var d4: List[UInt8] = [0, 0, 0, 0]
+        to_bytes_into(UInt32(0x01020304), MutSpan(d4), order)
+        assert_equal(from_bytes[DType.uint32](Span(d4), order), UInt32(0x01020304))
+
+        var d8: List[UInt8] = [0, 0, 0, 0, 0, 0, 0, 0]
+        to_bytes_into(UInt64(0x0102030405060708), MutSpan(d8), order)
+        assert_equal(
+            from_bytes[DType.uint64](Span(d8), order), UInt64(0x0102030405060708)
+        )
 
 
 def main() raises:
