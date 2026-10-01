@@ -1,13 +1,47 @@
-from std.os import abort
+from std.ffi import c_int, c_short
+from std.time import perf_counter_ns
 
+from .poll_error_kind import PollErrorKind
 from .poll_fd import PollFd
+from .poll_events import PollEvents
 from .poll_timeout import PollTimeout
 from .poll_error import PollError
+from akku.os_poll._internal.poll_native import RawPollFd, poll_once, read_errno, is_eintr
 
 
 # wait_many — bounded readiness wait for a caller-owned set of descriptors.
 def wait_many(mut fds: MutSpan[PollFd, _], timeout: PollTimeout) raises PollError -> Int:
-    abort("MojoAkku: this API is not yet implemented")
+    if timeout.millis < 0 or timeout.millis > PollTimeout.MAX_MILLIS:
+        raise PollError(PollErrorKind.INVALID_TIMEOUT, "wait_many", "timeout out of range")
+    var count = len(fds)
+    if count == 0:
+        return 0
+    var raw = List[RawPollFd]()
+    for i in range(count):
+        fds[i].clear()
+        raw.append(RawPollFd(c_int(fds[i].fd), c_short(fds[i].events.bits()), c_short(0)))
+    var remaining_ms = timeout.millis
+    var deadline_ns = perf_counter_ns() + remaining_ms * 1_000_000
+    while True:
+        var n = poll_once(raw, remaining_ms)
+        if n > 0:
+            break
+        if n < 0:
+            var code = read_errno()
+            if not is_eintr(code):
+                raise PollError(PollErrorKind.SYSCALL, "wait_many", String("errno ", code))
+        var remaining_ns = deadline_ns - perf_counter_ns()
+        if remaining_ns <= 0:
+            break
+        remaining_ms = (remaining_ns + 999_999) // 1_000_000
+        if remaining_ms > PollTimeout.MAX_MILLIS:
+            remaining_ms = PollTimeout.MAX_MILLIS
+    var ready = 0
+    for i in range(count):
+        fds[i].revents = PollEvents(UInt16(raw[i].revents))
+        if not fds[i].revents.is_empty():
+            ready += 1
+    return ready
 
 # API-DOCS-START
 # wait_many — wait at most `timeout` ms for any descriptor in the set to be ready.

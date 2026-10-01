@@ -1,6 +1,3 @@
-from std.os import abort
-
-
 # PollTimeout — a bounded wait, in milliseconds. There is no infinite form.
 struct PollTimeout(ImplicitlyCopyable, Deinitable, Equatable, Writable):
     var millis: Int
@@ -13,17 +10,21 @@ struct PollTimeout(ImplicitlyCopyable, Deinitable, Equatable, Writable):
         self.millis = millis
 
     def __eq__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self.millis == other.millis
 
     @staticmethod
     def clamped(millis: Int) -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        if millis < 0:
+            return Self(0)
+        if millis > Self.MAX_MILLIS:
+            return Self(Self.MAX_MILLIS)
+        return Self(millis)
 
     def is_zero(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self.millis == 0
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write("PollTimeout(", self.millis, " ms)")
 
 # API-DOCS-START
 # PollTimeout — a bounded wait, in milliseconds. There is no infinite form.

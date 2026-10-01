@@ -1,5 +1,3 @@
-from std.os import abort
-
 from .poll_events import PollEvents
 
 
@@ -15,13 +13,13 @@ struct PollFd(Copyable, Deinitable, Writable):
         self.revents = PollEvents.NONE
 
     def is_ready(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return not self.revents.is_empty()
 
-    def clear(self):
-        abort("MojoAkku: this API is not yet implemented")
+    def clear(mut self):
+        self.revents = PollEvents.NONE
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write("PollFd(fd=", self.fd, ", events=", self.events, ", revents=", self.revents, ")")
 
 # API-DOCS-START
 # PollFd — one descriptor record: fd, interest events and result revents.
@@ -32,7 +30,7 @@ struct PollFd(Copyable, Deinitable, Writable):
 #       var revents: PollEvents
 #       def __init__(out self, fd: Int, events: PollEvents)
 #       def is_ready(self) -> Bool
-#       def clear(self)
+#       def clear(mut self)
 #       def write_to(self, mut writer: Some[Writer])
 # What it does:
 #   The record you put in the set handed to wait_many. `fd` is the descriptor

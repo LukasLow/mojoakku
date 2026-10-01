@@ -1,7 +1,3 @@
-from std.os import abort
-from std.ffi import c_short as _c_short
-
-
 # PollEvents — the portable fd-readiness bitmask, used as interest and as result.
 struct PollEvents(ImplicitlyCopyable, Deinitable, Equatable, Writable):
     var _bits: UInt16
@@ -20,43 +16,75 @@ struct PollEvents(ImplicitlyCopyable, Deinitable, Equatable, Writable):
     comptime INVALID  = PollEvents(0x0020)   # POLLNVAL
 
     def __eq__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._bits == other._bits
 
     def bits(self) -> UInt16:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._bits
 
     def is_empty(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._bits == 0
 
     def __bool__(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._bits != 0
 
     def contains(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return (self._bits & other._bits) == other._bits
 
     def is_readable(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return (self._bits & 0x0001) != 0
 
     def is_writable(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return (self._bits & 0x0004) != 0
 
     def has_error(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return (self._bits & 0x0008) != 0
 
     def has_hangup(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return (self._bits & 0x0010) != 0
 
     def is_invalid(self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return (self._bits & 0x0020) != 0
 
     def __or__(self, other: Self) -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        return Self(self._bits | other._bits)
 
     def __and__(self, other: Self) -> Self:
-        abort("MojoAkku: this API is not yet implemented")
+        return Self(self._bits & other._bits)
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        # Symbolic names in a fixed order; NONE for the empty set.
+        if self._bits == 0:
+            writer.write("NONE")
+            return
+        var first = True
+        if (self._bits & 0x0001) != 0:
+            writer.write("READ")
+            first = False
+        if (self._bits & 0x0002) != 0:
+            if not first:
+                writer.write("|")
+            writer.write("PRIORITY")
+            first = False
+        if (self._bits & 0x0004) != 0:
+            if not first:
+                writer.write("|")
+            writer.write("WRITE")
+            first = False
+        if (self._bits & 0x0008) != 0:
+            if not first:
+                writer.write("|")
+            writer.write("ERROR")
+            first = False
+        if (self._bits & 0x0010) != 0:
+            if not first:
+                writer.write("|")
+            writer.write("HANGUP")
+            first = False
+        if (self._bits & 0x0020) != 0:
+            if not first:
+                writer.write("|")
+            writer.write("INVALID")
+
 
 # API-DOCS-START
 # PollEvents — the portable fd-readiness bitmask, used as interest and as result.

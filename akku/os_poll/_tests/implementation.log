@@ -1,0 +1,66 @@
+# Phase-11 implementation green log for akku/os_poll.
+# Command: cd akku/os_poll && sh ../../.repo/scrupts/libraries.sh test
+
+== _tests/test_os_poll_bounded.mojo
+
+Running 2 tests for /workspace/.worktrees/os_poll-library/akku/os_poll/_tests/test_os_poll_bounded.mojo 
+    PASS [ 51.989 ] test_bounded_wait_returns_after_timeout
+    PASS [ 0.009 ] test_zero_timeout_returns_immediately
+--------
+Summary [ 51.999 ] 2 tests run: 2 passed , 0 failed , 0 skipped 
+
+== _tests/test_os_poll_events.mojo
+
+Running 5 tests for /workspace/.worktrees/os_poll-library/akku/os_poll/_tests/test_os_poll_events.mojo 
+    PASS [ 0.001 ] test_event_bit_values
+    PASS [ 0.001 ] test_none_is_empty_and_falsy
+    PASS [ 0.001 ] test_or_and_contains
+    PASS [ 0.001 ] test_named_predicates
+    PASS [ 0.001 ] test_events_and_errors_print_symbolically
+--------
+Summary [ 0.001 ] 5 tests run: 5 passed , 0 failed , 0 skipped 
+
+== _tests/test_os_poll_fd.mojo
+
+Running 4 tests for /workspace/.worktrees/os_poll-library/akku/os_poll/_tests/test_os_poll_fd.mojo 
+    PASS [ 0.001 ] test_construction_starts_empty
+    PASS [ 0.001 ] test_clear_resets_revents
+    PASS [ 0.001 ] test_negative_fd_is_representable
+    PASS [ 0.001 ] test_printing_reports_fields
+--------
+Summary [ 0.001 ] 4 tests run: 4 passed , 0 failed , 0 skipped 
+
+== _tests/test_os_poll_timeout.mojo
+
+Running 3 tests for /workspace/.worktrees/os_poll-library/akku/os_poll/_tests/test_os_poll_timeout.mojo 
+    PASS [ 0.001 ] test_construct_and_read_millis
+    PASS [ 0.001 ] test_clamped_saturates
+    PASS [ 0.001 ] test_equality_and_printing
+--------
+Summary [ 0.001 ] 3 tests run: 3 passed , 0 failed , 0 skipped 
+
+== _tests/test_os_poll_wait.mojo
+
+Running 6 tests for /workspace/.worktrees/os_poll-library/akku/os_poll/_tests/test_os_poll_wait.mojo 
+    PASS [ 0.009 ] test_write_end_is_writable
+    PASS [ 0.004 ] test_zero_timeout_then_data_becomes_readable
+    PASS [ 0.001 ] test_negative_fd_raises_invalid_fd
+    PASS [ 0.001 ] test_negative_timeout_raises_invalid_timeout
+    PASS [ 0.001 ] test_closed_descriptor_reports_invalid_bit
+    PASS [ 0.001 ] test_peer_close_reports_hangup
+--------
+Summary [ 0.018 ] 6 tests run: 6 passed , 0 failed , 0 skipped 
+
+== _tests/test_os_poll_wait_many.mojo
+
+Running 6 tests for /workspace/.worktrees/os_poll-library/akku/os_poll/_tests/test_os_poll_wait_many.mojo 
+    PASS [ 0.017 ] test_one_ready_of_two
+    PASS [ 0.004 ] test_both_ready
+    PASS [ 0.002 ] test_negative_fd_slot_is_skipped
+    PASS [ 0.001 ] test_empty_set_returns_zero
+    PASS [ 0.001 ] test_closed_slot_reports_invalid_bit
+    PASS [ 0.001 ] test_peer_close_reports_hangup
+--------
+Summary [ 0.027 ] 6 tests run: 6 passed , 0 failed , 0 skipped 
+
+All os_poll tests passed.

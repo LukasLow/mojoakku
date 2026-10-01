@@ -3,8 +3,8 @@ Design record for akku/os_poll — NOT end-user documentation.
 End-user docs live inline in the `*.mojo` files (`# API-DOCS` blocks) and in
 `__init__.mojo`. This file keeps developer-facing reasoning: status, semantics,
 tests, rationale, reference-API comparisons, non-goals and open questions.
-State after Phase 5 (design docs complete); no code exists yet.
-All 7 entries are `planned` / `not implemented`.
+State after Phase 11 (implementation); the code exists and the tests pass.
+All 7 entries are `implemented`.
 -->
 
 # os_poll — Design Record
@@ -36,7 +36,8 @@ Supported targets: **Linux and macOS**. Windows is out of scope for release 1.
 | `implemented` | Implemented and passing its tests. Default after Phase 12/13. |
 | `benchmarked` | Implemented, tested and measured against the performance goals. |
 
-All seven entries are `planned` and `not implemented` at Phase 5 (docs); no code exists yet.
+All seven entries are `implemented` after Phase 11 (implementation); the frozen
+test suite passes.
 
 ## Dependencies
 
@@ -208,7 +209,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 
 ## API entry: PollEvents
 
-- **Status:** planned
+- **Status:** implemented
 - **Signature:**
   ```
   struct PollEvents(ImplicitlyCopyable, Deinitable, Equatable, Writable):
@@ -248,7 +249,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 - **Errors:** none (a pure value type).
 - **Tests:** `test_os_poll_events.mojo` — bit values, `|`/`&`, `contains`, `is_*`
   predicates, `NONE` is empty and falsy, printing shows symbolic names.
-- **Implementation status:** not implemented
+- **Implementation status:** implemented
 - **Rationale:** MojoAkku uses a single `PollEvents` value type for both
   interest and result because POSIX `poll(2)` and Rust `nix`/`rustix` both use
   one bit-set for both directions (`c.md` §3, `rust.md` §3), and because one
@@ -263,7 +264,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 
 ## API entry: PollErrorKind
 
-- **Status:** planned
+- **Status:** implemented
 - **Signature:**
   ```
   struct PollErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
@@ -284,7 +285,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 - **Errors:** none (a discriminant).
 - **Tests:** `test_os_poll_events.mojo` covers printing/equality of the kind;
   the `INVALID_TIMEOUT` path is exercised in `test_os_poll_timeout.mojo`.
-- **Implementation status:** not implemented
+- **Implementation status:** implemented
 - **Rationale:** MojoAkku uses a closed discriminant instead of leaking raw
   errno because C's `errno` is a clobberable global (`c.md` §11) and Go's
   dynamic `error` forces `errors.Is` type assertions (`go.md` §11); a closed
@@ -292,7 +293,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 
 ## API entry: PollError
 
-- **Status:** planned
+- **Status:** implemented
 - **Signature:**
   ```
   @fieldwise_init
@@ -311,7 +312,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
   matching `IoError`.
 - **Tests:** `test_os_poll_events.mojo` (printing), `test_os_poll_wait.mojo`
   (INVALID_FD path).
-- **Implementation status:** not implemented
+- **Implementation status:** implemented
 - **Rationale:** MojoAkku uses one typed error with a closed kind because
   Java's four overlapping exception types for one conceptual failure
   (`java.md` §11) and Rust's boxed `io::Error` both lose the machine-testable
@@ -323,7 +324,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 
 ## API entry: PollTimeout
 
-- **Status:** planned
+- **Status:** implemented
 - **Signature:**
   ```
   struct PollTimeout(ImplicitlyCopyable, Deinitable, Equatable, Writable):
@@ -349,7 +350,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
   fail.
 - **Tests:** `test_os_poll_timeout.mojo` — `ZERO`/`MAX`, `is_zero`, `clamped`
   saturation and negative clamp, `millis`.
-- **Implementation status:** not implemented
+- **Implementation status:** implemented
 - **Rationale:** MojoAkku uses one milliseconds type because C mixes `int` ms,
   `timeval` and `timespec` with three infinite sentinels (`c.md` §8, §11) and
   Python mixes seconds and ms with `None`/`0`/negative (`python.md` §8, §11).
@@ -362,7 +363,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 
 ## API entry: PollFd
 
-- **Status:** planned
+- **Status:** implemented
 - **Signature:**
   ```
   struct PollFd(Copyable, Deinitable, Writable):
@@ -371,7 +372,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
       var revents: PollEvents
       def __init__(out self, fd: Int, events: PollEvents)
       def is_ready(self) -> Bool
-      def clear(self)
+      def clear(mut self)
       def write_to(self, mut writer: Some[Writer])
   ```
 - **Semantics:** One descriptor record. `fd` is the caller's borrowed
@@ -383,7 +384,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 - **Errors:** none (a value type).
 - **Tests:** `test_os_poll_fd.mojo` — construction sets empty `revents`, `is_ready`
   false before and true after a result is written, `clear` resets.
-- **Implementation status:** not implemented
+- **Implementation status:** implemented
 - **Rationale:** MojoAkku uses a value record instead of Java's live mutable
   `SelectionKey` because a returned value needs no `isValid()`/`remove()` dance
   and no deferred cancellation (`java.md` §10, §11); the in/out `fd`/`events`/
@@ -393,7 +394,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 
 ## API entry: wait
 
-- **Status:** planned
+- **Status:** implemented
 - **Signature:**
   ```
   def wait(fd: Int, events: PollEvents, timeout: PollTimeout) raises PollError -> PollEvents
@@ -418,7 +419,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
   for write; after writing, read end ready for read; empty-before-data returns
   `NONE` on a zero timeout), `test_os_poll_bounded.mojo` (a 50 ms wait returns
   within a generous upper bound).
-- **Implementation status:** not implemented
+- **Implementation status:** implemented
 - **Rationale:** MojoAkku uses a single-descriptor `wait` returning a mask
   because the `net_socket` consumer needs exactly `wait(fd, events, timeout_ms)`
   and because returning the mask (not a count) makes "timed out" and "became
@@ -429,7 +430,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 
 ## API entry: wait_many
 
-- **Status:** planned
+- **Status:** implemented
 - **Signature:**
   ```
   def wait_many(mut fds: MutSpan[PollFd, _], timeout: PollTimeout) raises PollError -> Int
@@ -451,7 +452,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 - **Tests:** `test_os_poll_wait_many.mojo` (two libc pipes, one read end written:
   count is 1 and the right `revents` is set; both ready → 2; a negative-fd slot
   is skipped), `test_os_poll_bounded.mojo` (bounded return).
-- **Implementation status:** not implemented
+- **Implementation status:** implemented
 - **Rationale:** MojoAkku uses one caller-owned `MutSpan[PollFd, _]` and returns
   the ready count because that is exactly `poll(2)`'s in/out contract (`c.md`
   §3) and because it allocates no caller-visible result container. Python's

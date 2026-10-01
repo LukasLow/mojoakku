@@ -1,6 +1,3 @@
-from std.os import abort
-
-
 # PollErrorKind — the closed reason a readiness wait failed.
 struct PollErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     var _id: UInt8
@@ -10,14 +7,20 @@ struct PollErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
         self._id = id
 
     def __eq__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._id == other._id
 
     comptime INVALID_TIMEOUT = PollErrorKind(0)   # the timeout is negative or too large
     comptime INVALID_FD      = PollErrorKind(1)   # a single-fd wait was given a negative fd
     comptime SYSCALL         = PollErrorKind(2)   # any other poll(2) failure
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        # Symbolic names, not the numeric _id.
+        if self._id == 0:
+            writer.write("INVALID_TIMEOUT")
+        elif self._id == 1:
+            writer.write("INVALID_FD")
+        else:
+            writer.write("SYSCALL")
 
 # API-DOCS-START
 # PollErrorKind — the machine-testable reason a readiness wait failed.
