@@ -1,5 +1,5 @@
-time_clock Phase 9 — failing baseline
-=====================================
+time_clock Phase 9 (post-Phase-10-review) — failing baseline
+==========================================================
 
 Worktree: /Users/lukas/home/repos/mojoakku/.worktrees/time_clock-library
 Branch:   time_clock-library
@@ -25,11 +25,11 @@ but each was run directly and each aborts in its first stub call (all 5 fail).
 == time_clock::test
 == _tests/test_time_clock.mojo
 ABORT: /workspace/.worktrees/time_clock-library/akku/time_clock/clock.mojo:10:14: MojoAkku: this API is not yet implemented
-#0 0x0000ffff88465580 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105580)
-#1 0x0000ffff88462c40 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x102c40)
-#2 0x0000ffff88465fe4 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105fe4)
-#3 0x0000ffff8bf3e8c0 (linux-vdso.so.1+0x8c0)
-#4 0x0000ffff4ee0fc28
+#0 0x0000ffff80415580 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105580)
+#1 0x0000ffff80412c40 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x102c40)
+#2 0x0000ffff80415fe4 (/root/.pixi/envs/mojo/lib/libKGENCompilerRTShared.so+0x105fe4)
+#3 0x0000ffff82e988c0 (linux-vdso.so.1+0x8c0)
+#4 0x0000ffff4000fc3c
 /root/.pixi/envs/mojo/bin/mojo: error: execution crashed
 To get a symbolicated stack trace, compile your program using `mojo build` with debug info enabled (e.g., `-debug-level=line-tables`) and execute it separately.
 task: Failed to run task "test": exit status 1

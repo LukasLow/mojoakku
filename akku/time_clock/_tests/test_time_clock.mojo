@@ -1,13 +1,14 @@
 # Concern: `Clock` — the one monotonic clock entry point (docs block in
 # `../clock.mojo`; shared in `../__init__.mojo`).
 #
-# Covers: now() yields a Deadline; the reading is monotonic (non-decreasing);
-# it advances after real work (bounded busy loop, no sleep assumption); and
-# now() - now() is a Duration.
+# Covers: now() yields a Deadline; the reading is monotonic (non-decreasing),
+# including across real bounded work; and now() - now() is a Duration.
 #
 # Edge-case checklist: EOF/EINTR/EAGAIN/close/timeouts are N/A — now() never
-# blocks and never fails. The "advances" test deliberately uses a bounded busy
-# loop rather than a sleep, so it does not depend on scheduler timing.
+# blocks and never fails. The work test deliberately uses a bounded busy loop
+# rather than a sleep, so it does not depend on scheduler timing. It proves the
+# documented non-decreasing contract only; it deliberately does NOT claim that
+# the clock strictly advanced (a coarse clock may not tick during short work).
 
 from std.testing import assert_true, TestSuite
 from akku.time_clock import Clock, Deadline, Duration
@@ -27,9 +28,13 @@ def test_clock_now_non_decreasing() raises:
     assert_true((second - first).is_positive() or (second - first).is_zero())
 
 
-def test_clock_now_advances_after_work() raises:
+def test_clock_now_non_decreasing_across_work() raises:
+    # The documented contract is monotonicity (never moves backwards). This
+    # exercises that contract across real bounded work, using a busy loop rather
+    # than a sleep so it does not depend on scheduler timing. It deliberately
+    # does NOT assert strict advance: a coarse clock may not tick during short
+    # work, and the docs promise non-decrease, not progress.
     var start = Clock.now()
-    # Bounded busy work; no sleep and no exact-duration assumption.
     var total = 0
     for i in range(200_000):
         total += i

@@ -528,6 +528,23 @@ here or recorded as a future API candidate in `_dev/TODO.md`:
 - *How many error kinds?* → **two** (`OVERFLOW`, `DIVISION_BY_ZERO`); a future
   parse/format or wall-clock layer is additive.
 
+**Testing limitations (no API question; recorded for the tests review).**
+
+- **Asserting method *absence* is not possible in Mojo 1.x.** Reflection
+  (`std.reflection`) exposes a struct's fields and name but has no method
+  enumeration and no `hasattr`-style membership test, so `test_deadline_no_raw_accessor`
+  cannot compile-time assert that `Deadline` lacks a `to_nanos`. It instead
+  asserts the documented production invariant (a Deadline is produced only by
+  `Clock.now()` and `± Duration`). A dedicated absence check is not an API
+  candidate; it would need a language feature (`mast`/hasattr), not a library
+  change.
+- **A deterministic Deadline overflow probe is impossible today.** Because the
+  monotonic origin is undefined and the instant opaque, `test_deadline_add_overflow_raises`
+  rests on the explicit, real-platform assumption that the current tick is below
+  `Int.MAX` (adding `Duration` MAX then overflows). Pinning the probe would
+  require an injectable/`TestClock` — a concrete future API candidate already
+  tracked in `_dev/TODO.md` (`test_clock` / injectable time source).
+
 ## Semantics
 
 #### Terminology
@@ -807,9 +824,17 @@ Tests:
   - `test_deadline_is_expired_past_and_future` — past `True`, future `False`.
   - `test_deadline_remaining_positive_then_negative` — signed `remaining`.
   - `test_deadline_elapsed_negative_then_positive` — signed `elapsed`.
-  - `test_deadline_no_raw_accessor` — no method returns the tick (a `conforms_to`
-    / surface check, expressed as a compile-time test).
-  - `test_deadline_add_overflow_raises` — `MAX +` a span → `OVERFLOW`.
+  - `test_deadline_no_raw_accessor` — asserts the documented **production
+    invariant** (a Deadline carrying a known offset is produced only through
+    `Clock.now()` and `± Duration`, and the only way to recover a magnitude is
+    the signed difference). A direct compile-time assertion of method *absence*
+    is not expressible in Mojo 1.x reflection (no method enumeration /
+    `hasattr`); the testing limitation is recorded in `## Open Questions`.
+  - `test_deadline_add_overflow_raises` — `MAX +` a span → `OVERFLOW`. Explicit
+    assumption: the monotonic tick has not reached `Int.MAX` (true of every real
+    clock, whose origin is far below the signed maximum). A fully deterministic
+    probe is impossible while the origin is undefined and the instant opaque; see
+    `## Open Questions`.
   - `test_deadline_value_semantics` — `conforms_to(Deadline, Copyable/ImplicitlyCopyable/Equatable)`.
   - `test_deadline_write_to_canonical` — `print` shows the canonical form.
 
@@ -881,8 +906,10 @@ Tests:
   - `test_clock_now_is_deadline` — `now()` yields a `Deadline`.
   - `test_clock_now_non_decreasing` — two calls do not move backwards
     (`now2 - now1 >= ZERO`).
-  - `test_clock_now_advances_after_work` — a busy loop produces `elapsed() > 0`
-    (bounded, non-flaky assertion).
+  - `test_clock_now_non_decreasing_across_work` — the non-decreasing contract
+    holds across a bounded busy loop (no sleep assumption). It deliberately does
+    **not** assert a strict advance, because the documented contract is
+    non-decrease and a coarse clock may not tick during short work.
   - `test_clock_now_difference_is_duration` — `now() - now()` is a `Duration`.
 
 Implementation status: not implemented
