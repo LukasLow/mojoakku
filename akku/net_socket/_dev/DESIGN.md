@@ -10,7 +10,7 @@ macOS support claim can be released. No Python runtime or external C library.
 ## Status legend
 
 planned → scaffolded → tested → implemented; benchmarked is optional.
-This phase records planned API only; no implementation exists.
+The design and docs phases record planned API only; no implementation exists.
 
 ## Dependencies
 
@@ -153,8 +153,17 @@ round-trips through a hostname. No I/O, interruption, EOF or close behavior appl
 Errors: Constructor raises IoError(OTHER, "address", opaque detail) for IPv4 scope.
 Accessors, equality and formatting cannot fail.
 
-Tests: IPv4/IPv6 value/accessor independence; port boundaries and zero; scoped IPv6
-format/equality; IPv4 nonzero-scope rejection; loopback binding address roundtrip.
+Tests:
+- `test_address_ipv4_values`: independent IP/accessor copies, port zero/65535,
+  equality and `127.0.0.1:80` formatting.
+- `test_address_ipv6_values`: IPv6 address copies, scope default/nonzero,
+  scope-sensitive equality and bracketed numeric-scope formatting.
+- `test_address_ipv4_scope_rejected`: OTHER with op address for nonzero IPv4 scope.
+- `test_local_address_ipv4` / `test_local_address_ipv6`: native local endpoint
+  preserves family, IP and assigned nonzero bind(port=0) port.
+
+These are planned assertions, not claims that tests already exist. The same
+SocketAddress contract applies when a value is returned by local_address.
 
 Implementation status: not implemented
 
@@ -186,7 +195,10 @@ struct Socket(Movable, Deinitable, Reader, ByteWriter):
     def close(mut self) raises IoError
     def is_closed(self) -> Bool
     def flush(mut self) raises IoError
-    # Reader provides read_exact/read_to_end; ByteWriter provides write_all.
+    # Inherited signatures from Reader and ByteWriter:
+    def read_exact(mut self, buf: MutSpan[UInt8, _]) raises IoError
+    def read_to_end(mut self) raises IoError -> List[UInt8]
+    def write_all(mut self, data: Span[UInt8, _]) raises IoError
 ```
 
 Semantics:
@@ -238,7 +250,14 @@ Semantics:
 Errors: IoError mappings, op and recoverability follow Error Surface above.
 INTERRUPTED and WOULD_BLOCK may be retried except connect (fresh socket required)
 and close (never retry). OTHER requires caller-specific recovery; EBADF becomes
-CLOSED. Peer EOF is a value; broken pipe/reset are errors. No destructor errors.
+CLOSED. Peer EOF is a value; broken pipe/reset are errors. No destructor errors. The public operation labels are `socket` (construction),
+`bind`, `listen`, `connect`, `accept`, `local_address`, `read`, `write`,
+`shutdown_write`, `close`, and `flush`. Native configuration performed for a newly
+created/accepted handle uses the initiating `socket`/`accept` label, preserving
+which public action failed. `is_closed` and move/destruction do not raise.
+Provided helpers preserve their existing io_core error labels and semantics.
+Closed-handle calls use their invoked method's op; a locally write-shut socket
+reports CLOSED with op write. Validation failures use the invoked method's op.
 
 Tests: Loopback IPv4/IPv6 bind/listen/connect/accept; dynamic-port/local-address
 roundtrip; scope representation; binary/partial I/O and untouched buffer suffix;
@@ -248,6 +267,33 @@ and family mismatch; refused-connect invalidation; move/destructor fd ownership;
 accepted independence; native close-on-exec flags and SIGPIPE subprocess safety;
 controlled EINTR with an isolated alarm/signal fixture. Timeout/nonblocking paths
 are excluded APIs and their configured-path tests are N/A, not reported as skips.
+Planned concern-to-test names:
+- lifecycle: `test_socket_creation`, `test_socket_invalid_family`,
+  `test_socket_move_owner`, `test_socket_destructor_closes`,
+  `test_socket_close_idempotent`, `test_socket_closed_operations`.
+- connection: `test_loopback_ipv4`, `test_loopback_ipv6`,
+  `test_local_address_ipv4`, `test_local_address_ipv6`,
+  `test_family_mismatch_retains_owner`, `test_listen_invalid_backlog`,
+  `test_connect_refused_closes`, `test_accepted_independent`.
+- transfers: `test_binary_short_read`, `test_short_write_count`,
+  `test_read_suffix_untouched`, `test_empty_read_rejected`,
+  `test_empty_write`, `test_peer_eof_repeated`, `test_flush_open`.
+- interoperability: `test_read_exact`, `test_read_exact_unexpected_eof`,
+  `test_read_to_end`, `test_write_all`, `test_empty_helpers_existing_contract`.
+- shutdown: `test_shutdown_write_idempotent`,
+  `test_shutdown_response_read`, `test_shutdown_empty_write_closed`.
+- native contracts: `test_cloexec_created_and_accepted`,
+  `test_sigpipe_safe_subprocess`, `test_interrupted_read`,
+  `test_interrupted_accept`; ABI layout/constants and errno mapping are verified
+  by an independent native probe rather than by self-referential Mojo assertions.
+
+The interrupted-read/accept fixture runs in an isolated process with an explicit
+bounded watchdog. Real signal interruption must be observed, never counted as a
+pass merely because the signal was configured. Loopback tests use dynamic ports,
+fixed byte expectations and a bounded outer timeout; they need no external host.
+Descriptor ownership/security tests use independent OS observations or a native
+peer fixture, without importing the library's private implementation. Names may
+be refined before the reviewed test baseline; semantics remain frozen.
 
 Implementation status: not implemented
 

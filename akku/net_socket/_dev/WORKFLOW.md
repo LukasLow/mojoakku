@@ -36,3 +36,9 @@ Buch structs.md move signature corrected from its exact documented Movable trait
 Independent reviewer approved complete semantics, existing trait compatibility,
 sole ownership, public sibling dependencies and accurate live backlog. Native
 macOS ABI/close/SIGPIPE verification remains an implementation acceptance gate.
+
+## Phase 5 — complete documentation
+
+Coder verified seven ordered fields for both public entries and expanded exact
+inherited helper signatures, operation/error names and named planned tests.
+No implementation or tests created; approved semantics unchanged.
