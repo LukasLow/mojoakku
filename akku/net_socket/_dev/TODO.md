@@ -15,3 +15,5 @@
 - shutdown_read/both — disable other stream directions — python.md §3.
 - IPv6 flowinfo — explicit traffic flow metadata — rust.md §7.
 - Windows sockets — native Windows transport — rust.md §8.
+- queued writes — buffered backpressure in a later stream layer — js_ts.md §12.
+- framed messaging — explicit message boundaries in a sibling layer — js_ts.md §12.
