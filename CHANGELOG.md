@@ -5,6 +5,12 @@ All notable changes to MojoAkku are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions stay on `0.x.y`; major is never bumped.
 
+## v0.10.0 - 2026-10-01
+
+### Added
+
+- net_socket — owned blocking IPv4/IPv6 stream sockets and numeric endpoints, with io_core reader/writer helpers.
+
 ## v0.9.1 - 2026-10-01
 
 ### Fixed
