@@ -29,7 +29,7 @@ def from_bytes[dtype: DType](src: Span[UInt8, _], order: EndianOrder) raises End
 #   raises EndianError — BAD_LENGTH when `src.len` does not equal the carrier's
 #   byte width. Recoverable by passing a correctly sized span.
 # Example:
-#   var bytes = List[UInt8](0x01, 0x02)
+#   var bytes: List[UInt8] = [0x01, 0x02]
 #   print(from_bytes[DType.uint16](bytes, EndianOrder.BIG))     # -> 0x0102
 #   print(from_bytes[DType.uint16](bytes, EndianOrder.LITTLE))  # -> 0x0201
 #   # an empty or short span raises BAD_LENGTH

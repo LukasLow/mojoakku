@@ -29,7 +29,7 @@ def to_bytes_into[dtype: DType](x: Scalar[dtype], dst: MutSpan[UInt8, _], order:
 #   raises EndianError — BAD_LENGTH when `dst.len` does not equal the carrier's
 #   byte width. Recoverable by passing a correctly sized span.
 # Example:
-#   var dst = List[UInt8](2, 0)
+#   var dst: List[UInt8] = [0, 0]
 #   to_bytes_into(UInt16(0x0102), dst, EndianOrder.BIG)     # -> [0x01, 0x02]
 #   to_bytes_into(UInt16(0x0102), dst, EndianOrder.LITTLE)  # -> [0x02, 0x01]
 #   # a 4-byte carrier into this 2-byte dst raises BAD_LENGTH

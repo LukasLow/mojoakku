@@ -778,7 +778,7 @@ Status: planned
 Signature:
 
 ```mojo
-def to_bytes_into[dtype: DType](x: Scalar[dtype], dst: MutSpan[UInt8], order: EndianOrder)
+def to_bytes_into[dtype: DType](x: Scalar[dtype], dst: MutSpan[UInt8, _], order: EndianOrder)
     raises EndianError
     where dtype.is_integral()
 ```
@@ -842,7 +842,7 @@ Status: planned
 Signature:
 
 ```mojo
-def from_bytes[dtype: DType](src: Span[UInt8], order: EndianOrder)
+def from_bytes[dtype: DType](src: Span[UInt8, _], order: EndianOrder)
     raises EndianError -> Scalar[dtype]
     where dtype.is_integral()
 ```

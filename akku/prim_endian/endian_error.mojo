@@ -38,7 +38,7 @@ struct EndianError(Copyable, Deinitable, Writable):
 # Errors:
 #   none — EndianError *is* the error; constructing it cannot fail.
 # Example:
-#   var dst = List[UInt8](2, 0)
+#   var dst: List[UInt8] = [0, 0]
 #   try:
 #       to_bytes_into(UInt32(1), dst, EndianOrder.BIG)   # 4-byte carrier, 2-byte dst
 #   except e:
