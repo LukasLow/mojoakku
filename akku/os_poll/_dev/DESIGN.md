@@ -330,6 +330,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
       comptime ZERO = PollTimeout(0)
       comptime MAX  = PollTimeout(2_147_483_647)
       def __init__(out self, millis: Int)
+      def __eq__(self, other: Self) -> Bool
       @staticmethod def clamped(millis: Int) -> Self
       def is_zero(self) -> Bool
       def write_to(self, mut writer: Some[Writer])
