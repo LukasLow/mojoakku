@@ -55,7 +55,7 @@ are needed for the `nfds` argument, which is `nfds_t`: `c_ulong` on Linux and
   considered and rejected: `io_core` is the **stream** layer and sits *above* an
   OS readiness primitive; making the OS layer depend on the stream layer inverts
   the natural direction and would drag `io_core` under every future OS
-  primitive. Readiness errors (invalid timeout, invalid fd, closed fd, raw
+  primitive. Readiness errors (invalid timeout, invalid fd, raw
   syscall failure) also do not map one-to-one onto stream error kinds. Consumers
   that already speak `IoError` (e.g. `net_socket`) map `PollError` to `IoError`
   at their boundary with an explicit, documented conversion.
@@ -164,8 +164,8 @@ error** (it is the empty result). Kinds:
 - `INVALID_FD` — a single-fd `wait` was given a negative fd.
 - `SYSCALL` — any other `poll(2)` failure; the numeric value is in `detail`.
 
-`poll(2)` itself only fails with `EINTR`, `EINVAL`, `EFAULT` or `ENOMEM`
-(`c.md` §4); it never returns `EBADF`. A bad or closed descriptor is therefore
+`poll(2)` itself only fails with `EINTR`, `EINVAL`, `EFAULT`, `EAGAIN` or
+`ENOMEM` (`c.md` §4); it never returns `EBADF`. A bad or closed descriptor is therefore
 **not** a raised error: it is reported per-descriptor in `revents` as `INVALID`
 (`POLLNVAL`). `EINTR` is **never** surfaced either: `wait`/`wait_many` retry it
 internally and recompute the remaining timeout. All kinds are recoverable by a
@@ -201,7 +201,7 @@ correct caller (fix the argument).
 
 ## Open Questions
 
-None open at Phase 3. Items that resolved to concrete future API candidates were
+None open at Phase 5. Items that resolved to concrete future API candidates were
 moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 `kqueue`/`select`/`ppoll` entry points, stateful poller, wakeup handle,
 `READ_HANGUP`, Windows, async).
