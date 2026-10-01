@@ -3,7 +3,8 @@ Design record for akku/os_poll — NOT end-user documentation.
 End-user docs live inline in the `*.mojo` files (`# API-DOCS` blocks) and in
 `__init__.mojo`. This file keeps developer-facing reasoning: status, semantics,
 tests, rationale, reference-API comparisons, non-goals and open questions.
-State after Phase 3 (API design); no code exists yet.
+State after Phase 5 (design docs complete); no code exists yet.
+All 7 entries are `planned` / `not implemented`.
 -->
 
 # os_poll — Design Record
@@ -35,7 +36,7 @@ Supported targets: **Linux and macOS**. Windows is out of scope for release 1.
 | `implemented` | Implemented and passing its tests. Default after Phase 12/13. |
 | `benchmarked` | Implemented, tested and measured against the performance goals. |
 
-All entries are `planned` at Phase 3.
+All seven entries are `planned` and `not implemented` at Phase 5 (docs); no code exists yet.
 
 ## Dependencies
 
@@ -245,7 +246,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
   is needed. `|` and `&` combine; `contains(other)` is true when every bit of
   `other` is present.
 - **Errors:** none (a pure value type).
-- **Tests:** `test_os_poll_events` — bit values, `|`/`&`, `contains`, `is_*`
+- **Tests:** `test_os_poll_events.mojo` — bit values, `|`/`&`, `contains`, `is_*`
   predicates, `NONE` is empty and falsy, printing shows symbolic names.
 - **Implementation status:** not implemented
 - **Rationale:** MojoAkku uses a single `PollEvents` value type for both
@@ -279,9 +280,8 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
   failure (`c.md` §4): a bad or closed descriptor surfaces per-descriptor as
   `revents.INVALID`, not as an exception.
 - **Errors:** none (a discriminant).
-- **Tests:** `test_os_poll_events` covers printing/equality of the kind; the
-  `INVALID_TIMEOUT` path is exercised in `test_os_poll_timeout` and `POLLNVAL`
-  in `test_os_poll_wait_many`.
+- **Tests:** `test_os_poll_events.mojo` covers printing/equality of the kind;
+  the `INVALID_TIMEOUT` path is exercised in `test_os_poll_timeout.mojo`.
 - **Implementation status:** not implemented
 - **Rationale:** MojoAkku uses a closed discriminant instead of leaking raw
   errno because C's `errno` is a clobberable global (`c.md` §11) and Go's
@@ -307,9 +307,8 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 - **Errors:** none — `PollError` *is* the error; constructing it cannot fail.
   Raise-by-transfer with `raise e^` (Copyable but not ImplicitlyCopyable),
   matching `IoError`.
-- **Tests:** `test_os_poll_events` (printing), `test_os_poll_timeout`
-  (INVALID_TIMEOUT), `test_os_poll_wait` (INVALID_FD), `test_os_poll_wait_many`
-  (`POLLNVAL` in `revents`).
+- **Tests:** `test_os_poll_events.mojo` (printing), `test_os_poll_wait.mojo`
+  (INVALID_FD path).
 - **Implementation status:** not implemented
 - **Rationale:** MojoAkku uses one typed error with a closed kind because
   Java's four overlapping exception types for one conceptual failure
@@ -345,7 +344,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 - **Errors:** none from the constructor; the range violation surfaces as
   `PollError(INVALID_TIMEOUT, "wait", ...)` from the wait call. `clamped` cannot
   fail.
-- **Tests:** `test_os_poll_timeout` — `ZERO`/`MAX`, `is_zero`, `clamped`
+- **Tests:** `test_os_poll_timeout.mojo` — `ZERO`/`MAX`, `is_zero`, `clamped`
   saturation and negative clamp, `millis`.
 - **Implementation status:** not implemented
 - **Rationale:** MojoAkku uses one milliseconds type because C mixes `int` ms,
@@ -377,7 +376,7 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
   negative `fd` is carried through and skipped by `poll(2)` (POSIX), so a caller
   can mask a slot for one call without rebuilding the array.
 - **Errors:** none (a value type).
-- **Tests:** `test_os_poll_fd` — construction sets empty `revents`, `is_ready`
+- **Tests:** `test_os_poll_fd.mojo` — construction sets empty `revents`, `is_ready`
   false before and true after a result is written, `clear` resets.
 - **Implementation status:** not implemented
 - **Rationale:** MojoAkku uses a value record instead of Java's live mutable
@@ -410,10 +409,10 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
   timeout), `SYSCALL` (any other `poll(2)` failure, numeric code in `detail`).
   All are recoverable. `EINTR` is never raised, and a closed-but-valid-numbered
   fd yields `revents.INVALID` (`POLLNVAL`) rather than an exception.
-- **Tests:** `test_os_poll_wait` (readiness via a libc pipe: write end ready
+- **Tests:** `test_os_poll_wait.mojo` (readiness via a libc pipe: write end ready
   for write; after writing, read end ready for read; empty-before-data returns
-  `NONE` on a zero timeout), `test_os_poll_bounded` (a 50 ms wait returns
-  within a generous upper bound), `test_os_poll_errno` (`INVALID_FD`).
+  `NONE` on a zero timeout), `test_os_poll_bounded.mojo` (a 50 ms wait returns
+  within a generous upper bound).
 - **Implementation status:** not implemented
 - **Rationale:** MojoAkku uses a single-descriptor `wait` returning a mask
   because the `net_socket` consumer needs exactly `wait(fd, events, timeout_ms)`
@@ -444,9 +443,9 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
   surfaces. A per-descriptor problem such as a closed-but-pollable fd is
   reported in that entry's `revents` (`INVALID`, `POLLNVAL`), not as an
   exception.
-- **Tests:** `test_os_poll_wait_many` (two libc pipes, one read end written:
+- **Tests:** `test_os_poll_wait_many.mojo` (two libc pipes, one read end written:
   count is 1 and the right `revents` is set; both ready → 2; a negative-fd slot
-  is skipped), `test_os_poll_bounded` (bounded return).
+  is skipped), `test_os_poll_bounded.mojo` (bounded return).
 - **Implementation status:** not implemented
 - **Rationale:** MojoAkku uses one caller-owned `MutSpan[PollFd, _]` and returns
   the ready count because that is exactly `poll(2)`'s in/out contract (`c.md`
