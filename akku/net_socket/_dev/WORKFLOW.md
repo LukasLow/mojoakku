@@ -63,3 +63,10 @@ Reviewer found a dangling developer-only Error Surface reference. Scaffold
 comments now include the full errno mapping, immediate capture/numeric opaque
 detail, EOF distinction, helper/direct retry and recovery policies. No code or
 tests changed; returned to scaffold before repeating the review.
+
+## Phase 8 — scaffold review APPROVED, GO
+
+Independent reviewer confirmed the only blocker resolved. Two public entries and
+all twenty own stubs, inherited helpers, layout, exact aborts, root exports and
+generic Taskfile pass. Independent consumer compilation passed. Rework was only
+comments, so compile evidence remains valid. No implementation introduced.
