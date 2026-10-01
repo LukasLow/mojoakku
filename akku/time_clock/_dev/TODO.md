@@ -13,10 +13,9 @@ end state.
 
 ## Duration construction / conversion
 
-- `from_secs_f64`/`from_millis`/`from_micros` unit constructors — build a duration from a named unit. (origin: `rust.md` §3)
-- float-seconds constructor with a checked `try_*` form — accept fractional seconds without an unchecked panic. (origin: `rust.md` §4)
+- `from_secs_f64`/`from_secs_f32` and a checked `try_from_secs_*` form — accept fractional seconds without an unchecked panic. (origin: `rust.md` §3, §4)
 - `parse_duration` — parse a duration from a string. (origin: `go.md` §3)
-- `Duration.to_string` — format a duration human-readably. (origin: `go.md` §3)
+- `Duration.to_string` — format a duration human-readably (the shipped `Writable` output is the canonical machine form only). (origin: `go.md` §3)
 
 ## Clock / instant extras
 
