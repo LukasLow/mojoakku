@@ -70,3 +70,10 @@ Independent reviewer confirmed the only blocker resolved. Two public entries and
 all twenty own stubs, inherited helpers, layout, exact aborts, root exports and
 generic Taskfile pass. Independent consumer compilation passed. Rework was only
 comments, so compile evidence remains valid. No implementation introduced.
+
+### Phase 7/8 rework — instantiated abort import
+
+Phase 9 compile revealed std.os.abort had not been explicitly imported: the
+consumer import did not instantiate method bodies. Added that import to both API
+files without changing any body, signature or contract. Tests are paused until
+an independent scaffold re-check. No implementation is allowed yet.

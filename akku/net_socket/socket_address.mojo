@@ -1,3 +1,4 @@
+from std.os import abort
 from akku.net_ip import IpAddress as _IpAddress
 from akku.io_core import IoError as _IoError
 

@@ -1,3 +1,4 @@
+from std.os import abort
 from akku.net_ip import AddressFamily as _AddressFamily
 from akku.io_core import (
     Reader as _Reader, ByteWriter as _ByteWriter,
