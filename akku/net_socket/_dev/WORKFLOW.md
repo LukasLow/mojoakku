@@ -21,3 +21,12 @@ Independent reviewer confirmed six languages, all twelve questions, primary
 sources, reconciled blocking/runtime differences and complete candidate backlog.
 No required findings. IPv6 scope/flowinfo must be decided explicitly in design.
 Markdown regression reproduced against v0.9.0 in an isolated temporary copy.
+
+## Phase 3 — API design
+
+Two public entries, SocketAddress and Socket, with justified io_core/net_ip edges.
+Session user waiver replaces the API presentation/approval gate; no new approval
+requested. Scope IDs included, flowinfo deferred, empty Reader buffers rejected,
+connect failure consumes owner, close never retried, SIGPIPE/CLOEXEC policies
+explicit. Native platform ABI must be verified before support claims.
+Buch structs.md move signature corrected from its exact documented Movable trait.
