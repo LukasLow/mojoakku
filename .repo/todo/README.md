@@ -4,7 +4,7 @@ This folder is the **machine-readable catalogue of every library MojoAkku could
 build**. There is exactly **one file per library**, named `<id>.yml`, and all
 files sit **flat** in this directory. The flat layout is a core project
 decision: no library is nested inside another, not here and not under
-`akku/`. The catalogue currently holds **319** entries (6 `done`, and the
+`akku/`. The catalogue currently holds **319** entries (9 `done`, and the
 `covered_*`/`homeless_*` marker prefixes explained in the ADR).
 
 The catalogue is pure inventory — a library may still be only an idea. Its
@@ -123,9 +123,9 @@ web_http    todo     HTTP
 $ task count
 MojoAkku catalogue: 319 libraries
 
-todo:      311
-current:   2
-done:      6
+todo:      310
+current:   0
+done:      9
 total:     319
 
 $ task show -- net_udp
