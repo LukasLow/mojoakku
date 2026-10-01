@@ -5,6 +5,12 @@ All notable changes to MojoAkku are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions stay on `0.x.y`; major is never bumped.
 
+## v0.9.1 - 2026-10-01
+
+### Fixed
+
+- smart tests — exclude Markdown documentation at every path while keeping native code, Python code, fixtures, and unknown file types test-relevant.
+
 ## v0.9.0 - 2026-09-30
 
 ### Changed
