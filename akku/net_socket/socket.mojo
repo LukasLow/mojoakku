@@ -126,7 +126,10 @@ struct Socket(Movable, Deinitable, _Reader, _ByteWriter):
 #   read_to_end returns a new owned List[UInt8]. is_closed returns local ownership
 #   state; other ordinary methods return nothing.
 # Errors:
-#   IoError mappings, op and recoverability follow Error Surface above.
+#   Raises IoError: EINTR → INTERRUPTED; EAGAIN/EWOULDBLOCK → WOULD_BLOCK;
+#   ETIMEDOUT → TIMED_OUT; native EBADF or local closed owner → CLOSED;
+#   all other native failures → OTHER. Native errno is captured immediately and
+#   included numerically in opaque detail; callers inspect kind, never parse detail.
 #   INTERRUPTED and WOULD_BLOCK may be retried except connect (fresh socket required)
 #   and close (never retry). OTHER requires caller-specific recovery; EBADF becomes
 #   CLOSED. Peer EOF is a value; broken pipe/reset are errors. No destructor errors. The public operation labels are `socket` (construction),

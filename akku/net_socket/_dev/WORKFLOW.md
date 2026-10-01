@@ -56,3 +56,10 @@ out of the public root. All twenty own method bodies are the exact abort stub.
 Taskfile derives the shared library runner with method:none; no registration or
 shared helper change. Consumer import: `smd -t '{task net_socket::compile}'`
 passed, raw output in scaffold.log. No implementation or tests yet.
+
+### Phase 8 rework — public error contract
+
+Reviewer found a dangling developer-only Error Surface reference. Scaffold
+comments now include the full errno mapping, immediate capture/numeric opaque
+detail, EOF distinction, helper/direct retry and recovery policies. No code or
+tests changed; returned to scaffold before repeating the review.
