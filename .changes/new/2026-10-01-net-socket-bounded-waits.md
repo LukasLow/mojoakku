@@ -1,0 +1,1 @@
+NEW: net_socket — owned IPv4/IPv6 stream sockets with bounded waits: non-blocking internals, absolute read/write deadlines, and EINTR/EAGAIN absorbed into the readiness wait. Consumer needs only `mojo build` (no third-party native library, no linker flags).
