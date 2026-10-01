@@ -1,5 +1,3 @@
-from std.os import abort
-
 from .endian_error_kind import EndianErrorKind
 
 
@@ -11,7 +9,7 @@ struct EndianError(Copyable, Deinitable, Writable):
     var detail: String
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write("EndianError(", self.kind, ", op=", self.op, ", detail=", self.detail, ")")
 
 # API-DOCS-START
 # EndianError — the one typed error every fallible endian operation declares.

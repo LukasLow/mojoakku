@@ -1,4 +1,3 @@
-from std.os import abort
 from std.sys import is_little_endian
 
 
@@ -18,8 +17,13 @@ struct EndianOrder(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     comptime BIG = EndianOrder(1)      # byte 0 is the most significant byte; network order
     comptime NATIVE = EndianOrder.LITTLE if is_little_endian() else EndianOrder.BIG
 
+    # write_to — symbolic name, not the numeric _id.
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        # Symbolic names, not the numeric _id (0 = LITTLE, 1 = BIG).
+        if self._id == 0:
+            writer.write("LITTLE")
+        else:
+            writer.write("BIG")
 
 # API-DOCS-START
 # EndianOrder — the byte order a conversion targets.

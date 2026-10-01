@@ -1,12 +1,29 @@
-from std.os import abort
+from std.sys import size_of
 
 from .endian_error import EndianError
+from .endian_error_kind import EndianErrorKind
 from .endian_order import EndianOrder
 
 
 # from_bytes — read a value from a borrowed span, in an order.
 def from_bytes[dtype: DType](src: Span[UInt8, _], order: EndianOrder) raises EndianError -> Scalar[dtype] where dtype.is_integral():
-    abort("MojoAkku: this API is not yet implemented")
+    # The carrier's byte width is its own type width; exact length is required.
+    comptime width = size_of[Scalar[dtype]]()
+    if len(src) != width:
+        raise EndianError(
+            EndianErrorKind.BAD_LENGTH,
+            "from_bytes",
+            "source length does not equal the carrier byte width",
+        )
+    # A shift-based, dtype-generic assembly. `order == BIG` is also correct for
+    # NATIVE, which resolves at compile time to LITTLE or BIG.
+    var big = order == EndianOrder.BIG
+    var acc = Scalar[dtype](0)
+    for i in range(width):
+        # BIG: src[0] is the most significant byte. LITTLE: the least.
+        var pos = (width - 1 - i) if big else i
+        acc |= Scalar[dtype](src[i]) << Scalar[dtype](8 * pos)
+    return acc
 
 # API-DOCS-START
 # from_bytes — read a value from a borrowed span, in an order.

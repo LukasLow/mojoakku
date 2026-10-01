@@ -1,12 +1,29 @@
-from std.os import abort
+from std.sys import size_of
 
 from .endian_error import EndianError
+from .endian_error_kind import EndianErrorKind
 from .endian_order import EndianOrder
 
 
 # to_bytes_into — write a value's bytes into a caller-owned span, in an order.
 def to_bytes_into[dtype: DType](x: Scalar[dtype], dst: MutSpan[UInt8, _], order: EndianOrder) raises EndianError where dtype.is_integral():
-    abort("MojoAkku: this API is not yet implemented")
+    # The carrier's byte width is its own type width, never inferred from dst.
+    comptime width = size_of[Scalar[dtype]]()
+    # Exact length is required; check before writing so a failed call leaves
+    # `dst` untouched.
+    if len(dst) != width:
+        raise EndianError(
+            EndianErrorKind.BAD_LENGTH,
+            "to_bytes_into",
+            "destination length does not equal the carrier byte width",
+        )
+    # A shift-based, dtype-generic write. `order == BIG` is also correct for
+    # NATIVE, which resolves at compile time to LITTLE or BIG.
+    var big = order == EndianOrder.BIG
+    for i in range(width):
+        # BIG: dst[0] is the most significant byte. LITTLE: the least.
+        var pos = (width - 1 - i) if big else i
+        dst[i] = UInt8(x >> Scalar[dtype](8 * pos))
 
 # API-DOCS-START
 # to_bytes_into — write a value's bytes into a caller-owned span, in an order.

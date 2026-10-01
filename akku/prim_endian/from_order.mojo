@@ -1,11 +1,15 @@
-from std.os import abort
-
 from .endian_order import EndianOrder
+from .host_order import host_order
+from .swap_bytes import swap_bytes
 
 
 # from_order — convert a value that is in a named byte order back to host order.
 def from_order[dtype: DType](x: Scalar[dtype], order: EndianOrder) -> Scalar[dtype] where dtype.is_integral():
-    abort("MojoAkku: this API is not yet implemented")
+    # Identity when `order` already is the host order (including NATIVE),
+    # otherwise a byte reversal. Byte reversal is its own inverse.
+    if order == host_order():
+        return x
+    return swap_bytes(x)
 
 # API-DOCS-START
 # from_order — convert a value that is in a named byte order back to host order.

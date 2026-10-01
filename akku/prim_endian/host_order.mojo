@@ -1,11 +1,12 @@
-from std.os import abort
+from std.sys import is_little_endian
 
 from .endian_order import EndianOrder
 
 
 # host_order — the host's byte order, resolved at compile time.
 def host_order() -> EndianOrder:
-    abort("MojoAkku: this API is not yet implemented")
+    # Resolved at compile time: NATIVE is exactly this choice.
+    return EndianOrder.LITTLE if is_little_endian() else EndianOrder.BIG
 
 # API-DOCS-START
 # host_order — the host's byte order, resolved at compile time.

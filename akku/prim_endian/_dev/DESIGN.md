@@ -43,8 +43,9 @@ Every API entry carries a `Status:` field with exactly one of these values:
 | `implemented` | Implemented and passing its tests. Default after Phase 12/13. |
 | `benchmarked` | Implemented, tested and measured against the performance goals. |
 
-All 9 entries in this document are `planned` at Phase 3; `Implementation
-status:` is `not implemented` until Phase 11.
+All 9 entries were `planned` at Phase 3; `Implementation status:` was
+`not implemented` until Phase 11, which shipped every entry. They are all
+`implemented` now (40 tests pass, 0 failed).
 
 ## Dependencies
 
@@ -351,7 +352,7 @@ later phase does not reopen them:
 
 ### `EndianOrder`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -403,7 +404,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -420,7 +421,7 @@ free string because a typed value makes an invalid order unrepresentable
 
 ### `EndianErrorKind`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -473,7 +474,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -489,7 +490,7 @@ to accept a 1-byte carrier.`
 
 ### `EndianError`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -529,7 +530,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -543,7 +544,7 @@ low-vision user (java.md §11, go.md §11).`
 
 ### `host_order`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -578,7 +579,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -593,7 +594,7 @@ system_info(endian) runtime query (elixir.md §9) is therefore not copied.`
 
 ### `swap_bytes`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -633,7 +634,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -651,7 +652,7 @@ over Scalar[dtype] covers every width (js-ts.md §11).`
 
 ### `to_order`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -699,7 +700,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -715,7 +716,7 @@ order is not given its own function because it is simply BIG (c.md §7, java.md
 
 ### `from_order`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -758,7 +759,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -773,7 +774,7 @@ the same result, a single ambiguous name was rejected because the intent
 
 ### `to_bytes_into`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -818,7 +819,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -837,7 +838,7 @@ byte-array form remains backlog (_dev/TODO.md).`
 
 ### `from_bytes`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -879,7 +880,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 

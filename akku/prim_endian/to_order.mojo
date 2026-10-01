@@ -1,11 +1,15 @@
-from std.os import abort
-
 from .endian_order import EndianOrder
+from .host_order import host_order
+from .swap_bytes import swap_bytes
 
 
 # to_order — convert a host-order value into a named byte order.
 def to_order[dtype: DType](x: Scalar[dtype], order: EndianOrder) -> Scalar[dtype] where dtype.is_integral():
-    abort("MojoAkku: this API is not yet implemented")
+    # Identity when `order` already is the host order (including NATIVE),
+    # otherwise a byte reversal. A 1-byte carrier is a no-op either way.
+    if order == host_order():
+        return x
+    return swap_bytes(x)
 
 # API-DOCS-START
 # to_order — convert a host-order value into a named byte order.

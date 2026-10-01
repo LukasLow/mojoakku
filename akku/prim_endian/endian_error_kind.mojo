@@ -1,6 +1,3 @@
-from std.os import abort
-
-
 # EndianErrorKind — closed discriminant for EndianError.
 struct EndianErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     var _id: UInt8
@@ -16,8 +13,13 @@ struct EndianErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     comptime BAD_LENGTH = EndianErrorKind(0)   # a buffer length != the carrier's byte width
     comptime OTHER = EndianErrorKind(1)        # any other condition (see EndianError.detail)
 
+    # write_to — symbolic name, not the numeric _id.
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        # Symbolic names, not the numeric _id (0 = BAD_LENGTH, 1 = OTHER).
+        if self._id == 0:
+            writer.write("BAD_LENGTH")
+        else:
+            writer.write("OTHER")
 
 # API-DOCS-START
 # EndianErrorKind — the machine-testable reason an endian operation failed.
