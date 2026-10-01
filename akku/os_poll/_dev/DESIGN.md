@@ -42,7 +42,9 @@ All entries are `planned` at Phase 3.
 `os_poll` has **no dependency edge to any sibling MojoAkku library**. It is a
 leaf: it uses only `std.ffi` (the `poll` symbol, `c_int`/`c_uint`/`c_short`/
 `c_ulong`), `std.sys` (`CompilationTarget`, for the platform split) and
-`std.time` (`monotonic`, for EINTR timeout recomputation).
+`std.time` (`monotonic`, for EINTR timeout recomputation). Both integer aliases
+are needed for the `nfds` argument, which is `nfds_t`: `c_ulong` on Linux and
+`c_uint` on macOS, so both are imported from `std.ffi`.
 
 | Library | Edge | Justification |
 | --- | --- | --- |
@@ -159,12 +161,14 @@ error** (it is the empty result). Kinds:
 
 - `INVALID_TIMEOUT` — the timeout is negative or exceeds `PollTimeout.MAX_MILLIS`.
 - `INVALID_FD` — a single-fd `wait` was given a negative fd.
-- `CLOSED` — the OS reported `EBADF` (the descriptor is not open).
 - `SYSCALL` — any other `poll(2)` failure; the numeric value is in `detail`.
 
-`EINTR` is **never** surfaced: `wait`/`wait_many` retry it internally and
-recompute the remaining timeout. All kinds are recoverable by a correct caller
-(fix the argument, reopen the fd).
+`poll(2)` itself only fails with `EINTR`, `EINVAL`, `EFAULT` or `ENOMEM`
+(`c.md` §4); it never returns `EBADF`. A bad or closed descriptor is therefore
+**not** a raised error: it is reported per-descriptor in `revents` as `INVALID`
+(`POLLNVAL`). `EINTR` is **never** surfaced either: `wait`/`wait_many` retry it
+internally and recompute the remaining timeout. All kinds are recoverable by a
+correct caller (fix the argument).
 
 ## Conventions
 
@@ -188,8 +192,11 @@ recompute the remaining timeout. All kinds are recoverable by a correct caller
   caller-visible result container.
 - **`PollEvents`, `PollTimeout` and `PollFd` are value types** (copyable); the
   library holds no hidden global state.
-- The internal native `pollfd` array is a private per-call buffer, freed before
-  the call returns.
+- The internal native `pollfd` array is a library-owned **per-call** buffer: it
+  is allocated by the library for the duration of one wait, is never
+  caller-allocated and never appears in the API, and is freed before the call
+  returns. The "never allocates with the caller's data" contract therefore
+  still holds.
 
 ## Open Questions
 
@@ -262,18 +269,19 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
       def __eq__(self, other: Self) -> Bool
       comptime INVALID_TIMEOUT = PollErrorKind(0)
       comptime INVALID_FD      = PollErrorKind(1)
-      comptime CLOSED          = PollErrorKind(2)
-      comptime SYSCALL         = PollErrorKind(3)
+      comptime SYSCALL         = PollErrorKind(2)
       def write_to(self, mut writer: Some[Writer])
   ```
 - **Semantics:** Read from `PollError.kind` inside an except block; never
-  constructed by a caller. The four kinds are the complete, closed set.
+  constructed by a caller. The three kinds are the complete, closed set.
   `INTERRUPTED` is deliberately absent because `EINTR` is retried internally and
-  can never surface.
+  can never surface. `CLOSED` is also absent because `poll(2)` has no `EBADF`
+  failure (`c.md` §4): a bad or closed descriptor surfaces per-descriptor as
+  `revents.INVALID`, not as an exception.
 - **Errors:** none (a discriminant).
 - **Tests:** `test_os_poll_events` covers printing/equality of the kind; the
-  `CLOSED` and `INVALID_TIMEOUT` paths are exercised in `test_os_poll_errno` and
-  `test_os_poll_timeout`.
+  `INVALID_TIMEOUT` path is exercised in `test_os_poll_timeout` and `POLLNVAL`
+  in `test_os_poll_wait_many`.
 - **Implementation status:** not implemented
 - **Rationale:** MojoAkku uses a closed discriminant instead of leaking raw
   errno because C's `errno` is a clobberable global (`c.md` §11) and Go's
@@ -299,14 +307,18 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
 - **Errors:** none — `PollError` *is* the error; constructing it cannot fail.
   Raise-by-transfer with `raise e^` (Copyable but not ImplicitlyCopyable),
   matching `IoError`.
-- **Tests:** `test_os_poll_events` (printing), `test_os_poll_errno` (CLOSED),
-  `test_os_poll_timeout` (INVALID_TIMEOUT), `test_os_poll_wait` (INVALID_FD).
+- **Tests:** `test_os_poll_events` (printing), `test_os_poll_timeout`
+  (INVALID_TIMEOUT), `test_os_poll_wait` (INVALID_FD), `test_os_poll_wait_many`
+  (`POLLNVAL` in `revents`).
 - **Implementation status:** not implemented
 - **Rationale:** MojoAkku uses one typed error with a closed kind because
   Java's four overlapping exception types for one conceptual failure
   (`java.md` §11) and Rust's boxed `io::Error` both lose the machine-testable
   reason; the three-field shape matches `io_core`'s `IoError` for consistency
-  across the project.
+  across the project. The `op` field follows Go's `*OpError`/`*PathError`, which
+  carry the operation name alongside the underlying error (`go.md` §4), and
+  Java's exception hierarchy, which likewise reports the failing operation
+  (`java.md` §4).
 
 ## API entry: PollTimeout
 
@@ -387,14 +399,17 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
   (requested and satisfied), plus `ERROR`/`HANGUP`/`INVALID` (always reported by
   `poll(2)`). On timeout returns `NONE` (empty) — this is **not** an error.
   Preconditions: `fd >= 0` (else `INVALID_FD`), `0 <= timeout.millis <=
-  MAX_MILLIS` (else `INVALID_TIMEOUT`). `EINTR` is retried internally: after an
+  MAX_MILLIS` (else `INVALID_TIMEOUT`). `timeout = PollTimeout.ZERO` performs
+  exactly one `poll` and returns immediately (non-blocking). `EINTR` is retried
+  internally: after an
   interrupt the remaining bound is recomputed from `std.time.monotonic()` so the
   total wait never exceeds the requested timeout; if the remaining time is
   `<= 0`, the call returns `NONE`. The call never blocks longer than the bound.
   Ownership: the fd is borrowed and never closed; the result is an owned value.
 - **Errors:** `INVALID_FD` (negative fd), `INVALID_TIMEOUT` (out-of-range
-  timeout), `CLOSED` (`EBADF`), `SYSCALL` (any other `poll(2)` failure, numeric
-  code in `detail`). All are recoverable. `EINTR` is never raised.
+  timeout), `SYSCALL` (any other `poll(2)` failure, numeric code in `detail`).
+  All are recoverable. `EINTR` is never raised, and a closed-but-valid-numbered
+  fd yields `revents.INVALID` (`POLLNVAL`) rather than an exception.
 - **Tests:** `test_os_poll_wait` (readiness via a libc pipe: write end ready
   for write; after writing, read end ready for read; empty-before-data returns
   `NONE` on a zero timeout), `test_os_poll_bounded` (a 50 ms wait returns
@@ -419,13 +434,16 @@ moved to `_dev/TODO.md` (unbounded timeout, absolute-deadline wait, `epoll`/
   caller-owned `fds` set. First clears every `fds[i].revents`, then calls
   `poll(2)` over the whole set and writes each result back. Returns the number
   of entries whose `revents` is non-empty; `0` means the timeout elapsed (not an
-  error). `fds[i].fd < 0` skips that entry (POSIX). An **empty span returns `0`
-  immediately** without sleeping. `EINTR` is retried with the remaining bound
+  error). `fds[i].fd < 0` skips that entry (POSIX). `timeout =
+  PollTimeout.ZERO` performs exactly one `poll` and returns immediately
+  (non-blocking); an **empty span returns `0` immediately** without sleeping.
+  `EINTR` is retried with the remaining bound
   recomputed, exactly as in `wait`. Precondition: `0 <= timeout.millis <=
   MAX_MILLIS` (else `INVALID_TIMEOUT`).
-- **Errors:** `INVALID_TIMEOUT`, `CLOSED` (`EBADF`), `SYSCALL`. `EINTR` never
+- **Errors:** `INVALID_TIMEOUT`, `SYSCALL`. `EINTR` never
   surfaces. A per-descriptor problem such as a closed-but-pollable fd is
-  reported in that entry's `revents` (`INVALID`), not as an exception.
+  reported in that entry's `revents` (`INVALID`, `POLLNVAL`), not as an
+  exception.
 - **Tests:** `test_os_poll_wait_many` (two libc pipes, one read end written:
   count is 1 and the right `revents` is set; both ready → 2; a negative-fd slot
   is skipped), `test_os_poll_bounded` (bounded return).

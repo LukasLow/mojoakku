@@ -12,6 +12,7 @@ state. Format and rules: `.agents/workflows/LibraryLayout.md`.
 - `ReadySet` / `poll_into` — a no-alloc caller-buffer variant returning ready records rather than an in-place `revents`. (origin: `c.md` §12, `java.md` §12)
 - `poll_until(predicate)` — interruptible bounded wait that returns once a caller predicate holds. (origin: `cpp.md` §12)
 - `PollOutcome` (ready/timeout/interrupted) — one shared result type replacing per-primitive status enums. (origin: `cpp.md` §12)
+- `READ_HANGUP` — Linux-only `POLLRDHUP` half-close bit, deferred because macOS lacks it. (origin: `c.md` §3, `rust.md` §12)
 
 ## Kernel-primitive entry points
 
