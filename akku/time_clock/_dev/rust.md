@@ -34,9 +34,12 @@
 
 `Duration` (exact names from docs.rs):
 
-- Constants: `ZERO`, `MAX`, `SECOND`/`MILLISECOND`/`MICROSECOND`/`NANOSECOND`
-  (latter four are nightly `duration_constants`). `MAX` is
+- Constants: `ZERO` and `MAX` are stable; `SECOND`/`MILLISECOND`/`MICROSECOND`/
+  `NANOSECOND` are still **nightly-only** under the `duration_constants`
+  feature (tracking issue #57391) as of the cited page. `MAX` is
   `Duration::new(u64::MAX, 999_999_999)` and "about 584,942,417,355 years".
+  Source: https://doc.rust-lang.org/std/time/struct.Duration.html
+  (each constant's stability note).
 - Constructors: `new(secs: u64, nanos: u32)`, `from_secs`, `from_millis`,
   `from_micros`, `from_nanos`, `from_nanos_u128`, `from_secs_f64`,
   `from_secs_f32`, plus nightly `from_weeks`/`from_days`, stable
@@ -89,7 +92,8 @@
 - `Instant` is opaque ("Opaque and useful only with `Duration`") — there is
   **no** method to read raw seconds; only compare and subtract.
   Source: struct.Instant page description.
-- No heap, no handle, no free.
+- `GUESS:` no heap, no handle, no free — a consequence of the types being
+  `Copy` scalars; not stated as such on the cited page.
 
 ## 6. Blocking / non-blocking
 

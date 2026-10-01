@@ -42,9 +42,13 @@ Two packages: `time` and `context`.
   `Milliseconds() int64`, `Minutes() float64`, `Nanoseconds() int64`,
   `Seconds() float64`, `Round(m Duration) Duration`, `Truncate(m Duration)
   Duration`, `String() string`.
-- Arithmetic is by Go **operators** on `Duration` (it is an `int64`): `+`, `-`,
-  `*`, `/`, and comparisons. `GUESS:` operator support follows from it being a
-  defined int64 type; the doc page shows `time.Duration(seconds) * time.Second`.
+- Arithmetic is by Go **operators** on `Duration` (it is a defined `int64`):
+  `+`, `-`, `*`, `/`, and comparisons. Operator support follows from its
+  underlying `int64` type; the doc page shows
+  `time.Duration(seconds) * time.Second`. Integer values use "two's complement
+  arithmetic", so results are taken modulo 2^64 and overflow wraps silently.
+  Sources: https://pkg.go.dev/time#Duration and
+  https://go.dev/ref/spec#Numeric_types .
 - `Time` methods relevant here: `Add(d Duration) Time`, `Sub(u Time) Duration`,
   `Before(u Time) bool`, `After(u Time) bool`, `Equal(u Time) bool`,
   `Compare(u Time) int`, `AddDate`, `Round`, `Truncate`, `IsZero()`.
@@ -135,12 +139,14 @@ Not applicable to a time library; there is no transport and no TLS layer.
   with `now+d`), so only one primitive is canonical.
   Source: https://pkg.go.dev/context#WithTimeout .
 - **`Duration` is just an int64**: arithmetic is operator-based and overflow
-  is silent, but `Abs` guards the one dangerous case explicitly.
-  Source: https://pkg.go.dev/time#Duration.Abs .
+  wraps silently under two's-complement rules, but `Abs` guards the one
+  dangerous case explicitly. Sources:
+  https://pkg.go.dev/time#Duration.Abs and https://go.dev/ref/spec#Numeric_types .
 
 ## 11. Decisions NOT to copy
 
-- **Silent int64 overflow on `Duration` arithmetic.** Go wraps; a Mojo API
+- **Silent int64 overflow on `Duration` arithmetic.** Go wraps under
+  two's-complement rules (https://go.dev/ref/spec#Numeric_types); a Mojo API
   should expose checked/saturating operations. (Contrast: only `Abs` has an
   explicit guard; https://pkg.go.dev/time#Duration.Abs .)
 - **Two representations in one `Time`** (wall + optional monotonic) makes the
@@ -178,3 +184,5 @@ Not applicable to a time library; there is no transport and no TLS layer.
 - `time.Duration`: https://pkg.go.dev/time#Duration
 - `time.Time`: https://pkg.go.dev/time#Time
 - `context` package: https://pkg.go.dev/context
+- Go spec, numeric types / integer overflow:
+  https://go.dev/ref/spec#Numeric_types

@@ -18,9 +18,11 @@ durations" (https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/).
 - `ComparableTimeMark` — a `TimeMark` "that can be compared for difference with
   other time marks obtained from the same `TimeSource.WithComparableMarks`".
   Source: kotlin.time package page.
-- `DurationUnit` enum; `Instant` and `Clock` interfaces (since Kotlin 2.3) — "A
-  source of `Instant` values" / "A moment in time".
-  Source: kotlin.time package page.
+- `DurationUnit` enum; `Clock` (interface) and `Instant` (class) are documented
+  **"Since Kotlin 2.3"** — "A source of `Instant` values" / "A moment in time".
+  Sources: kotlin.time package page;
+  https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-instant/ ("Since
+  Kotlin 2.3").
 - `TestTimeSource` — "A time source that has programmatically updatable
   readings. It is useful as a predictable source of time in tests."
   Source: kotlin.time package page.
@@ -83,7 +85,8 @@ durations" (https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/).
 - `TimeMark` is bound to its `TimeSource`; comparing marks from different
   sources is not supported by `ComparableTimeMark` (only marks from the same
   `TimeSource.WithComparableMarks`). Source: kotlin.time package page.
-- No handles, no free; JVM GC.
+- `GUESS:` no handles, no manual free; JVM GC manages lifetime (general
+  Kotlin/JVM semantics, not a sentence on the cited pages).
 
 ## 6. Blocking / non-blocking
 

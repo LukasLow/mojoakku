@@ -16,8 +16,10 @@ platforms" (https://docs.python.org/3/library/time.html).
 - `time.monotonic_ns() -> int` — same but nanoseconds, "to avoid the precision
   loss caused by the float type". Source: same page.
 - `time.perf_counter()` / `perf_counter_ns()` — "highest available resolution",
-  includes time elapsed during sleep; CPython implements it with the same clock
-  as `monotonic()`. Source: same page.
+  includes time elapsed during sleep; CPython changed it (3.13) to use the same
+  underlying clock as `monotonic()`. Source:
+  https://docs.python.org/3/library/time.html#time.perf_counter ("Changed in
+  version 3.13").
 - `time.time() -> float` and `time.time_ns() -> int` — wall clock since epoch.
   Source: same page.
 - `time.get_clock_info(name)` returns a namespace with `adjustable`,
@@ -111,9 +113,12 @@ Not applicable to a time library; no transport, no TLS.
   Source: https://docs.python.org/3/library/time.html#time.get_clock_info .
 - **Integer-nanosecond variants of every clock** (`*_ns`) exist specifically
   to avoid float precision loss. Source: same page.
-- **`perf_counter` and `monotonic` are the same clock on CPython 3.13+**, but
-  the API keeps two names for portability/intent.
-  Source: same page (`perf_counter`, "Changed in version 3.13").
+- **On CPython 3.13+, `perf_counter` uses the same underlying clock as
+  `monotonic`** ("Changed in version 3.13: Use the same clock as
+  `time.monotonic()`"); the docs describe this as a CPython implementation
+  detail, not a language guarantee, and the API keeps two names for
+  portability/intent. Source:
+  https://docs.python.org/3/library/time.html#time.perf_counter .
 - **Signal-interrupted sleep is transparently restarted** (PEP 475) unless the
   handler raises. Source: same page.
 - **`CLOCK_BOOTTIME`** is offered as a suspend-aware monotonic clock distinct
@@ -124,9 +129,10 @@ Not applicable to a time library; no transport, no TLS.
 - **Float seconds as the primary representation.** `monotonic()` returns
   `float`; the docs themselves warn about precision loss and add `_ns`
   variants. Mojo should use integer nanoseconds from the start.
-- **Two parallel names for the same clock** (`monotonic` vs `perf_counter` on
-  CPython) is portability cruft; one monotonic clock is enough for a socket
-  wait. Source: same page.
+- **Two parallel clock names** (`monotonic` vs `perf_counter`) is portability
+  cruft — they coincide only as a CPython implementation detail (3.13+) and
+  are not guaranteed to; one monotonic clock is enough for a socket wait.
+  Source: https://docs.python.org/3/library/time.html#time.perf_counter .
 - **No monotonic instant type at all.** Python forces `start + timeout` on
   floats; a typed `Deadline` is safer and reads better.
 - **Platform-dependent semantics** ("semantics of these functions varies among

@@ -26,10 +26,13 @@ struct. All of it is in `<time.h>`.
   the calling thread; on interruption it returns -1/EINTR and, if `rmtp` is
   non-NULL, writes the **remaining** interval into it. Source: POSIX
   `nanosleep` page (https://pubs.opengroup.org/onlinepubs/9699919799/functions/nanosleep.html).
-- `int clock_nanosleep(...)` with the `TIMER_ABSTIME` flag sleeps until an
-  absolute `CLOCK_REALTIME` instant; resetting `CLOCK_REALTIME` makes an
-  already-past absolute time expire immediately. Source: POSIX `clock_gettime`
-  DESCRIPTION.
+- `int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec
+  *rqtp, struct timespec *rmtp)` sleeps on a specified clock; with
+  `TIMER_ABSTIME` set it sleeps until the clock reaches the absolute `rqtp`.
+  Source: POSIX `clock_nanosleep` SYNOPSIS and DESCRIPTION
+  (https://pubs.opengroup.org/onlinepubs/9699919799/functions/clock_nanosleep.html).
+  Resetting `CLOCK_REALTIME` makes an already-past absolute time expire
+  immediately. Source: POSIX `clock_gettime` DESCRIPTION.
 - `time_t time(time_t *t)` / `double difftime(time_t, time_t)` give wall-clock
   seconds; `struct tm`/`mktime`/`strftime` are calendar, not interval, tools.
   Source: POSIX `<time.h>` XBD referenced from both pages above.
@@ -92,8 +95,9 @@ Exact spellings from POSIX:
 - `nanosleep` blocks the calling thread. Source: POSIX `nanosleep` DESCRIPTION.
 - There is no async/timeout parameter on the clock reads themselves; asynchrony
   is built by the caller from signals, `clock_nanosleep` absolute wake-ups, or
-  threads. Source: POSIX `clock_gettime` DESCRIPTION (relative vs absolute
-  sleeps) and `nanosleep` DESCRIPTION (signal interruption).
+  threads. Source: POSIX `clock_nanosleep` DESCRIPTION (relative vs absolute
+  sleeps, https://pubs.opengroup.org/onlinepubs/9699919799/functions/clock_nanosleep.html)
+  and `nanosleep` DESCRIPTION (signal interruption).
 
 ## 7. IPv4 / IPv6
 
@@ -104,7 +108,9 @@ network address family.
 
 - Timeouts are represented as a relative `struct timespec` passed to
   `nanosleep`, or an absolute one via `clock_nanosleep` + `TIMER_ABSTIME`.
-  Source: POSIX `nanosleep` SYNOPSIS and `clock_gettime` DESCRIPTION.
+  Source: POSIX `nanosleep` SYNOPSIS and POSIX `clock_nanosleep` SYNOPSIS and
+  DESCRIPTION
+  (https://pubs.opengroup.org/onlinepubs/9699919799/functions/clock_nanosleep.html).
 - Because a signal aborts `nanosleep` with `EINTR` and returns the remaining
   time in `rmtp`, a correct timeout loop must re-arm with the remainder.
   Source: POSIX `nanosleep` RETURN VALUE.
@@ -130,8 +136,9 @@ layer.
   caller's problem. Source: POSIX `clock_gettime` page (only raw access is
   specified).
 - **Relative vs absolute sleep is a flag**, not a different function name:
-  `clock_nanosleep` + `TIMER_ABSTIME`. Source: POSIX `clock_gettime`
-  DESCRIPTION.
+  `clock_nanosleep` + `TIMER_ABSTIME`. Source: POSIX `clock_nanosleep`
+  DESCRIPTION
+  (https://pubs.opengroup.org/onlinepubs/9699919799/functions/clock_nanosleep.html).
 - **EINTR is explicit and lossless**: the remainder is handed back. Source:
   POSIX `nanosleep` RETURN VALUE.
 
@@ -162,7 +169,8 @@ layer.
   world has no checked ops, so Mojo can do strictly better.
 - **A `sleep(Duration)` primitive** and an absolute-deadline primitive, as
   `nanosleep` + `clock_nanosleep(TIMER_ABSTIME)` split them. (Source: POSIX
-  SYNOPSIS/ DESCRIPTION.)
+  `nanosleep` and `clock_nanosleep` SYNOPSIS/
+  DESCRIPTION, https://pubs.opengroup.org/onlinepubs/9699919799/functions/clock_nanosleep.html.)
 - **Value semantics + `Copy`**: `struct timespec` is pass-by-value and
   trivially copyable; Mojo's own value types map directly.
 
@@ -172,3 +180,5 @@ layer.
   https://pubs.opengroup.org/onlinepubs/9699919799/functions/clock_gettime.html
 - POSIX `nanosleep`:
   https://pubs.opengroup.org/onlinepubs/9699919799/functions/nanosleep.html
+- POSIX `clock_nanosleep`:
+  https://pubs.opengroup.org/onlinepubs/9699919799/functions/clock_nanosleep.html

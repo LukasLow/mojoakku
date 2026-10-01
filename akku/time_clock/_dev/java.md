@@ -12,9 +12,12 @@ provides the raw monotonic read.
   `int` representing nanosecond-of-second, which will always be between 0 and
   999,999,999". Source:
   https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Duration.html .
-- `java.time.Instant` — wall-clock instant on the time-line (UTC epoch),
-  comparable, with `now()` and arithmetic. `GUESS:` exact wording from general
-  knowledge; Duration page links to `Instant` and discusses its time-scale.
+- `java.time.Instant` — "An instantaneous point on the time-line"; stores "a
+  `long` representing epoch-seconds and an `int` representing
+  nanosecond-of-second", epoch `1970-01-01T00:00:00Z`; comparable; has
+  `now()`, `plus`/`minus`, `isBefore`/`isAfter`, `getEpochSecond()`,
+  `getNano()`, `EPOCH`/`MIN`/`MAX`. Source:
+  https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Instant.html .
 - `System.nanoTime()` — "Returns the current value of the running Java Virtual
   Machine's high-resolution time source, in nanoseconds. … can only be used to
   measure elapsed time and is not related to any other notion of system or
@@ -83,7 +86,9 @@ provides the raw monotonic read.
   mutating-looking methods return a copy. Source: Duration javadoc
   (class description, `withSeconds`, `plus`, etc.).
 - `System.nanoTime()` returns a primitive `long`; no ownership.
-- No handles, no free; GC manages object lifetime.
+  Source: System javadoc (`public static long nanoTime()`).
+- `GUESS:` no handles, no manual free; JVM GC manages object lifetime
+  (general Java semantics, not a sentence on the cited javadoc pages).
 
 ## 6. Blocking / non-blocking
 
@@ -105,14 +110,15 @@ family.
 
 - A timeout is a `Duration`; a deadline is an `Instant` (`Instant.now().plus(d)`)
   or, on the monotonic side, a raw `long` deadline in `nanoTime()` units.
-  Source: Duration javadoc + System.nanoTime().
+  Source: Instant javadoc + Duration javadoc + System.nanoTime().
 - **Overflow guidance is explicit**: to compare against a timeout, use
   `if (System.nanoTime() - startTime >= timeoutNanos)` rather than
   `if (System.nanoTime() >= startTime + timeoutNanos)` "because of the
   possibility of numerical overflow". Source: System javadoc.
-- Absolute deadlines are wall-clock (`Instant`) and are affected by clock
-  changes; monotonic waiting must use the `nanoTime` difference form.
-  Source: System javadoc.
+- Absolute deadlines are wall-clock (`Instant`, on the Java Time-Scale with
+  UTC-SLS leap-second smearing) and are affected by clock changes; monotonic
+  waiting must use the `nanoTime` difference form.
+  Source: Instant javadoc + System javadoc.
 
 ## 9. TLS
 
@@ -171,5 +177,7 @@ Not applicable to a time library; no transport, no TLS.
 
 - `java.time.Duration` (Java SE 21):
   https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Duration.html
+- `java.time.Instant` (Java SE 21):
+  https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Instant.html
 - `java.lang.System` (Java SE 21):
   https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/System.html

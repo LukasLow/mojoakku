@@ -58,8 +58,9 @@ copies. It has three parts, all in `namespace std::chrono`:
 
 - The core types do **not** raise. Arithmetic on `duration`/`time_point` is
   plain integer (or floating) arithmetic with **no overflow checking**, so
-  signed overflow is UB; the caller must bound values. `GUESS:` exact
-  UB statement from the C++ core-language rule, not fetched on the chrono page.
+  signed overflow is UB; the caller must bound values. `GUESS:` the exact
+  "signed overflow is UB" statement comes from the C++ core-language rule
+  ([expr] arithmetic), which was not fetched on the chrono page in this pass.
 - `time_point_cast` / `duration_cast` are lossy by design and never report it.
   Source: duration page (conversion requires a cast when precision is lost).
 - The C++20 calendar/time-zone layer introduces exceptions
@@ -129,9 +130,10 @@ Not applicable to a time library; there is no transport to secure.
 
 ## 11. Decisions NOT to copy
 
-- **No overflow-checked arithmetic** on duration/time_point: C++ signed
-  overflow is UB. Mojo should default to checked or saturating, matching
-  Rust's `checked_*`/`saturating_*` split.
+- **No overflow-checked arithmetic** on duration/time_point: `GUESS:` C++
+  signed overflow is UB (C++ core-language rule, not fetched — see §4). Mojo
+  should default to checked or saturating, matching Rust's
+  `checked_*`/`saturating_*` split.
 - **Unchecked implicit vs explicit conversion subtlety** (`duration_cast`
   required only when lossy) is powerful but subtle; a Mojo API should keep
   conversion explicit and obvious. (Source: duration page conversion rules.)

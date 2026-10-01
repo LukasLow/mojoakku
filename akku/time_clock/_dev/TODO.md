@@ -33,4 +33,4 @@ end state.
 
 ## Out of scope but possible
 
-- calendar/date — wall-clock calendar arithmetic, belongs in a separate library. (origin: `c.md` §10)
+- calendar/date — wall-clock calendar arithmetic, belongs in a separate library. (origin: `c.md` §1)
