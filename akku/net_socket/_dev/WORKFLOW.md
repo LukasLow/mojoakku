@@ -92,3 +92,13 @@ program failures, not 30 individually executed case failures); aggregate stops
 at the first abort. Raw logs and concern/edge-case matrix in TESTS.md.
 Independent native signal fixture proves real EINTR/EAGAIN and default SIGPIPE
 behavior on Linux aarch64, Mojo 1.1.0. No production implementation added.
+
+## Phase 10 — tests review APPROVED
+
+Fresh independent reviewer froze f609d1e, reproduced the exact aggregate abort
+(task 201/host 1), and separately all five compile-success/runtime-abort programs
+(exit 1 each). Thirty authored tests correctly counted. Public success paths,
+EOF, actual EINTR/EAGAIN, accepted/client SIGPIPE, CLOEXEC, IPv6-only, ownership,
+closed precedence and invalid inputs are non-tautological. No private imports.
+Real ETIMEDOUT induction remains unproven; Phase 12 must inspect the exact mapping
+and target constants. No tests changed. Implementation is now permitted.
