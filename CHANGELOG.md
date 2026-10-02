@@ -5,6 +5,16 @@ All notable changes to MojoAkku are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions stay on `0.x.y`; major is never bumped.
 
+## v0.12.0 - 2026-10-02
+
+### Added
+
+- prim_endian — byte-order (endianness) library: EndianOrder, host_order, swap_bytes, to_order, from_order, to_bytes_into, from_bytes.
+
+### Changed
+
+- workflows — one subagent per agent type, reuse the same session across phases instead of spawning a new agent each time.
+
 ## v0.11.0 - 2026-10-01
 
 ### Fixed
