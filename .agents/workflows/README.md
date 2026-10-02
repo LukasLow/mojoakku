@@ -4,6 +4,31 @@ Every workflow listed here lives in this directory (`.agents/workflows/`) and
 is owned by the agent type named in it. This file is the entry point: pick the
 phase you are in and follow the matching workflow.
 
+## One subagent per agent type — reuse it across phases
+
+Start **at most ONE subagent per agent type** for the whole task, and **reuse
+that same subagent session** whenever its role is needed again later (resume it
+instead of spawning a new one). One `coder`, one `researcher`, one `reviewer`,
+one `debug`, and so on. Typical shape:
+
+```
+coder1  researcher1  reviewer1  debug1
+```
+
+- When a later phase needs the same role (e.g. `NewLibPhase4DesignReview` after
+  `NewLibPhase2ResearchReview` both need a `reviewer`), **resume the existing
+  `<role>1` session** rather than starting a fresh agent.
+- Rationale: a reused session keeps the context it already built up (the library
+  under construction, prior findings, the house conventions) and costs far less
+  than a cold start. This also prevents a growing fleet of redundant agents.
+- Exception: parallel work that is genuinely independent may briefly need more
+  than one instance of a role (e.g. the at-most-6 `researcher` agents in
+  `NewLibPhase1Research.md`, one per language group). Even there, reuse each
+  group's researcher if that group must run again.
+- Leaf agents that change nothing (`reviewer`, `compliance`, `idea-reviewer`,
+  `debug`) are the clearest reuse candidates: they are read-only, so a resumed
+  session is always safe.
+
 ## New library pipeline
 
 The full path for a new library, in order. Each phase has a review gate before
