@@ -34,7 +34,8 @@ coder1  researcher1  reviewer1  debug1
 The full path for a new library, in order. Each phase has a review gate before
 the next phase starts, and each phase ends with a git commit naming the phase
 (and, for a review phase, its verdict). All phases for a library commit to the
-**library's own branch `<lib>-library`** (created in Phase 1); `main` is never
+**library's own branch — `<libname>-library-new` for a new library,
+`<libname>-library-patch` for a patch** (created in Phase 1); `main` is never
 written directly — the library reaches `main` through exactly one PR at the end.
 
 ```

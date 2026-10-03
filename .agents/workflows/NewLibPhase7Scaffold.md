@@ -66,6 +66,6 @@ Create the compile-ready skeleton for `akku/<lib>/` from the approved design, wi
 - `Taskfile.yml` exists and its `test` task runs the `_tests/` files.
 - The scaffold compiles via the consumer-import check.
 - No real implementation exists in the API files or `__init__.mojo`.
-- The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
+- The phase is committed on the library branch `<libname>-library-new` (see `LibraryLayout.md`, "Branch model").
 
 ## Handoff: `NewLibPhase8ScaffoldReview.md`

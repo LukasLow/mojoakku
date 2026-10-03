@@ -7,9 +7,11 @@ HERE first.
 
 ## Branch model (one branch per library, one PR per library)
 
-Every phase commit for a library goes to that library's **own long-lived branch
-`<lib>-library`**, created at Phase 1 (`git checkout -b <lib>-library`) and
-checked out for every phase. **`main` is never written directly.**
+Every phase commit for a library goes to that library's **own long-lived branch**,
+created at Phase 1 and checked out for every phase. The branch name follows the
+convention: `<libname>-library-new` for a new library, `<libname>-library-patch`
+for a patch/improvement to an existing library (`git checkout -b <libname>-library-new`
+or `git checkout -b <libname>-library-patch`). **`main` is never written directly.**
 
 - A library reaches `main` through **exactly one pull request**, opened by
   `CreatePR.md` after `NewLibPhase13FinalReview.md` returns GO.

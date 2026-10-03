@@ -161,8 +161,10 @@ Rules:
 - **Every workflow phase ends with a git commit** naming the phase (and, for a
   review phase, its verdict), so each phase boundary is visible in history.
 - **One branch per library; never commit to `main`.** All work for a library
-  happens on a single long-lived branch named `<lib>-library` (created at Phase 1
-  and checked out for every phase commit). `main` is **never** written directly.
+  happens on a single long-lived branch whose name follows the convention:
+  `<libname>-library-new` for a new library, `<libname>-library-patch` for a
+  patch/improvement to an existing library (created at Phase 1 and checked out
+  for every phase commit). `main` is **never** written directly.
   A library reaches `main` only through **exactly one pull request** per library,
   opened by `CreatePR.md` after Phase 13 passes, and merged only when CI on the
   PR is green. `main-push.yml` then auto-releases from `.changes/new/`.

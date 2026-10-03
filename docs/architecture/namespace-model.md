@@ -289,7 +289,7 @@ Gesamtzahl Katalog: **318**. Davon 4 `done`, 6 `covered_*`, 2 `homeless_*`.
 1. `.repo/todo/<alt>.yml` → `.repo/todo/<neu>.yml`.
 2. `akku/<alt>/` → `akku/<neu>/` (nur bei den 4 `done`-Libs).
 3. `_tests/*.mojo`: die `from <alt> import …`-Zeile (1 Zeile pro Datei).
-4. Docs-Header, Branch-Name `<neu>-library`.
+4. Docs-Header, Branch-Name `<neu>-library-new` (neue Library) bzw. `<neu>-library-patch` (Patch).
 
 **Repo-weit, einmalig:**
 5. `AGENTS.md`, `.agents/workflows/LibraryLayout.md`, Phasen-Workflows:

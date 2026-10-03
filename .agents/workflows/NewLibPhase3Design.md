@@ -69,6 +69,6 @@ Derive the Mojo public API for `<lib>` from the reviewed research and record eve
 - The design is implementable under Mojo language constraints.
 - The user has explicitly approved the public API (Step 9), or requested changes were applied and re-approved.
 - No code is written in this phase.
-- The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
+- The phase is committed on the library branch `<libname>-library-new` (see `LibraryLayout.md`, "Branch model").
 
 ## Handoff: `NewLibPhase4DesignReview.md`

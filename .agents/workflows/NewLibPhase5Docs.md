@@ -61,6 +61,6 @@ Turn the approved design into the complete `akku/<lib>/_dev/DESIGN.md` design re
 - Every dependency edge has a written justification.
 - Status defaults to `planned`; implementation status is `not implemented`.
 - No implementation or tests are written in this phase.
-- The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
+- The phase is committed on the library branch `<libname>-library-new` (see `LibraryLayout.md`, "Branch model").
 
 ## Handoff: `NewLibPhase6DocsReview.md`

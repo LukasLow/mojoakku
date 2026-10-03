@@ -2,13 +2,14 @@
 
 ## Purpose
 Take a finished, reviewed change set on the library branch and open its single
-pull request: record the change in `.changes/`, push the `<lib>-library` branch,
+pull request: record the change in `.changes/`, push the library branch
+(`<libname>-library-new` for a new library, `<libname>-library-patch` for a patch),
 and open the PR with `gh`. This is the hand-off from a finished library (or task)
 to CI and review. For a library this happens **once** — after Phase 13 — and is
 the only way the library reaches `main`.
 
 ## Inputs
-- The reviewed, committed change set on the `<lib>-library` branch (a library
+- The reviewed, committed change set on the library branch (a library
   after Phase 13, or a task workflow result).
 - The target repository and its default branch (`main`).
 - `.changes/README.md` (the change-file format and the versioning rule).
@@ -18,7 +19,8 @@ the only way the library reaches `main`.
 ## Preconditions
 - The relevant review gate passed (for a library: `NewLibPhase13FinalReview.md`
   returned GO; for a task: the matching workflow's gate passed).
-- All phase commits are on the library branch `<lib>-library`; nothing is
+- All phase commits are on the library branch (`<libname>-library-new` or
+  `<libname>-library-patch`); nothing is
   committed directly to `main`.
 - `task ci` is green locally (it auto-discovers every library and runs its
   tests).
@@ -37,7 +39,7 @@ the only way the library reaches `main`.
 
 ## Steps
 1. Manager confirms the change set is committed on the **library branch** and `task ci` is green.
-2. Manager confirms the branch for the library already exists — one long-lived branch named `<lib>-library`, created at Phase 1 and used for every phase commit. If for some reason it does not exist yet, Manager creates it off `main` now (`git checkout -b <lib>-library`). `main` is never written directly.
+2. Manager confirms the branch for the library already exists — one long-lived branch named `<libname>-library-new` (new library) or `<libname>-library-patch` (patch), created at Phase 1 and used for every phase commit. If for some reason it does not exist yet, Manager creates it off `main` now (`git checkout -b <libname>-library-new` or `git checkout -b <libname>-library-patch`). `main` is never written directly.
 3. Manager ensures a `.changes/new/<yyyy-mm-dd>-<slug>.md` file exists, with one
    category line per change (`NEW:` / `FIX:` / `SECURITY:` / `PERFORMANCE:` /
    `BREAKING:` / `DEPRECATED:` / `INTERNAL:`). If it is missing, `docs` writes it.

@@ -23,7 +23,7 @@ Research the problem space for one new MojoAkku library across many reference la
 - **reviewer**: not started here; invoked by the next workflow `NewLibPhase2ResearchReview.md`.
 
 ## Steps
-1. Manager confirms the library name `<lib>` and **creates and checks out the library branch `git checkout -b <lib>-library`** (or checks out the existing `<lib>-library` if Phase 1 is resumed). Every phase of this library commits to this branch; `main` is never written directly. Manager then creates the directory `akku/<lib>/_dev/` in the repository.
+1. Manager confirms the library name `<lib>` and **creates and checks out the library branch `git checkout -b <libname>-library-new`** (or checks out the existing `<libname>-library-new` if Phase 1 is resumed). Every phase of this library commits to this branch; `main` is never written directly. Manager then creates the directory `akku/<lib>/_dev/` in the repository.
 2. Manager fixes the language groups for this run from the baseline roster below. The roster is a pool, not a mandate: the Manager selects the languages in which the concept `<lib>` actually exists and relevantly differs, and records the selection with a one-line reason per language in `akku/<lib>/_dev/README.md`. The selection is frozen for the run.
    - **Mojo** — always present in the list, but served by the `mojov1` buch and **not** by a `researcher`: Mojo facts are read from `mojov1` (and improved in place via `buch_update` if wrong), so **no `researcher` handles Mojo**.
    - **Mandatory languages (always selected, in every run):** C, C++, Go, Rust, JS/TS, Python — plus Mojo via the buch. These are never dropped; if a language genuinely cannot answer a domain, the Manager states why in `_dev/README.md`.
@@ -86,7 +86,7 @@ Research the problem space for one new MojoAkku library across many reference la
 - `NewLibPhase1Research.md` is complete when every language of the frozen selection of this run (recorded in `_dev/README.md`) is covered — Mojo by the `mojov1` buch (optionally linked from `_dev/mojo.md`) and each other language by a non-empty `_dev/<lang>.md` — and every question is answered or explicitly marked `GUESS:`.
 - At most 6 researchers were started, one per selected group.
 - No design or API decision is made in this phase.
-- The phase is committed on the library branch `<lib>-library` (see `LibraryLayout.md`, "Branch model").
+- The phase is committed on the library branch `<libname>-library-new` (see `LibraryLayout.md`, "Branch model").
 - The phase is NOT approved here; approval happens in `NewLibPhase2ResearchReview.md`.
 
 ## Handoff: `NewLibPhase2ResearchReview.md`
