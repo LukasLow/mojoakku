@@ -1,0 +1,80 @@
+build_versioning Phase 9 — behavioral test suite + failing baseline
+==================================================================
+
+Branch:  build_versioning-library-new
+Date:    2026-10-03
+Files:   akku/build_versioning/_tests/test_build_versioning_*.mojo (one concern per file)
+
+Exact commands
+--------------
+Run from the repo root:
+
+  smd '{ cd .worktrees/build-versioning && task -t akku/build_versioning/Taskfile.yml test }'
+  # Taskfile.yml -> `sh ../../.repo/scrupts/libraries.sh test`
+  # libraries.sh -> for each _tests/*.mojo: `mojo run -I <root> <file>`
+  # The runner stops at the FIRST non-zero exit (all 8 are red, so it stops
+  # after the first file).
+
+Direct per-file equivalent (used below to see every file, because the runner
+stops at the first failure):
+  cd .worktrees/build-versioning/akku/build_versioning \
+    && for f in _tests/*.mojo; do mojo run -I ../.. "$f"; done
+
+Test inventory
+--------------
+Test-file count: 8    Test-function total: 61
+  _tests/test_build_versioning_semver.mojo          (9 tests)
+  _tests/test_build_versioning_error_kind.mojo      (3 tests)
+  _tests/test_build_versioning_error.mojo           (7 tests)
+  _tests/test_build_versioning_parse.mojo           (19 tests)
+  _tests/test_build_versioning_try_parse.mojo       (5 tests)
+  _tests/test_build_versioning_precedence.mojo      (10 tests)
+  _tests/test_build_versioning_is_prerelease.mojo   (4 tests)
+  _tests/test_build_versioning_is_stable.mojo       (4 tests)
+
+Baseline result (intended red state)
+------------------------------------
+Files run:     8
+Files passing: 0
+Files failing: 8 / 8 — each fails with a stub `abort`, the intended red state.
+No test assertion is executed; no test logic is yet disproven.
+
+Raw output — exact reproduction (each line is that file's abort)
+----------------------------------------------------------------
+== _tests/test_build_versioning_error.mojo
+ABORT: /workspace/.worktrees/build-versioning/akku/build_versioning/version_error_kind.mojo:14:14: MojoAkku: this API is not yet implemented
+== _tests/test_build_versioning_error_kind.mojo
+ABORT: ../../akku/build_versioning/version_error_kind.mojo:14:14: MojoAkku: this API is not yet implemented
+== _tests/test_build_versioning_is_prerelease.mojo
+ABORT: ../../akku/build_versioning/parse.mojo:9:10: MojoAkku: this API is not yet implemented
+== _tests/test_build_versioning_is_stable.mojo
+ABORT: ../../akku/build_versioning/parse.mojo:9:10: MojoAkku: this API is not yet implemented
+== _tests/test_build_versioning_parse.mojo
+ABORT: ../../akku/build_versioning/parse.mojo:9:10: MojoAkku: this API is not yet implemented
+== _tests/test_build_versioning_precedence.mojo
+ABORT: ../../akku/build_versioning/parse.mojo:9:10: MojoAkku: this API is not yet implemented
+== _tests/test_build_versioning_semver.mojo
+ABORT: ../../akku/build_versioning/semver.mojo:26:14: MojoAkku: this API is not yet implemented
+== _tests/test_build_versioning_try_parse.mojo
+ABORT: ../../akku/build_versioning/try_parse.mojo:9:10: MojoAkku: this API is not yet implemented
+
+`task -t akku/build_versioning/Taskfile.yml test` stops at the first file
+------------------------------------------------------------------------
+The per-library runner (`libraries.sh test`) stops at the first non-zero exit,
+so `task test` reports only the first file:
+
+  == _tests/test_build_versioning_error.mojo
+  ABORT: /workspace/.worktrees/build-versioning/akku/build_versioning/version_error_kind.mojo:14:14: MojoAkku: this API is not yet implemented
+  task: Failed to run task "test": exit status 1
+
+Interpretation
+--------------
+- 8 test files, 61 test functions, 8 files failing, 0 passing — the intended
+  red baseline: the tests fail because the stubs call
+  `abort("MojoAkku: this API is not yet implemented")`, not for any other reason.
+- Edge cases derived from the docs are covered explicitly: EMPTY, INVALID_FORMAT
+  (partial/extra component, `v`/`=` prefix, whitespace, empty identifiers,
+  double separators), LEADING_ZERO (core and numeric prerelease), BAD_NUMBER,
+  OVERFLOW, build leading-zero allowance, build-ignored precedence and equality,
+  the full semver.org item-11 chain, and antisymmetry.
+- The tests are expected to go green in Phase 11 (implementation).
