@@ -1,0 +1,52 @@
+Phase-9 red baseline for akku/text_format.
+
+Exact suite command:
+  cd .worktrees/text-format/akku/text_format && task test
+  (task test delegates to: sh ../../.repo/scrupts/libraries.sh test,
+   which runs each _tests/*.mojo with `mojo run` and stops on the first abort.)
+
+Because the per-library runner stops at the first stub abort, the full
+per-file classification is produced by the equivalent baseline runner:
+  cd .worktrees/text-format && sh akku/text_format/_tests/run_baseline.sh
+
+Expected red-phase state: every file fails with the stub abort
+"MojoAkku: this API is not yet implemented"; no compile/import errors.
+
+--- run_baseline.sh output ---
+== mojo run -I . akku/text_format/_tests/test_text_format_alignment.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: /workspace/.worktrees/text-format/akku/text_format/parse_format_spec.mojo:9:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_error.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/format_error.mojo:15:14: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_error_kind.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/format_error_kind.mojo:20:14: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_format_args.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/format_args.mojo:32:14: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_format_bool.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/parse_format_spec.mojo:9:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_format_float.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/parse_format_spec.mojo:9:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_format_int.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/parse_format_spec.mojo:9:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_format_spec.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/format_spec.mojo:58:14: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_format_string.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/parse_format_spec.mojo:9:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_format_template.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/format_args.mojo:16:14: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_format_template_to.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/format_args.mojo:16:14: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_format_type.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/parse_format_spec.mojo:9:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_grouping.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/parse_format_spec.mojo:9:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_parse_spec.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/parse_format_spec.mojo:9:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/text_format/_tests/test_text_format_sign_mode.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/parse_format_spec.mojo:9:10: MojoAkku: this API is not yet implemented
+--------
+baseline: 15 files, 0 passed, 15 failed
+  failures: 15 stub abort, 0 compile/import error, 0 other
+note: the suite holds 106 test functions across 15 files. A stub
+      `abort` stops the process on its first call, so no per-test
+      passed/failed count is reachable in the red phase; the file count
+      (15) is the honest measure.
