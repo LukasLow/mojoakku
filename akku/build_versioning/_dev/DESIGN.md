@@ -65,25 +65,39 @@ status:` is `not implemented` until Phase 11.
 - **Direction of the edge.** `build_versioning` points *to* `text_string`;
   `text_string` never points back. No other sibling is needed and none is
   declared.
+- **Internal shared core, not a sibling edge.** `akku/build_versioning/_internal/version_core.mojo`
+  holds the private Clause-11 comparison and the shared identifier validation so
+  `SemVer.__eq__` and `precedence` do not import each other (see `## Overview`).
+  `_internal/` is private to this library and is **not** a dependency edge; it
+  is the same convention as `akku/net_ip/_internal/ip_core.mojo`.
 - **No stdlib/Python build dependency.** The library is pure Mojo: no FFI, no
   Python interop, no hidden global state (`mojov1/intro/packages-and-modules`).
 
 ## Overview
 
 `akku/build_versioning` is a pure, in-process, deterministic library with a
-**single value type and one precedence function**:
+**single value type and one precedence function**, plus a private shared core:
 
-1. **The version value — `SemVer`.** Fields `major`, `minor`, `patch` (`Int`),
-   plus `prerelease` and `build` as owned `String`s (empty when absent).
-   It is constructed only through a validating component constructor or through
-   `parse`, so a `SemVer` that exists is always a well-formed version.
+1. **The version value — `SemVer`.** Private fields `_major`, `_minor`, `_patch`
+   (`Int`) and `_prerelease`, `_build` (owned `String`, empty when absent),
+   exposed through accessor methods `major()`, `minor()`, `patch()`,
+   `prerelease()`, `build()`. It is constructed only through a validating
+   component constructor or through `parse`, so a `SemVer` that exists is
+   always a well-formed version.
 2. **The strict parser — `parse` / `try_parse`.** `parse` implements the
    semver.org BNF exactly and raises a typed `VersionError` on any violation;
    `try_parse` is its non-raising twin returning `Optional[SemVer]`.
 3. **Precedence — `precedence`.** Implements SemVer clause 11 and returns
-   `-1`, `0` or `+1`; build metadata is ignored.
+   `-1`, `0` or `+1`; build metadata is ignored. It delegates to the private
+   core.
 4. **Kind predicates — `is_prerelease`, `is_stable`.** Two one-line boolean
    questions about a value.
+5. **Private shared core — `_internal/version_core.mojo`.** The Clause-11
+   precedence algorithm and the shared identifier validation live here as pure
+   functions over the raw fields, so `precedence.mojo` and `SemVer.__eq__` call
+   one implementation without importing each other (the
+   `akku/net_ip/_internal/ip_core.mojo` convention). This is not a public API
+   entry and not a sibling dependency edge.
 
 Cross-cutting shape:
 
@@ -94,9 +108,16 @@ Cross-cutting shape:
 - **Strict by design.** No `v` prefix, no `=` prefix, no surrounding
   whitespace, no partial versions (`1`, `1.2`), no silent normalization. Those
   lenient forms stay backlog (`_dev/TODO.md`).
-- **Equality equals precedence.** `SemVer.__eq__` is `precedence(a, b) == 0`,
-  so build metadata never affects equality (clause 10). A build-sensitive
-  equality/total order is backlog.
+- **Private fields protect the invariant.** Mojo has no access control
+  (`mojov1/keywords/struct`), so `SemVer` follows the MojoAkku convention
+  (`akku/net_ip/ipv4_address.mojo`: private `_b` plus accessor `octets()`):
+  fields are `_`-prefixed and the only initializer is `@doc_hidden`, so the
+  public surface cannot build an unvalidated value. Validation lives in the one
+  constructor and in `parse` (see `## Ownership and Lifecycle`).
+- **Equality equals precedence.** `SemVer.__eq__` delegates to the private core
+  (`_internal/version_core.mojo`), the same comparison `precedence` exposes, so
+  build metadata never affects equality (clause 10) and the two cannot drift
+  apart. A build-sensitive equality/total order is backlog.
 - **Value semantics, no hidden global state.** `SemVer`, `VersionError`,
   `VersionErrorKind` are value types with Mojo lifecycle conformance.
 
@@ -216,7 +237,7 @@ right column are the reference APIs cited in the justifications below.
 | Precedence comparator | Rust `cmp_precedence -> Ordering`; Elixir `Version.compare/2 -> :gt|:eq|:lt`; node `compare`; Go `x/mod/semver.Compare`; C `semver_compare` | `rust.md` §3,§9; `elixir.md` §3; `js-ts.md` §3; `go.md` §3; `c.md` §3 |
 | Clause 11 prerelease rules | semver.org item 11; Zig `order`; Rust `Prerelease` total ordering; Elixir `compare` docs | `zig.md` §9; `rust.md` §9; `elixir.md` §7,§9 |
 | Build metadata ignored for precedence | semver.org item 10; Rust `cmp_precedence`; Elixir `("2.0.1+build0","2.0.1") -> :eq`; node non-capturing build | `rust.md` §9; `elixir.md` §7; `js-ts.md` §7 |
-| Typed error + closed kind | Rust `ErrorKind`; MojoAkku `prim_bit`/`prim_endian` `*Error`/`*ErrorKind`; Elixir `InvalidVersionError`; Zig `error.InvalidVersion`/`error.Overflow` | `rust.md` §4; `akku/prim_bit/_dev/DESIGN.md`; `akku/prim_endian/_dev/DESIGN.md`; `elixir.md` §4; `zig.md` §4 |
+| Typed error + closed kind | Rust `semver::Error` / `Result<T, Error>` with enumerated causes; MojoAkku `prim_bit`/`prim_endian` `*Error`/`*ErrorKind`; Elixir `InvalidVersionError`; Zig `error.InvalidVersion`/`error.Overflow` | `rust.md` §4,§10; `akku/prim_bit/_dev/DESIGN.md`; `akku/prim_endian/_dev/DESIGN.md`; `elixir.md` §4; `zig.md` §4 |
 | Component constructor without a string | Python `Version.from_parts`; Java `Semver.of(1,2,3)`; kotlin-semver `Version(major,minor,patch,...)`; C++ `version(1,2,3)` | `python.md` §10; `java.md` §12; `kotlin.md` §3; `cpp.md` §3 |
 | `is_stable` / `is_prerelease` predicates | semver4j `isStable()`; kotlin-semver `.isStable`, `.isPreRelease`; C++ `is_prerelease` | `java.md` §12; `kotlin.md` §12; `cpp.md` §3 |
 | Owned qualifier storage | Rust owned `Prerelease`/`BuildMetadata`; Elixir owned `:pre` list / `:build` string; Kotlin joined `String`s | `rust.md` §7,§10; `elixir.md` §7,§11; `kotlin.md` §11 |
@@ -229,8 +250,10 @@ Every entry below is listed here with its one-line meaning and is fully
 specified in the per-entry blocks. Names are stable: Phase 5 documents them and
 Phase 7 stubs them, in this order (one file per entry).
 
-1. `SemVer` — a parsed version value: `major`, `minor`, `patch` (numeric),
-   `prerelease` and `build` (owned strings); precedence-based equality.
+1. `SemVer` — a parsed version value: private `_major`, `_minor`, `_patch`
+   (numeric) and `_prerelease`, `_build` (owned strings) exposed by
+   `major()`/`minor()`/`patch()`/`prerelease()`/`build()`; precedence-based
+   equality.
 2. `VersionErrorKind` — closed discriminant for `VersionError`: `EMPTY`,
    `INVALID_FORMAT`, `BAD_NUMBER`, `LEADING_ZERO`, `OVERFLOW`, `OTHER`.
 3. `VersionError` — the one typed error: `kind: VersionErrorKind`, `op: String`,
@@ -294,6 +317,20 @@ string; no release-1 operation raises it.
   `Equatable, Copyable, Deinitable, Writable`; `VersionErrorKind` to
   `Equatable, ImplicitlyCopyable, Deinitable, Writable`; `VersionError` to
   `Copyable, Deinitable, Writable`.
+- **The `SemVer` invariant is protected by private fields.** Mojo has no access
+  control, so — like `akku/net_ip/ipv4_address.mojo` (private `_b`, accessor
+  `octets()`) — `SemVer` stores `_major`/`_minor`/`_patch`/`_prerelease`/
+  `_build` and exposes plain accessor methods. The only initializer is
+  `@doc_hidden` (the `mojov1/decorators/doc-hidden` convention already used by
+  `prim_bit`/`prim_endian` kinds), so the public surface cannot set an
+  unvalidated field; every value comes from the single validating constructor
+  or from `parse`. Because there is no way to reach the fields directly, the
+  "every `SemVer` is well-formed" invariant holds (`mojov1/keywords/struct`).
+- **One private comparison, two thin callers.** The Clause-11 algorithm lives
+  once in `_internal/version_core.mojo` as a pure function over the raw fields;
+  `precedence.mojo` and `SemVer.__eq__` delegate to it. This removes the
+  circular import `semver.mojo <-> precedence.mojo` — the shared-core
+  convention of `akku/net_ip/_internal/ip_core.mojo` (`mojov1/intro/packages-and-modules`).
 - **`SemVer` is `Copyable` but not `ImplicitlyCopyable`.** It owns two `String`
   fields, so an implicit copy could hide allocation; `ImplicitlyCopyable`
   should only be used when copying is inexpensive and side-effect-free
@@ -353,12 +390,13 @@ Signature:
 
 ```mojo
 struct SemVer(Equatable, Copyable, Deinitable, Writable):
-    var major: Int
-    var minor: Int
-    var patch: Int
-    var prerelease: String
-    var build: String
+    var _major: Int
+    var _minor: Int
+    var _patch: Int
+    var _prerelease: String
+    var _build: String
 
+    @doc_hidden
     def __init__(
         out self,
         major: Int,
@@ -367,6 +405,12 @@ struct SemVer(Equatable, Copyable, Deinitable, Writable):
         prerelease: String = "",
         build: String = "",
     ) raises VersionError
+
+    def major(self) -> Int
+    def minor(self) -> Int
+    def patch(self) -> Int
+    def prerelease(self) -> StringSpan
+    def build(self) -> StringSpan
 
     def __eq__(self, other: Self) -> Bool
 
@@ -377,30 +421,41 @@ struct SemVer(Equatable, Copyable, Deinitable, Writable):
 
 Semantics:
 
-- **Fields / meaning:** `major`, `minor`, `patch` are the three numeric core
-  components; `prerelease` is the dot-joined prerelease identifier string
-  (`"alpha.1"`), empty when the version has no prerelease; `build` is the
+- **Fields / meaning:** `_major`, `_minor`, `_patch` are the three numeric core
+  components; `_prerelease` is the dot-joined prerelease identifier string
+  (`"alpha.1"`), empty when the version has no prerelease; `_build` is the
   dot-joined build-metadata string (`"build.5"`), empty when absent. An empty
   `String` is the one absence representation — there is no `Optional` field and
   no sentinel (`zig.md` §11, `elixir.md` §7).
-- **Construction — component path.** The `__init__` is the parser-free
-  constructor (`python.md` §10: `from_parts`; `java.md` §12: `Semver.of`): it
-  validates `major`/`minor`/`patch >= 0` (else `BAD_NUMBER`) and validates the
-  two qualifier strings against the SemVer identifier grammar (else
-  `INVALID_FORMAT` or `LEADING_ZERO`). It is the only constructor, so a `SemVer`
-  that exists is always well-formed — the Rust newtype invariant
-  (`rust.md` §10) reached through a validating constructor because Mojo has no
-  access control.
+- **Private fields, public accessors.** Following
+  `akku/net_ip/ipv4_address.mojo` (private `_b`, accessor `octets()`), the
+  fields are `_`-prefixed and read through `major()`/`minor()`/
+  `patch()` (returning `Int`) and `prerelease()`/`build()` (returning a
+  borrowed `StringSpan` view into the value). The value owns the two
+  `String`s; the accessors do not copy. This is how a no-access-control
+  language still keeps the always-valid invariant: nothing outside the module
+  can write a field.
+- **Construction — component path.** The `@doc_hidden __init__` is the
+  parser-free constructor (`python.md` §10: `from_parts`; `java.md` §12:
+  `Semver.of`): it validates `major`/`minor`/`patch >= 0` (else `BAD_NUMBER`)
+  and validates the two qualifier strings against the SemVer identifier grammar
+  (else `INVALID_FORMAT` or `LEADING_ZERO`). It is the only initializer, so a
+  `SemVer` that exists is always well-formed — the Rust newtype invariant
+  (`rust.md` §10) reached through a validating `@doc_hidden` constructor,
+  because Mojo has no access control and hides internals by the `_`/`@doc_hidden`
+  convention (`mojov1/decorators/doc-hidden`, `mojov1/keywords/struct`).
 - **Construction — string path.** `parse(text)` builds the same value after
   full string validation; `try_parse(text)` returns it inside an `Optional`.
-- **Equality.** `__eq__` is true iff `precedence(self, other) == 0`, i.e. the
-  three numerics and the prerelease are equal and **build metadata is ignored**
+- **Equality.** `__eq__` delegates to the private core comparison
+  (`_internal/version_core.mojo`), the same Clause-11 algorithm `precedence`
+  exposes; it is true iff `precedence(self, other) == 0`, i.e. the three
+  numerics and the prerelease are equal and **build metadata is ignored**
   (clause 10; `rust.md` §9, `elixir.md` §7). `__ne__` is its negation. There is
   no build-sensitive equality in release 1 (backlog `same_build`).
 - **Rendering.** `write_to` prints the canonical strict form
-  `major.minor.patch`, then `-` + `prerelease` when non-empty, then `+` +
-  `build` when non-empty. It is the exact inverse of `parse` for any value built
-  by `parse`.
+  `major.minor.patch`, then `-` + prerelease when non-empty, then `+` + build
+  when non-empty. It is the exact inverse of `parse` for any value built by
+  `parse`.
 - **Ownership.** The value owns its two qualifier `String`s; it can be returned
   from a function, stored in a `List`, and outlive the parsed input buffer
   (`zig.md` §11). It is `Copyable` (explicit `.copy()`), not
@@ -423,6 +478,10 @@ Tests:
   `INVALID_FORMAT`.
 - `test_semver_construct_rejects_leading_zero_prerelease` — `"01"` raises
   `LEADING_ZERO`.
+- `test_semver_accessors_major_minor_patch` — the three accessors return the
+  constructed components.
+- `test_semver_accessors_prerelease_build` — `prerelease()`/`build()` return
+  the qualifier strings (empty `StringSpan` when absent).
 - `test_semver_eq_ignores_build` — `1.2.3+a == 1.2.3+b`.
 - `test_semver_eq_uses_precedence` — `1.2.3-alpha != 1.2.3`.
 - `test_semver_writable_roundtrip` — parse then print returns the strict form.
@@ -440,15 +499,20 @@ struct fields as the identity itself (elixir.md §7), while Zig's borrowed
 are rejected (zig.md §11). MojoAkku stores prerelease and build as single
 joined Strings rather than Elixir's identifier list because it keeps the value
 small and Writable-friendly for release 1, accepting Kotlin's joined-string
-weakness knowingly (kotlin.md §11); a pre-split list is backlog. MojoAkku uses
-Int for the three components because Int is Mojo's machine-word default and the
-project convention (mojov1/types/integers-and-floats); Rust's u64 with checked
-overflow (rust.md §10) is mirrored by validating Int and raising OVERFLOW in
-parse, and C's 32-bit int trap (c.md §11) is explicitly avoided. MojoAkku uses
-a validating component constructor because Python from_parts (python.md §10)
-and Java Semver.of (java.md §12) show programmatic construction is needed, and
-the constructor is the only way to keep the always-valid invariant without
-access control (rust.md §10).`
+weakness knowingly (kotlin.md §11); a pre-split identifier list plus identifier
+accessors are backlog (_dev/TODO.md). MojoAkku uses private `_`-prefixed fields
+with public accessors because Mojo has no access control (mojov1/keywords/struct)
+and this is the established house convention for a value with an invariant
+(akku/net_ip/ipv4_address.mojo, private `_b` + `octets()`); the single
+`@doc_hidden` constructor is the only way to build a value, mirroring Rust's
+newtype invariant (rust.md §10) and the prim_bit/prim_endian hidden-kind
+convention. MojoAkku uses Int for the three components because Int is Mojo's
+machine-word default and the project convention
+(mojov1/types/integers-and-floats); Rust's u64 with checked overflow (rust.md
+§10) is mirrored by validating Int and raising OVERFLOW in parse, and C's
+32-bit int trap (c.md §11) is explicitly avoided. MojoAkku uses a validating
+component constructor because Python from_parts (python.md §10) and Java
+Semver.of (java.md §12) show programmatic construction is needed.`
 
 ---
 
@@ -497,7 +561,8 @@ Semantics:
     SemVer clause 2/9 forbids for the core and for numeric prerelease
     identifiers.
   - `OVERFLOW` — a numeric component does not fit `Int` (distinct from a syntax
-    error; `zig.md` §10, `elixir.md` §10).
+    error; `zig.md` §4 documents `error.Overflow` separately from
+    `error.InvalidVersion`).
   - `OTHER` — any other condition; the opaque `VersionError.detail` holds it.
     Reserved in release 1: no release-1 operation raises it.
 - **Why these six and no more.** Every kind maps to a real branch in `parse` or
@@ -522,15 +587,16 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses a closed VersionErrorKind because Rust's ErrorKind (rust.md §4)
-and Zig's InvalidVersion/Overflow split (zig.md §4) show a small closed set is
-enough, and prim_bit/prim_endian already taught the low-vision user one
-kind+op+detail shape (akku/prim_bit/_dev/DESIGN.md,
-akku/prim_endian/_dev/DESIGN.md); a Python exception class hierarchy
-(python.md §11) or a numeric errno is rejected as noise. The set is
-deliberately as small as the reachable failures: each of EMPTY, INVALID_FORMAT,
-BAD_NUMBER, LEADING_ZERO and OVERFLOW corresponds to a documented semver.org
-rule, and OTHER is reserved.`
+`MojoAkku uses a closed VersionErrorKind because Zig splits InvalidVersion
+from Overflow (zig.md §4) and Rust funnels all parse failures through one
+`Error` type with enumerated causes (rust.md §4, §10), so a single error type
+with a small closed discriminant is enough; prim_bit/prim_endian already
+taught the low-vision user one kind+op+detail shape
+(akku/prim_bit/_dev/DESIGN.md, akku/prim_endian/_dev/DESIGN.md); a Python
+exception class hierarchy (python.md §11) or a numeric errno is rejected as
+noise. The set is deliberately as small as the reachable failures: each of
+EMPTY, INVALID_FORMAT, BAD_NUMBER, LEADING_ZERO and OVERFLOW corresponds to a
+documented semver.org rule, and OTHER is reserved.`
 
 ---
 
@@ -585,14 +651,16 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses one typed error VersionError because Rust and Java both funnel
-all version failures through one error type (rust.md §4, java.md §4) and
-prim_bit/prim_endian established the kind+op+detail shape
-(akku/prim_bit/_dev/DESIGN.md, akku/prim_endian/_dev/DESIGN.md); it replaces
-both Python's InvalidVersion exception and node's null (python.md §11,
-js-ts.md §11) with Mojo's alternate-return-value model
-(mojov1/errors/error-model), and a separate error type per failure kind is
-rejected as a taxonomy the low-vision user does not need.`
+`MojoAkku uses one typed error VersionError because Rust funnels all parse
+failures through a single `semver::Error` (rust.md §4: "`Result<T, Error>` is
+the only error channel; no panics and no sentinels") and Java likewise exposes
+one exception path per parse (java.md §4), and prim_bit/prim_endian
+established the kind+op+detail shape (akku/prim_bit/_dev/DESIGN.md,
+akku/prim_endian/_dev/DESIGN.md); it replaces both Python's InvalidVersion
+exception and node's null (python.md §11, js-ts.md §11) with Mojo's
+alternate-return-value model (mojov1/errors/error-model), and a separate error
+type per failure kind is rejected as a taxonomy the low-vision user does not
+need.`
 
 ---
 
@@ -794,8 +862,13 @@ Semantics:
 - **Totality.** `precedence` cannot fail and raises nothing; it is a pure
   function from two values to `Int` (`zig.md` §4: `order` is not fallible
   because invalid values cannot exist).
+- **One implementation.** `precedence.mojo` is a thin wrapper over the private
+  `_internal/version_core.mojo` Clause-11 function; `SemVer.__eq__` calls the
+  same core, so there is exactly one comparison implementation and no
+  `semver.mojo <-> precedence.mojo` import cycle (the
+  `akku/net_ip/_internal/ip_core.mojo` convention).
 - **Relation to `__eq__`.** `SemVer.__eq__` is exactly `precedence(a, b) == 0`;
-  the two are guaranteed consistent.
+  the two are guaranteed consistent because they share the core.
 - **Sorting.** A caller can sort by mapping `precedence` to a key; a dedicated
   `sort` helper is backlog (`_dev/TODO.md`).
 
@@ -857,12 +930,13 @@ def is_prerelease(v: SemVer) -> Bool
 Semantics:
 
 - **Parameter / precondition:** any valid `SemVer`, borrowed. Cannot fail.
-- **Return / meaning:** `True` iff `v.prerelease` is non-empty, i.e. the
-  version carries a prerelease identifier string. It never inspects `build`.
+- **Return / meaning:** `True` iff `v.prerelease()` is non-empty, i.e. the
+  version carries a prerelease identifier string. It never inspects
+  `v.build()`.
 - **Relation to precedence:** `is_prerelease(v)` is exactly the condition in
   clause 11 that makes `v` compare lower than its release counterpart; it is
   offered as a named predicate so callers do not re-derive it from the string.
-- **No mutation, no allocation.** It reads one field.
+- **No mutation, no allocation.** It reads the public accessor only.
 
 Errors:
 
@@ -885,11 +959,12 @@ Rationale:
 
 `MojoAkku uses is_prerelease(v) because semver4j exposes isStable() and Kotlin
 exposes .isPreRelease (java.md §12, kotlin.md §12) and C++ exposes
-is_prerelease (cpp.md §3); it is a one-field predicate that names the clause-11
-condition instead of forcing the caller to test an empty string, which is the
-predictability goal for a low-vision user. MojoAkku keeps it a free function
-rather than a method so each public API entry maps to one file, the
-LibraryLayout convention.`
+is_prerelease (cpp.md §3); it is a one-accessor predicate that names the
+clause-11 condition instead of forcing the caller to test an empty string,
+which is the predictability goal for a low-vision user. MojoAkku keeps it a
+free function rather than a method so each public API entry maps to one file,
+the LibraryLayout convention; it reads the public `prerelease()` accessor, so
+it does not depend on the private fields.`
 
 ---
 
@@ -906,12 +981,12 @@ def is_stable(v: SemVer) -> Bool
 Semantics:
 
 - **Parameter / precondition:** any valid `SemVer`, borrowed. Cannot fail.
-- **Return / meaning:** `True` iff `v.major > 0` **and** `v.prerelease` is
+- **Return / meaning:** `True` iff `v.major() > 0` **and** `v.prerelease()` is
   empty. This is a documented **convention**, not a semver.org rule: the spec
   defines precedence, not stability (`java.md` §11, `kotlin.md` §11).
 - **Consistency:** `is_stable(v)` implies `not is_prerelease(v)` and
-  `v.major > 0`; a `0.x.y` release and any prerelease are not stable.
-- **No mutation, no allocation.**
+  `v.major() > 0`; a `0.x.y` release and any prerelease are not stable.
+- **No mutation, no allocation.** It reads public accessors only.
 
 Errors:
 

@@ -53,8 +53,14 @@ end state.
   `cpp.md` §3)
 - `has_build_metadata` — does the version carry build metadata. (origin:
   `cpp.md` §3)
+- `prerelease_identifiers` — the prerelease split into its dot-separated
+  identifier list, plus per-identifier accessors. (origin: `elixir.md` §9,
+  `kotlin.md` §11)
 - Build-metadata accessor as identifiers, not only a joined string. (origin:
   `elixir.md` §9)
+- Configurable component integer width — an explicit width/type policy for
+  `major`/`minor`/`patch` beyond `Int`. (origin: `elixir.md` §11, `rust.md`
+  §10, `cpp.md` §10)
 
 ## Sorting and selection
 
