@@ -28,11 +28,13 @@ family, and the `mojov1` buch documents them:
   (buch `mojov1/types/bool-and-strings`).
 
 The **unanswered** part — the reason to build a library — is the format-spec
-mini-language and its error contract. The buch documents **no** width, precision,
-alignment, sign, radix, locale, or malformed-template/arity error behaviour. That
-gap is recorded in `mojo.md` and is the premise this research tests against the
-reference languages. Mojo facts come **only** from `mojov1`; no internet Mojo
-sources, no memory.
+mini-language and its error contract. Mojo *does* document interpolation
+(`t"…"`), automatic/manual indexing (`{}`/`{0}`) and the `{!r}` representation
+conversion (`Writable.write_repr_to`). What the buch leaves **open** is width,
+precision, alignment, fill, sign, radix, locale/grouping, and
+malformed-template/arity error behaviour. That gap is recorded in `mojo.md` and
+is the premise this research tests against the reference languages. Mojo facts
+come **only** from `mojov1`; no internet Mojo sources, no memory.
 
 ## Selected languages (frozen)
 
@@ -45,7 +47,7 @@ set plus Java. There is no separate parallel fan-out.
 
 | group | languages | one-line reason |
 | --- | --- | --- |
-| systems-lowlevel | C, C++ | C's `printf` is the raw `%`-spec floor (and its UB/`%n` hazards); C++ `std::format` is the first stdlib formatter with **compile-time format-string checking** and a returned owning `std::string` |
+| systems-lowlevel | C, C++ | C's `printf` is the raw `%`-spec floor (and its UB/`%n` hazards); C++ `std::format` is the first **C++ standard-library** formatter with **compile-time format-string checking** and a returned owning `std::string` |
 | systems-modern | Go, Rust | Go's `fmt` verbs + **rune-based width** and error-strings-in-output; Rust's `format!`/`Writable`-like traits and **literal-only, compile-time-checked** templates are the closest ancestors of Mojo's `t"…"`+traits |
 | scripting-web | Python, JS/TS | Python's `str.format` mini-language + f-string/t-string split is the richest spec model; JS/TS **tagged templates** are the composable interpolation model with the `TString`-closest design |
 | managed-JVM | Java | `java.util.Formatter` is the canonical **strict** printf derivative: unknown conversion or incompatible flag throws, locale is explicit, `Formattable` customizes user types |

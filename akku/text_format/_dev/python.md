@@ -85,6 +85,8 @@ characters. Source: ibid.
   <https://docs.python.org/3/library/functions.html#format>.)
 - A **str passed as a format string is fine** — Python checks at runtime; there is
   no injection memory hazard because there is no raw-pointer varargs.
+  (Assessment: derived from the runtime `format()`/`str.format` model at
+  <https://docs.python.org/3/library/string.html>.)
 - `Template.safe_substitute` is the "never raise" escape hatch. Source: ibid.
 
 ## 9. Owned type, borrowed view and builder layer (how the language builds formatted output)

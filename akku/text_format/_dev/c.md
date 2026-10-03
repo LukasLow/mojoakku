@@ -13,8 +13,9 @@ There is **no owned string type**: everything is a caller-provided
 ## 2. Relevant community libraries
 
 None that add a distinct *model* — the printf family is the de-facto standard.
-The `fmt` C++ library ({fmt}) that later became `std::format` originated a safe
-replacement, but for C the model is exactly `printf`. (Assessment: derived from
+The {fmt} library (by Victor Zverovich, MIT) that later became `std::format`
+originated a safe replacement, but for C the model is exactly `printf`.
+(Assessment: derived from
 <https://en.cppreference.com/w/cpp/utility/format/format>.)
 
 ## 3. Exposed APIs
@@ -58,9 +59,12 @@ select the argument's size. Conversions: `%d/%i %u %o %x/%X %f %e/%E %g/%G %a/%A
 Precision for integers is the minimum number of digits; default float precision
 is 6. Source: <https://en.cppreference.com/w/c/io/fprintf>.
 
-**Locale**: formatting is locale-sensitive through the C locale (`setlocale`,
-`LC_NUMERIC`) for the decimal point and digit grouping; wide-character variants
-(`wprintf`) exist. Source: <https://en.cppreference.com/w/c/io/fprintf>.
+**Locale**: formatting is locale-sensitive through the C locale for the decimal
+point and digit grouping; wide-character variants (`wprintf`) exist. Sources:
+<https://en.cppreference.com/w/c/io/fprintf> (wide variants),
+<https://en.cppreference.com/w/c/locale/setlocale> (`setlocale`, `LC_NUMERIC`);
+POSIX additionally specifies the `'` flag for the thousands separator.
+(Assessment: derived from the setlocale and fprintf references.)
 
 ## 8. Bounds, invalid input and errors (bad placeholder, missing/extra argument, type mismatch, format-string injection)
 

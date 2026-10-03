@@ -41,7 +41,7 @@ but not in scope for this run. One line each: candidate — meaning — origin.
 - string_formatter — a builder-style incremental formatter — java.md §9, rust.md §9
 - writable_bridge — adapt any `Writable` value into a template argument — mojo.md (buch `stdlib/format`)
 - display_vs_debug — separate user-facing and debug representations — rust.md §10, go.md §10
-- number_format — decimal/hex/oct/bin formatting for numeric types — mojo.md (buch `stdlib/builtin`)
+- number_format — decimal width/precision/sign/grouping for numeric types (hex/oct/bin already ship via `hex`/`oct`/`bin`) — mojo.md (buch `stdlib/builtin`), python.md §7
 - locale_parameter — explicit locale value for number/date formatting — cpp.md §10, java.md §7
 - date_time_format — separate date/time formatting concern — java.md §10
 - tagged_renderer — a formatter receiving literal segments for escaping (e.g. HTML) — js-ts.md §10

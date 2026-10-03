@@ -78,14 +78,17 @@ derived from the absence of locale in the API at <https://pkg.go.dev/fmt>.)
 - The docs explicitly warn about recursion: convert the value before recursing.
   Source: ibid.
 - Format-string injection is not a memory-safety issue (no `%n`); the worst case
-  is a confusing `%!` string.
+  is a confusing `%!` string. (Assessment: derived from the error-marker
+  behaviour and the absence of a pointer-write verb at
+  <https://pkg.go.dev/fmt>.)
 
 ## 9. Owned type, borrowed view and builder layer (how the language builds formatted output)
 
 - **Owned**: `string` returned by `Sprintf`.
 - **Borrowed**: `[]byte` output target for `Append*`; `io.Writer` interface.
-- **Builder**: `strings.Builder` is the idiomatic incremental accumulator; the
-  `Append*` family appends directly to a byte slice with no intermediate string.
+- **Builder**: `strings.Builder` is the idiomatic incremental accumulator
+  (<https://pkg.go.dev/strings#Builder>); the `Append*` family appends directly to
+  a byte slice with no intermediate string. Source: <https://pkg.go.dev/fmt>.
 - **Customization interfaces**: `Stringer`/`Formatter`/`GoStringer`.
 Source: <https://pkg.go.dev/fmt>.
 
@@ -132,3 +135,4 @@ Source: <https://pkg.go.dev/fmt>.
 ## Sources
 
 - Go `fmt` package: <https://pkg.go.dev/fmt>
+- Go `strings.Builder`: <https://pkg.go.dev/strings#Builder>

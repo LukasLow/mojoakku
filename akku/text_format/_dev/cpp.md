@@ -75,7 +75,11 @@ formatting (e.g. digit grouping). Source:
   `std::vformat`/`std::dynamic_format`, which throw `std::format_error` at run
   time. Source: ibid.
 - Extra arguments are ignored (not an error); too few/unmatched → error.
+  (Assessment: derived from
+  <https://en.cppreference.com/w/cpp/utility/format/format>.)
 - `format_to_n` bounds output by design, so no buffer overflow.
+  (Assessment: derived from the `format_to_n` signature and description at
+  <https://en.cppreference.com/w/cpp/utility/format/format>.)
 
 ## 9. Owned type, borrowed view and builder layer (how the language builds formatted output)
 

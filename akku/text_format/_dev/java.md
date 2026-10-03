@@ -84,13 +84,14 @@ Source:
   `IllegalFormatPrecisionException`/`IllegalFormatException`. Source: ibid.
 - `null` argument for general/char/numeric/date → the literal string `"null"`.
   Source: ibid.
-- Java has **no `%n`-style `%n` pointer write** (its `%n` is the line separator),
-  so there is no C-style `%n` memory hazard. (Assessment: derived from the
-  conversions table at
+- Java's `%n` is the **line separator**, not C's `%n` pointer-write; Java has no
+  equivalent of C's memory-writing conversion, so there is no C-style `%n` memory
+  hazard. (Assessment: derived from the conversions table at
   <https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Formatter.html>.)
 - A runtime `String` format is allowed (dynamic), so a format string from user
   input can trigger `IllegalFormatException` — a controlled failure, not memory
-  corruption.
+  corruption. (Assessment: derived from the runtime `format` methods at
+  <https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Formatter.html>.)
 
 ## 9. Owned type, borrowed view and builder layer (how the language builds formatted output)
 
