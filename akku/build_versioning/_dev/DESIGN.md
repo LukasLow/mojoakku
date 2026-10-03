@@ -242,7 +242,7 @@ right column are the reference APIs cited in the justifications below.
 | `is_stable` / `is_prerelease` predicates | semver4j `isStable()`; kotlin-semver `.isStable`, `.isPreRelease`; C++ `is_prerelease` | `java.md` §12; `kotlin.md` §12; `cpp.md` §3 |
 | Owned qualifier storage | Rust owned `Prerelease`/`BuildMetadata`; Elixir owned `:pre` list / `:build` string; Kotlin joined `String`s | `rust.md` §7,§10; `elixir.md` §7,§11; `kotlin.md` §11 |
 | Reject borrowed qualifiers | Zig `?[]const u8` slices into the input | `zig.md` §5,§11 |
-| Mojo language anchors | typed `raises`; value `struct`; `StringSpan`/`String`/`Optional`; `Writable`/`Writer`; `text_string.split_once` | `mojov1/errors/error-model`; `mojov1/errors/raising-and-propagation`; `mojov1/keywords/struct`; `mojov1/types/bool-and-strings`; `mojov1/types/optionals-and-nullability`; `mojov1/stdlib/format`; `akku/text_string/` |
+| Mojo language anchors | typed `raises`; value `struct`; `StringSpan`/`String`/`Optional`; borrow origins (`StringSpan[origin_of(self)]`); `Writable`/`Writer`; `text_string.split_once` | `mojov1/errors/error-model`; `mojov1/errors/raising-and-propagation`; `mojov1/keywords/struct`; `mojov1/types/bool-and-strings`; `mojov1/memory/origin-and-borrowing`; `mojov1/types/optionals-and-nullability`; `mojov1/stdlib/format`; `akku/text_string/` |
 
 ## Public API
 
@@ -409,8 +409,8 @@ struct SemVer(Equatable, Copyable, Deinitable, Writable):
     def major(self) -> Int
     def minor(self) -> Int
     def patch(self) -> Int
-    def prerelease(self) -> StringSpan
-    def build(self) -> StringSpan
+    def prerelease(self) -> StringSpan[origin_of(self)]
+    def build(self) -> StringSpan[origin_of(self)]
 
     def __eq__(self, other: Self) -> Bool
 
@@ -435,6 +435,20 @@ Semantics:
   `String`s; the accessors do not copy. This is how a no-access-control
   language still keeps the always-valid invariant: nothing outside the module
   can write a field.
+- **Accessor origins.** `prerelease()` and `build()` return a view into the
+  value's own storage, so the return type names the origin it borrows from:
+  `-> StringSpan[origin_of(self)]` (`mojov1/memory/origin-and-borrowing`:
+  `StringSpan` is parameterized on the origin of the data it points to, and
+  `origin_of(self)` derives the origin from the receiver — the compiler then
+  extends the owner's lifetime for as long as the view is live). An origin
+  specifier is mandatory whenever a returned reference/view is tied to an
+  argument (`mojov1/memory/origin-and-borrowing`: "you must provide an origin
+  specifier for a `ref` return value"). The receiver is the default immutable
+  convention, so the returned view is immutable; the caller may copy it but
+  cannot mutate the value through the accessor. This is the same shape as
+  `akku/text_string`'s
+  `def trim[o: Origin[mut=False]](text: StringSpan[o]) -> StringSpan[o]`, where
+  the returned view keeps the input's origin.
 - **Construction — component path.** The `@doc_hidden __init__` is the
   parser-free constructor (`python.md` §10: `from_parts`; `java.md` §12:
   `Semver.of`): it validates `major`/`minor`/`patch >= 0` (else `BAD_NUMBER`)
