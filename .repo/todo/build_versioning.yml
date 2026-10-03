@@ -1,6 +1,6 @@
 id: build_versioning
 name: Versioning
-status: todo
+status: done
 depends_on: [text_string]
 mojoNeeds: [pure-mojo]
 summary: Semantic version parsing and comparison.
