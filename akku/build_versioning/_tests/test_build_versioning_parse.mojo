@@ -141,15 +141,15 @@ def test_parse_rejects_empty_identifier() raises:
         assert_equal(kind, VersionErrorKind.INVALID_FORMAT)
 
 
-def test_parse_rejects_double_separator() raises:
-    # Build must follow prerelease, and neither `+` nor `-` may repeat.
-    for text in ["1.2.3+1-2", "1.2.3-a+b+c"]:
-        var kind = VersionErrorKind.OTHER
-        try:
-            _ = parse(text)
-        except e:
-            kind = e.kind
-        assert_equal(kind, VersionErrorKind.INVALID_FORMAT)
+def test_parse_rejects_second_plus() raises:
+    # Only one '+' separator is allowed: build exists only after the core/
+    # prerelease, so a second '+' is INVALID_FORMAT.
+    var kind = VersionErrorKind.OTHER
+    try:
+        _ = parse("1.2.3-a+b+c")
+    except e:
+        kind = e.kind
+    assert_equal(kind, VersionErrorKind.INVALID_FORMAT)
 
 
 def test_parse_rejects_overflow() raises:
@@ -168,6 +168,20 @@ def test_parse_accepts_build_leading_zero() raises:
     assert_equal(String(v.build()), "01")
 
 
+def test_parse_accepts_build_hyphen() raises:
+    # Clause 10 allows '-' inside a build identifier: build over [0-9A-Za-z-].
+    var a = parse("1.2.3+build-1")
+    assert_equal(String(a.build()), "build-1")
+    var b = parse("1.2.3+1-2")
+    assert_equal(String(b.build()), "1-2")
+    var c = parse("1.2.3+a-b.c-d")
+    assert_equal(String(c.build()), "a-b.c-d")
+    # A hyphen-bearing build combined with a prerelease is still valid.
+    var d = parse("1.2.3-alpha+build-1")
+    assert_equal(String(d.prerelease()), "alpha")
+    assert_equal(String(d.build()), "build-1")
+
+
 def test_parse_roundtrip() raises:
     for text in [
         "1.2.3",
@@ -177,6 +191,9 @@ def test_parse_roundtrip() raises:
         "1.2.3+build.5",
         "1.2.3-alpha.1+build.5",
         "1.2.3+01",
+        "1.2.3+build-1",
+        "1.2.3+1-2",
+        "1.2.3+a-b.c-d",
     ]:
         assert_equal(String(parse(text)), text)
 

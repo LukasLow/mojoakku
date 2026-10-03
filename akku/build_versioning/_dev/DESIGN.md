@@ -717,10 +717,15 @@ Semantics:
     identifier is rejected (`INVALID_FORMAT`/`LEADING_ZERO`).
   - An optional build follows a single `+`: `<core>[+<build>]` or
     `<core>-<pre>+<build>`. `<build>` is dot-separated identifiers over
-    `[0-9A-Za-z-]`; leading zeros **are** allowed in build identifiers and are
-    preserved. An empty build identifier is rejected (`INVALID_FORMAT`).
-  - `-` and `+` are mutually ordered: build only after prerelease; a `+` before
-    a `-`, or a second `+`/`-`, is `INVALID_FORMAT`.
+    `[0-9A-Za-z-]` — **a `-` inside a build identifier is valid** (clause 10),
+    so `1.2.3+build-1` and `1.2.3+1-2` are accepted. Leading zeros **are**
+    allowed in build identifiers and are preserved. An empty build identifier
+    (`1.2.3+`, or an empty dot-separated part such as `1.2.3+a..b`) is rejected
+    (`INVALID_FORMAT`).
+  - There is exactly **one** `+` separator; a second `+` (`1.2.3-a+b+c`) is
+    `INVALID_FORMAT`. Build exists only after the core/prerelease. The `-`
+    separator introduces the prerelease only when it appears before any `+`; a
+    `-` after the `+` belongs to a build identifier and is valid.
 - **Splitting.** The parser splits **once** on `+`, **once** on `-` and twice
   on `.` using `akku/text_string.split_once`, whose `Optional[(before, after)]`
   result makes absence a value and avoids the stdlib `find` `-1` sentinel
@@ -759,11 +764,13 @@ Tests:
 - `test_parse_rejects_bad_char` — `"1.2.x"` raises `BAD_NUMBER`.
 - `test_parse_rejects_empty_identifier` — `"1.2.3-"`, `"1.2.3+"`,
   `"1.2.3-a..b"` raise `INVALID_FORMAT`.
-- `test_parse_rejects_double_separator` — `"1.2.3+1-2"`, `"1.2.3-a+b+c"` raise
+- `test_parse_rejects_second_plus` — `"1.2.3-a+b+c"` (a second `+`) raises
   `INVALID_FORMAT`.
 - `test_parse_rejects_overflow` — a component above `Int` range raises
   `OVERFLOW`.
 - `test_parse_accepts_build_leading_zero` — `"1.2.3+01"` is valid.
+- `test_parse_accepts_build_hyphen` — hyphen-bearing build identifiers are valid
+  (`"1.2.3+build-1"`, `"1.2.3+1-2"`, `"1.2.3+a-b.c-d"`).
 - `test_parse_roundtrip` — `parse(text)` then `print` equals `text` for every
   valid corpus entry.
 - `test_parse_error_op_is_parse` — the raised error's `op` is `"parse"`.

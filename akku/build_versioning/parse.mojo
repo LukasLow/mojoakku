@@ -57,9 +57,9 @@ def parse(text: StringSpan) raises VersionError -> SemVer:
             _fail(VersionErrorKind.INVALID_FORMAT, "empty build metadata")
         if split_once(StringSpan(build), "+"):
             _fail(VersionErrorKind.INVALID_FORMAT, "more than one '+' separator")
-        # Build metadata must follow the prerelease: a '-' after '+' is rejected.
-        if split_once(StringSpan(build), "-"):
-            _fail(VersionErrorKind.INVALID_FORMAT, "build metadata may not contain '-'")
+        # Build identifiers are over [0-9A-Za-z-] (clause 10), so a '-' INSIDE
+        # the build is valid; leading zeros are allowed there. Only the empty
+        # identifier list and a second '+' are invalid.
         if _validate_qualifier(StringSpan(build), True) != 0:
             _fail(VersionErrorKind.INVALID_FORMAT, "invalid build identifier list")
 

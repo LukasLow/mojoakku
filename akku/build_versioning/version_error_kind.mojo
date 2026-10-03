@@ -1,6 +1,3 @@
-from std.os import abort
-
-
 # VersionErrorKind — the closed reason a version operation failed.
 struct VersionErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     var _id: UInt8
