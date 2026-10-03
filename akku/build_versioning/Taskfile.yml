@@ -1,0 +1,23 @@
+version: '3'
+
+silent: true
+method: none
+
+tasks:
+
+  default:
+    desc: 'Run the build_versioning test suite (same as `task test`).'
+    cmds:
+      - task: test
+
+  test:
+    desc: 'Run every _tests/*.mojo with mojo run; stop and fail on the first error.'
+    dir: '{{.TASKFILE_DIR}}'
+    cmds:
+      - sh ../../.repo/scrupts/libraries.sh test
+
+  compile:
+    desc: 'Type-check the public API via a consumer import (JIT).'
+    dir: '{{.TASKFILE_DIR}}'
+    cmds:
+      - sh ../../.repo/scrupts/libraries.sh compile
