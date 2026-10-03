@@ -46,7 +46,9 @@ The category lines drive the version. One file may carry several lines:
 ## Versioning rule (IMPORTANT)
 
 MojoAkku stays on **`0.x.y`** — **major is never bumped**. A break is a **minor**
-bump (`0.x.0`), exactly like `NEW` and `DEPRECATED`. The version is derived from
+bump (`0.x.0`), exactly like `NEW` and `DEPRECATED`. The single source of this
+derivation is **`.github/scripts/newversion.sh`** (called by
+`release-prepare.sh` and by `task changes:version`). It derives the version from
 the current tag plus the categories of the pending files in `new/`:
 
 - any `NEW`, `BREAKING` or `DEPRECATED` → minor: `0.<x+1>.0`
@@ -59,8 +61,9 @@ the current tag plus the categories of the pending files in `new/`:
 Triggered by a push to `main` (`.github/workflows/main-push.yml`):
 
 1. `task ci::full` runs on Linux x86-64 and macOS ARM64; both must pass.
-2. `sh .github/scripts/release-prepare.sh` computes the next `0.x.y`, prepends
-   the changelog section, and **moves** the released files from `new/` into
+2. `sh .github/scripts/release-prepare.sh` asks
+   `.github/scripts/newversion.sh` for the next `0.x.y`, prepends the changelog
+   section, and **moves** the released files from `new/` into
    `.changes/archive/<version>/`.
 3. The workflow commits the changelog and the moves, creates an annotated
    `v<version>` tag with `Full CI: linux-64 osx-arm64`, and pushes both atomically.

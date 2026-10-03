@@ -12,4 +12,5 @@
       `DEPRECATED:` / `INTERNAL:` / `DOCS:` — see `.changes/README.md`).
 - [ ] The affected library's inline `# API-DOCS` blocks are current.
 - [ ] No version was set by hand; the next tag is derived from `.changes/`
-      (`task changes:version`, always `0.x.y`, never major).
+      by `.github/scripts/newversion.sh` (`task changes:version` previews it,
+      always `0.x.y`, never major).

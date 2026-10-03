@@ -3,7 +3,7 @@
 # compute the next 0.x.y version. Used by the main-push release workflow (and
 # callable locally as `task release:prepare`).
 #
-# Input : .changes/new/*.md   (pending; NOT .gitkeep, NOT README)
+# Input : .changes/new/*.md   (pending change files; .gitkeep is not a match)
 # Output: .changes/archive/<tag>/  — CI-owned; the released files are MOVED here
 #
 # It groups the category lines into Keep-a-Changelog sections, prepends a
@@ -13,9 +13,9 @@
 # With nothing pending it prints `new=none` and changes nothing (exit 0).
 # Exit non-zero on a malformed file.
 #
-# Versioning: MojoAkku stays on 0.x.y; major is never bumped.
-#   NEW / BREAKING / DEPRECATED present -> minor (0.(x+1).0)
-#   only FIX/SECURITY/PERFORMANCE/INTERNAL -> patch (0.x.(y+1))
+# Versioning: the next version (and whether there is one at all) comes from
+# newversion.sh — the single source of the 0.x.y rule. This script only folds
+# the pending files into the changelog and moves them to the archive.
 
 set -eu
 
@@ -32,9 +32,6 @@ fail() { echo "release: error: $*" >&2; exit 1; }
 pending=""
 for f in "$NEW_DIR"/*.md; do
   [ -f "$f" ] || continue
-  case "$f" in
-    "$NEW_DIR"/README.md) continue ;;
-  esac
   pending="$pending $f"
 done
 
@@ -47,42 +44,31 @@ fi
 lines_file=$(mktemp)
 trap 'rm -f "$lines_file"' EXIT
 
-bump=none
 for f in $pending; do
   bad=$(awk '
     /^[[:space:]]*$/ { next }
     !/^(NEW|BREAKING|DEPRECATED|FIX|SECURITY|PERFORMANCE|INTERNAL|DOCS):/ { print }
   ' "$f")
   [ -z "$bad" ] || fail "$f: line without a valid category: '$bad'"
-  if grep -qE '^(NEW|BREAKING|DEPRECATED):' "$f"; then
-    bump=minor
-  elif [ "$bump" != "minor" ] && grep -qE '^(FIX|SECURITY|PERFORMANCE):' "$f"; then
-    bump=patch
-  fi
   awk '/^(NEW|BREAKING|DEPRECATED|FIX|SECURITY|PERFORMANCE|INTERNAL|DOCS):/ { print }' "$f" >> "$lines_file"
 done
 
 [ -s "$lines_file" ] || fail "pending files have no category lines"
 
+# --- derive the next version (single source: newversion.sh) ---------------
+# Capture stdout and the exit code separately: a pipe would mask newversion's
+# failure (POSIX sh has no pipefail).
+out=$(sh "$ROOT/.github/scripts/newversion.sh") || fail "newversion.sh failed"
+new=$(printf '%s\n' "$out" | grep '^new=' | cut -d= -f2)
+[ -n "$new" ] || fail "newversion.sh did not report a version"
+
 # Only non-releasing categories (INTERNAL, DOCS) pending: nothing to tag. The
 # files stay in new/ and are released together with the next real change.
-if [ "$bump" = "none" ]; then
+if [ "$new" = "none" ]; then
   echo "new=none"
   exit 0
 fi
-
-# --- compute the next version --------------------------------------------
-current=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n1)
-[ -n "$current" ] || current=v0.0.0
-version=$(printf '%s\n' "$current" | awk -v bump="$bump" -F. '
-  {
-    major = $1; sub(/^v/, "", major)
-    minor = $2; patch = $3
-    if (major != 0) { print "ERROR_MAJOR_NOT_ZERO" > "/dev/stderr"; exit 1 }
-    if (bump == "minor") { minor = minor + 1; patch = 0 }
-    else { patch = patch + 1 }
-    printf "v%d.%d.%d\n", major, minor, patch
-  }') || fail "current tag must be v0.x.y, got '$current'"
+version=$new
 
 today=$(date +%Y-%m-%d)
 

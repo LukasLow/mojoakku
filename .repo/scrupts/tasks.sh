@@ -3,30 +3,16 @@
 set -e
 case "${1:-}" in
   changes:version)
-    tag=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n1)
-    [ -n "$tag" ] || tag=v0.0.0
-    ver=${tag#v}
-    minor=$(printf '%s' "$ver" | cut -d. -f2)
-    patch=$(printf '%s' "$ver" | cut -d. -f3)
-    [ -n "$minor" ] || minor=0
-    [ -n "$patch" ] || patch=0
-    bump=none
-    any=""
-    for f in .changes/new/*.md; do
-      [ -f "$f" ] || continue
-      any="yes"
-      if grep -qE '^(NEW|BREAKING|DEPRECATED):' "$f"; then
-        bump=minor
-      elif [ "$bump" != "minor" ] && grep -qE '^(FIX|SECURITY|PERFORMANCE):' "$f"; then
-        bump=patch
-      fi
-    done
-    if [ -z "$any" ] || [ "$bump" = "none" ]; then
+    # Single source of the 0.x.y rule: .github/scripts/newversion.sh. It prints
+    # `new=vX.Y.Z` or `new=none`; the preview prints the version without the
+    # `v` prefix (or `none`) to stay human-friendly.
+    out=$(sh .github/scripts/newversion.sh)
+    ver=$(printf '%s\n' "$out" | sed -n 's/^new=//p')
+    [ -n "$ver" ] || { echo "error: newversion.sh gave no 'new=' line" >&2; exit 1; }
+    if [ "$ver" = "none" ]; then
       echo "none"
-    elif [ "$bump" = "minor" ]; then
-      echo "0.$((minor + 1)).0"
     else
-      echo "0.${minor}.$((patch + 1))"
+      echo "${ver#v}"
     fi
     ;;
   todo)

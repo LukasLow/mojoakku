@@ -89,7 +89,7 @@ Run these from the repository root:
 | `task ci::smart` | Changed libraries and transitive consumers plus repository gates. |
 | `task test::smart` / `task test::plan` | Run or preview tests since the last full-checked release tag. |
 | `task net_ip::test` / `task net_ip::compile` | Automatically dispatch to one library. |
-| `task changes:version` | Compute the next `0.x.y` version from the current tag and `.changes/`. |
+| `task changes:version` | Preview the next `0.x.y` version (via `.github/scripts/newversion.sh`, the single version source). |
 
 More commands: `task current` (libraries in progress) and
 `task show -- <id>` (print one catalogue file).
@@ -98,7 +98,7 @@ More commands: `task current` (libraries in progress) and
 
 - **`.changes/new/`** holds pending change files: one per change, with category
   lines (`NEW`, `FIX`, `SECURITY`, `PERFORMANCE`, `BREAKING`, `DEPRECATED`,
-  `INTERNAL`). See `.changes/README.md`.
+  `INTERNAL`, `DOCS`). See `.changes/README.md`.
 - **Pull requests** run `.github/workflows/pull-request-check.yml`: it runs
   `task ci::smart` and requires exactly one new `.changes/new/*.md` file.
 - **Pushes to `main`** run `.github/workflows/main-push.yml`: it runs `task ci::full`,

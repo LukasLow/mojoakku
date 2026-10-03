@@ -43,8 +43,9 @@ the only way the library reaches `main`.
 3. Manager ensures a `.changes/new/<yyyy-mm-dd>-<slug>.md` file exists, with one
    category line per change (`NEW:` / `FIX:` / `SECURITY:` / `PERFORMANCE:` /
    `BREAKING:` / `DEPRECATED:` / `INTERNAL:`). If it is missing, `docs` writes it.
-4. Manager verifies the next version with `task changes:version` (always
-   `0.x.y`; a break is a minor bump, never major) and states it in the PR body.
+4. Manager verifies the next version with `task changes:version` (which
+   delegates to `.github/scripts/newversion.sh`; always `0.x.y`; a break is a
+   minor bump, never major) and states it in the PR body.
 5. Manager pushes the branch to the remote.
 6. Manager opens the PR with `gh pr create`, using the repository's PR template:
    a title naming the change, a body that fills the checklist (CI green, change
