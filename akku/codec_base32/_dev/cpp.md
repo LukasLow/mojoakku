@@ -12,9 +12,10 @@ https://en.cppreference.com/w/cpp/header,
 https://en.cppreference.com/w/cpp/utility/to_chars)
 
 Base32 is therefore third-party. The standout is **cppcodec**, the only
-surveyed library in any language that ships the RFC 4648 base32 and base32hex
-variants **and** Crockford's base32 behind one templated API. (Assessment:
-derived from the cppcodec README/source below.)
+**C-family** library that ships the RFC 4648 base32 and base32hex variants
+**and** Crockford's base32 behind one templated API (Crockford is also shipped
+by the Rust `base32` crate — `rust.md` §7 — and by npm `base32-encode` —
+`js-ts.md` §7). (Assessment: derived from the cppcodec README/source below.)
 
 **Mojo anchor:** Mojo's stdlib has no base32. The `mojov1` buch `stdlib/base64`
 page records only `b64encode`, `b64decode`, `b16encode`, `b16decode`; a
@@ -153,8 +154,9 @@ function is buffer-in/buffer-out.)
 
 ## 7. Alphabet variants, case and padding
 
-This is where C++ is clearly richer than C, and cppcodec is the **only surveyed
-library that ships Crockford base32**:
+This is where C++ is clearly richer than C, and cppcodec is the **only C-family
+library that ships Crockford base32** (Crockford is also shipped by the Rust
+`base32` crate — `rust.md` §7 — and by npm `base32-encode` — `js-ts.md` §7):
 
 - **cppcodec ships one class per base32 variant** and makes the padding policy a
   `constexpr` property of that class:
@@ -190,8 +192,10 @@ library that ships Crockford base32**:
 
 (Assessment: derived from the sources above: cppcodec's `generates_padding()` /
 `requires_padding()` / `should_ignore()` triple is the most precise variant
-contract found in either C-family language, and it is the only concrete place
-where Crockford base32 is implemented next to RFC 4648 base32 in one API.)
+contract found in either C-family language, and it is the only **C-family**
+place where Crockford base32 is implemented next to RFC 4648 base32 in one API.
+Crockford is not unique to cppcodec overall: the Rust `base32` crate
+(`rust.md` §7) and npm `base32-encode` (`js-ts.md` §7) also ship it.)
 
 ## 8. Timeouts
 

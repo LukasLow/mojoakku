@@ -252,7 +252,9 @@ from the API surface quoted above; no timeout symbol exists in the source.)
 - **An explicit `canonical`/`strict` option** that Go lacks — the RFC 4648 §3.5
   trailing-bit check should be a first-class, documented choice.
 - **Explicit case policy** (`Upper`/`Lower`/`Mixed`) so lowercase decode is a
-  visible, opt-in decision rather than impossible (Go) or silent (Elixir).
+  visible, opt-in decision rather than impossible (Go) or blanket-folded (Perl's
+  always-on `uc()`; Elixir and Python offer explicit case options — `elixir.md`
+  §7, `python.md` §7).
 
 ## Sources
 

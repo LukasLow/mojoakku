@@ -69,10 +69,11 @@ Base32 base32 = Base32.builder()
 ```
 
 It "can be parameterized … [by] whether to use the 'base32hex' variant instead
-of the default 'base32'", line length (default 76; "Line length that aren't
-multiples of 8 will still essentially end up being multiples of 8 in the encoded
-data" — the base32 quantum made visible), line separator, padding and a custom
-encode table. Inherited `BaseNCodec` methods include `encode(byte[])`,
+of the default 'base32'", line length (the class javadoc says "Default 76", but
+the actual `Base32()` and builder default is 0/no chunking; "Line length that
+aren't multiples of 8 will still essentially end up being multiples of 8 in the
+encoded data" — the base32 quantum made visible), line separator, padding and a
+custom encode table. Inherited `BaseNCodec` methods include `encode(byte[])`,
 `encode(byte[],int,int)`, `encodeAsString`, `encodeToString`, `decode(byte[])`,
 `decode(String)`, `decode(Object)`, `isInAlphabet(...)`, `getEncodedLength(...)`,
 `isStrictDecoding()`. Streaming variants: `Base32InputStream` /
@@ -187,9 +188,14 @@ base64 in the sibling run, but now without any JDK fallback.)
   **base32hex (RFC 4648 §7 Table 4)** is selected by `useHex=true` (or the
   builder's hex mode). (Source:
   <https://commons.apache.org/proper/commons-codec/apidocs/org/apache/commons/codec/binary/Base32.html>.)
-- **Line length default 76**, "rounded down to the nearest multiple of 8"; line
-  length 0 disables chunking. This is the base32 MIME-ish legacy (base64 used 76
-  too, but base32's quantum is 8, not 4). (Source: the same page.)
+- **Line length: the class javadoc says "Default 76", but the actual
+  `Base32()` no-arg constructor and the builder default are line length 0 (no
+  chunking).** The javadoc's "Line length: Default 76" describes the historical
+  constructor family, while `Base32()` is documented as "When encoding the line
+  length is 0 (no chunking)" and the builder example shows `.setLineLength(0) //
+  default is none`. Line lengths "that aren't multiples of 8 will still
+  essentially end up being multiples of 8 in the encoded data." (Sources:
+  <https://commons.apache.org/proper/commons-codec/apidocs/org/apache/commons/codec/binary/Base32.html>.)
 - **Padding** is `'='` by default and adjustable via `setPadding(char)`.
 - **Custom encode table** via `setEncodeTable`.
 - Case: not exposed as an option; the default encode table is uppercase, and the
@@ -291,7 +297,8 @@ API must state explicitly.)
 4. **A strict-vs-lenient *decoding policy*** (Commons Codec `CodecPolicy.STRICT`
    vs `LENIENT`): makes canonical-vs-non-canonical input an explicit, typed
    choice, matching RFC 4648 §3.5. (Source: `BaseNCodec`.)
-5. **Line-length defaults in a binary codec** (Commons Codec 76, rounded to a
+5. **Line-length config in a binary codec** (Commons Codec: the javadoc's "Default
+   76" vs. the actual constructor/builder default of 0, either way rounded to a
    multiple of 8). Carried over from the MIME era; Guava's default is no line
    breaks, matching RFC 4648 §3.1. (Sources: both pages.)
 6. **Whitespace leniency by default in Bouncy Castle** (`decode(String)` "-
@@ -317,7 +324,8 @@ API must state explicitly.)
 4. **Deprecated-constructor sprawl** (Commons Codec's `Base32` has nine mostly
    `@Deprecated` constructors). Do not design a public API with a deprecated
    parallel universe from day one. (Source: `Base32`.)
-5. **Line-wrapping as a default** (Commons Codec line length 76). RFC 4648 §3.1
+5. **Line-wrapping support carried in from the MIME era** (Commons Codec's
+   javadoc "Default 76", rounded to a multiple of 8). RFC 4648 §3.1
    says "Implementations MUST NOT add line feeds … unless the specification
    referring to this document explicitly directs base encoders to add line
    feeds"; wrapping belongs to an explicit option. (Sources: `Base32`;
@@ -342,22 +350,22 @@ Anchored on the Mojo stdlib `base64` package as documented in the `mojov1` buch
 (page `mojov1/stdlib/base64`): four functions `b64encode` (three overloads,
 including an in-place `mut result: String` overload), `b64decode`, `b16encode`,
 `b16decode`; borrowed spans in, fresh `List[UInt8]` out; decoders raise on
-malformed input. Sources: <https://mojolang.org/docs/std/base64/base64/>,
-<https://mojolang.org/docs/std/base64/base64/b64encode/>.
+malformed input. Source: `mojov1` buch page `stdlib/base64` (whose underlying
+sources are <https://mojolang.org/docs/std/base64/base64/> and
+<https://mojolang.org/docs/std/base64/base64/b64encode/>).
 
 1. **Borrowed-span input plus fresh output is the right default.** Mojo already
    takes `StringSpan`/`Span[UInt8]` by immutable reference and returns a new
    `List[UInt8]` (buch) — the same stance as Guava's `encode`/`decode` pair.
    Java's extra caller-buffer overload suggests adding a Mojo variant that writes
-   into an `out`/`mut` buffer. Source for the overload:
-   <https://mojolang.org/docs/std/base64/base64/b64encode/>.
+   into an `out`/`mut` buffer. Source: `mojov1` buch page `stdlib/base64`.
 2. **Errors as values via `raises`, not exceptions.** Java's checked/unchecked
    split and Commons Codec's `DecoderException` show the cost of exception
    taxonomies. Mojo's model — `raises` declares the effect, typed errors carry
    structured detail — fits a codec far better; the buch shows the compiler
    enforcing `raises` on every caller. Sources: `mojov1/errors/error-model`,
-   `mojov1/keyword-conventions/raises`; also
-   <https://mojolang.org/docs/manual/errors/>.
+   `mojov1/keyword-conventions/raises` (the buch's underlying source is
+   <https://mojolang.org/docs/manual/errors/>).
 3. **A typed decode error.** Commons Codec's `STRICT` policy distinguishes
    "trailing bits not zero" from "impossible final character count". A Mojo
    `struct` error with fields such as `kind` and `symbol_index` implements
@@ -366,8 +374,8 @@ malformed input. Sources: <https://mojolang.org/docs/std/base64/base64/>,
 4. **Alphabet/padding as compile-time parameters, not runtime flags.** Java needs
    a builder (`setEncodeTable`, `useHex`) or factory method per variant; Mojo's
    value parameters (`[alphabet: Alphabet, padded: Bool]`) specialize at compile
-   time, removing branches. Sources: `mojov1/functions/parameters-and-generics`;
-   <https://mojolang.org/docs/manual/generics/>.
+   time, removing branches. Sources: `mojov1/functions/parameters-and-generics`
+   (underlying source <https://mojolang.org/docs/manual/generics/>).
 5. **Explicit case policy, adopting Guava's `ignoreCase()` as an enum.** Guava is
    the only Java library that exposes case; model it as `Case { Upper, Lower,
    Mixed }` (Elixir's `:case` is the direct precedent, §Elixir `elixir.md` §7).

@@ -224,10 +224,14 @@ absence of an incremental API and the `binascii.Incomplete` retry contract.)
   security footgun even opt-in; keep it out or document it as interop-only.
 - **Pure-Python hot loop.** Do not reproduce a slow base32 core when Mojo can
   have one native path for all radices.
-- **`ignorechars` with a default that changes `validate` semantics**
-  (`validate` defaults to `True` iff `ignorechars` is supplied) — implicit
-  coupling of two arguments that a Mojo signature should keep orthogonal.
-  (Source: https://raw.githubusercontent.com/python/cpython/main/Lib/base64.py)
+- **`ignorechars` coupled to `validate` semantics — base64-derived only.**
+  In `b64decode` the default of `validate` changes to `True` iff `ignorechars` is
+  supplied, an implicit coupling of two arguments a Mojo signature should keep
+  orthogonal. This is a **base64** observation: `b32decode`/`b32hexdecode` accept
+  `ignorechars` but have **no `validate` parameter**, so the coupling does not
+  exist on the base32 path. (Sources:
+  https://raw.githubusercontent.com/python/cpython/main/Lib/base64.py,
+  https://docs.python.org/3.15/library/base64.html)
 
 ## 12. Ideas fitting Mojo
 

@@ -17,10 +17,21 @@ page records only `b64encode`, `b64decode`, `b16encode`, `b16decode`; a
 
 ## 2. Relevant community libraries
 
-- **`base32` 0.5.1** — author andreasots, "MIT OR Apache-2.0", `#![no_std]`,
+- **`base32`** — author andreasots, "MIT OR Apache-2.0", `#![no_std]`,
   `#![deny(missing_docs)]`; "Encoders and decoders for various Base32 variants"
   (`andreasots/base32`, `src/lib.rs:1-5`). This is the dedicated reference for
-  base32 alphabets, including Crockford and z-base-32.
+  base32 alphabets, including Crockford, z-base-32 and Nix's reversed base32.
+  **Revision note:** the published **0.5.1** docs expose an `Alphabet` **enum**
+  (`Rfc4648`, `Rfc4648Lower`, `Rfc4648Hex`, `Rfc4648HexLower`, `Crockford`, `Z`)
+  and free `encode`/`decode` functions
+  (`https://docs.rs/base32/latest/base32/enum.Alphabet.html`,
+  `https://docs.rs/base32/latest/base32/`). The **master branch** (which §3 below
+  documents) has been rewritten as an `Encoding` **struct** with builder methods
+  (`const fn new`, `with_symbol`, `with_ignore_case`, `with_padding`,
+  `with_reversed`) and the `RFC4648*`/`CROCKFORD`/`Z`/`NIX` constants
+  (`andreasots/base32`, `src/lib.rs`). The two API shapes are not the same release;
+  the master rewrite is not in 0.5.1. (Assessment: derived from comparing the two
+  sources.)
 - **`data-encoding` 2.11.1** — author ia0, MIT, 100% documented; "Efficient and
   customizable data-encoding functions like base64, base32, and hex", supporting
   "bases of size 2, 4, 8, 16, 32, and 64" (`https://docs.rs/data-encoding/latest/data_encoding/`).
@@ -37,7 +48,8 @@ the `base64` crate dominates, base32 in Rust splits between a small dedicated
 
 ## 3. Exposed APIs
 
-`base32` (`andreasots/base32`, `src/lib.rs`):
+`base32` (andreasots/base32, **master branch** — an `Encoding`-struct API that is
+not the shape published in 0.5.1; see §2, revision note):
 
 - `struct Encoding { alphabet: [u8; 32], inv_alphabet: [u8; 128], padding:
   Option<u8>, reversed: bool }`.
@@ -131,7 +143,8 @@ surface, which has no I/O module, and the `data-encoding` no_std design.)
 This is the base32-specific heart, and Rust is the most explicit of all surveyed
 languages.
 
-- **`base32` crate variants** (`andreasots/base32`, `src/lib.rs`):
+- **`base32` crate variants** (`andreasots/base32`, master `src/lib.rs`; see §2
+  revision note):
   - `RFC4648` = `ABCDEFGHIJKLMNOPQRSTUVWXYZ234567` + `=` padding.
   - `RFC4648_NOPAD` = same alphabet, no padding.
   - `RFC4648_LOWER` / `RFC4648_LOWER_NOPAD` = lowercased alphabet.
@@ -283,9 +296,11 @@ to the async runtime wrapping any caller-built stream, not to the codec.
 
 ## Sources
 
-- `base32` crate source (andreasots/base32, master):
+- `base32` crate source (andreasots/base32, **master branch** — `Encoding`-struct
+  API, distinct from the 0.5.1 release):
   https://raw.githubusercontent.com/andreasots/base32/master/src/lib.rs
-- `base32` 0.5.1 docs: https://docs.rs/base32/latest/base32/ and
+- `base32` **0.5.1** docs (enum-based `Alphabet` API, the published release):
+  https://docs.rs/base32/latest/base32/ and
   `Alphabet` enum: https://docs.rs/base32/latest/base32/enum.Alphabet.html
 - `data-encoding` 2.11.1:
   https://docs.rs/data-encoding/latest/data_encoding/ ;

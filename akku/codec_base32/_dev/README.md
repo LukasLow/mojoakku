@@ -16,8 +16,8 @@ Python** — plus **Mojo**, covered by the `mojov1` buch (no researcher, no
 
 | group | languages | reason |
 | --- | --- | --- |
-| systems-lowlevel | C, C++ | C has no ISO base32; gnulib and cppcodec are the de-facto C-family references, and cppcodec is the only surveyed library that ships the RFC 4648 base32/base32hex **and** Crockford variants behind one API |
-| systems-modern | Go, Rust | Go's `encoding/base32` has the richest stdlib surface (standard + `HexEncoding`, stream encoder/decoder, offset errors); Rust has the strongest alphabet/padding/streaming crate designs (`base32`, `data-encoding`, `base64ct`) |
+| systems-lowlevel | C, C++ | C has no ISO base32; gnulib and cppcodec are the de-facto C-family references, and cppcodec is the only **C-family** library that ships the RFC 4648 base32/base32hex **and** Crockford variants behind one API (Crockford is also shipped by the Rust `base32` crate — `rust.md` §7 — and by npm `base32-encode` — `js-ts.md` §7) |
+| systems-modern | Go, Rust | Go's `encoding/base32` has the richest stdlib surface (standard + `HexEncoding`, stream encoder/decoder, offset errors); Rust has the strongest alphabet/padding/streaming crate designs for base32 (`base32`, `data-encoding`); `base64ct` is a constant-time **base64-only** contrast, not a base32 signal (`rust.md` §1/§2) |
 | scripting-web | Python, Perl, JS/TS | Python `base32`/`b32hex` with `casefold`/`map01`; Perl puts base32 in a separate, single-maintainer CPAN dist (`MIME::Base32`) while base64 is core; JS/TS has no platform base32 at all, only community libraries |
 | managed-JVM | Java | the JDK has **no** Base32, only Base64 and `HexFormat`; Guava, Commons Codec and Bouncy Castle fill the gap with different config models |
 | functional/BEAM | Elixir | `Base` covers base16/32/32hex/64/64url with `:case` and `:padding`; research covers the BEAM/Erlang side |

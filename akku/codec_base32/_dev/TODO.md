@@ -18,14 +18,14 @@ state. Format and rules: `.agents/workflows/LibraryLayout.md`.
 - `three-way case enum` — `Upper` / `Lower` / `Mixed` decode policy. (origin: `elixir.md` §7, §12)
 - `casefold option` — lenient cross-case decode switch. (origin: `python.md` §7)
 - `map01 confusable mapping` — `0`→`O` and `1`→`I`/`L` decode mapping. (origin: `python.md` §7)
-- `ignore characters` — caller-supplied set of characters to skip (whitespace, hyphens). (origin: `python.md` §3; `cpp.md` §7; `go.md` §7)
+- `ignore characters` — caller-supplied set of characters to skip (whitespace, hyphens). (origin: `python.md` §3; `cpp.md` §7; `go.md` §4/§11)
 
 ## Padding and canonicality
 
 - `padding toggle` — `padded: Bool` to emit/require or omit padding. (origin: `python.md` §7; `java.md` §7)
 - `canonical / strict check` — reject non-zero trailing pad bits (RFC 4648 §3.5). (origin: `rust.md` §4; `go.md` §11; `c.md` §7)
 - `strict decoding policy` — `LENIENT` vs `STRICT` decode enum. (origin: `java.md` §7)
-- `line wrapping / MIME layer` — 64/76-column wrapping as a layer above the codec. (origin: `java.md` §7; `perl.md` §11)
+- `line wrapping / MIME layer` — 64/76-column wrapping as a layer above the codec. (origin: `java.md` §7; `perl.md` §11; `python.md` §7)
 
 ## Length / validation helpers
 
