@@ -5,6 +5,16 @@ All notable changes to MojoAkku are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions stay on `0.x.y`; major is never bumped.
 
+## v0.13.0 - 2026-10-03
+
+### Added
+
+- build_versioning — strict Semantic Versioning 2.0.0 parse, precedence compare and stability predicates (8-entry public API; depends on text_string)
+
+### Changed
+
+- versioning — `.github/scripts/newversion.sh` is the single source of the 0.x.y rule; `release-prepare.sh` and `task changes:version` delegate to it, so no version arithmetic is duplicated.
+
 ## v0.12.0 - 2026-10-02
 
 ### Added
