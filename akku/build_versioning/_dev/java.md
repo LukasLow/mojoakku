@@ -232,12 +232,15 @@ padding/trimming or `Runtime.Version`'s arbitrary-length core.)
 ## 8. Timeouts
 
 Not applicable. Parsing and comparison are bounded string/sequence operations.
-(Assessment: derived from the pure API surfaces above.) One adjacent risk:
-Maven's and node-semver's string tokenizers use regular expressions, which need
-the same DoS-bounding care discussed in `js-ts.md` §8. Maven's tokenizer is
-documented as a split on separators rather than a single complex regex, so the
-risk is lower. Source:
-<https://maven.apache.org/pom.html#version-order-specification>.
+(Assessment: derived from the pure API surfaces above.) The adjacent
+regex-DoS concern discussed in `js-ts.md` §8 applies to node-semver, but
+**not** to Maven: `ComparableVersion.parseVersion` is a hand-written character
+scanner, not a regex parser. It is a single `for` loop over the lowercased
+string that advances a `startIndex`, branches on `.`, `-` and
+`Character.isDigit(c)`, and pushes/pops `ListItem` frames on an `ArrayDeque`
+(no `java.util.regex` import appears anywhere in the file). Source:
+<https://github.com/apache/maven/blob/maven-3.9.6/maven-artifact/src/main/java/org/apache/maven/artifact/versioning/ComparableVersion.java>
+(the `parseVersion` method).
 
 ## 9. Prerelease / build metadata + constraints (adapted)
 
@@ -384,6 +387,9 @@ spec's own examples.)
   <https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Comparable.html>
 - Maven `ComparableVersion` (3.9.6 API):
   <https://maven.apache.org/ref/3.9.6/maven-artifact/apidocs/org/apache/maven/artifact/versioning/ComparableVersion.html>
+- Maven `ComparableVersion` source (3.9.6 tag; `parseVersion` hand-written
+  character scanner, no regex):
+  <https://github.com/apache/maven/blob/maven-3.9.6/maven-artifact/src/main/java/org/apache/maven/artifact/versioning/ComparableVersion.java>
 - Maven POM reference — dependency version requirements and version order:
   <https://maven.apache.org/pom.html#dependency-version-requirement-specification>
   and <https://maven.apache.org/pom.html#version-order-specification>

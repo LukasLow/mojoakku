@@ -115,7 +115,7 @@ end state.
   (origin: `go.md` §10)
 - Distinct overflow error variant. (origin: `zig.md` §10, `elixir.md` §10)
 - Exported input-length limits (`MaxVersionLen`-style). (origin: `go.md` §8,
-  `cpp.md` §8)
+  `cpp.md` §10)
 - `check` — bool-only constraint check. (origin: `go.md` §3)
 
 ## Convenience predicates and accessors

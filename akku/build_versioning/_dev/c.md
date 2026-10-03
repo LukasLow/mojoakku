@@ -65,8 +65,8 @@ From `h2non/semver.c` (README, *API*):
   `semver_satisfies_caret`, `semver_satisfies_patch` (README).
 - Rendering/bump/lifetime: `semver_render(semver_t*, char *dest)`;
   `semver_numeric(semver_t*)` (packs to a single `int` "useful for ordering and
-  filtering"); `semver_bump`, `semver_bump_minor`, `semver_bump_patch`;
-  `semver_free(semver_t*)` (README).
+  filtering" — lossy, see §11); `semver_bump`, `semver_bump_minor`,
+  `semver_bump_patch`; `semver_free(semver_t*)` (README).
 - From libc: `int strverscmp(const char*, const char*)` (man7 `strverscmp(3)`).
 
 ## 4. Error representation
@@ -86,7 +86,7 @@ From `h2non/semver.c` (README, *API*):
   defines no error for malformed input, because it accepts arbitrary strings
   (man7 `strverscmp(3)`).
 
-## 5. Ownership semantics
+## 5. Ownership semantics (adapted: value-returning vs. in-place)
 
 *Adapted for versioning (see `_dev/README.md`): whether parsing is in-place or
 value-returning, and who owns the parsed value/string.*
@@ -117,7 +117,7 @@ value-returning, and who owns the parsed value/string.*
   thread-safe as the buffers passed in (Assessment: derived from the by-value/
   pointer signatures in README).
 
-## 7. IPv4 / IPv6
+## 7. Version-identity model (adapted: how the spec / version identity is modelled)
 
 *Adapted for versioning (see `_dev/README.md`): how the spec/version identity is
 modelled (major.minor.patch, prerelease, build metadata, optional `v` prefix) and
@@ -134,7 +134,7 @@ whether one abstraction covers it all.*
 - **No optional/partial components.** `semver_parse` requires a full `X.Y.Z`;
   `1` or `1.2` are invalid (semver.org item 2 requires all three; the example
   tests reject `1` and `1.2` — Zig's corpus of the same spec lists them invalid,
-  `zig.md` §1).
+  `zig.md` §7).
 - **No `v` prefix support documented.** `v1.2.3` is explicitly *not* a semantic
   version (semver.org FAQ, *Is "v1.2.3" a semantic version?*); a parser that
   accepts it would have to strip it. `semver.c`'s documented operator set does
@@ -154,7 +154,7 @@ whether one abstraction covers it all.*
   socket/file) belong to the surrounding I/O layer, not to the version functions
   (Assessment: derived from the pure signatures in README).
 
-## 9. TLS
+## 9. Prerelease / build metadata + constraint ranges (adapted)
 
 *Adapted for versioning (see `_dev/README.md`): how prerelease/build metadata and
 constraint ranges are handled.*
@@ -170,7 +170,8 @@ constraint ranges are handled.*
   define ranges (semver.org defines only precedence; the npm README likewise
   notes "a version range is a set of comparators"). `semver.c` adds npm-style
   operators `^` (caret) and `~` (tilde) in `semver_satisfies`, explicitly citing
-  the npm documentation (README, links to `docs.npmjs.com/misc/semver`).
+  the npm documentation (README, links to the npm semver docs;
+  <https://docs.npmjs.com/cli/v10/using-npm/semver>).
 - Caret semantics are version-zero-sensitive: `^1.2.3` allows `<2.0.0` but
   `^0.2.5` only allows `<0.3.0` and `^0.0.4` only `<0.0.5` (npm README, *Caret
   Ranges*; the npm rules are what `semver.c` cites).

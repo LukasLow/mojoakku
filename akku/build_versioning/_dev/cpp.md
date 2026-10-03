@@ -97,7 +97,7 @@ From `Neargye/semver` (reference, *Synopsis*):
 - **`range.contains` is `noexcept` and takes its policy as an argument**, so range
   matching itself does not throw (reference, *Ranges*).
 
-## 5. Ownership semantics
+## 5. Ownership semantics (adapted: value-returning vs. in-place)
 
 *Adapted for versioning (see `_dev/README.md`): whether parsing is in-place or
 value-returning, and who owns the parsed value/string.*
@@ -131,15 +131,20 @@ value-returning, and who owns the parsed value/string.*
   it is safely usable from multiple threads on distinct values; no threaded
   guarantee is documented.
 
-## 7. IPv4 / IPv6
+## 7. Version-identity model (adapted: how the spec / version identity is modelled)
 
 *Adapted for versioning (see `_dev/README.md`): how the spec/version identity is
 modelled and whether one abstraction covers it all.*
 
-- **Identity model:** `Version { major, minor, patch, pre: Prerelease,
-  build: BuildMetadata }` — three numeric fields plus two qualifier types
-  (Rust sibling doc `rust.md` §7 describes the same spec shape; semver.org
-  item 2 + 9 + 10).
+- **Identity model:** `template <typename I1, typename I2, typename I3> class
+  version` with private `I1 major_, I2 minor_, I3 patch_, std::string
+  prerelease_tag_, std::string build_metadata_`; default component type
+  `std::uint32_t` (`include/semver.hpp`). So in the `version<>` default case the
+  three numbers are `std::uint32_t`, and **each qualifier is an owned
+  `std::string`, not a `Prerelease`/`BuildMetadata` newtype** (the observers
+  `prerelease_tag()` / `build_metadata()` return `std::string_view`,
+  `include/semver.hpp`). This differs from Rust's crate, where `pre`/`build` are
+  validated newtypes (`rust.md` §7).
 - **All three numeric components are required** by strict parsing; `from_string`
   throws on `1.0` and `coerce` is the separate opt-in that fills missing minor /
   patch with zero and accepts leading zeros (reference, *Cleaning and coercion*).
@@ -167,7 +172,7 @@ modelled and whether one abstraction covers it all.*
   caller's I/O and to `operator<<` / `to_chars`, not to the version model
   (Assessment: derived from the pure signatures in reference).
 
-## 9. TLS
+## 9. Prerelease / build metadata + constraint ranges (adapted)
 
 *Adapted for versioning (see `_dev/README.md`): how prerelease/build metadata and
 constraint ranges are handled.*
@@ -176,7 +181,7 @@ constraint ranges are handled.*
   numerically, letter/hyphen identifiers in ASCII order, numeric < non-numeric,
   more fields > fewer, prerelease < release) — the library documents the
   `1.0.0-alpha < ... < 1.0.0` chain (semver.org item 11; Rust sibling `rust.md`
-  §7 cites the same chain).
+  §9 cites the same chain).
 - **Build metadata is stored and ignored for precedence** (semver.org item 10;
   reference, *Comparison*).
 - **Ranges are first-class and richer than SemVer.** Supported forms: complete
@@ -252,8 +257,9 @@ constraint ranges are handled.*
 
 ## 12. Ideas fitting Mojo
 
-- **A `Version` value struct** mirroring `pre` + `build` qualifier types, with
-  value semantics and no manual lifetime (semver.org item 9/10; mojov1 buch,
+- **A `Version` value struct** with three numeric fields plus owned
+  prerelease/build strings, with value semantics and no manual lifetime
+  (semver.org item 9/10; `include/semver.hpp`; mojov1 buch,
   `mojov1/types/overview` — value semantics, structs).
 - **Three parse flavours, one model:** a strict raising `parse`, a non-raising
   `try_parse` returning an optional, and no exception taxonomy — map
@@ -291,6 +297,10 @@ constraint ranges are handled.*
   `version<>`, parsing (`parse`/`from_chars`/`try_parse`/`from_string`/`valid`/
   `clean`/`coerce`), result types, comparison/`diff`, serialization, ranges +
   prerelease policy, incrementing, literals, constants.
+- <https://github.com/Neargye/semver/blob/master/include/semver.hpp> — the actual
+  `class version` definition: private `major_/minor_/patch_` (`I1/I2/I3`,
+  default `std::uint32_t`) and `std::string prerelease_tag_` / `build_metadata_`;
+  observers return `std::string_view`.
 - <https://en.cppreference.com/w/cpp/header/version> — `<version>` is the C++20
   language-support/feature-test-macro header, not a semver API.
 - <https://en.cppreference.com/w/cpp/language/operator_comparison> — C++20

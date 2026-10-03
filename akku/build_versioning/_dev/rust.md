@@ -79,7 +79,7 @@ From the `semver` crate (docs.rs):
   invalid `Version` at all: the newtypes enforce the invariant at construction
   (Assessment: derived from `Prerelease::new -> Result` and private fields).
 
-## 5. Ownership semantics
+## 5. Ownership semantics (adapted: value-returning vs. in-place)
 
 *Adapted for versioning (see `_dev/README.md`): whether parsing is in-place or
 value-returning, and who owns the parsed value/string.*
@@ -112,7 +112,7 @@ value-returning, and who owns the parsed value/string.*
 - No cancellation or timeout concept exists (Assessment: derived from the pure
   signatures).
 
-## 7. IPv4 / IPv6
+## 7. Version-identity model (adapted: how the spec / version identity is modelled)
 
 *Adapted for versioning (see `_dev/README.md`): how the spec/version identity is
 modelled and whether one abstraction covers it all.*
@@ -152,7 +152,7 @@ modelled and whether one abstraction covers it all.*
   documents a length cap.
 - No cancellation or scheduler interaction exists (Assessment).
 
-## 9. TLS
+## 9. Prerelease / build metadata + constraint ranges (adapted)
 
 *Adapted for versioning (see `_dev/README.md`): how prerelease/build metadata and
 constraint ranges are handled.*

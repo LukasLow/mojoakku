@@ -14,7 +14,7 @@
   SemVer precedence model (semver.org item 11).
 - **The module system's SemVer support lives outside the standard library** in
   the `golang.org/x/mod/semver` package (pkg.go.dev, `golang.org/x/mod/semver`,
-  BSD-3-Clause, imported by 1,930 packages).
+  BSD-3-Clause).
 - Generic building blocks in stdlib: `strconv.ParseUint`/`ParseInt` for numeric
   components, `strings.Split`/`Cut`/`TrimPrefix` for structure, `sort.Sort` /
   `sort.Slice` for ordering. `debug.BuildInfo` carries a module version string
@@ -29,14 +29,20 @@
   with **two deliberate exceptions**: it *requires* a leading `"v"`, and it
   accepts `vMAJOR` and `vMAJOR.MINOR` as shorthand for `vMAJOR.0.0` and
   `vMAJOR.MINOR.0` (package docs, *Overview*).
-- **`github.com/Masterminds/semver/v3`** — MIT, 4,026 importers, "the stable and
-  active version" focused on constraint compatibility with other ecosystems; API
-  similar to v1 (README, *Package Versions*). v2 was built for `dep`; v1 is
-  unmaintained (README).
-- **`github.com/hashicorp/go-version`** — MPL-2.0, 6,106 importers, "parsing
-  versions and version constraints, and verifying versions against a set of
-  constraints", can sort, handles prerelease/beta, can increment (README).
-  "Versions used with go-version must follow SemVer" (README).
+- **`github.com/Masterminds/semver/v3`** — MIT, "the stable and active version"
+  focused on constraint compatibility with other ecosystems; API similar to v1
+  (README, *Package Versions*). v2 was built for `dep`; v1 is unmaintained
+  (README).
+- **`github.com/hashicorp/go-version`** — MPL-2.0, "parsing versions and version
+  constraints, and verifying versions against a set of constraints", can sort,
+  handles prerelease/beta, can increment (README). "Versions used with go-version
+  must follow SemVer" (README).
+- Popularity note: pkg.go.dev shows an "Imported by" count per package, but it is
+  a **time-bound snapshot of the current index** and changes continuously; the
+  counts observed in this run (e.g. several thousand importers for each of the
+  two libraries above) are therefore deliberately not quoted as facts
+  (Assessment: derived from the pkg.go.dev pages, which label the number as
+  "Imported by" for the currently published version).
 - **`blang/semver`, `coreos/go-semver`** — widely used but not fetched in this
   run; `GUESS:` they exist and provide comparable parse/compare APIs. Reason no
   source: the run fetched the three libraries above and did not fetch these two.
@@ -113,7 +119,7 @@
   `Validate(v) (bool, []error)` returns "a slice of reasons" like
   "1.3 is greater than 1.2.3" (Masterminds README, *Validation*).
 
-## 5. Ownership semantics
+## 5. Ownership semantics (adapted: value-returning vs. in-place)
 
 *Adapted for versioning (see `_dev/README.md`): whether parsing is in-place or
 value-returning, and who owns the parsed value/string.*
@@ -149,7 +155,7 @@ value-returning, and who owns the parsed value/string.*
 - `x/mod/semver` functions are pure; `Compare`/`Sort` are safe to call
   concurrently on distinct data (Assessment: derived from pure signatures).
 
-## 7. IPv4 / IPv6
+## 7. Version-identity model (adapted: how the spec / version identity is modelled)
 
 *Adapted for versioning (see `_dev/README.md`): how the spec/version identity is
 modelled and whether one abstraction covers it all.*
@@ -197,7 +203,7 @@ modelled and whether one abstraction covers it all.*
 - No cancellation, no context, no scheduler interaction exists in any of the
   three APIs (Assessment: derived from the pure signatures).
 
-## 9. TLS
+## 9. Prerelease / build metadata + constraint ranges (adapted)
 
 *Adapted for versioning (see `_dev/README.md`): how prerelease/build metadata and
 constraint ranges are handled.*
