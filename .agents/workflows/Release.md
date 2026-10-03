@@ -29,10 +29,11 @@ Prepare and cut a release: decide the version, write the changelog, verify docs 
    than the installed Mojo is either upgraded (feature now exists) or re-stamped
    to the installed version ("checked here, still true"). No stale marker may
    survive the release. See `.agents/workflows/MissingMojo.md`.
-3. `manager` computes the version with `task changes:version` (always `0.x.y`: any
-   `NEW`/`BREAKING`/`DEPRECATED` change is a minor bump, only
-   `FIX`/`SECURITY`/`PERFORMANCE`/`INTERNAL` is a patch bump; **major is never
-   bumped**) and records the rationale.
+3. `manager` computes the version with `task changes:version`, which delegates
+   to `.github/scripts/newversion.sh` — the single source of the derivation
+   (always `0.x.y`: any `NEW`/`BREAKING`/`DEPRECATED` change is a minor bump,
+   only `FIX`/`SECURITY`/`PERFORMANCE` is a patch bump, `INTERNAL`/`DOCS` alone
+   release nothing; **major is never bumped**) — and records the rationale.
 4. `docs` writes the changelog: it groups the `.changes/*.md` category lines
    (NEW → Added, FIX → Fixed, SECURITY → Security, PERFORMANCE → Changed,
    DEPRECATED → Deprecated, BREAKING → Changed/Breaking, INTERNAL → Changed)

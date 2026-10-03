@@ -312,6 +312,103 @@ class RepositoryTests(unittest.TestCase):
         self.assertEqual(peak, 2)
 
 
+class VersionSourceTests(unittest.TestCase):
+    """The single version source: newversion.sh and its consumers agree."""
+
+    PROJECT = Path(__file__).resolve().parents[2]
+    SCRIPTS = (
+        ".github/scripts/newversion.sh",
+        ".github/scripts/release-prepare.sh",
+        ".repo/scrupts/tasks.sh",
+        "Taskfile.yml",
+    )
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.git("init", "-q", "-b", "main")
+        self.git("config", "user.email", "tests@example.invalid")
+        self.git("config", "user.name", "Testing")
+        for rel in self.SCRIPTS:
+            self.copy(rel)
+        self.write(".changes/new/.gitkeep", "")
+        self.write("CHANGELOG.md", "# Changelog\n")
+        self.commit("Initial state")
+        self.git("tag", "v0.12.0")
+
+    def git(self, *args):
+        return subprocess.check_output(["git", *args], cwd=self.root, text=True).strip()
+
+    def copy(self, rel):
+        dest = self.root / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text((self.PROJECT / rel).read_text())
+
+    def write(self, name, text):
+        path = self.root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text)
+
+    def commit(self, message):
+        self.git("add", "-A")
+        self.git("commit", "-qm", message)
+
+    def change(self, text):
+        self.write(".changes/new/2099-01-01-test.md", text)
+
+    def shell(self, args):
+        return subprocess.run(args, cwd=self.root, capture_output=True, text=True)
+
+    def newversion(self):
+        return self.shell(["sh", ".github/scripts/newversion.sh"])
+
+    def assert_newversion(self, expected):
+        result = self.newversion()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.strip(), expected)
+
+    def test_empty_new_dir_reports_none(self):
+        self.assert_newversion("new=none")
+
+    def test_new_category_is_a_minor_bump(self):
+        self.change("NEW: example — added\n")
+        self.assert_newversion("new=v0.13.0")
+
+    def test_fix_category_is_a_patch_bump(self):
+        self.change("FIX: example — fixed\n")
+        self.assert_newversion("new=v0.12.1")
+
+    def test_new_and_fix_together_is_minor(self):
+        self.change("FIX: example — fixed\nNEW: example — added\n")
+        self.assert_newversion("new=v0.13.0")
+
+    def test_internal_or_docs_only_reports_none(self):
+        for category in ("INTERNAL", "DOCS"):
+            with self.subTest(category=category):
+                self.change(f"{category}: example — not releasable\n")
+                self.assert_newversion("new=none")
+
+    def test_non_zero_major_tag_fails_with_non_zero_exit(self):
+        self.git("tag", "v1.2.3")
+        self.change("NEW: example — added\n")
+        result = self.newversion()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("v0.x.y", result.stderr)
+
+    def test_preview_and_release_prepare_agree_with_newversion(self):
+        self.change("NEW: example — added\n")
+        self.assert_newversion("new=v0.13.0")
+
+        preview = self.shell(["task", "changes:version"])
+        self.assertEqual(preview.returncode, 0, preview.stdout + preview.stderr)
+        self.assertEqual(preview.stdout.strip(), "0.13.0")
+
+        prepared = self.shell(["sh", ".github/scripts/release-prepare.sh"])
+        self.assertEqual(prepared.returncode, 0, prepared.stdout + prepared.stderr)
+        self.assertIn("new=v0.13.0", prepared.stdout)
+
+
 class ImportTests(unittest.TestCase):
     names = {"net_ip", "net_socket", "web_http", "codec_base64"}
 

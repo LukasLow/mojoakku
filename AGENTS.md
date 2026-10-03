@@ -184,7 +184,8 @@ Rules:
   files to `.changes/archive/<tag>/` (CI-only). Versions stay on `0.x.y` and
   **major is never bumped**: `NEW`/`BREAKING`/`DEPRECATED` → minor,
   `FIX`/`SECURITY`/`PERFORMANCE` → patch, `INTERNAL`/`DOCS` → none (no tag;
-  they fold into the next real release). `task changes:version` previews it.
+  they fold into the next real release). `.github/scripts/newversion.sh` is the
+  single source of this derivation; `task changes:version` previews it.
   See `.changes/README.md`.
 - **The Manager starts NO Manager**.
 
