@@ -173,9 +173,11 @@ in Mojo stay only here.
   general formatter and Java itself split it out into `DateTimeFormatter`
   (`java.md` §11); date/time formatting is a separate concern and stays out
   (`_dev/TODO.md`).
-- **Byte-counted or UTF-16-counted width.** C counts bytes and JS/Java count
-  UTF-16 code units (`c.md` §7, `js-ts.md` §11, `java.md` §11). MojoAkku widths
-  count **codepoints** (Go's rune fix), with grapheme/display width deferred
+- **Byte-counted width.** C counts bytes and has no codepoint notion
+  (`c.md` §7); Java's `Formatter` has no width concept in code units — its width
+  is a character count (`java.md` §7), so only C is a genuine byte-width contrast.
+  (Assessment: derived from `c.md` §7 and `java.md` §7.) MojoAkku widths count
+  **codepoints** (Go's rune fix), with grapheme/display width deferred
   (`go.md` §7, §10).
 - **`g`/`G` general, `%` percent and `a`/`A` hex-float presentations.** They need
   significant-digit selection and hexadecimal-float algorithms not documented in
@@ -208,7 +210,7 @@ language anchors are from the `mojov1` buch.
 | `!s` display / `!r` debug conversion | Python `!s`/`!r`; Mojo `write_to`/`write_repr_to`; Rust Display/Debug | `python.md` §7; `mojov1/stdlib/format`; `rust.md` §10 |
 | Explicit one-based/zero-based index | Mojo `String.format()` zero-based; Java one-based; Go one-based | `mojov1/types/bool-and-strings`; `java.md` §7; `go.md` §7 |
 | Strict arity/type errors | Java `IllegalFormat*Exception` family; Python `ValueError` | `java.md` §4, §8; `python.md` §4 |
-| Typed error value + closed kind | MojoAkku `StringError`/`StringErrorKind`; `BitError`; Julia `StringIndexError` | `akku/text_string/_dev/DESIGN.md`; `akku/prim_bit/_dev/DESIGN.md`; `julia.md` §4 |
+| Typed error value + closed kind | MojoAkku `StringError`/`StringErrorKind`; MojoAkku `BitError`/`BitErrorKind`; Java `IllegalFormatException` | `akku/text_string/_dev/DESIGN.md`; `akku/prim_bit/_dev/DESIGN.md`; `java.md` §4 |
 | Writer-based output, no owned intermediate | Mojo `Writer`/`write_string`; Rust `write!`; Go `Fprintf` | `mojov1/stdlib/format`; `rust.md` §9; `go.md` §9 |
 | Runtime template vs literal check | Python `str.format` (runtime); Rust/C++ literal-only | `python.md` §7; `rust.md` §8; `cpp.md` §10 |
 | Typed/heterogeneous runtime args | Mojo `Variant` (closed union); Python `*args` | `mojov1/glossary`; `mojov1/appendix/comparison-to-python`; `python.md` §3 |
@@ -311,8 +313,8 @@ with `raise e^` because `FormatError` is deliberately **not**
   String precision is a maximum number of codepoints, truncated on a codepoint
   boundary.
 - **Default alignment** is left for strings, right for numbers, filled with
-  spaces; `SIGN_AWARE` (`=`) is valid only for numbers (`python.md` §7,
-  `rust.md` §7).
+  spaces; `SIGN_AWARE` (`=`) is valid **only for numbers**: on a string or bool
+  it is `TYPE_MISMATCH` (`python.md` §7, `rust.md` §7).
 - **No hidden global state.** No ambient locale, no default width, no package
   global mutable state (`c.md` §11).
 - **Names are `snake_case`** for functions/methods and fields, `CamelCase` for
@@ -455,14 +457,14 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses a closed FormatErrorKind because Java's many IllegalFormat*
+MojoAkku uses a closed FormatErrorKind because Java's many IllegalFormat*
 exceptions prove the distinct failure classes (bad spec, wrong conversion,
 missing/extra argument) are worth separating for a caller (`java.md` §4, §8),
 while a single closed kind is the shape MojoAkku already taught in
 StringError/StringErrorKind and BitError/BitErrorKind
 (akku/text_string/_dev/DESIGN.md, akku/prim_bit/_dev/DESIGN.md). Go's
 error-marker output and C's undefined behaviour are rejected (go.md §4, §11;
-c.md §8, §11).`
+c.md §8, §11).
 
 ---
 
@@ -486,10 +488,10 @@ Semantics:
 
 - **Parameters / preconditions:** constructed by the library on failure; read in
   an `except` block. `kind` is the discriminant above; `position` is the **byte
-  offset in the original template/spec text** at which the failure was detected
-  (`0` when the fault is an extra argument and no single field owns it — the
-  position is then the template's end); `message` is a short, human-readable
-  explanation with the offending text.
+  offset in the original template/spec text** at which the failure was detected.
+  For `EXTRA_ARGUMENT` the position is the template's byte length (its end), since
+  no field owns the fault; `message` is a short, human-readable explanation with
+  the offending text.
 - **Return / meaning:** raised, never returned. Every condition is recoverable:
   fix the template/spec, supply the missing argument, drop the extra argument, or
   pick a compatible presentation.
@@ -513,12 +515,12 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses one typed error FormatError with kind+position+message because
+MojoAkku uses one typed error FormatError with kind+position+message because
 Java's IllegalFormatExceptions carry the offending index and Python's ValueError
 describes the bad spec, proving position and text are part of a usable diagnostic
 (java.md §4, §8; python.md §4), and a re-raise by transfer is the established
 MojoAkku error convention (akku/text_string/_dev/DESIGN.md,
-mojov1/errors/raising-and-propagation).`
+mojov1/errors/raising-and-propagation).
 
 ---
 
@@ -575,11 +577,11 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses a closed Alignment because Python and Rust share the exact
+MojoAkku uses a closed Alignment because Python and Rust share the exact
 < > ^ = alphabet, so one mnemonic covers the whole family (python.md §7;
 rust.md §7), and the closed discriminants match the MojoAkku error-kind shape
 (akku/text_string/_dev/DESIGN.md). Java's alignment is expressed through
-separate flags and is rejected as a second spelling (java.md §7).`
+separate flags and is rejected as a second spelling (java.md §7).
 
 ---
 
@@ -631,10 +633,10 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses a closed SignMode because Java, Go and C all expose the same
+MojoAkku uses a closed SignMode because Java, Go and C all expose the same
 + / space / negative-only control (java.md §7; go.md §7; c.md §7) and one value
 type makes it testable; the `=` alignment is kept separate from the sign because
-the spec grammar places them in different positions (rust.md §7).`
+the spec grammar places them in different positions (rust.md §7).
 
 ---
 
@@ -660,7 +662,7 @@ struct FormatType(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     comptime CHAR               = FormatType(6)    # 'c'
     comptime STRING             = FormatType(7)    # 's'
     comptime REPR               = FormatType(8)    # 'r'
-    comptime FIXED              = FormatType(9)    # 'f' / 'F'
+    comptime FIXED              = FormatType(9)    # 'f' (and 'F', same output)
     comptime SCIENTIFIC         = FormatType(10)   # 'e'
     comptime UPPER_SCIENTIFIC   = FormatType(11)   # 'E'
 
@@ -683,7 +685,10 @@ Semantics:
     form).
   - `REPR` (`r`) — the debug form via `repr`/`write_repr_to`; for a string it is
     the quoted representation (`mojov1/stdlib/format`; `rust.md` §10).
-  - `FIXED` (`f`/`F`) — fixed-point with `precision` digits after the point.
+  - `FIXED` (`f`, and `F` as an alias with identical lowercase output) —
+    fixed-point with `precision` digits after the point. `FIXED` is a single
+    member, so `F` does **not** upper-case anything: the parser maps both letters
+    to the same presentation.
   - `SCIENTIFIC` (`e`) / `UPPER_SCIENTIFIC` (`E`) — scientific notation with
     `precision` digits, lowercase/uppercase `e`.
 - **Ownership:** value type; constants copied into the spec.
@@ -695,7 +700,7 @@ Tests:
 
 - `test_format_type_distinct_ids` — twelve distinct `_id`s.
 - `test_format_type_parse_letters` — every accepted letter maps correctly,
-  including `F` to `FIXED`.
+  including `F` to `FIXED` (same member as `f`).
 - `test_format_type_writable` — symbolic name is printed.
 
 Implementation status:
@@ -704,12 +709,12 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses a closed FormatType because Go's verb table and Python's type
+MojoAkku uses a closed FormatType because Go's verb table and Python's type
 letters are closed, finite sets, so an enumeration is both faithful and
 exhaustively testable (go.md §7; python.md §7), and the rejected letters
 (g/G/%/a/A) are deferred rather than silently accepted (java.md §7). The REPR
 member reuses Mojo's existing write_repr_to/`{!r}` split instead of inventing a
-new debug path (mojov1/stdlib/format; rust.md §10).`
+new debug path (mojov1/stdlib/format; rust.md §10).
 
 ---
 
@@ -763,11 +768,11 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses a closed Grouping because Python and Java both expose comma/other
+MojoAkku uses a closed Grouping because Python and Java both expose comma/other
 separator grouping (python.md §7; java.md §7), and making the separator an
 explicit value keeps output locale-independent, unlike C's global setlocale
 (c.md §11). A locale-aware separator is deferred as an explicit locale parameter
-(cpp.md §10, java.md §7).`
+(cpp.md §10, java.md §7).
 
 ---
 
@@ -844,13 +849,13 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses one FormatSpec value because Rust's format_spec is one grammar
+MojoAkku uses one FormatSpec value because Rust's format_spec is one grammar
 with one parse result and Python's format-spec mini-language is likewise a single
 tuple of options (rust.md §7; python.md §7); bundling the nine grammar elements
 in one copyable struct keeps the per-value formatters signature-stable and makes
 every option independently testable. The C flag bag is rejected as type-erased
 varargs (c.md §11) and Java's Formattable receives the options explicitly, which
-confirms passing a value is the right model (java.md §12).`
+confirms passing a value is the right model (java.md §12).
 
 ---
 
@@ -872,7 +877,8 @@ Semantics:
   `[[fill]align][sign][#][0][width][grouping][.precision][presentation]`; it
   accepts a `fill` only when it is followed by an alignment character.
 - **Return / meaning:** the validated `FormatSpec`. Leading `-` is accepted as an
-  explicit `NEGATIVE_ONLY` sign; `F` is accepted as an alias of `FIXED`.
+  explicit `NEGATIVE_ONLY` sign; `F` is accepted as an alias of `f`, mapping to
+  `FIXED` with identical lowercase output.
   Repeated flags, an unknown presentation letter, a `.` with no digits, a
   negative width, or a second fill/align are `INVALID_SPEC` (`python.md` §7,
   `rust.md` §7). `g`/`G`/`%`/`a`/`A` and nested `{…}` specs are not accepted
@@ -905,12 +911,12 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses a separate parse_format_spec because Rust's format_spec is a
+MojoAkku uses a separate parse_format_spec because Rust's format_spec is a
 documented standalone grammar and Python's format-spec is parsed independently of
 the template (rust.md §7; python.md §7); splitting parse from apply lets the
 template reuse the same parser inline and lets callers build/validate a spec on
 its own. Parsing the grammar rather than pattern-matching letters keeps the
-field order the single source of truth (python.md §7).`
+field order the single source of truth (python.md §7).
 
 ---
 
@@ -974,13 +980,13 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses a per-kind format_int as the explicit entry because the
+MojoAkku uses a per-kind format_int as the explicit entry because the
 presentation must be checked against the value kind and Mojo has no runtime type
 switch over a Writable; Go's verbs and Python's type letters both select a
 per-kind formatter, and the radix results must agree with Mojo's existing
 hex/oct/bin (go.md §7; python.md §7; mojov1/stdlib/builtin). Grouping and
 sign-aware zero-pad follow Rust/Python/Java rather than C's UB on mismatch
-(rust.md §7; python.md §7; java.md §10; c.md §11).`
+(rust.md §7; python.md §7; java.md §10; c.md §11).
 
 ---
 
@@ -997,8 +1003,8 @@ def format_float(value: Float64, spec: FormatSpec) raises FormatError -> String
 Semantics:
 
 - **Parameters / preconditions:** `value` is the float to render; `spec` is the
-  parsed specification. Allowed presentations: `DEFAULT`, `FIXED` (`f`/`F`),
-  `SCIENTIFIC` (`e`), `UPPER_SCIENTIFIC` (`E`), `REPR`. `precision` is the number
+  parsed specification. Allowed presentations: `DEFAULT`, `FIXED` (`f`, or `F`
+  as an alias), `SCIENTIFIC` (`e`), `UPPER_SCIENTIFIC` (`E`), `REPR`. `precision` is the number
   of digits after the decimal point for `FIXED`/`SCIENTIFIC` (default `6`, the
   C/Java default); for `DEFAULT` it is not applicable and `precision` must be
   `None` (otherwise `TYPE_MISMATCH`). `sign`, `zero_pad`, `width`,
@@ -1008,7 +1014,8 @@ Semantics:
   round-trip form. `FIXED`/`SCIENTIFIC` round **half-to-even** at `precision`
   digits (the Rust rule) and render the sign, then digits, then fill/align to
   `width` in codepoints (`go.md` §7; `c.md` §7; `rust.md` §7, §12). `inf`/`nan`
-  render as-is, upper-cased for `F`/`E` (`c.md` §7).
+  render as lowercase `inf`/`nan`; `F` is an alias of `f` and never upper-cases
+  them (`c.md` §7).
 - **Ownership:** the returned `String` is newly allocated and owned by the caller;
   `value`/`spec` are copied by value.
 - **Stream I/O:** not applicable.
@@ -1027,7 +1034,7 @@ Tests:
 - `test_format_float_zero_pad` — `010.2f`, sign-aware.
 - `test_format_float_width_align` — fill/align in codepoints.
 - `test_format_float_alt_form` — `#.0f` keeps the point.
-- `test_format_float_inf_nan` — `inf`/`nan` and `F` upper-casing.
+- `test_format_float_inf_nan` — `inf`/`nan` render lowercase; `F` aliases `f`.
 - `test_format_float_grouping_invalid` — `,f` -> `INVALID_SPEC`.
 - `test_format_float_int_presentation_mismatch` — `d` on `Float64` ->
   `TYPE_MISMATCH`.
@@ -1038,13 +1045,13 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses format_float with f/e/E because Go, C and Java all expose exactly
+MojoAkku uses format_float with f/e/E because Go, C and Java all expose exactly
 those float presentations, and Rust documents the round-half-to-even rule that
 makes the digits reproducible (go.md §7; c.md §7; java.md §7; rust.md §7, §12).
 DEFAULT deliberately falls back to the stdlib shortest form because the buch
 documents no precision API, so no separate float formatter exists to reuse
 (mojo.md gap item 7; mojov1/stdlib/builtin). g/G/%/a/A are deferred rather than
-half-implemented (java.md §7, _dev/TODO.md).`
+half-implemented (java.md §7, _dev/TODO.md).
 
 ---
 
@@ -1063,10 +1070,10 @@ Semantics:
 - **Parameters / preconditions:** `value` is the borrowed text; `spec` is the
   parsed specification. Allowed presentations: `DEFAULT`, `STRING`, `REPR`.
   `precision`, when present, is the **maximum number of codepoints** (the string
-  is truncated at a codepoint boundary, never mid-sequence). `fill`, `align`,
-  `width`, `zero_pad` and `SIGN_AWARE` are valid; `sign`, `grouping` and
-  `alt_form` are `TYPE_MISMATCH`. `zero_pad` on a string behaves as space fill
-  is **rejected** (`TYPE_MISMATCH`), because zero-padding text is never intended.
+  is truncated at a codepoint boundary, never mid-sequence). Only `fill`, `align`
+  and `width` are valid; `sign`, `grouping`, `alt_form`, `zero_pad` and
+  `SIGN_AWARE` are all `TYPE_MISMATCH` (`zero_pad` on text is never intended, and
+  `SIGN_AWARE` padding is meaningful only next to a numeric sign).
 - **Return / meaning:** an owned `String`. The text is first truncated to
   `precision` codepoints (using `text_string.is_char_boundary` +
   `text_string.slice` so a multi-byte sequence is never split), then padded to
@@ -1078,8 +1085,8 @@ Semantics:
   `value` stays borrowed.
 - **Stream I/O:** not applicable.
 
-Errors: `FormatError` `TYPE_MISMATCH` for a numeric presentation or a sign/
-grouping/zero-pad flag on a string. Recoverable.
+Errors: `FormatError` `TYPE_MISMATCH` for a numeric presentation, or for a sign,
+grouping, zero-pad or `SIGN_AWARE` specification on a string. Recoverable.
 
 Tests:
 
@@ -1100,13 +1107,13 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses format_string with codepoint width and codepoint precision because
+MojoAkku uses format_string with codepoint width and codepoint precision because
 Go deliberately fixed C's byte semantics with rune-based width and Python's string
 precision is a character count (go.md §7, §10; python.md §7), while Mojo exposes
 three length measures so the choice must be explicit
 (mojov1/types/bool-and-strings). Boundary-safe truncation reuses text_string
 instead of std's aborting byte slice (akku/text_string/_dev/DESIGN.md). Sign and
-grouping on strings are rejected rather than ignored (java.md §10).`
+grouping on strings are rejected rather than ignored (java.md §10).
 
 ---
 
@@ -1151,11 +1158,11 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses format_bool because Go's %t and Java's %b both treat booleans as
+MojoAkku uses format_bool because Go's %t and Java's %b both treat booleans as
 first-class formattable values with width/alignment (go.md §7; java.md §7); the
 closed argument union includes Bool, so its formatter is needed for the template
 path to be total. Sign and grouping are rejected because they make no sense on a
-logical value (java.md §10).`
+logical value (java.md §10).
 
 ---
 
@@ -1211,13 +1218,13 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses an explicit ordered FormatArgs because Java's Object... and Go's
+MojoAkku uses an explicit ordered FormatArgs because Java's Object... and Go's
 a ...any bind positionally and Python's *args is positional, so an index-ordered
 list is the shared model (java.md §7; go.md §3; python.md §3); Mojo has no
 keyword-argument variadic, so named binding is deferred
 (mojov1/functions/parameters-and-generics, rust.md §7). A closed union over the
 supported kinds turns a type error into a FormatError instead of dynamic
-dispatch (java.md §4; python.md §8).`
+dispatch (java.md §4; python.md §8).
 
 ---
 
@@ -1280,7 +1287,7 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses a runtime template formatter because Python's str.format is the
+MojoAkku uses a runtime template formatter because Python's str.format is the
 runtime-checked counterpart to f-strings and is the exact missing piece next to
 Mojo's t"…" (python.md §7, §12), and Java proves a runtime format string can fail
 in a controlled way instead of corrupting memory (java.md §8). It is strict about
@@ -1288,7 +1295,7 @@ mixed numbering (python.md §7; one rule, cpp.md §11), missing/extra arguments 
 type mismatch (java.md §4, §8), rather than Go's marker strings or C++'s ignored
 extras (go.md §4; cpp.md §8). Literal braces follow the {{/}} rule shared by
 Python, Rust and Mojo's own t-strings (python.md §7; rust.md §7;
-mojov1/basics/literals).`
+mojov1/basics/literals).
 
 ---
 
@@ -1321,7 +1328,12 @@ Semantics:
   (`mojo.md`, Q6 N/A for the core).
 
 Errors: the same `FormatError` set as `format_template`; the writer's own errors
-are the writer's contract, not surfaced as `FormatError`.
+are the writer's contract, not surfaced as `FormatError`. **Partial output is
+possible.** A template/spec error detected while parsing (before any write)
+leaves the writer untouched, but a `TYPE_MISMATCH` in a *later* field can only be
+detected after earlier literal segments and fields have already been written, so
+the writer then holds the prefix produced so far. Atomicity therefore holds only
+up to the first write, not for the whole call.
 
 Tests:
 
@@ -1329,8 +1341,11 @@ Tests:
 - `test_format_template_to_string_builder` — output equals `format_template`.
 - `test_format_template_to_no_intermediate_string` — the writer sees each segment
   in order.
-- `test_format_template_to_raises_before_writing_on_error` — a malformed template
-  raises and writes nothing (atomicity at the parse stage).
+- `test_format_template_to_raises_before_first_write_on_malformed` — a malformed
+  template raises and writes nothing (the parse stage precedes the first write).
+- `test_format_template_to_partial_output_on_later_type_mismatch` — an earlier
+  field/literal is already in the writer when a later-field `TYPE_MISMATCH`
+  raises.
 
 Implementation status:
 
@@ -1338,11 +1353,11 @@ not implemented
 
 Rationale:
 
-`MojoAkku uses format_template_to because Mojo's Writer is the documented
+MojoAkku uses format_template_to because Mojo's Writer is the documented
 destination trait and Rust's write! / Go's Fprintf both expose a
 write-through-destination path next to the owned-string one (mojov1/stdlib/format;
 rust.md §9; go.md §9). Providing both in one design avoids the owned-string
 allocation when a destination already exists, and matches the
-text_string.StringBuilder Writer conformance (akku/text_string/_dev/DESIGN.md).`
+text_string.StringBuilder Writer conformance (akku/text_string/_dev/DESIGN.md).
 
 ---
