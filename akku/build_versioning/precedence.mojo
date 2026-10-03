@@ -1,5 +1,3 @@
-from std.os import abort
-
 from .semver import SemVer
 from akku.build_versioning._internal.version_core import (
     compare_precedence as _compare_precedence,
@@ -8,7 +6,16 @@ from akku.build_versioning._internal.version_core import (
 
 # precedence — SemVer clause 11 ordering of two versions, as -1 / 0 / +1.
 def precedence(a: SemVer, b: SemVer) -> Int:
-    abort("MojoAkku: this API is not yet implemented")
+    return _compare_precedence(
+        a.major(),
+        a.minor(),
+        a.patch(),
+        a.prerelease(),
+        b.major(),
+        b.minor(),
+        b.patch(),
+        b.prerelease(),
+    )
 
 # API-DOCS-START
 # precedence — SemVer clause 11 ordering of two versions, as -1 / 0 / +1.

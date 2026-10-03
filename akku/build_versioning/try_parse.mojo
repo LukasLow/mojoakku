@@ -1,12 +1,13 @@
-from std.os import abort
-
 from .semver import SemVer
 from .parse import parse
 
 
 # try_parse — non-raising strict SemVer 2.0.0 parser.
 def try_parse(text: StringSpan) -> Optional[SemVer]:
-    abort("MojoAkku: this API is not yet implemented")
+    try:
+        return Optional(parse(text))
+    except e:
+        return None
 
 # API-DOCS-START
 # try_parse — parse a strict SemVer 2.0.0 string, or None.

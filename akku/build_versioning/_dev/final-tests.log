@@ -1,0 +1,110 @@
+== _tests/test_build_versioning_error.mojo
+
+Running 7 tests for /workspace/.worktrees/build-versioning/akku/build_versioning/_tests/test_build_versioning_error.mojo 
+    PASS [ 0.001 ] test_error_fields_kind_op_detail
+    PASS [ 0.002 ] test_error_writable
+    PASS [ 0.001 ] test_error_copyable_not_implicit
+    PASS [ 0.001 ] test_error_reraise_transfer
+    PASS [ 0.001 ] test_error_op_names_parse_call
+    PASS [ 0.001 ] test_error_op_names_semver_constructor
+    PASS [ 0.001 ] test_error_detail_is_opaque_context
+--------
+Summary [ 0.003 ] 7 tests run: 7 passed , 0 failed , 0 skipped 
+
+== _tests/test_build_versioning_error_kind.mojo
+
+Running 3 tests for /workspace/.worktrees/build-versioning/akku/build_versioning/_tests/test_build_versioning_error_kind.mojo 
+    PASS [ 0.003 ] test_error_kind_six_distinct
+    PASS [ 0.001 ] test_error_kind_eq_discriminant_only
+    PASS [ 0.001 ] test_error_kind_writable_symbolic_names
+--------
+Summary [ 0.003 ] 3 tests run: 3 passed , 0 failed , 0 skipped 
+
+== _tests/test_build_versioning_is_prerelease.mojo
+
+Running 4 tests for /workspace/.worktrees/build-versioning/akku/build_versioning/_tests/test_build_versioning_is_prerelease.mojo 
+    PASS [ 0.001 ] test_is_prerelease_true
+    PASS [ 0.001 ] test_is_prerelease_false_for_release
+    PASS [ 0.001 ] test_is_prerelease_false_for_build_only
+    PASS [ 0.001 ] test_is_prerelease_agrees_with_precedence
+--------
+Summary [ 0.002 ] 4 tests run: 4 passed , 0 failed , 0 skipped 
+
+== _tests/test_build_versioning_is_stable.mojo
+
+Running 4 tests for /workspace/.worktrees/build-versioning/akku/build_versioning/_tests/test_build_versioning_is_stable.mojo 
+    PASS [ 0.001 ] test_is_stable_major_positive
+    PASS [ 0.001 ] test_is_stable_zero_major
+    PASS [ 0.001 ] test_is_stable_prerelease
+    PASS [ 0.001 ] test_is_stable_implies_not_prerelease
+--------
+Summary [ 0.002 ] 4 tests run: 4 passed , 0 failed , 0 skipped 
+
+== _tests/test_build_versioning_parse.mojo
+
+Running 19 tests for /workspace/.worktrees/build-versioning/akku/build_versioning/_tests/test_build_versioning_parse.mojo 
+    PASS [ 0.001 ] test_parse_basic
+    PASS [ 0.001 ] test_parse_prerelease
+    PASS [ 0.001 ] test_parse_build
+    PASS [ 0.001 ] test_parse_prerelease_and_build
+    PASS [ 0.001 ] test_parse_rejects_empty
+    PASS [ 0.001 ] test_parse_rejects_partial
+    PASS [ 0.001 ] test_parse_rejects_four_components
+    PASS [ 0.001 ] test_parse_rejects_v_prefix
+    PASS [ 0.001 ] test_parse_rejects_equals_prefix
+    PASS [ 0.001 ] test_parse_rejects_surrounding_whitespace
+    PASS [ 0.001 ] test_parse_rejects_leading_zero_core
+    PASS [ 0.001 ] test_parse_rejects_leading_zero_prerelease
+    PASS [ 0.001 ] test_parse_rejects_bad_char
+    PASS [ 0.001 ] test_parse_rejects_empty_identifier
+    PASS [ 0.001 ] test_parse_rejects_double_separator
+    PASS [ 0.001 ] test_parse_rejects_overflow
+    PASS [ 0.001 ] test_parse_accepts_build_leading_zero
+    PASS [ 0.002 ] test_parse_roundtrip
+    PASS [ 0.001 ] test_parse_error_op_is_parse
+--------
+Summary [ 0.008 ] 19 tests run: 19 passed , 0 failed , 0 skipped 
+
+== _tests/test_build_versioning_precedence.mojo
+
+Running 10 tests for /workspace/.worktrees/build-versioning/akku/build_versioning/_tests/test_build_versioning_precedence.mojo 
+    PASS [ 0.001 ] test_precedence_numeric_order
+    PASS [ 0.001 ] test_precedence_equal
+    PASS [ 0.001 ] test_precedence_prerelease_lower
+    PASS [ 0.001 ] test_precedence_numeric_identifiers_numeric
+    PASS [ 0.001 ] test_precedence_alphanumeric_ascii
+    PASS [ 0.001 ] test_precedence_numeric_below_alphanumeric
+    PASS [ 0.001 ] test_precedence_fewer_identifiers_lower
+    PASS [ 0.003 ] test_precedence_spec_chain
+    PASS [ 0.001 ] test_precedence_ignores_build
+    PASS [ 0.001 ] test_precedence_antisymmetric
+--------
+Summary [ 0.010 ] 10 tests run: 10 passed , 0 failed , 0 skipped 
+
+== _tests/test_build_versioning_semver.mojo
+
+Running 9 tests for /workspace/.worktrees/build-versioning/akku/build_versioning/_tests/test_build_versioning_semver.mojo 
+    PASS [ 0.001 ] test_semver_construct_valid_empty_qualifiers
+    PASS [ 0.001 ] test_semver_construct_with_qualifiers
+    PASS [ 0.001 ] test_semver_construct_rejects_negative_component
+    PASS [ 0.001 ] test_semver_construct_rejects_empty_prerelease_identifier
+    PASS [ 0.001 ] test_semver_construct_rejects_leading_zero_prerelease
+    PASS [ 0.001 ] test_semver_eq_ignores_build
+    PASS [ 0.001 ] test_semver_eq_prerelease_lower_not_equal
+    PASS [ 0.001 ] test_semver_eq_numeric_components
+    PASS [ 0.001 ] test_semver_writable_canonical
+--------
+Summary [ 0.002 ] 9 tests run: 9 passed , 0 failed , 0 skipped 
+
+== _tests/test_build_versioning_try_parse.mojo
+
+Running 5 tests for /workspace/.worktrees/build-versioning/akku/build_versioning/_tests/test_build_versioning_try_parse.mojo 
+    PASS [ 0.001 ] test_try_parse_valid_some_fields
+    PASS [ 0.001 ] test_try_parse_invalid_none
+    PASS [ 0.001 ] test_try_parse_empty_none
+    PASS [ 0.002 ] test_try_parse_matches_parse
+    PASS [ 0.002 ] test_try_parse_never_raises
+--------
+Summary [ 0.007 ] 5 tests run: 5 passed , 0 failed , 0 skipped 
+
+All build_versioning tests passed.

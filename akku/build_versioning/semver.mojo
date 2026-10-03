@@ -1,8 +1,8 @@
-from std.os import abort
-
 from .version_error import VersionError
+from .version_error_kind import VersionErrorKind
 from akku.build_versioning._internal.version_core import (
     compare_precedence as _compare_precedence,
+    validate_qualifier as _validate_qualifier,
 )
 
 
@@ -23,31 +23,79 @@ struct SemVer(Equatable, Copyable, Deinitable, Writable):
         prerelease: String = "",
         build: String = "",
     ) raises VersionError:
-        abort("MojoAkku: this API is not yet implemented")
+        if major < 0 or minor < 0 or patch < 0:
+            raise VersionError(
+                VersionErrorKind.BAD_NUMBER,
+                "SemVer",
+                "numeric components must be non-negative",
+            )
+        if prerelease.byte_length() > 0:
+            var pre = _validate_qualifier(StringSpan(prerelease), False)
+            if pre == -1:
+                raise VersionError(
+                    VersionErrorKind.INVALID_FORMAT,
+                    "SemVer",
+                    "invalid prerelease identifier list",
+                )
+            if pre == -2:
+                raise VersionError(
+                    VersionErrorKind.LEADING_ZERO,
+                    "SemVer",
+                    "numeric prerelease identifier has a leading zero",
+                )
+        if build.byte_length() > 0:
+            var bld = _validate_qualifier(StringSpan(build), True)
+            if bld == -1:
+                raise VersionError(
+                    VersionErrorKind.INVALID_FORMAT,
+                    "SemVer",
+                    "invalid build identifier list",
+                )
+        self._major = major
+        self._minor = minor
+        self._patch = patch
+        self._prerelease = prerelease
+        self._build = build
 
     def major(self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._major
 
     def minor(self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._minor
 
     def patch(self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._patch
 
     def prerelease(self) -> StringSpan[origin_of(self._prerelease)]:
-        abort("MojoAkku: this API is not yet implemented")
+        return StringSpan(self._prerelease)
 
     def build(self) -> StringSpan[origin_of(self._build)]:
-        abort("MojoAkku: this API is not yet implemented")
+        return StringSpan(self._build)
 
     def __eq__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return (
+            _compare_precedence(
+                self._major,
+                self._minor,
+                self._patch,
+                StringSpan(self._prerelease),
+                other._major,
+                other._minor,
+                other._patch,
+                StringSpan(other._prerelease),
+            )
+            == 0
+        )
 
     def __ne__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return not (self == other)
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write(self._major, ".", self._minor, ".", self._patch)
+        if self._prerelease.byte_length() > 0:
+            writer.write("-", self._prerelease)
+        if self._build.byte_length() > 0:
+            writer.write("+", self._build)
 
 # API-DOCS-START
 # SemVer — a parsed Semantic Versioning 2.0.0 value.

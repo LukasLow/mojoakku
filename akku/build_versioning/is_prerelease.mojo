@@ -1,11 +1,9 @@
-from std.os import abort
-
 from .semver import SemVer
 
 
 # is_prerelease — does the version carry a prerelease?
 def is_prerelease(v: SemVer) -> Bool:
-    abort("MojoAkku: this API is not yet implemented")
+    return v.prerelease().byte_length() > 0
 
 # API-DOCS-START
 # is_prerelease — does the version carry a prerelease?

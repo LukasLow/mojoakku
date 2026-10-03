@@ -11,7 +11,7 @@ struct VersionErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
 
     # Written explicitly so equality compares the discriminant only.
     def __eq__(self, other: Self) -> Bool:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._id == other._id
 
     comptime EMPTY          = VersionErrorKind(0)   # the input was empty
     comptime INVALID_FORMAT = VersionErrorKind(1)   # structural violation of the SemVer grammar
@@ -22,7 +22,19 @@ struct VersionErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
 
     # write_to — symbolic name, not the numeric _id.
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        # Symbolic names, not the numeric _id.
+        if self._id == 0:
+            writer.write("EMPTY")
+        elif self._id == 1:
+            writer.write("INVALID_FORMAT")
+        elif self._id == 2:
+            writer.write("BAD_NUMBER")
+        elif self._id == 3:
+            writer.write("LEADING_ZERO")
+        elif self._id == 4:
+            writer.write("OVERFLOW")
+        else:
+            writer.write("OTHER")
 
 # API-DOCS-START
 # VersionErrorKind — the machine-testable reason a version operation failed.

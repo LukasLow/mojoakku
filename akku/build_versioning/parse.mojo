@@ -1,12 +1,113 @@
-from std.os import abort
-
 from .semver import SemVer
 from .version_error import VersionError
+from .version_error_kind import VersionErrorKind
+from akku.text_string import split_once
+from akku.build_versioning._internal.version_core import (
+    identifier_class as _identifier_class,
+    has_leading_zero as _has_leading_zero,
+    parse_digits as _parse_digits,
+    validate_qualifier as _validate_qualifier,
+)
+
+
+# _fail — raise the one typed error with a consistent op and a detail string.
+def _fail(kind: VersionErrorKind, detail: String) raises VersionError -> Never:
+    raise VersionError(kind, "parse", detail)
+
+
+# _parse_core_number — parse one core component. A component that contains a
+# character outside [0-9A-Za-z-] (a space, '=', ...) is a structural error; a
+# component of allowed characters that is not all digits (e.g. "x") is a number
+# error. A leading zero and an Int overflow get their own kinds.
+def _parse_core_number(text: StringSpan) raises VersionError -> Int:
+    var cls = _identifier_class(text)
+    if cls == 0:
+        _fail(VersionErrorKind.INVALID_FORMAT, "core component has a disallowed character")
+    if cls == 2:
+        _fail(VersionErrorKind.BAD_NUMBER, "core component is not all digits")
+    if _has_leading_zero(text):
+        _fail(VersionErrorKind.LEADING_ZERO, "core component has a leading zero")
+    var value = _parse_digits(text)
+    if value < 0:
+        _fail(VersionErrorKind.OVERFLOW, "core component does not fit Int")
+    return value
 
 
 # parse — strict SemVer 2.0.0 parser.
 def parse(text: StringSpan) raises VersionError -> SemVer:
-    abort("MojoAkku: this API is not yet implemented")
+    if text.byte_length() == 0:
+        _fail(VersionErrorKind.EMPTY, "input is empty")
+
+    # A leading "v" or "=" is never part of a semantic version (semver.org:
+    # "v1.2.3" is not a semantic version). Reject it structurally.
+    var first = text.as_bytes()[0]
+    if first == UInt8(118) or first == UInt8(61):  # 'v' or '='
+        _fail(VersionErrorKind.INVALID_FORMAT, "a version may not start with 'v' or '='")
+
+    # Split off build metadata at the first '+'. Split once and copy the halves
+    # into owned Strings, so later splits do not fight the view origins; the
+    # build remainder is kept whole, so '.' inside it is not split.
+    var rest = String(text)
+    var build = String()
+    var plus = split_once(text, "+")
+    if plus:
+        rest = String(plus.value()[0])
+        build = String(plus.value()[1])
+        if build.byte_length() == 0:
+            _fail(VersionErrorKind.INVALID_FORMAT, "empty build metadata")
+        if split_once(StringSpan(build), "+"):
+            _fail(VersionErrorKind.INVALID_FORMAT, "more than one '+' separator")
+        # Build metadata must follow the prerelease: a '-' after '+' is rejected.
+        if split_once(StringSpan(build), "-"):
+            _fail(VersionErrorKind.INVALID_FORMAT, "build metadata may not contain '-'")
+        if _validate_qualifier(StringSpan(build), True) != 0:
+            _fail(VersionErrorKind.INVALID_FORMAT, "invalid build identifier list")
+
+    # Split off the prerelease at the first '-' after the core. The prerelease is
+    # kept whole; its '-'/'.'-separated identifiers are validated separately.
+    var core = rest
+    var prerelease = String()
+    var dash = split_once(StringSpan(rest), "-")
+    if dash:
+        core = String(dash.value()[0])
+        prerelease = String(dash.value()[1])
+        if prerelease.byte_length() == 0:
+            _fail(VersionErrorKind.INVALID_FORMAT, "empty prerelease")
+        var pre = _validate_qualifier(StringSpan(prerelease), False)
+        if pre == -1:
+            _fail(VersionErrorKind.INVALID_FORMAT, "invalid prerelease identifier list")
+        if pre == -2:
+            _fail(VersionErrorKind.LEADING_ZERO, "numeric prerelease identifier has a leading zero")
+
+    # The core is exactly three dot-separated numeric identifiers. Count the
+    # parts first, then parse each in place (views are used immediately).
+    var core_bytes = core.as_bytes()
+    var n = len(core_bytes)
+    var count = 1
+    for i in range(n):
+        if core_bytes[i] == UInt8(46):  # '.'
+            count += 1
+    if count != 3:
+        _fail(VersionErrorKind.INVALID_FORMAT, "core must be MAJOR.MINOR.PATCH")
+
+    var start = 0
+    var major = 0
+    var minor = 0
+    var patch = 0
+    var part = 0
+    for i in range(n + 1):
+        if i == n or core_bytes[i] == UInt8(46):
+            var value = _parse_core_number(core[byte=start:i])
+            if part == 0:
+                major = value
+            elif part == 1:
+                minor = value
+            else:
+                patch = value
+            part += 1
+            start = i + 1
+
+    return SemVer(major, minor, patch, prerelease, build)
 
 # API-DOCS-START
 # parse — parse a strict Semantic Versioning 2.0.0 string into a SemVer.

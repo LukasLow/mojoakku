@@ -44,8 +44,9 @@ Every API entry carries a `Status:` field with exactly one of these values:
 | `implemented` | Implemented and passing its tests. Default after Phase 12/13. |
 | `benchmarked` | Implemented, tested and measured against the performance goals. |
 
-All 8 entries in this document were `planned` at Phase 3; `Implementation
-status:` is `not implemented` until Phase 11.
+All 8 entries in this document were `planned` at Phase 3 and are
+`implemented` after Phase 11; `Implementation status:` is `implemented`, with
+the full test suite green (61 tests, 0 failing).
 
 ## Dependencies
 
@@ -384,7 +385,7 @@ phase does not reopen them:
 
 ### `SemVer`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -508,7 +509,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -538,7 +539,7 @@ Semver.of (java.md §12) show programmatic construction is needed.`
 
 ### `VersionErrorKind`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -603,7 +604,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -622,7 +623,7 @@ documented semver.org rule, and OTHER is reserved.`
 
 ### `VersionError`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -667,7 +668,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -686,7 +687,7 @@ need.`
 
 ### `parse`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -769,7 +770,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -793,7 +794,7 @@ avoiding the regex-DoS class node-semver must harden against (js-ts.md §8).`
 
 ### `try_parse`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -831,7 +832,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -849,7 +850,7 @@ parse, so it stays inside the release-1 parsing scope.`
 
 ### `precedence`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -916,7 +917,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -939,7 +940,7 @@ comparator and stays backlog (rust.md §11, js-ts.md §11).`
 
 ### `is_prerelease`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -973,7 +974,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -990,7 +991,7 @@ it does not depend on the private fields.`
 
 ### `is_stable`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1021,7 +1022,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 

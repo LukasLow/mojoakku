@@ -1,5 +1,3 @@
-from std.os import abort
-
 from .version_error_kind import VersionErrorKind
 
 
@@ -11,7 +9,7 @@ struct VersionError(Copyable, Deinitable, Writable):
     var detail: String
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write("VersionError(", self.kind, ", op=", self.op, ", detail=", self.detail, ")")
 
 # API-DOCS-START
 # VersionError — the one typed error every fallible version operation declares.

@@ -1,11 +1,11 @@
-from std.os import abort
-
 from .semver import SemVer
 
 
 # is_stable — is the version stable by the documented convention?
 def is_stable(v: SemVer) -> Bool:
-    abort("MojoAkku: this API is not yet implemented")
+    if v.prerelease().byte_length() > 0:
+        return False
+    return v.major() > 0
 
 # API-DOCS-START
 # is_stable — is the version stable by the documented convention?
