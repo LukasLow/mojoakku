@@ -51,7 +51,8 @@ end state.
 - `same_build` — explicit build-metadata equality. (origin: `js-ts.md` §11)
 - `without_build` / `without_prerelease` — strip qualifiers. (origin:
   `cpp.md` §3)
-- `has_build_metadata` / `is_prerelease` predicates. (origin: `cpp.md` §3)
+- `has_build_metadata` — does the version carry build metadata. (origin:
+  `cpp.md` §3)
 - Build-metadata accessor as identifiers, not only a joined string. (origin:
   `elixir.md` §9)
 
@@ -76,13 +77,10 @@ end state.
 
 ## Normalization and loose parsing
 
-- `canonical` — canonical string form. (origin: `go.md` §3)
 - `clean` — trim outer whitespace, `=` and `v` to a valid version. (origin:
   `js-ts.md` §3, `cpp.md` §3)
 - `coerce` — extract a version from arbitrary text. (origin: `js-ts.md` §3,
   `go.md` §10)
-- `try_parse` — non-raising parse returning an optional. (origin: `c.md` §12,
-  `cpp.md` §12, `go.md` §12)
 - `parse_lenient` — accept partial and `v`-prefixed input. (origin: `kotlin.md`
   §12)
 - `original` — retain the input text for round-tripping. (origin: `go.md` §10)
@@ -113,21 +111,16 @@ end state.
 
 - `validate` — satisfiability with structured, human-readable failure reasons.
   (origin: `go.md` §10)
-- Distinct overflow error variant. (origin: `zig.md` §10, `elixir.md` §10)
 - Exported input-length limits (`MaxVersionLen`-style). (origin: `go.md` §8,
   `cpp.md` §10)
 - `check` — bool-only constraint check. (origin: `go.md` §3)
 
 ## Convenience predicates and accessors
 
-- `is_stable` — major > 0 and no prerelease. (origin: `java.md` §12,
-  `kotlin.md` §12)
 - `is_at_least` — three-valued compatibility query (`Optional[Bool]`). (origin:
   `zig.md` §12)
 - `segments` / `core` — component-list and core-only accessors. (origin: `go.md`
   §3)
-- `from_parts` — component constructor without a string. (origin: `python.md`
-  §3, `java.md` §12)
 - `semver_numeric` — lossy packed integer ordering key. (origin: `c.md` §3,
   §11)
 
