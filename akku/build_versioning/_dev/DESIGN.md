@@ -242,7 +242,7 @@ right column are the reference APIs cited in the justifications below.
 | `is_stable` / `is_prerelease` predicates | semver4j `isStable()`; kotlin-semver `.isStable`, `.isPreRelease`; C++ `is_prerelease` | `java.md` §12; `kotlin.md` §12; `cpp.md` §3 |
 | Owned qualifier storage | Rust owned `Prerelease`/`BuildMetadata`; Elixir owned `:pre` list / `:build` string; Kotlin joined `String`s | `rust.md` §7,§10; `elixir.md` §7,§11; `kotlin.md` §11 |
 | Reject borrowed qualifiers | Zig `?[]const u8` slices into the input | `zig.md` §5,§11 |
-| Mojo language anchors | typed `raises`; value `struct`; `StringSpan`/`String`/`Optional`; parametric borrow origins (`def prerelease[o: Origin[mut=False]](self) -> StringSpan[o]`); `Writable`/`Writer`; `text_string.split_once` | `mojov1/errors/error-model`; `mojov1/errors/raising-and-propagation`; `mojov1/keywords/struct`; `mojov1/types/bool-and-strings`; `mojov1/memory/origin-and-borrowing`; `mojov1/types/optionals-and-nullability`; `mojov1/stdlib/format`; `akku/text_string/` |
+| Mojo language anchors | typed `raises`; value `struct`; `StringSpan`/`String`/`Optional`; derived borrow origins (`def prerelease(self) -> StringSpan[origin_of(self._prerelease)]`); `Writable`/`Writer`; `text_string.split_once` | `mojov1/errors/error-model`; `mojov1/errors/raising-and-propagation`; `mojov1/keywords/struct`; `mojov1/types/bool-and-strings`; `mojov1/memory/origin-and-borrowing`; `mojov1/types/optionals-and-nullability`; `mojov1/stdlib/format`; `akku/text_string/` |
 
 ## Public API
 
@@ -409,8 +409,8 @@ struct SemVer(Equatable, Copyable, Deinitable, Writable):
     def major(self) -> Int
     def minor(self) -> Int
     def patch(self) -> Int
-    def prerelease[o: Origin[mut=False]](self) -> StringSpan[o]
-    def build[o: Origin[mut=False]](self) -> StringSpan[o]
+    def prerelease(self) -> StringSpan[origin_of(self._prerelease)]
+    def build(self) -> StringSpan[origin_of(self._build)]
 
     def __eq__(self, other: Self) -> Bool
 
@@ -436,21 +436,25 @@ Semantics:
   language still keeps the always-valid invariant: nothing outside the module
   can write a field.
 - **Accessor origins.** `prerelease()` and `build()` return a view into the
-  value's own storage, so the return type is tied to the receiver with a
-  parametric origin: `def prerelease[o: Origin[mut=False]](self) -> StringSpan[o]`
-  (and `build`). `StringSpan` is parameterized on the origin of the data it
-  points to, and `o` captures the receiver's origin, so the compiler extends the
-  owner's lifetime for as long as the view is live
-  (`mojov1/memory/origin-and-borrowing`). This parametric form is the only
-  spelling that compiles as a public signature returning a view into a field:
-  probe-verified — `-> StringSpan[origin_of(self)]` and a plain `-> StringSpan[o]`
-  both fail at declaration/call time ("failed to infer parameter
-  'origin_of(_mlir_origin)'"), while `[o: Origin[mut=False]]` on the receiver
-  binds it. The receiver is the default immutable convention, so the returned
+  value's own field, so the return type uses the **derived-origin** form:
+  `def prerelease(self) -> StringSpan[origin_of(self._prerelease)]` (and
+  `def build(self) -> StringSpan[origin_of(self._build)]`). `origin_of(value)`
+  is the documented derived origin — it names the value whose owner the
+  compiler must keep alive (`mojov1/memory/origin-and-borrowing`: "`origin_of()`
+  ... the origin associated with the value passed in"; the canonical example is
+  `def as_ptr(mut self) -> Pointer[String, origin_of(self.o_ptr)]`). `StringSpan`
+  is parameterized on the origin of the data it points to, so the view stays
+  valid as long as the `SemVer` does.
+  A parametric `[o: Origin[mut=False]]` return is **wrong** here: `o` has no
+  input parameter to infer from, so it fails with "failed to infer parameter"
+  (probe-verified). The derived-origin form compiles and runs (probe-verified on
+  Mojo 1.1.0, body `return StringSpan(self._prerelease)`). `origin_of(self)`
+  likewise fails (the field's origin is not the whole-`self` origin). This is the
+  same convention as `akku/net_ip/ipv4_address.mojo` (`def octets(self) -> Array[UInt8, 4]`,
+  value accessor over a private field) and the manual's derived-origin pointer
+  example. The receiver is the default immutable convention, so the returned
   view is immutable; the caller may copy it but cannot mutate the value through
-  the accessor. This is the same shape as `akku/text_string`'s
-  `def trim[o: Origin[mut=False]](text: StringSpan[o]) -> StringSpan[o]`, where
-  the returned view keeps the input's origin.
+  the accessor.
 - **Construction — component path.** The `@doc_hidden __init__` is the
   parser-free constructor (`python.md` §10: `from_parts`; `java.md` §12:
   `Semver.of`): it validates `major`/`minor`/`patch >= 0` (else `BAD_NUMBER`)

@@ -34,10 +34,10 @@ struct SemVer(Equatable, Copyable, Deinitable, Writable):
     def patch(self) -> Int:
         abort("MojoAkku: this API is not yet implemented")
 
-    def prerelease[o: Origin[mut=False]](self) -> StringSpan[o]:
+    def prerelease(self) -> StringSpan[origin_of(self._prerelease)]:
         abort("MojoAkku: this API is not yet implemented")
 
-    def build[o: Origin[mut=False]](self) -> StringSpan[o]:
+    def build(self) -> StringSpan[origin_of(self._build)]:
         abort("MojoAkku: this API is not yet implemented")
 
     def __eq__(self, other: Self) -> Bool:
@@ -66,8 +66,8 @@ struct SemVer(Equatable, Copyable, Deinitable, Writable):
 #       def major(self) -> Int
 #       def minor(self) -> Int
 #       def patch(self) -> Int
-#       def prerelease[o: Origin[mut=False]](self) -> StringSpan[o]
-#       def build[o: Origin[mut=False]](self) -> StringSpan[o]
+#       def prerelease(self) -> StringSpan[origin_of(self._prerelease)]
+#       def build(self) -> StringSpan[origin_of(self._build)]
 #       def __eq__(self, other: Self) -> Bool
 #       def __ne__(self, other: Self) -> Bool
 #       def write_to(self, mut writer: Some[Writer])
