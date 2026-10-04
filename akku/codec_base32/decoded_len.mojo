@@ -1,9 +1,9 @@
-from std.os import abort
+from akku.codec_base32._internal.engine import decoded_len_core
 
 
 # Returns a safe upper bound (counts padding and, under IGNORE, whitespace).
 def decoded_len(n: Int) -> Int:
-    abort("MojoAkku: this API is not yet implemented")
+    return decoded_len_core(n)
 
 # API-DOCS-START
 # decoded_len — maximum decoded byte count for n encoded symbols.

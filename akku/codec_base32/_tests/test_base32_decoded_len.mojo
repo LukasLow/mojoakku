@@ -9,6 +9,9 @@
 
 from std.testing import assert_equal, assert_true, TestSuite
 from akku.codec_base32 import (
+    Alphabet,
+    PaddingMode,
+    Whitespace,
     decode,
     decoded_len,
 )
@@ -51,8 +54,22 @@ def test_is_a_conservative_upper_bound() raises:
     assert_true(len(actual) < decoded_len(raw.byte_length()))
 
     var unpadded = "MZXW6YTBOI"
-    assert_equal(len(decode(unpadded)), 6)
-    assert_true(len(decode(unpadded)) <= decoded_len(unpadded.byte_length()))
+    assert_equal(
+        len(
+            decode[Alphabet.B32_STANDARD, PaddingMode.TOLERANT, Whitespace.REJECT](
+                unpadded
+            )
+        ),
+        6,
+    )
+    assert_true(
+        len(
+            decode[Alphabet.B32_STANDARD, PaddingMode.TOLERANT, Whitespace.REJECT](
+                unpadded
+            )
+        )
+        <= decoded_len(unpadded.byte_length())
+    )
 
 def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()

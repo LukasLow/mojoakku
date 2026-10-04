@@ -1,7 +1,7 @@
-from std.os import abort
-
 from .alphabet import Alphabet
 from .padding import Padding
+
+from akku.codec_base32._internal.engine import EncodeState
 
 
 # Encoder — stateful encode value type owning the sub-quantum byte carry.
@@ -11,21 +11,23 @@ struct Encoder[
     alphabet: Alphabet = Alphabet.B32_STANDARD,
     padding: Padding = Padding.REQUIRED,
 ](Deinitable where False):
+    var _state: EncodeState
+
     def __init__(out self):
-        abort("MojoAkku: this API is not yet implemented")
+        self._state = EncodeState()
 
     def feed(mut self, chunk: Span[UInt8, _], mut out: String) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._state.feed[Self.alphabet, Self.padding](chunk, out)
 
     # StringSpan overload: chunk bytes are encoded as-is (no UTF-8 conversion).
     def feed(mut self, chunk: StringSpan, mut out: String) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._state.feed[Self.alphabet, Self.padding](chunk.as_bytes(), out)
 
     def finish(deinit self, mut out: String) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._state.finish[Self.alphabet, Self.padding](out)
 
     def discard(deinit self):
-        abort("MojoAkku: this API is not yet implemented")
+        pass
 
 # API-DOCS-START
 # Encoder — stateful streaming encoder with a mandatory finish.

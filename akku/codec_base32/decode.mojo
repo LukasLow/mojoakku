@@ -1,9 +1,9 @@
-from std.os import abort
-
 from .alphabet import Alphabet
 from .padding_mode import PaddingMode
 from .whitespace import Whitespace
 from .base32_error import Base32Error
+
+from akku.codec_base32._internal.engine import decode_into_core
 
 
 def decode[
@@ -11,7 +11,9 @@ def decode[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](input: StringSpan) raises Base32Error -> List[UInt8]:
-    abort("MojoAkku: this API is not yet implemented")
+    var result = List[UInt8]()
+    _ = decode_into_core[alphabet, padding_mode, whitespace](input.as_bytes(), result)
+    return result^
 
 
 def decode[
@@ -19,7 +21,9 @@ def decode[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](input: Span[UInt8, _]) raises Base32Error -> List[UInt8]:
-    abort("MojoAkku: this API is not yet implemented")
+    var result = List[UInt8]()
+    _ = decode_into_core[alphabet, padding_mode, whitespace](input, result)
+    return result^
 
 # API-DOCS-START
 # decode — decode borrowed encoded text/bytes to an owned List[UInt8].

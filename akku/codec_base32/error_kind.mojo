@@ -1,6 +1,3 @@
-from std.os import abort
-
-
 # ErrorKind — compile-time discriminant for Base32Error; see API-DOCS below.
 struct ErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     var _id: UInt8
@@ -17,7 +14,12 @@ struct ErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
     def write_to(self, mut writer: Some[Writer]):
         # Symbolic names, not the numeric _id. An if/elif chain is used because
         # the `comptime NAME[...]` runtime-index form does not compile.
-        abort("MojoAkku: this API is not yet implemented")
+        if self._id == 0:
+            writer.write("INVALID_SYMBOL")
+        elif self._id == 1:
+            writer.write("INVALID_LENGTH")
+        else:
+            writer.write("INVALID_PADDING")
 
 # API-DOCS-START
 # ErrorKind — the machine-testable reason a decode failed.

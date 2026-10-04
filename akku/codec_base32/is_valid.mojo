@@ -1,8 +1,8 @@
-from std.os import abort
-
 from .alphabet import Alphabet
 from .padding_mode import PaddingMode
 from .whitespace import Whitespace
+
+from akku.codec_base32._internal.engine import is_valid_core
 
 
 # True iff decode with the same parameters would succeed; allocates nothing.
@@ -11,7 +11,7 @@ def is_valid[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](input: StringSpan) -> Bool:
-    abort("MojoAkku: this API is not yet implemented")
+    return is_valid_core[alphabet, padding_mode, whitespace](input.as_bytes())
 
 
 def is_valid[
@@ -19,7 +19,7 @@ def is_valid[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](input: Span[UInt8, _]) -> Bool:
-    abort("MojoAkku: this API is not yet implemented")
+    return is_valid_core[alphabet, padding_mode, whitespace](input)
 
 # API-DOCS-START
 # is_valid — allocation-free validity predicate returning Bool.

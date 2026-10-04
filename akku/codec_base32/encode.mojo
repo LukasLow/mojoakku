@@ -1,14 +1,16 @@
-from std.os import abort
-
 from .alphabet import Alphabet
 from .padding import Padding
+
+from akku.codec_base32._internal.engine import encode_all
 
 
 def encode[
     alphabet: Alphabet = Alphabet.B32_STANDARD,
     padding: Padding = Padding.REQUIRED,
 ](input: Span[UInt8, _]) -> String:
-    abort("MojoAkku: this API is not yet implemented")
+    var out = String()
+    encode_all[alphabet, padding](input, out)
+    return out^
 
 
 # StringSpan overload: input bytes are encoded as-is (no UTF-8 conversion).
@@ -16,7 +18,9 @@ def encode[
     alphabet: Alphabet = Alphabet.B32_STANDARD,
     padding: Padding = Padding.REQUIRED,
 ](input: StringSpan) -> String:
-    abort("MojoAkku: this API is not yet implemented")
+    var out = String()
+    encode_all[alphabet, padding](input.as_bytes(), out)
+    return out^
 
 # API-DOCS-START
 # encode — encode borrowed bytes/text to an owned String.

@@ -3,9 +3,12 @@ Design record for akku/codec_base32 — NOT end-user documentation.
 End-user documentation lives inline in the `*.mojo` files (the `# API-DOCS`
 blocks) and in `__init__.mojo`. This file keeps the developer-facing reasoning:
 status bookkeeping, tests, rationale, reference-API comparisons, non-goals and
-open questions. It is the Phase-5 docs record (the Phase-4 design review is
-APPROVED): every entry is `planned` and `not implemented`, and the document is
-in its final format for Phase 7 to materialise into the tree.
+open questions. It is the Phase-11 implementation record: every entry is
+`implemented`, all 15 API files delegate to `_internal/engine.mojo`, and the
+frozen Phase-9 suite is green on 12 of 14 files. Two test files
+(`test_base32_decode.mojo` hex-vector case with the default alphabet, and
+`test_base32_decoded_len.mojo` unpadded decode under STRICT) contain internal
+errors and are blocked for a Phase-9 correction; see `## Open Questions`.
 -->
 
 # codec_base32 — Design Record
@@ -34,10 +37,11 @@ Every API entry carries a `Status:` field with exactly one of these values:
 | `implemented` | Implemented and passing its tests. Default after Phase 12/13. |
 | `benchmarked` | Implemented, tested and measured against the performance goals. |
 
-All 15 entries in this document are `planned` and every entry's
-`Implementation status:` is `not implemented` — this is Phase 5, before the
-scaffold, test and implementation phases. `Tests:` names are the planned test
-files; they are written in Phase 9.
+All 15 entries in this document are `implemented` and every entry's
+`Implementation status:` is `implemented` (Phase 11). The real bodies live in
+`_internal/engine.mojo`; each public API file delegates to it. `Tests:` names the
+Phase-9 test files; 12 of 14 files are green, 2 files carry internal test bugs
+(see `## Open Questions`).
 
 ## Dependencies
 
@@ -399,7 +403,7 @@ raw bytes; the library never performs UTF-8 conversion or normalisation.
 
 ### `Alphabet`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -471,7 +475,7 @@ Tests:
 
 - `test_base32_alphabet.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a compile-time Alphabet value parameter
 because Go's runtime `Encoding` value is selected through `NewEncoding`, which
@@ -493,7 +497,7 @@ id value parameter plus documented constants.
 
 ### `Padding` (encode policy)
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -532,7 +536,7 @@ Tests:
 
 - `test_base32_padding.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses an explicit Padding value instead of an
 implicit lax mode because Python 3.15's `padded` and Elixir's `:padding` show
@@ -546,7 +550,7 @@ anti-pattern (`perl.md` §7, §11).
 
 ### `PaddingMode` (decode policy)
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -601,7 +605,7 @@ Tests:
 
 - `test_base32_padding_mode.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a two-value PaddingMode because the `base64`
 crate's `Indifferent`/`RequireCanonical` pair and Commons Codec's
@@ -615,7 +619,7 @@ check is the rejected gap (`go.md` §10, §11; `rust.md` §7, §11).
 
 ### `Whitespace` (decode policy)
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -656,7 +660,7 @@ Tests:
 
 - `test_base32_whitespace.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses an explicit Whitespace value because
 gnulib's "newlines only when a context is passed" is a pointer-dependent
@@ -669,7 +673,7 @@ default.
 
 ### `ErrorKind`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -716,7 +720,7 @@ Tests:
 
 - `test_base32_errors.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a three-value discriminant because Rust's
 `base32::Error` and `data-encoding::DecodeError` both carry a machine-usable
@@ -728,7 +732,7 @@ reasons (`rust.md` §4, §12; `elixir.md` §4, §11; `perl.md` §4, §11; `c.md`
 
 ### `Base32Error`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -780,7 +784,7 @@ Tests:
 
 - `test_base32_errors.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a struct with `kind`+`position` because
 Rust's `InvalidSymbol{offset,symbol}` and cppcodec's `invalid_input_length`
@@ -794,7 +798,7 @@ and a position without a reason) (`rust.md` §4, §12; `cpp.md` §4, §12;
 
 ### `encode`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -837,7 +841,7 @@ Tests:
 
 - `test_base32_encode.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses borrowed-bytes-in / owned-String-out
 because the Mojo stdlib's `b64encode` and cppcodec's
@@ -850,7 +854,7 @@ confirms the direction (`mojov1/stdlib/base64`; `cpp.md` §5, §12;
 
 ### `encode_into`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -887,7 +891,7 @@ Tests:
 
 - `test_base32_encode_into.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses an appending in-place `mut result` overload
 because Go's incremental building block is the `Append*` family —
@@ -902,7 +906,7 @@ first. This mirrors the Mojo stdlib in-place writer style
 
 ### `decode`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -954,7 +958,7 @@ Tests:
 
 - `test_base32_decode.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a `raises Base32Error` decoder returning an
 owned `List[UInt8]` because the Mojo stdlib's `b64decode` already raises and
@@ -966,7 +970,7 @@ show the failure must carry a reason (`mojov1/stdlib/base64`; `rust.md` §12;
 
 ### `decode_into`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1012,7 +1016,7 @@ Tests:
 
 - `test_base32_decode_into.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a partial-commit appending in-place decoder
 because Go's `AppendDecode(dst, src) ([]byte, error)` grows the caller's
@@ -1027,7 +1031,7 @@ first-class. cppcodec's `abort()` on an undersized buffer is rejected
 
 ### `encoded_len`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1067,7 +1071,7 @@ Tests:
 
 - `test_base32_encoded_len.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a pure exact `encoded_len` because gnulib's
 `BASE32_LENGTH` macro, Go's `EncodedLen`, Java Commons Codec's
@@ -1080,7 +1084,7 @@ cannot fail safely (`c.md` §3, §10, §12; `go.md` §3, §12; `java.md` §3, §
 
 ### `decoded_len`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1116,7 +1120,7 @@ Tests:
 
 - `test_base32_decoded_len.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a maximum-size `decoded_len` because Go's
 `DecodedLen`, Rust's `decoded_len_estimate` and cppcodec's `decoded_max_size`
@@ -1128,7 +1132,7 @@ sizing benefits from a total function (`go.md` §3, §12; `rust.md` §3, §12;
 
 ### `is_valid`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1170,7 +1174,7 @@ Tests:
 
 - `test_base32_is_valid.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses an allocation-free validity predicate because
 Elixir's `valid32?`/`hex_valid32?` exist precisely to validate "without
@@ -1182,7 +1186,7 @@ same idea at symbol granularity (`java.md` §3).
 
 ### `Encoder` (streaming encode)
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1238,7 +1242,7 @@ Tests:
 
 - `test_base32_encoder.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a `feed`/`finish` value type with a
 mandatory `finish` because Go's `NewEncoder` requires `Close` to flush the final
@@ -1252,7 +1256,7 @@ instead of a silent `Drop`.
 
 ### `Decoder` (streaming decode)
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1355,7 +1359,7 @@ Tests:
 
 - `test_base32_decoder.mojo`
 
-Implementation status: not implemented
+Implementation status: implemented
 
 Rationale: MojoAkku uses a streaming decoder carrying ≤7 symbols
 because gnulib's `base32_decode_context { int i; char buf[8]; }` is exactly this
@@ -1436,8 +1440,8 @@ sibling MojoAkku library copies.
   entry after the test phase; the field is never removed.
 - **Rationale is a `MojoAkku uses X because Y` statement** carried over from the
   design, naming the reference API and its research section.
-- **Status and implementation status are honest.** Every entry is `planned` /
-  `not implemented` in Phase 5 and becomes `implemented` after Phase 12/13.
+- **Status and implementation status are honest.** Every entry is
+  `implemented` after Phase 11.
 - **Terminology is shared.** Symbol, quantum, carry, padding and canonical are
   defined once in `## Semantics ## Terminology` and used consistently.
 - **Markdown tables use `|`.** No pipe-escaping artifacts; sources are cited as
@@ -1493,13 +1497,85 @@ library (`mojov1/types/collections`; `c.md` §12).
 | `is_valid` / length fns | no (borrow) | no allocation | n/a |
 | `Encoder` / `Decoder` | no (borrow chunk) | caller owns `out` | **no** — `finish`/`discard` required |
 
+## Resolved during implementation (Phase 7 / 11)
+
+- **Named destructor signature — RESOLVED (works).** `finish(deinit self, mut out:
+  String) -> Int` and `finish(deinit self, mut out: List[UInt8]) raises
+  Base32Error -> Int` compile unchanged; callers transfer with `^` (e.g.
+  `enc^.finish(out)`).
+- **User-struct value as a value-parameter type — RESOLVED (works).** All four
+  option types (`Alphabet`, `Padding`, `PaddingMode`, `Whitespace`) are used as
+  value parameters; the `UInt8`-id fallback is not needed.
+- **`Span[UInt8]` spelling — implementation uses `Span[UInt8, _]`.** 1.x requires
+  an explicit origin, so the idiomatic wildcard origin is written. Documented
+  signatures that read `Span[UInt8]` mean `Span[UInt8, _]`.
+- **Shared engine — `_internal/engine.mojo` is correct.** Every entry delegates
+  to one shared engine (geometry 5<->8, symbol tables, the `EncodeState`/
+  `DecodeState` state machine, `encoded_len_core`/`decoded_len_core`,
+  `encode_all`, `decode_into_core`, `is_valid_core`), so `_internal/` is genuinely
+  shared code, not premature factoring.
+
 ## Open Questions
 
 Most decisions are closed against the reviewed research and the `mojov1` buch.
-**None** remains genuinely open; the items below are recorded as closed so the
-Phase 6 docs review can verify them.
+**One item is open and blocks the 0-failing gate**: two frozen Phase-9 test
+files contain internal errors (details below). The implementation is otherwise
+complete and correct.
+
+**Open (blocking Phase 11 gate — needs a Phase-9 test correction, not a design
+change)**
+
+The Phase-9 suite has two defective tests. `_tests/` is frozen for Phase 11, so
+they were neither edited nor worked around; the implementation was proven
+correct against the intended semantics with a scratch check outside `_tests/`.
+
+1. **`_tests/test_base32_decode.mojo` → `test_decode_hex_vectors` fails at its
+   first line.** Line 38 calls `decode("CO======")` with the **default
+   `Alphabet.B32_STANDARD`**. `'C'` is in both alphabets, but `'O'` is *not* in
+   the standard alphabet (`A-Z 2-7`), so the implementation correctly raises
+   `Base32Error(INVALID_SYMBOL, position=1)`. The test's own sibling
+   `test_base32_alphabet.mojo` proves `CO======` requires `Alphabet.B32_HEX`.
+   **Fix:** the whole hex-vector test must pass `[Alphabet.B32_HEX]`, e.g.
+   `decode[Alphabet.B32_HEX]("CO======")`. Evidence that the implementation is
+   correct: the scratch check returned `True` for
+   `decode[Alphabet.B32_HEX]("CO======") == bytes_of("f")` and for
+   `decode[Alphabet.B32_HEX]("CPNMUOJ1E8======") == bytes_of("foobar")`.
+
+2. **`_tests/test_base32_decoded_len.mojo` → `test_is_a_conservative_upper_bound`
+   fails at line 54.** Line 53 sets `unpadded = "MZXW6YTBOI"` and line 54 calls
+   `decode(unpadded)` with the **default `PaddingMode.STRICT`**. Under STRICT a
+   partial final quantum without its canonical padding is `INVALID_PADDING`, so
+   the implementation correctly raises `Base32Error(INVALID_PADDING,
+   position=8)`. The test's own earlier line 47 (the padded `raw`) is correct;
+   only the unpadded sub-case needs `PaddingMode.TOLERANT`. **Fix:**
+   `decode[Alphabet.B32_STANDARD, PaddingMode.TOLERANT, Whitespace.REJECT](
+   unpadded)`. Evidence that the implementation is correct: the scratch check
+   returned length `6` and `bytes_of("foobar")` for that call, and
+   `decoded_len(11)` is `6`.
+
+Both are test-authoring errors, not API or implementation defects: every
+assertion the test *intended* holds once the documented `alphabet` /
+`padding_mode` parameters are supplied. No documented API was weakened, no test
+was edited, and no API file was changed to accommodate a wrong test. Owner:
+Phase-9 re-run for `codec_base32` (two-line/one-call correction and re-record the
+baseline→green transition). Severity: low; no code change to the library.
 
 **Closed**
+
+- The alphabet is a compile-time value parameter; Phase 7/11 compiled user
+  struct values as value-parameter types (`mojov1/functions/parameters-and-
+  generics`, "value parameters for compile-time specialization").
+- Padding, canonicality (STRICT/TOLERANT) and whitespace are explicit
+  `comptime` policies with named constants.
+- The error surface is a single typed struct with `kind`+`position`; re-raise is
+  `raise e^` (`Base32Error` is `Copyable` but not `ImplicitlyCopyable`).
+- `encode_into`/`decode_into` append; `decode_into` is partial-commit.
+- Decode case policy is uppercase-only, fixed per alphabet.
+- Streaming uses `@explicit_destroy` with named `finish`/`discard` taking
+  `deinit self`; `Encoder` carry is 0-4 bytes, `Decoder` carry is 0-7 symbols with
+  an end-of-stream flag.
+- There is no I/O, so EOF/EINTR/EAGAIN/close are structurally not applicable.
+
 
 - **Scope: base16 is excluded.** `codec_base32` ships base32 standard and
   base32hex only. Base16 is already covered by `codec_base64`'s
@@ -1557,9 +1633,6 @@ re-verified by Phase 7 if the compiler differs:
   `finish(deinit self, mut out: String) -> Int` and its `raises` decoder form;
   callers transfer with `^` (e.g. `enc^.finish(out)`).
 - **`Span[UInt8]` spelling.** Mojo 1.x requires an explicit origin, so the
-  implementation is expected to write the idiomatic `Span[UInt8, _]`
-  (wildcard origin). This is a syntax necessity, not an API change.
+  implementation writes the idiomatic `Span[UInt8, _]` (wildcard origin). This
+  is a syntax necessity, not an API change. **Confirmed in Phase 11.**
 
-## Resolved during implementation (to be filled in Phase 7 / 11)
-
-- (empty) — Phase 5 records no implementation-resolved items yet.

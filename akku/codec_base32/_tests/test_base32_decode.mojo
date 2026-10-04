@@ -8,6 +8,7 @@
 
 from std.testing import assert_equal, assert_true, TestSuite
 from akku.codec_base32 import (
+    Alphabet,
     ErrorKind,
     encode,
     decode,
@@ -35,12 +36,12 @@ def test_decode_standard_vectors() raises:
     assert_equal(decode("MZXW6YTBOI======"), bytes_of("foobar"))
 
 def test_decode_hex_vectors() raises:
-    assert_equal(decode("CO======"), bytes_of("f"))
-    assert_equal(decode("CPNG===="), bytes_of("fo"))
-    assert_equal(decode("CPNMU==="), bytes_of("foo"))
-    assert_equal(decode("CPNMUOG="), bytes_of("foob"))
-    assert_equal(decode("CPNMUOJ1"), bytes_of("fooba"))
-    assert_equal(decode("CPNMUOJ1E8======"), bytes_of("foobar"))
+    assert_equal(decode[Alphabet.B32_HEX]("CO======"), bytes_of("f"))
+    assert_equal(decode[Alphabet.B32_HEX]("CPNG===="), bytes_of("fo"))
+    assert_equal(decode[Alphabet.B32_HEX]("CPNMU==="), bytes_of("foo"))
+    assert_equal(decode[Alphabet.B32_HEX]("CPNMUOG="), bytes_of("foob"))
+    assert_equal(decode[Alphabet.B32_HEX]("CPNMUOJ1"), bytes_of("fooba"))
+    assert_equal(decode[Alphabet.B32_HEX]("CPNMUOJ1E8======"), bytes_of("foobar"))
 
 def test_decode_binary_bytes_round_trip() raises:
     var data = List[UInt8]()

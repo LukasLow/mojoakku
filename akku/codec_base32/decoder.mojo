@@ -1,9 +1,9 @@
-from std.os import abort
-
 from .alphabet import Alphabet
 from .padding_mode import PaddingMode
 from .whitespace import Whitespace
 from .base32_error import Base32Error
+
+from akku.codec_base32._internal.engine import DecodeState
 
 
 # Decoder — stateful decode value type owning the sub-quantum character carry.
@@ -15,21 +15,23 @@ struct Decoder[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](Deinitable where False):
+    var _state: DecodeState
+
     def __init__(out self):
-        abort("MojoAkku: this API is not yet implemented")
+        self._state = DecodeState()
 
     def feed(mut self, chunk: StringSpan, mut out: List[UInt8]) raises Base32Error -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._state.feed_chunk[Self.alphabet, Self.padding_mode, Self.whitespace](chunk.as_bytes(), out)
 
     # Span[UInt8] overload of Decoder.feed.
     def feed(mut self, chunk: Span[UInt8, _], mut out: List[UInt8]) raises Base32Error -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._state.feed_chunk[Self.alphabet, Self.padding_mode, Self.whitespace](chunk, out)
 
     def finish(deinit self, mut out: List[UInt8]) raises Base32Error -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return self._state.finish[Self.alphabet, Self.padding_mode](True, out)
 
     def discard(deinit self):
-        abort("MojoAkku: this API is not yet implemented")
+        pass
 
 # API-DOCS-START
 # Decoder — stateful streaming decoder with a mandatory finish.

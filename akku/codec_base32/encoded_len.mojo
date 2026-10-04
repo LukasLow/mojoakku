@@ -1,13 +1,13 @@
-from std.os import abort
-
 from .padding import Padding
+
+from akku.codec_base32._internal.engine import encoded_len_core
 
 
 # n < 0 is defined to return 0 rather than trap (caller programming error).
 def encoded_len[
     padding: Padding = Padding.REQUIRED,
 ](n: Int) -> Int:
-    abort("MojoAkku: this API is not yet implemented")
+    return encoded_len_core[padding](n)
 
 # API-DOCS-START
 # encoded_len — exact encoded length for n raw input bytes.

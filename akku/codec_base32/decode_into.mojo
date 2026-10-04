@@ -1,9 +1,9 @@
-from std.os import abort
-
 from .alphabet import Alphabet
 from .padding_mode import PaddingMode
 from .whitespace import Whitespace
 from .base32_error import Base32Error
+
+from akku.codec_base32._internal.engine import decode_into_core
 
 
 # Partial-commit append: whole quanta decoded before the first bad quantum stay in result.
@@ -12,7 +12,7 @@ def decode_into[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](input: StringSpan, mut result: List[UInt8]) raises Base32Error -> Int:
-    abort("MojoAkku: this API is not yet implemented")
+    return decode_into_core[alphabet, padding_mode, whitespace](input.as_bytes(), result)
 
 
 def decode_into[
@@ -20,7 +20,7 @@ def decode_into[
     padding_mode: PaddingMode = PaddingMode.STRICT,
     whitespace: Whitespace = Whitespace.REJECT,
 ](input: Span[UInt8, _], mut result: List[UInt8]) raises Base32Error -> Int:
-    abort("MojoAkku: this API is not yet implemented")
+    return decode_into_core[alphabet, padding_mode, whitespace](input, result)
 
 # API-DOCS-START
 # decode_into — decode borrowed encoded text/bytes into a caller-owned List.

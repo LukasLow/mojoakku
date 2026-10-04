@@ -1,5 +1,3 @@
-from std.os import abort
-
 from .error_kind import ErrorKind
 
 
@@ -10,7 +8,7 @@ struct Base32Error(Copyable, Deinitable, Writable):
     var position: Int
 
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write("Base32Error(", self.kind, ", position=", self.position, ")")
 
 # API-DOCS-START
 # Base32Error — the one typed error every decoder declares via `raises`.
