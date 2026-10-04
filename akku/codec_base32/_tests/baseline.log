@@ -1,0 +1,31 @@
+== mojo run -I . akku/codec_base32/_tests/test_base32_alphabet.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/encode.mojo:19:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/codec_base32/_tests/test_base32_decode.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/decode.mojo:14:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/codec_base32/_tests/test_base32_decode_into.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/decode_into.mojo:15:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/codec_base32/_tests/test_base32_decoded_len.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/decoded_len.mojo:6:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/codec_base32/_tests/test_base32_decoder.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/decoder.mojo:19:14: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/codec_base32/_tests/test_base32_encode.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/encode.mojo:19:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/codec_base32/_tests/test_base32_encode_into.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/encode_into.mojo:19:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/codec_base32/_tests/test_base32_encoded_len.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/encoded_len.mojo:10:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/codec_base32/_tests/test_base32_encoder.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/encoder.mojo:15:14: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/codec_base32/_tests/test_base32_errors.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/decode.mojo:14:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/codec_base32/_tests/test_base32_is_valid.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/is_valid.mojo:14:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/codec_base32/_tests/test_base32_padding.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/encode.mojo:19:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/codec_base32/_tests/test_base32_padding_mode.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/decode.mojo:14:10: MojoAkku: this API is not yet implemented
+== mojo run -I . akku/codec_base32/_tests/test_base32_whitespace.mojo
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/codec_base32/decode.mojo:14:10: MojoAkku: this API is not yet implemented
+--------
+baseline: 14 files, 0 passed, 14 failed
+  failures: 14 stub abort, 0 compile/import error, 0 other
