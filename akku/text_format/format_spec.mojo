@@ -1,5 +1,3 @@
-from std.os import abort
-
 from .alignment import Alignment
 from .format_type import FormatType
 from .grouping import Grouping
@@ -55,7 +53,18 @@ struct FormatSpec(Copyable, ImplicitlyCopyable, Deinitable, Equatable, Writable)
 
     # write_to — the grammar-like form, used by print(spec).
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write(
+            "FormatSpec(width=", self.width,
+            ", precision=", self.precision,
+            ", fill=", String(self.fill),
+            ", align=", self.align,
+            ", sign=", self.sign,
+            ", alt_form=", self.alt_form,
+            ", zero_pad=", self.zero_pad,
+            ", grouping=", self.grouping,
+            ", presentation=", self.presentation,
+            ")",
+        )
 
 # API-DOCS-START
 # FormatSpec — the fully resolved format specification a value is rendered under.

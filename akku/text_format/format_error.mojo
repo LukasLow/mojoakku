@@ -12,7 +12,10 @@ struct FormatError(Copyable, Deinitable, Writable):
 
     # write_to — readable kind + position + message, used by print(err).
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        writer.write(
+            "FormatError(", self.kind, ", position=", self.position,
+            ", ", self.message, ")",
+        )
 
 # API-DOCS-START
 # FormatError — the one typed error every failing formatting operation declares.

@@ -15,7 +15,12 @@ struct SignMode(Equatable, ImplicitlyCopyable, Deinitable, Writable):
 
     # write_to — symbolic name, not the numeric _id.
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        if self._id == 0:
+            writer.write("NEGATIVE_ONLY")
+        elif self._id == 1:
+            writer.write("ALWAYS")
+        else:
+            writer.write("SPACE")
 
 # API-DOCS-START
 # SignMode — how the sign of a numeric value is rendered.

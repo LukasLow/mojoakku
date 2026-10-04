@@ -1,0 +1,87 @@
+Phase-11 green test log for akku/text_format.
+
+Exact suite command:
+  cd .worktrees/text-format/akku/text_format && task test
+
+The task test runner delegates to:
+  sh ../../.repo/scrupts/libraries.sh test
+  which runs each _tests/*.mojo with `mojo run`.
+
+Sun Oct  4 00:42:42 UTC 2026
+
+--- per-file pass/fail (classification runner) ---
+== mojo run -I . akku/text_format/_tests/test_text_format_alignment.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_error.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_error_kind.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_format_args.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_format_bool.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_format_float.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_format_int.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_format_spec.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_format_string.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_format_template.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_format_template_to.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_format_type.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_grouping.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_parse_spec.mojo
+   result: PASS
+== mojo run -I . akku/text_format/_tests/test_text_format_sign_mode.mojo
+   result: PASS
+--------
+baseline: 15 files, 15 passed, 0 failed
+  failures: 0 stub abort, 0 compile/import error, 0 other
+note: the suite holds 112 test functions across 15 files. A stub
+      `abort` stops the process on its first call, so no per-test
+      passed/failed count is reachable in the red phase; the file count
+      (15) is the honest measure.
+Summary [ 0.005 ] 5 tests run: 5 passed , 0 failed , 0 skipped 
+Summary [ 0.001 ] 5 tests run: 5 passed , 0 failed , 0 skipped 
+Summary [ 0.007 ] 4 tests run: 4 passed , 0 failed , 0 skipped 
+Summary [ 0.005 ] 5 tests run: 5 passed , 0 failed , 0 skipped 
+Summary [ 0.001 ] 8 tests run: 8 passed , 0 failed , 0 skipped 
+Summary [ 0.011 ] 14 tests run: 14 passed , 0 failed , 0 skipped 
+Summary [ 0.014 ] 14 tests run: 14 passed , 0 failed , 0 skipped 
+Summary [ 0.008 ] 5 tests run: 5 passed , 0 failed , 0 skipped 
+Summary [ 0.003 ] 12 tests run: 12 passed , 0 failed , 0 skipped 
+Summary [ 0.018 ] 15 tests run: 15 passed , 0 failed , 0 skipped 
+Summary [ 0.008 ] 4 tests run: 4 passed , 0 failed , 0 skipped 
+Summary [ 0.004 ] 4 tests run: 4 passed , 0 failed , 0 skipped 
+Summary [ 0.003 ] 3 tests run: 3 passed , 0 failed , 0 skipped 
+Summary [ 0.001 ] 11 tests run: 11 passed , 0 failed , 0 skipped 
+Summary [ 0.003 ] 3 tests run: 3 passed , 0 failed , 0 skipped 
+
+--- exact `task test` per-file summaries (112 tests total) ---
+Summary [ 0.003 ] 5 tests run: 5 passed , 0 failed , 0 skipped 
+Summary [ 0.002 ] 5 tests run: 5 passed , 0 failed , 0 skipped 
+Summary [ 0.003 ] 4 tests run: 4 passed , 0 failed , 0 skipped 
+Summary [ 0.005 ] 5 tests run: 5 passed , 0 failed , 0 skipped 
+Summary [ 0.001 ] 8 tests run: 8 passed , 0 failed , 0 skipped 
+Summary [ 0.012 ] 14 tests run: 14 passed , 0 failed , 0 skipped 
+Summary [ 0.006 ] 14 tests run: 14 passed , 0 failed , 0 skipped 
+Summary [ 0.003 ] 5 tests run: 5 passed , 0 failed , 0 skipped 
+Summary [ 0.003 ] 12 tests run: 12 passed , 0 failed , 0 skipped 
+Summary [ 0.016 ] 15 tests run: 15 passed , 0 failed , 0 skipped 
+Summary [ 0.008 ] 4 tests run: 4 passed , 0 failed , 0 skipped 
+Summary [ 0.004 ] 4 tests run: 4 passed , 0 failed , 0 skipped 
+Summary [ 0.010 ] 3 tests run: 3 passed , 0 failed , 0 skipped 
+Summary [ 0.001 ] 11 tests run: 11 passed , 0 failed , 0 skipped 
+Summary [ 0.004 ] 3 tests run: 3 passed , 0 failed , 0 skipped 
+
+--- final `task test` run (exact command, exit 0) ---
+
+All text_format tests passed.
+
+Total: 112 test functions, 112 passed, 0 failed (15/15 files PASS).

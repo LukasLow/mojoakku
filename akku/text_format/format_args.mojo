@@ -1,5 +1,3 @@
-from std.os import abort
-
 from akku.text_format._internal.format_arg import FormatArg
 
 
@@ -13,29 +11,32 @@ struct FormatArgs(Deinitable):
 
     # push_int — append one Int argument at the end.
     def push_int(mut self, var value: Int):
-        abort("MojoAkku: this API is not yet implemented")
+        self._args.append(FormatArg(value))
 
     # push_float — append one Float64 argument at the end.
     def push_float(mut self, var value: Float64):
-        abort("MojoAkku: this API is not yet implemented")
+        self._args.append(FormatArg(value))
 
     # push_string — append one owned String argument at the end.
     def push_string(mut self, var value: String):
-        abort("MojoAkku: this API is not yet implemented")
+        self._args.append(FormatArg(value^))
 
     # push_bool — append one Bool argument at the end.
     def push_bool(mut self, var value: Bool):
-        abort("MojoAkku: this API is not yet implemented")
+        self._args.append(FormatArg(value))
 
     # count — the number of arguments pushed so far.
     def count(self) -> Int:
-        abort("MojoAkku: this API is not yet implemented")
+        return len(self._args)
+
+    # _arg — the stored argument at `index` (internal; not public API).
+    def _arg(self, index: Int) -> FormatArg:
+        return self._args[index]
 
 # API-DOCS-START
 # FormatArgs — an ordered, typed argument list for format_template.
 # Signature:
 #   struct FormatArgs(Deinitable):
-#       var _args: List[FormatArg]
 #       def __init__(out self)
 #       def push_int(mut self, var value: Int)
 #       def push_float(mut self, var value: Float64)

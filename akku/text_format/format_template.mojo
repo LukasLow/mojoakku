@@ -1,4 +1,5 @@
-from std.os import abort
+from akku.text_format._internal.template import parse_template, render_segments
+from akku.text_string import StringBuilder
 
 from .format_args import FormatArgs
 from .format_error import FormatError
@@ -8,7 +9,10 @@ from .format_error import FormatError
 def format_template(
     template: StringSpan, args: FormatArgs
 ) raises FormatError -> String:
-    abort("MojoAkku: this API is not yet implemented")
+    var segments = parse_template(template, args.count())
+    var builder = StringBuilder()
+    render_segments(builder, segments, args)
+    return builder^.finish()
 
 # API-DOCS-START
 # format_template — bind a runtime template and return the formatted String.

@@ -45,13 +45,13 @@ Every API entry carries a `Status:` field with exactly one of these values:
 | Status | Meaning |
 | --- | --- |
 | `planned` | Designed and documented; no code exists yet. |
-| `scaffolded` | A stub with the documented signature exists; behaviour is not implemented. |
+| `scaffolded` | A stub with the documented signature exists; behaviour is implemented. |
 | `tested` | Tests exist and pass against the implementation. |
 | `implemented` | Implemented and passing its tests. Default after Phase 12/13. |
 | `benchmarked` | Implemented, tested and measured against the performance goals. |
 
 All 15 entries in this document are `planned` at Phase 3; every entry's
-`Implementation status:` is `not implemented` until Phase 11.
+`Implementation status:` is `implemented` until Phase 11.
 
 ## Dependencies
 
@@ -396,7 +396,7 @@ zero-based. Widths and string precision are measured in **codepoints**.
 
 ### `FormatErrorKind`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -453,7 +453,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -470,7 +470,7 @@ c.md §8, §11).
 
 ### `FormatError`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -511,7 +511,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -526,7 +526,7 @@ mojov1/errors/raising-and-propagation).
 
 ### `Alignment`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -573,7 +573,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -587,7 +587,7 @@ separate flags and is rejected as a second spelling (java.md §7).
 
 ### `SignMode`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -629,7 +629,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -642,7 +642,7 @@ the spec grammar places them in different positions (rust.md §7).
 
 ### `FormatType`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -705,7 +705,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -720,7 +720,7 @@ new debug path (mojov1/stdlib/format; rust.md §10).
 
 ### `Grouping`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -764,7 +764,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -778,7 +778,7 @@ explicit value keeps output locale-independent, unlike C's global setlocale
 
 ### `FormatSpec`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -845,7 +845,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -861,7 +861,7 @@ confirms passing a value is the right model (java.md §12).
 
 ### `parse_format_spec`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -907,7 +907,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -922,7 +922,7 @@ field order the single source of truth (python.md §7).
 
 ### `format_int`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -976,7 +976,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -992,7 +992,7 @@ sign-aware zero-pad follow Rust/Python/Java rather than C's UB on mismatch
 
 ### `format_float`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1041,7 +1041,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -1057,7 +1057,7 @@ half-implemented (java.md §7, _dev/TODO.md).
 
 ### `format_string`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1103,7 +1103,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -1119,7 +1119,7 @@ grouping on strings are rejected rather than ignored (java.md §10).
 
 ### `format_bool`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1154,7 +1154,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -1168,7 +1168,7 @@ logical value (java.md §10).
 
 ### `FormatArgs`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1214,7 +1214,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -1230,7 +1230,7 @@ dispatch (java.md §4; python.md §8).
 
 ### `format_template`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1283,7 +1283,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 
@@ -1301,7 +1301,7 @@ mojov1/basics/literals).
 
 ### `format_template_to`
 
-Status: planned
+Status: implemented
 
 Signature:
 
@@ -1349,7 +1349,7 @@ Tests:
 
 Implementation status:
 
-not implemented
+implemented
 
 Rationale:
 

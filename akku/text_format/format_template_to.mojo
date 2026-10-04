@@ -1,4 +1,4 @@
-from std.os import abort
+from akku.text_format._internal.template import parse_template, render_segments
 
 from .format_args import FormatArgs
 from .format_error import FormatError
@@ -8,7 +8,9 @@ from .format_error import FormatError
 def format_template_to(
     mut writer: Some[Writer], template: StringSpan, args: FormatArgs
 ) raises FormatError:
-    abort("MojoAkku: this API is not yet implemented")
+    # Parse everything first: a parse-stage error must write nothing.
+    var segments = parse_template(template, args.count())
+    render_segments(writer, segments, args)
 
 # API-DOCS-START
 # format_template_to — bind a runtime template and write it through a Writer.

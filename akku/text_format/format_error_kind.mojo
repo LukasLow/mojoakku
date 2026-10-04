@@ -17,7 +17,16 @@ struct FormatErrorKind(Equatable, ImplicitlyCopyable, Deinitable, Writable):
 
     # write_to — symbolic name, not the numeric _id.
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        if self._id == 0:
+            writer.write("MALFORMED_TEMPLATE")
+        elif self._id == 1:
+            writer.write("INVALID_SPEC")
+        elif self._id == 2:
+            writer.write("MISSING_ARGUMENT")
+        elif self._id == 3:
+            writer.write("EXTRA_ARGUMENT")
+        else:
+            writer.write("TYPE_MISMATCH")
 
 # API-DOCS-START
 # FormatErrorKind — the machine-testable reason a formatting operation failed.

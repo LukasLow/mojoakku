@@ -17,7 +17,16 @@ struct Alignment(Equatable, ImplicitlyCopyable, Deinitable, Writable):
 
     # write_to — symbolic name, not the numeric _id.
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        if self._id == 0:
+            writer.write("DEFAULT")
+        elif self._id == 1:
+            writer.write("LEFT")
+        elif self._id == 2:
+            writer.write("RIGHT")
+        elif self._id == 3:
+            writer.write("CENTER")
+        else:
+            writer.write("SIGN_AWARE")
 
 # API-DOCS-START
 # Alignment — how a formatted value is padded to its field width.

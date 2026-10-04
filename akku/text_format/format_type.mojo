@@ -24,7 +24,30 @@ struct FormatType(Equatable, ImplicitlyCopyable, Deinitable, Writable):
 
     # write_to — symbolic name, not the numeric _id.
     def write_to(self, mut writer: Some[Writer]):
-        abort("MojoAkku: this API is not yet implemented")
+        if self._id == 0:
+            writer.write("DEFAULT")
+        elif self._id == 1:
+            writer.write("BINARY")
+        elif self._id == 2:
+            writer.write("OCTAL")
+        elif self._id == 3:
+            writer.write("DECIMAL")
+        elif self._id == 4:
+            writer.write("LOWER_HEX")
+        elif self._id == 5:
+            writer.write("UPPER_HEX")
+        elif self._id == 6:
+            writer.write("CHAR")
+        elif self._id == 7:
+            writer.write("STRING")
+        elif self._id == 8:
+            writer.write("REPR")
+        elif self._id == 9:
+            writer.write("FIXED")
+        elif self._id == 10:
+            writer.write("SCIENTIFIC")
+        else:
+            writer.write("UPPER_SCIENTIFIC")
 
 # API-DOCS-START
 # FormatType — the form a value takes in the output (radix, float style, text).
