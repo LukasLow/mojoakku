@@ -3,9 +3,9 @@ Design record for akku/codec_base32 — NOT end-user documentation.
 End-user documentation lives inline in the `*.mojo` files (the `# API-DOCS`
 blocks) and in `__init__.mojo`. This file keeps the developer-facing reasoning:
 status bookkeeping, tests, rationale, reference-API comparisons, non-goals and
-open questions. It reflects the state after Phase 3 (API design, awaiting the
-user approval gate and Phase 4 design review): every entry is `planned` and
-`not implemented`.
+open questions. It is the Phase-5 docs record (the Phase-4 design review is
+APPROVED): every entry is `planned` and `not implemented`, and the document is
+in its final format for Phase 7 to materialise into the tree.
 -->
 
 # codec_base32 — Design Record
@@ -35,8 +35,9 @@ Every API entry carries a `Status:` field with exactly one of these values:
 | `benchmarked` | Implemented, tested and measured against the performance goals. |
 
 All 15 entries in this document are `planned` and every entry's
-`Implementation status:` is `not implemented` — this is Phase 3, before the
-scaffold, test and implementation phases.
+`Implementation status:` is `not implemented` — this is Phase 5, before the
+scaffold, test and implementation phases. `Tests:` names are the planned test
+files; they are written in Phase 9.
 
 ## Dependencies
 
@@ -1436,7 +1437,7 @@ sibling MojoAkku library copies.
 - **Rationale is a `MojoAkku uses X because Y` statement** carried over from the
   design, naming the reference API and its research section.
 - **Status and implementation status are honest.** Every entry is `planned` /
-  `not implemented` in Phase 3 and becomes `implemented` after Phase 12/13.
+  `not implemented` in Phase 5 and becomes `implemented` after Phase 12/13.
 - **Terminology is shared.** Symbol, quantum, carry, padding and canonical are
   defined once in `## Semantics ## Terminology` and used consistently.
 - **Markdown tables use `|`.** No pipe-escaping artifacts; sources are cited as
@@ -1495,8 +1496,8 @@ library (`mojov1/types/collections`; `c.md` §12).
 ## Open Questions
 
 Most decisions are closed against the reviewed research and the `mojov1` buch.
-**None** remains genuinely open at Phase 3; the items below are recorded as
-closed so the Phase 4 review can verify them.
+**None** remains genuinely open; the items below are recorded as closed so the
+Phase 6 docs review can verify them.
 
 **Closed**
 
@@ -1561,4 +1562,4 @@ re-verified by Phase 7 if the compiler differs:
 
 ## Resolved during implementation (to be filled in Phase 7 / 11)
 
-- (empty) — Phase 3 records no implementation-resolved items yet.
+- (empty) — Phase 5 records no implementation-resolved items yet.
