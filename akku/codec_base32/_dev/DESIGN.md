@@ -40,16 +40,30 @@ scaffold, test and implementation phases.
 
 ## Dependencies
 
-`codec_base32` has **no dependency edge to any sibling MojoAkku library**. It is
-a leaf in the dependency graph: it depends only on the Mojo standard library.
-The catalogue file `.repo/todo/codec_base32.yml` declares
-`depends_on: [codec_base64]`, but that is a **build-ordering hint in the
-catalogue, not a code import**: nothing in this library's signatures or bodies
-needs a type or function from `codec_base64`.
+`codec_base32` has **no code import edge to any sibling MojoAkku library**. It
+imports nothing from `codec_base64` and depends only on the Mojo standard
+library, so it is a leaf in the *code* dependency graph. The catalogue file
+`.repo/todo/codec_base32.yml` nonetheless declares
+`depends_on: [codec_base64]`.
+
+- **That catalogue `depends_on` is a deliberate build-ordering / name-family
+  hint, not a code-import edge.** The two libraries are the RFC 4648 family and
+  are built base64-first (base64 shipped, base32 is its sibling); the edge
+  records that ordering so `task todo` / `task waiting` surface `codec_base32`
+  only after `codec_base64` is `done`. The catalogue README defines `depends_on`
+  as a *conceptual graph edge* that gates buildability, and explicitly says an
+  edge "is a **conceptual dependency**, never physical nesting"; it does not
+  require an import. `codec_base32` imports nothing from `codec_base64`.
+- **The edge is retained, not removed.** Removing it would lose the explicit
+  record that the RFC 4648 family is built base64-first, and would make the two
+  catalogue files silently inconsistent about the family ordering. Because
+  `codec_base64` is already `status: done`, the edge never blocks `codec_base32`
+  anyway. This document and `.repo/todo/codec_base32.yml` agree: the catalogue
+  edge names an ordering, the code edge is absent.
 
 | Library | Edge | Justification |
 | --- | --- | --- |
-| (none) | — | Encoding and decoding are pure in-memory transforms over `Span`, `StringSpan`, `String`, `List`, `Array`, `Bool`, `Int` and `UInt8`. No signature mentions a base64 concept, so no sibling edge can be technically justified. The catalogue's `codec_base64` ordering is satisfied by the fact that both libraries only depend on the Mojo standard library. |
+| (none, in code) | — | Encoding and decoding are pure in-memory transforms over `Span`, `StringSpan`, `String`, `List`, `Array`, `Bool`, `Int` and `UInt8`. No signature mentions a base64 concept, so no code edge can be technically justified. The catalogue's `codec_base64` ordering is a build-order/name-family marker only (see above); it imports nothing. |
 
 - **Why a leaf.** A dependency edge exists only when a library needs another
   library's public types or functions. `codec_base32` needs none: every parameter
@@ -296,7 +310,7 @@ right column are the reference APIs cited in the justifications below.
 | Variant as type / zero-cost specialization | cppcodec `detail::codec<detail::base32<…>>`, `generates_padding()`/`requires_padding()`/`should_ignore()`; `data-encoding` `BASE32`/`BASE32HEX` constants | `cpp.md` §7, §10, §12; `rust.md` §3, §12 |
 | Padding as explicit policy | Rust `base32` `Option<u8>` padding + valid runs `[0,6,4,3,1]`; Go `WithPadding`/`NoPadding`; Python 3.15 `padded`; Elixir `:padding` | `rust.md` §3, §7, §12; `go.md` §3, §7; `python.md` §3, §7, §12; `elixir.md` §3, §7 |
 | Canonicality as explicit policy | gnulib trailing-bit masking `& 0x03`/`& 0x0f`/`& 0x01`/`& 0x07`; `data-encoding` `check_trailing_bits`; Python 3.15 `canonical`; Commons Codec `CodecPolicy.STRICT` | `c.md` §4, §10, §12; `rust.md` §7, §12; `python.md` §3, §7; `java.md` §4, §7 |
-| Decode padding modes | Rust `DecodePaddingMode`; Commons Codec `LENIENT`/`STRICT`; Java "padding accepted but not required" | `rust.md` §7, §12; `java.md` §4, §7 |
+| Decode padding modes | Rust `base64` crate `DecodePaddingMode` (`Indifferent`/`RequireCanonical`/`RequireNone`) and `with_decode_allow_trailing_bits`; Commons Codec `LENIENT`/`STRICT`; Java "padding accepted but not required" | `codec_base64/_dev/rust.md` §7; `java.md` §4, §7 |
 | Explicit ignore/whitespace policy | gnulib `ctx`-scoped newline skipping with `ctx == NULL` = strict; cppcodec `should_ignore` = false for RFC 4648 variants; libsodium-style `ignore` (base64 sibling) | `c.md` §7, §10, §12; `cpp.md` §7 |
 | Byte-first borrowed in / owned out | Mojo stdlib `b64encode(Span[UInt8]) -> String`, `b64decode(StringSpan) -> List[UInt8]`; cppcodec `encode(...) -> std::string`; Rust `encode(&[u8]) -> String` | `mojov1/stdlib/base64`; `cpp.md` §5, §12; `rust.md` §5, §12 |
 | In-place / append output | Go `AppendEncode(dst, src) []byte` / `AppendDecode(dst, src) ([]byte, error)`; Java `encode(byte[],int,int)` + `getEncodedLength`; cppcodec `Result&` refill | `go.md` §3, §5, §12; `java.md` §3, §5, §12; `cpp.md` §5, §12 |
@@ -556,17 +570,19 @@ Semantics:
   - `STRICT` — RFC 4648 canonical input only: if the final quantum is partial,
     the exact number of `=` symbols must be present (data-symbol counts 2, 4, 5
     or 7); a full final quantum must carry no `=`; a partial quantum with no
-    padding is `INVALID_PADDING`. This is Rust's `RequireCanonical` plus a
-    canonicality check (`rust.md` §7; `c.md` §4, §10).
+    padding is `INVALID_PADDING`. This is the `base64` crate's `RequireCanonical`
+    plus a canonicality check (`codec_base64/_dev/rust.md` §7; `c.md` §4, §10).
   - `TOLERANT` — the final quantum may be padded or unpadded (Java's "accepted
     and interpreted …, but is not required"). If padding is present its count
     must still be exactly right, padding may only occur at the end, and no
     symbol may follow it, and a remainder of 1, 3 or 6 data symbols stays
-    structurally impossible (`java.md` §7; `rust.md` §7 `Indifferent`).
+    structurally impossible (`java.md` §7; `codec_base64/_dev/rust.md` §7
+    `Indifferent`).
     `TOLERANT` also **accepts non-zero trailing bits** in the final symbol
-    (Rust `Indifferent` with `decode_allow_trailing_bits=true`); `STRICT`
-    rejects them as `INVALID_SYMBOL`. The two modes therefore differ on
-    canonicality, not only on padding (`rust.md` §7; `python.md` §7).
+    (the `base64` crate's `Indifferent` with `decode_allow_trailing_bits=true`);
+    `STRICT` rejects them as `INVALID_SYMBOL`. The two modes therefore differ on
+    canonicality, not only on padding (`codec_base64/_dev/rust.md` §7;
+    `python.md` §7).
   - Unlike `codec_base64`, there is **no third `RequireNone` state**. A caller
     who must reject `=` scans for the padding symbol before choosing
     `TOLERANT`; `STRICT` is the complement and the default. Python's
@@ -586,13 +602,13 @@ Tests:
 
 Implementation status: not implemented
 
-Rationale: MojoAkku uses a two-value PaddingMode because Rust's
-`Indifferent`/`RequireCanonical` pair and Commons Codec's
+Rationale: MojoAkku uses a two-value PaddingMode because the `base64`
+crate's `Indifferent`/`RequireCanonical` pair and Commons Codec's
 `LENIENT`/`STRICT` `CodecPolicy` show that padding/canonicality is a decode
 policy distinct from the encode policy, while Java shows the tolerant mode is
-useful for real-world interop (`rust.md` §7, §12; `java.md` §4, §7). Go's and
-the dedicated Rust crate's absence of any canonicality check is the rejected
-gap (`go.md` §10, §11; `rust.md` §7, §11).
+useful for real-world interop (`codec_base64/_dev/rust.md` §7; `java.md` §4,
+§7). Go's and the dedicated Rust `base32` crate's absence of any canonicality
+check is the rejected gap (`go.md` §10, §11; `rust.md` §7, §11).
 
 ---
 
@@ -1491,7 +1507,8 @@ closed so the Phase 4 review can verify them.
   backlog candidate (see `## Non-Goals`).
 - **The catalogue edge `depends_on: [codec_base64]` is not a code import.**
   `codec_base32` is a leaf that depends only on the Mojo standard library. The
-  catalogue edge is a build-ordering hint; no type or function is imported from
+  catalogue edge is a deliberate build-ordering / name-family marker (the RFC
+  4648 family is built base64-first); no type or function is imported from
   `codec_base64` (see `## Dependencies`).
 - **Decode case policy is uppercase-only, fixed per alphabet.** `B32_STANDARD`
   and `B32_HEX` accept only their uppercase spellings; lowercase is
@@ -1500,9 +1517,10 @@ closed so the Phase 4 review can verify them.
   silent lowercase acceptance and Perl's `uc()` are documented non-copies. A
   three-way case enum is a backlog item, not part of this release.
 - **Padding and canonicality are one decode policy (`PaddingMode`).**
-  `STRICT`/`TOLERANT` folds Python's separate `padded`/`canonical`, Rust's
-  `Indifferent`/`RequireCanonical` and Commons Codec's `LENIENT`/`STRICT` into
-  one named choice; a caller needing "padding forbidden" scans for `=` first.
+  `STRICT`/`TOLERANT` folds Python's `padded`/`canonical`, the `base64` crate's
+  `Indifferent`/`RequireCanonical` (sibling `codec_base64/_dev/rust.md` §7) and
+  Commons Codec's `LENIENT`/`STRICT` into one named choice; a caller needing
+  "padding forbidden" scans for `=` first.
 - **Whitespace tolerance is a policy, not implicit.** `Whitespace.REJECT` is the
   default; `IGNORE` is the explicit opt-in, replacing Go's unconditional
   newline skip and gnulib's pointer-dependent tolerance.
