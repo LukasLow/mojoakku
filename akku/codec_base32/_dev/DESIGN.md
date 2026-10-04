@@ -5,10 +5,10 @@ blocks) and in `__init__.mojo`. This file keeps the developer-facing reasoning:
 status bookkeeping, tests, rationale, reference-API comparisons, non-goals and
 open questions. It is the Phase-11 implementation record: every entry is
 `implemented`, all 15 API files delegate to `_internal/engine.mojo`, and the
-frozen Phase-9 suite is green on 12 of 14 files. Two test files
-(`test_base32_decode.mojo` hex-vector case with the default alphabet, and
-`test_base32_decoded_len.mojo` unpadded decode under STRICT) contain internal
-errors and are blocked for a Phase-9 correction; see `## Open Questions`.
+frozen Phase-9 suite is fully green (**14 test files / 126 test functions
+passed, 0 failed**). Two Phase-9 test-authoring defects were corrected in a
+Phase-9 update and are recorded as resolved (see
+`## Resolved during implementation`); no `## Open Questions` item is blocking.
 -->
 
 # codec_base32 — Design Record
@@ -40,8 +40,9 @@ Every API entry carries a `Status:` field with exactly one of these values:
 All 15 entries in this document are `implemented` and every entry's
 `Implementation status:` is `implemented` (Phase 11). The real bodies live in
 `_internal/engine.mojo`; each public API file delegates to it. `Tests:` names the
-Phase-9 test files; 12 of 14 files are green, 2 files carry internal test bugs
-(see `## Open Questions`).
+Phase-9 test files, all 14 of which are green (126/126), with the two
+test-authoring defects recorded as resolved (see
+`## Resolved during implementation`).
 
 ## Dependencies
 
@@ -488,10 +489,9 @@ parameters for compile-time specialization"). The buch documents scalar
 *parameterized struct type* (`struct Bar[v: Int]`) — which is not the same as
 using a user-struct **value** as a value-parameter type. Whether a user-defined
 struct value is accepted as a value-parameter type is not evidenced by the buch;
-the sibling `codec_base64` library proved in its Phase 7/11 that it works, so
-this design relies on that sibling evidence and records it under
-`## Open Questions`. If Phase 7 finds it unsupported, the fallback is a `UInt8`
-id value parameter plus documented constants.
+the sibling `codec_base64` library proved in its Phase 7/11 that it works, and
+this library's own Phase 7/11 confirmed it, so the `UInt8` id fallback is not
+needed (see `## Resolved during implementation`).
 
 ---
 
@@ -1427,9 +1427,9 @@ sibling MojoAkku library copies.
   `Implementation status:`, `Rationale:`. No field is omitted, even when its
   value is `none` or empty.
 - **Signature is the exact Mojo declaration.** It is copied verbatim from the
-  approved design; Phase 7 stubs it unchanged. The documented `Span[UInt8]`
+  approved design; Phase 7 stubbed it unchanged. The documented `Span[UInt8]`
   spelling means `Span[UInt8, _]` (Mojo 1.x requires the origin parameter); see
-  `## Open Questions`.
+  `## Resolved during implementation`.
 - **Semantics is complete.** It covers parameters/preconditions,
   return/meaning, ownership, and the stream-I/O / flush contract as applicable,
   plus any entry-specific policy (for example the `Alphabet` case policy, the
@@ -1514,51 +1514,30 @@ library (`mojov1/types/collections`; `c.md` §12).
   `DecodeState` state machine, `encoded_len_core`/`decoded_len_core`,
   `encode_all`, `decode_into_core`, `is_valid_core`), so `_internal/` is genuinely
   shared code, not premature factoring.
+- **`_tests/test_base32_decode.mojo` hex vectors — RESOLVED.** The Phase-9
+  `test_decode_hex_vectors` originally called `decode("CO======")` with the
+  default `Alphabet.B32_STANDARD`; `'O'` is not in `A-Z 2-7`, so the
+  implementation correctly raised `INVALID_SYMBOL`. The test was corrected (with
+  the freeze lifted for exactly this assertion) so all six base32hex vectors
+  select `Alphabet.B32_HEX`, mirroring `test_base32_alphabet.mojo`. The
+  implementation was not changed: `decode[Alphabet.B32_HEX]("CO======")` and
+  `decode[Alphabet.B32_HEX]("CPNMUOJ1E8======")` return the expected bytes.
+- **`_tests/test_base32_decoded_len.mojo` unpadded case — RESOLVED.** The
+  Phase-9 `test_is_a_conservative_upper_bound` decoded the unpadded
+  `"MZXW6YTBOI"` under the default `PaddingMode.STRICT`, which correctly raises
+  `INVALID_PADDING` for a partial final quantum without canonical padding. The
+  test was corrected to decode it under `PaddingMode.TOLERANT`, matching the
+  documented policy; the implementation was not changed.
+- **Final Phase-11 result — RESOLVED (0 failing).** With those two frozen-test
+  corrections applied, the suite is **14 test files / 126 test functions passed,
+  0 failed**. No API or implementation file was changed to accommodate a test.
 
 ## Open Questions
 
 Most decisions are closed against the reviewed research and the `mojov1` buch.
-**One item is open and blocks the 0-failing gate**: two frozen Phase-9 test
-files contain internal errors (details below). The implementation is otherwise
-complete and correct.
-
-**Open (blocking Phase 11 gate — needs a Phase-9 test correction, not a design
-change)**
-
-The Phase-9 suite has two defective tests. `_tests/` is frozen for Phase 11, so
-they were neither edited nor worked around; the implementation was proven
-correct against the intended semantics with a scratch check outside `_tests/`.
-
-1. **`_tests/test_base32_decode.mojo` → `test_decode_hex_vectors` fails at its
-   first line.** Line 38 calls `decode("CO======")` with the **default
-   `Alphabet.B32_STANDARD`**. `'C'` is in both alphabets, but `'O'` is *not* in
-   the standard alphabet (`A-Z 2-7`), so the implementation correctly raises
-   `Base32Error(INVALID_SYMBOL, position=1)`. The test's own sibling
-   `test_base32_alphabet.mojo` proves `CO======` requires `Alphabet.B32_HEX`.
-   **Fix:** the whole hex-vector test must pass `[Alphabet.B32_HEX]`, e.g.
-   `decode[Alphabet.B32_HEX]("CO======")`. Evidence that the implementation is
-   correct: the scratch check returned `True` for
-   `decode[Alphabet.B32_HEX]("CO======") == bytes_of("f")` and for
-   `decode[Alphabet.B32_HEX]("CPNMUOJ1E8======") == bytes_of("foobar")`.
-
-2. **`_tests/test_base32_decoded_len.mojo` → `test_is_a_conservative_upper_bound`
-   fails at line 54.** Line 53 sets `unpadded = "MZXW6YTBOI"` and line 54 calls
-   `decode(unpadded)` with the **default `PaddingMode.STRICT`**. Under STRICT a
-   partial final quantum without its canonical padding is `INVALID_PADDING`, so
-   the implementation correctly raises `Base32Error(INVALID_PADDING,
-   position=8)`. The test's own earlier line 47 (the padded `raw`) is correct;
-   only the unpadded sub-case needs `PaddingMode.TOLERANT`. **Fix:**
-   `decode[Alphabet.B32_STANDARD, PaddingMode.TOLERANT, Whitespace.REJECT](
-   unpadded)`. Evidence that the implementation is correct: the scratch check
-   returned length `6` and `bytes_of("foobar")` for that call, and
-   `decoded_len(11)` is `6`.
-
-Both are test-authoring errors, not API or implementation defects: every
-assertion the test *intended* holds once the documented `alphabet` /
-`padding_mode` parameters are supplied. No documented API was weakened, no test
-was edited, and no API file was changed to accommodate a wrong test. Owner:
-Phase-9 re-run for `codec_base32` (two-line/one-call correction and re-record the
-baseline→green transition). Severity: low; no code change to the library.
+**No item remains open**; the two Phase-11 test-authoring defects were corrected
+in a Phase-9 update and moved to `## Resolved during implementation` above. There
+is **no blocking item** for this library.
 
 **Closed**
 
