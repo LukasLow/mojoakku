@@ -29,10 +29,6 @@ struct FormatArgs(Deinitable):
     def count(self) -> Int:
         return len(self._args)
 
-    # _arg — the stored argument at `index` (internal; not public API).
-    def _arg(self, index: Int) -> FormatArg:
-        return self._args[index]
-
 # API-DOCS-START
 # FormatArgs — an ordered, typed argument list for format_template.
 # Signature:

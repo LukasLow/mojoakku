@@ -70,6 +70,15 @@ def format_float(value: Float64, spec: FormatSpec) raises FormatError -> String:
     # --- inf / nan ---
     if is_special_float(value):
         var text = special_float_text(value)
+        # Apply a forced sign to the positive inf/nan forms; -inf keeps its '-'.
+        if text.byte_length() > 0:
+            var ibytes = text.as_bytes()
+            var leading = Int(ibytes[0])
+            if leading != 45:   # not already '-'
+                if spec.sign == SignMode.ALWAYS:
+                    text = "+" + text
+                elif spec.sign == SignMode.SPACE:
+                    text = " " + text
         var align = Int(spec.align._id)
         if align == 0:
             align = 2     # numbers default RIGHT
@@ -89,9 +98,9 @@ def format_float(value: Float64, spec: FormatSpec) raises FormatError -> String:
     if pres == FormatType.FIXED:
         body = format_fixed(value, precision, spec.alt_form)
     elif pres == FormatType.SCIENTIFIC:
-        body = format_scientific(value, precision, False)
+        body = format_scientific(value, precision, False, spec.alt_form)
     else:
-        body = format_scientific(value, precision, True)
+        body = format_scientific(value, precision, True, spec.alt_form)
 
     # The digit routine already carries a '-' for negatives; separate it so the
     # sign logic and padding stay in one place.

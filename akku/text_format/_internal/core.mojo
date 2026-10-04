@@ -5,15 +5,7 @@
 # codepoint-counting, padding, grouping, ASCII and float-digit logic. Nothing
 # here is public API: the public surface is the top-level *.mojo entries.
 
-from std.format import repr
 from std.math import floor, log10, round
-
-from .format_arg import FormatArg
-
-
-# codepoint_count — the number of codepoints in borrowed text.
-def codepoint_count(text: StringSpan) -> Int:
-    return text.count_codepoints()
 
 
 # byte_offset_for_codepoints — the byte offset of the first `n` codepoints, or
@@ -205,14 +197,16 @@ def format_fixed(value: Float64, precision: Int, force_point: Bool) -> String:
 
 # format_scientific — `value` in scientific notation with `precision` digits
 # after the point, rounded half-to-even. The exponent uses at least two digits.
+# `force_point` keeps a trailing decimal point when `precision` is 0 (the same
+# alternate-form rule as format_fixed).
 def format_scientific(
-    value: Float64, precision: Int, upper: Bool
+    value: Float64, precision: Int, upper: Bool, force_point: Bool
 ) -> String:
     var e_char = "e"
     if upper:
         e_char = "E"
     if value == 0.0:
-        var zero = format_fixed(0.0, precision, False)
+        var zero = format_fixed(0.0, precision, force_point)
         return zero + e_char + "+00"
     var negative = value < 0.0
     var mag = value
@@ -227,7 +221,7 @@ def format_scientific(
     elif mantissa >= 10.0:
         mantissa /= 10.0
         exponent += 1
-    var mant = format_fixed(mantissa, precision, False)
+    var mant = format_fixed(mantissa, precision, force_point)
     var sign = "+"
     var abs_exp = exponent
     if exponent < 0:
@@ -268,15 +262,3 @@ def special_float_text(value: Float64) -> String:
     if value < 0.0:
         return "-inf"
     return "inf"
-
-
-# write_repr_of_arg — append the repr form of a stored argument.
-def write_repr_of_arg(mut writer: Some[Writer], arg: FormatArg):
-    if arg.kind() == 0:
-        writer.write(repr(arg.as_int()))
-    elif arg.kind() == 1:
-        writer.write(repr(arg.as_float()))
-    elif arg.kind() == 2:
-        writer.write(repr(arg.text()))
-    else:
-        writer.write(repr(arg.as_bool()))

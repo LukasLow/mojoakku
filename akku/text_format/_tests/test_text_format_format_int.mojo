@@ -94,6 +94,16 @@ def test_format_int_grouping_with_binary_is_invalid_spec() raises:
     assert_equal(kind_of_int(",b", 5), FormatErrorKind.INVALID_SPEC)
 
 
+def test_format_int_alt_form_with_char_is_invalid_spec() raises:
+    # '#' (alternate form) is valid for the radix presentations only.
+    assert_equal(kind_of_int("#c", 65), FormatErrorKind.INVALID_SPEC)
+
+
+def test_format_int_alt_form_with_decimal_is_invalid_spec() raises:
+    # '#' on decimal has no prefix and is an incompatible combination.
+    assert_equal(kind_of_int("#d", 42), FormatErrorKind.INVALID_SPEC)
+
+
 def test_format_int_returns_owned_independent_string() raises:
     # The returned String is independent of the spec/arguments.
     var spec = parse_format_spec("d")

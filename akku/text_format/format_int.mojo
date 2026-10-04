@@ -74,6 +74,19 @@ def format_int(value: Int, spec: FormatSpec) raises FormatError -> String:
             String("grouping is not valid for this presentation"),
         )
 
+    # Alternate form (`#`) is valid for the radix presentations only.
+    if spec.alt_form:
+        if (
+            pres != FormatType.BINARY
+            and pres != FormatType.OCTAL
+            and pres != FormatType.LOWER_HEX
+            and pres != FormatType.UPPER_HEX
+        ):
+            raise FormatError(
+                FormatErrorKind.INVALID_SPEC, 0,
+                String("alternate form is not valid for this presentation"),
+            )
+
     # CHAR: the value is a Unicode scalar.
     if pres == FormatType.CHAR:
         if value < 0 or value > 0x10FFFF or (value >= 0xD800 and value <= 0xDFFF):

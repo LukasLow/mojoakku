@@ -72,6 +72,11 @@ def test_format_float_alternate_form_keeps_decimal_point() raises:
     assert_equal(format_float(3.0, parse_format_spec("#.0f")), "3.")
 
 
+def test_format_float_scientific_alternate_form_keeps_decimal_point() raises:
+    # alt_form forces the trailing decimal point in scientific notation too.
+    assert_equal(format_float(1.0, parse_format_spec("#.0e")), "1.e+00")
+
+
 def test_format_float_inf_nan_are_lowercase_and_f_aliases_f() raises:
     var pos_inf = inf[DType.float64]()
     var not_a_number = nan[DType.float64]()
@@ -80,6 +85,11 @@ def test_format_float_inf_nan_are_lowercase_and_f_aliases_f() raises:
     # 'F' is an alias of 'f': it must NOT upper-case inf/nan.
     assert_equal(format_float(pos_inf, parse_format_spec("F")), "inf")
     assert_equal(format_float(not_a_number, parse_format_spec("F")), "nan")
+    # Sign flags apply to inf/nan: '+' forces a sign, space uses one, and the
+    # negative form keeps its '-'.
+    assert_equal(format_float(pos_inf, parse_format_spec("+")), "+inf")
+    assert_equal(format_float(pos_inf, parse_format_spec(" ")), " inf")
+    assert_equal(format_float(-pos_inf, parse_format_spec("")), "-inf")
 
 
 def test_format_float_grouping_is_invalid_spec() raises:
