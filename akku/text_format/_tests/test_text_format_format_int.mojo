@@ -88,6 +88,12 @@ def test_format_int_float_presentation_is_type_mismatch() raises:
     assert_equal(kind_of_int("f", 1), FormatErrorKind.TYPE_MISMATCH)
 
 
+def test_format_int_grouping_with_binary_is_invalid_spec() raises:
+    # grouping is valid for DEFAULT/DECIMAL only; ',' on a binary presentation is
+    # an incompatible combination.
+    assert_equal(kind_of_int(",b", 5), FormatErrorKind.INVALID_SPEC)
+
+
 def test_format_int_returns_owned_independent_string() raises:
     # The returned String is independent of the spec/arguments.
     var spec = parse_format_spec("d")

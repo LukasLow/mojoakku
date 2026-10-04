@@ -107,5 +107,18 @@ def test_format_template_type_mismatch() raises:
     assert_equal(kind_of("{:x}", args), FormatErrorKind.TYPE_MISMATCH)
 
 
+def test_format_template_unknown_conversion_is_malformed() raises:
+    # Only !s and !r are documented; an unknown conversion is MALFORMED_TEMPLATE.
+    var args = FormatArgs()
+    args.push_string(String("x"))
+    assert_equal(kind_of("{!a}", args), FormatErrorKind.MALFORMED_TEMPLATE)
+
+
+def test_format_template_unknown_spec_letter_is_invalid_spec() raises:
+    var args = FormatArgs()
+    args.push_int(1)
+    assert_equal(kind_of("{:q}", args), FormatErrorKind.INVALID_SPEC)
+
+
 def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()

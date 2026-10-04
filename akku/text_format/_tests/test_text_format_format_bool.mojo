@@ -47,6 +47,11 @@ def test_format_bool_sign_is_type_mismatch() raises:
     assert_equal(kind_of_bool("+", True), FormatErrorKind.TYPE_MISMATCH)
 
 
+def test_format_bool_sign_aware_alignment_is_type_mismatch() raises:
+    # SIGN_AWARE ('=') is valid only for numbers.
+    assert_equal(kind_of_bool("=5", True), FormatErrorKind.TYPE_MISMATCH)
+
+
 def test_format_bool_result_is_owned() raises:
     var spec = parse_format_spec("")
     var out = format_bool(True, spec)

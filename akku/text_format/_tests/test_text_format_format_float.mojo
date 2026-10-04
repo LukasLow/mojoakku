@@ -48,7 +48,8 @@ def test_format_float_scientific() raises:
 def test_format_float_rounds_half_to_even() raises:
     # 0.125 is an exact tie at 2 digits; half-to-even picks 0.12.
     assert_equal(format_float(0.125, parse_format_spec(".2f")), "0.12")
-    # 0.135 rounds to 0.14 (the even last digit, not a tie artifact).
+    # 0.375 is an exact tie at 2 digits; half-to-even picks the even last digit,
+    # giving 0.38.
     assert_equal(format_float(0.375, parse_format_spec(".2f")), "0.38")
 
 
@@ -83,6 +84,11 @@ def test_format_float_inf_nan_are_lowercase_and_f_aliases_f() raises:
 
 def test_format_float_grouping_is_invalid_spec() raises:
     assert_equal(kind_of_float(",f", 1.0), FormatErrorKind.INVALID_SPEC)
+
+
+def test_format_float_precision_on_default_is_type_mismatch() raises:
+    # precision is not applicable to the DEFAULT presentation.
+    assert_equal(kind_of_float(".2", 1.0), FormatErrorKind.TYPE_MISMATCH)
 
 
 def test_format_float_int_presentation_is_type_mismatch() raises:

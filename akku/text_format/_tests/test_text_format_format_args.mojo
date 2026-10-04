@@ -6,7 +6,7 @@
 # of the caller's buffer; the struct is move-only (not implicitly copyable).
 
 from std.testing import assert_equal, assert_true, assert_false, TestSuite
-from akku.text_format import FormatArgs
+from akku.text_format import FormatArgs, format_template
 
 
 def test_format_args_starts_empty() raises:
@@ -36,11 +36,13 @@ def test_format_args_accepts_all_four_kinds() raises:
 
 
 def test_format_args_string_is_owned_by_list() raises:
+    # The pushed String is owned by the list (the caller transfers it with `^`),
+    # and the list still renders its value.
     var args = FormatArgs()
     var text = String("owned")
     args.push_string(text^)
-    # The caller no longer holds the moved String; the list retains its value.
     assert_equal(args.count(), 1)
+    assert_equal(format_template("{}", args), "owned")
 
 
 def test_format_args_is_move_only() raises:

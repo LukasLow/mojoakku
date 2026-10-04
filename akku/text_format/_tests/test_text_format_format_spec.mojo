@@ -13,6 +13,7 @@ from akku.text_format import (
     FormatType,
     Grouping,
     SignMode,
+    format_int,
 )
 
 
@@ -45,11 +46,12 @@ def test_format_spec_full_constructor_sets_fields() raises:
     assert_true(spec.presentation == FormatType.LOWER_HEX)
 
 
-def test_format_spec_negative_width_behaves_as_zero() raises:
+def test_format_spec_negative_width_renders_without_padding() raises:
+    # A negative width is a caller error treated as 0 (no minimum width), so a
+    # value shorter than every field still renders unpadded.
     var spec = FormatSpec()
     spec.width = -5
-    # A negative width is a caller error treated as 0 (no minimum width).
-    assert_true(spec.width <= 0)
+    assert_equal(format_int(42, spec), "42")
 
 
 def test_format_spec_is_copyable_and_equatable() raises:
@@ -61,10 +63,11 @@ def test_format_spec_is_copyable_and_equatable() raises:
 
 
 def test_format_spec_writable_renders_grammar_form() raises:
-    # The docs promise print(spec) renders a grammar-like form; this exercises
-    # the Writable path (not yet implemented in the red phase).
+    # The docs promise print(spec) renders a grammar-like form, so at least one
+    # field marker (e.g. "width") must appear (not merely a non-empty string).
     var spec = FormatSpec()
-    assert_true(String(spec).byte_length() > 0)
+    var text = String(spec)
+    assert_true("width" in text)
 
 
 def main() raises:

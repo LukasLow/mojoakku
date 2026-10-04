@@ -12,6 +12,10 @@ per-file classification is produced by the equivalent baseline runner:
 Expected red-phase state: every file fails with the stub abort
 "MojoAkku: this API is not yet implemented"; no compile/import errors.
 
+Updated after the Phase-10 review fixes (behavioural negative-width test,
+owned-String render assertion, added error-surface sub-cases, f/F comment,
+stricter Writable assertion).
+
 --- run_baseline.sh output ---
 == mojo run -I . akku/text_format/_tests/test_text_format_alignment.mojo
    result: FAIL (exit 1) [stub abort] ABORT: /workspace/.worktrees/text-format/akku/text_format/parse_format_spec.mojo:9:10: MojoAkku: this API is not yet implemented
@@ -28,7 +32,7 @@ Expected red-phase state: every file fails with the stub abort
 == mojo run -I . akku/text_format/_tests/test_text_format_format_int.mojo
    result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/parse_format_spec.mojo:9:10: MojoAkku: this API is not yet implemented
 == mojo run -I . akku/text_format/_tests/test_text_format_format_spec.mojo
-   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/format_spec.mojo:58:14: MojoAkku: this API is not yet implemented
+   result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/format_int.mojo:9:10: MojoAkku: this API is not yet implemented
 == mojo run -I . akku/text_format/_tests/test_text_format_format_string.mojo
    result: FAIL (exit 1) [stub abort] ABORT: ./akku/text_format/parse_format_spec.mojo:9:10: MojoAkku: this API is not yet implemented
 == mojo run -I . akku/text_format/_tests/test_text_format_format_template.mojo
@@ -46,7 +50,7 @@ Expected red-phase state: every file fails with the stub abort
 --------
 baseline: 15 files, 0 passed, 15 failed
   failures: 15 stub abort, 0 compile/import error, 0 other
-note: the suite holds 106 test functions across 15 files. A stub
+note: the suite holds 112 test functions across 15 files. A stub
       `abort` stops the process on its first call, so no per-test
       passed/failed count is reachable in the red phase; the file count
       (15) is the honest measure.

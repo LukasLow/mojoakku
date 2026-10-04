@@ -74,6 +74,11 @@ def test_format_string_zero_pad_is_type_mismatch() raises:
     assert_equal(kind_of_string("08s", "x"), FormatErrorKind.TYPE_MISMATCH)
 
 
+def test_format_string_sign_aware_alignment_is_type_mismatch() raises:
+    # SIGN_AWARE ('=') is valid only for numbers.
+    assert_equal(kind_of_string("=5s", "x"), FormatErrorKind.TYPE_MISMATCH)
+
+
 def test_format_string_numeric_presentation_is_type_mismatch() raises:
     assert_equal(kind_of_string("d", "x"), FormatErrorKind.TYPE_MISMATCH)
 
